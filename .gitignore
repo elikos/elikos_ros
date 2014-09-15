@@ -26,3 +26,11 @@
 *.exe
 *.out
 *.app
+
+#ROS
+build/
+bin/
+lib/
+devel/
+.catkin_workspace/
+CATKIN_IGNORE
