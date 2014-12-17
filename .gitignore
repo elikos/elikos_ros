@@ -27,6 +27,9 @@
 *.out
 *.app
 
+# Open files meta-file (example.extension~)
+*.*~
+
 #ROS
 build/
 bin/
