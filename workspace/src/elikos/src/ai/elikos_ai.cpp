@@ -5,6 +5,7 @@
 #include <cmath>
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #define PI 3.14159265
 
@@ -19,6 +20,16 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh;
     ros::Publisher marker_pub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     ros::Rate r(30);    //10 hz
+    geometry_msgs::PoseStamped pose;
+    pose.header.frame_id = "/frame_elikos";
+    pose.header.stamp = ros::Time::now();
+    pose.pose.position.x = 0.0;
+    pose.pose.position.y = 0.0;
+    pose.pose.position.z = 1.0;
+    pose.pose.orientation.x = 0.0;
+    pose.pose.orientation.y = 0.0;
+    pose.pose.orientation.z = 0.0;
+    pose.pose.orientation.w = 0.0;
 
     float angle = 0.0;
 
@@ -48,6 +59,7 @@ visualization_msgs::Marker getMarker(float angle){
     marker.ns = "basic_shapes";
     marker.id = 0;
     marker.type = visualization_msgs::Marker::ARROW;
+    //Lemniscate of Gerono
     marker.pose.position.x = cos(angle);
     marker.pose.position.y = sin(2*angle)/2;
     marker.pose.position.z = 0.0;
