@@ -102,9 +102,9 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
-add_executable( elikos_ai src/ai/elikos_ai.cpp )
-add_executable( elikos_localization src/localization/elikos_localization.cpp )
-add_executable( elikos_robotdetect src/robotdetect/elikos_robotdetect.cpp )
+add_executable( elikos_ai src/ai.cpp )
+add_executable( elikos_localization src/localization.cpp )
+add_executable( elikos_robotdetect src/robotdetect.cpp )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
