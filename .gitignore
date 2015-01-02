@@ -29,11 +29,3 @@
 
 # Open files meta-file (example.extension~)
 *.*~
-
-#ROS
-build/
-bin/
-lib/
-devel/
-.catkin_workspace/
-CATKIN_IGNORE
