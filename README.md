@@ -1,7 +1,7 @@
-ROS
+Elikos_ROS
 ===
 
-Repository containing the ROS workspace that will be running on the Quad
+Package ROS "Elikos_ROS" contenant les différents modules servant à la localisation, à la détection d'obstacles et de cibles et à l'autonomie du quadricoptère.
 
 
 ##Wut is dis
