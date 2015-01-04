@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>elikos</name>
+  <name>elikos_ros</name>
   <version>0.0.0</version>
   <description>The Élikos package, containing localization, robot-detection and IA programs (nodes) for the Élikos Société technique de Montréal</description>
 
