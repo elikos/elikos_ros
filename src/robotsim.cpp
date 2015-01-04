@@ -10,7 +10,6 @@ using std::vector;
 
 int main(int argc, char** argv){
 	const int freq = 30;
-	uint32_t count = 0;
 	ros::init(argc, argv, "robotsim_tf_broadcaster");
 	ros::NodeHandle node;
 	ros::Rate r(freq);
@@ -23,7 +22,6 @@ int main(int argc, char** argv){
 	}
 
 	while(ros::ok()) {
-		count++;
 		for (int i = 0; i < 10; i++){
 			robot[i].advance(r.expectedCycleTime());
 			br.sendTransform(tf::StampedTransform(robot[i].getTransform(), ros::Time::now(), "world", robot[i].getName()));
