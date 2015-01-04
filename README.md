@@ -11,17 +11,18 @@ Le but ultime de ce repo est de pouvoir le cloner directement sur le board de de
 
 ##Prérequis
 
-Comprendre l'utilisation de ROS (catkin, package, node, etc.): http://wiki.ros.org/ROS/Tutorials
-Comprendre l'utilisation de Git (branch, fork, commit, pull/push request)
+  - Comprendre l'utilisation de ROS (catkin, package, node, etc.): http://wiki.ros.org/ROS/Tutorials
+  - Comprendre l'utilisation de Git (branch, fork, commit, pull/push request)
 
 ##Méthodologie
 
-  - Faire un **fork** du repo
-  - Travailler sur son fork
-  - **Tester** son fork sur **Ninon** et sur le board
-  - Faire un **Pull request**
-  - ???
-  - Profit
+  1. Faire un **fork** du repo et checkout dans son workspace
+	1. Set upstream au repo de l'équipe
+		
+		`git remote add upstream git@github.com:elikos/elikos_ros.git`
+  2. Travailler sur son fork
+  3. **Tester** son fork sur **Ninon** et sur le board
+  4. Faire un **Pull request**
   
 Cette façons de faire est pour s'assurer que seul le code **nécessaire** se retrouve sur le quad.
 
