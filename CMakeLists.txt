@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(elikos)
+project(elikos_ros)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
 find_package(catkin REQUIRED)
-find_package(catkin REQUIRED COMPONENTS roscpp)
+find_package(catkin REQUIRED COMPONENTS roscpp tf)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -95,29 +95,32 @@ catkin_package(
 include_directories( include ${catkin_INCLUDE_DIRS} )
 
 ## Declare a cpp library
-# add_library(elikos
-#   src/${PROJECT_NAME}/elikos.cpp
-# )
+add_library(elikos_ros
+  src/lib/GroundRobot.cpp
+)
 
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
-add_executable( elikos_ai src/ai.cpp )
-add_executable( elikos_localization src/localization.cpp )
-add_executable( elikos_robotdetect src/robotdetect.cpp )
+add_executable( ai src/ai.cpp )
+add_executable( localization src/localization.cpp )
+add_executable( robotdetect src/robotdetect.cpp )
+add_executable( robotsim src/robotsim.cpp )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(elikos_node elikos_generate_messages_cpp)
+#add_dependencies(robotsim elikos_ros)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(elikos_node
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries( elikos_ai ${catkin_LIBRARIES})
-target_link_libraries( elikos_localization ${catkin_LIBRARIES})
-target_link_libraries( elikos_robotdetect ${catkin_LIBRARIES})
+target_link_libraries( ai ${catkin_LIBRARIES})
+target_link_libraries( localization ${catkin_LIBRARIES})
+target_link_libraries( robotdetect ${catkin_LIBRARIES})
+target_link_libraries( robotsim elikos_ros ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
