@@ -1,0 +1,4 @@
+<launch>
+    <node name="simulator" pkg="elikos_ros" type="robotsim" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_ros)/launch/simulation.rviz" />
+</launch>
