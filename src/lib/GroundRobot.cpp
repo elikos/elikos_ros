@@ -44,11 +44,11 @@ tf::Transform GroundRobot::getTransform(){
 
 void GroundRobot::advance(ros::Duration cycleTime){
 
-	if ((ros::Time::now()-lastAutoReverse).toSec() > 20.0 && !isSpinning) {
+	if ((ros::Time::now()-lastAutoReverse).toSec() >= 20.0 && !isSpinning) {
 		autoReverse();
 	}
 
-	if ((ros::Time::now()-lastNoise).toSec() > 5.0 && !isSpinning) {
+	if ((ros::Time::now()-lastNoise).toSec() >= 5.0 && !isSpinning) {
 		noise();
 	}
 

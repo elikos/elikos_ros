@@ -37,4 +37,4 @@ private:
 	double limitTurn(double& angle, double angularSpeed, double cycleDuration);
 };
 
-#endif /* GROUNDROBOT_H_ */
+#endif /* __GROUNDROBOT_H_ */
