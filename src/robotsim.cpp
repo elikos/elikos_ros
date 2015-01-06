@@ -13,22 +13,23 @@ double collisionAngle(tf::Vector3 v, double yaw);
 void setVector(tf::Vector3& v, double x, double y, double z);
 
 int main(int argc, char** argv){
-	int simSpeed = 1.0;
+	double simSpeed = 1.0;
+	int nTrgtRobots = 10;
 	ros::init(argc, argv, "robotsim_tf_broadcaster");
 	ros::NodeHandle node;
 	ros::Rate r(30);
 	std::vector<GroundRobot> robot;
 	tf::TransformBroadcaster br;
 
-	robot.reserve(10);
-	for (int i = 0; i < 10; i++){
-		robot.push_back(GroundRobot(i, simSpeed));
+	robot.reserve(nTrgtRobots);
+	for (int i = 0; i < nTrgtRobots; i++){
+		robot.push_back(GroundRobot(TARGET_ROBOT, nTrgtRobots, i, simSpeed));
 	}
 
 	while(ros::ok()) {
 		// Collision checking
-		for (int i = 0; i < 10; i++){
-			for (int j = 0; j < 10; j++){
+		for (int i = 0; i < nTrgtRobots; i++){
+			for (int j = 0; j < nTrgtRobots; j++){
 				if (i==j) continue;
 				if (checkCollision(robot[i], robot[j])){
 					robot[i].collide();
@@ -36,7 +37,7 @@ int main(int argc, char** argv){
 			}
 		}
 		// Advance robots to next frame and publish tf
-		for (int i = 0; i < 10; i++){
+		for (int i = 0; i < nTrgtRobots; i++){
 			robot[i].advance(r.expectedCycleTime());
 			br.sendTransform(tf::StampedTransform(robot[i].getTransform(), ros::Time::now(), "world", robot[i].getName()));
 		}

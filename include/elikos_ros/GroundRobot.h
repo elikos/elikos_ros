@@ -9,10 +9,19 @@
 #define __GROUNDROBOT_H_
 
 #define PI 3.14159265
+enum robot_type {
+	TARGET_ROBOT,
+	OBSTACLE_ROBOT_RND,
+	OBSTACLE_ROBOT_100CM,
+	OBSTACLE_ROBOT_125CM,
+	OBSTACLE_ROBOT_150CM,
+	OBSTACLE_ROBOT_175CM,
+	OBSTACLE_ROBOT_200CM
+};
 
 class GroundRobot {
 public:
-	GroundRobot(int id, double simulationSpeed);
+	GroundRobot(robot_type type, int nbRobots, int id, double simulationSpeed);
 	~GroundRobot();
 	void advance(ros::Duration cycleTime);
 	void collide();
@@ -20,7 +29,7 @@ public:
 	std::string getName();
 	tf::Transform getTransform();
 private:
-	int robotID;
+	int robotID, robotType, nRobots;
 	std::string robotName;
 	bool isSpinning;
 	double x, y, z, yaw, turnAngle, simSpeed;

@@ -9,9 +9,11 @@
 #include <tf/tf.h>
 #include <elikos_ros/GroundRobot.h>
 
-GroundRobot::GroundRobot(int id, double simulationSpeed){
+GroundRobot::GroundRobot(robot_type type, int nbRobots, int id, double simulationSpeed){
 	robotID = id;
+	robotType = type;
 	simSpeed = simulationSpeed;
+	nRobots = nbRobots;
 	setStartingPose();
 	setName();
 	lastAutoReverse = ros::Time::now();
@@ -22,16 +24,32 @@ GroundRobot::GroundRobot(int id, double simulationSpeed){
 GroundRobot::~GroundRobot(){};
 
 void GroundRobot::setStartingPose(){
-	x = (5/PI)*cos(robotID*PI/5);
-	y = (5/PI)*sin(robotID*PI/5);
-	z = 0;
-	yaw = robotID*PI/5;
+	switch (robotType){
+	case TARGET_ROBOT:
+		x = (nRobots/(2*PI))*cos(robotID*(2*PI/nRobots));
+		y = (nRobots/(2*PI))*sin(robotID*(2*PI/nRobots));
+		z = 0;
+		yaw = robotID*2*PI/nRobots;
+		break;
+	default:
+		break;
+	}
+
 	refreshTransform();
 }
 
 void GroundRobot::setName(){
 	std::stringstream ss;
-	ss << "robot" << robotID;
+	std::string prefix;
+	switch (robotType){
+	case TARGET_ROBOT:
+		prefix = "trgtRobot";
+		break;
+	default:
+		prefix = "obsRobot";
+		break;
+	}
+	ss << prefix << robotID;
 	robotName = ss.str();
 }
 
