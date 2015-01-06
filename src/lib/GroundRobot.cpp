@@ -32,6 +32,10 @@ void GroundRobot::setStartingPose(){
 		yaw = robotID*2*PI/nRobots;
 		break;
 	default:
+		x = 5*cos(robotID*(2*PI/nRobots));
+		y = 5*sin(robotID*(2*PI/nRobots));
+		z = 0;
+		yaw = atan2(-x, y);
 		break;
 	}
 
@@ -62,24 +66,33 @@ tf::Transform GroundRobot::getTransform(){
 }
 
 void GroundRobot::advance(ros::Duration cycleTime){
+	if (robotType == TARGET_ROBOT) {
+		if ((ros::Time::now()-lastAutoReverse).toSec() >= 20.0/simSpeed && !isSpinning) {
+			autoReverse();
+		}
 
-	if ((ros::Time::now()-lastAutoReverse).toSec() >= 20.0/simSpeed && !isSpinning) {
-		autoReverse();
-	}
+		if ((ros::Time::now()-lastNoise).toSec() >= 5.0/simSpeed && !isSpinning) {
+			noise();
+		}
 
-	if ((ros::Time::now()-lastNoise).toSec() >= 5.0/simSpeed && !isSpinning) {
-		noise();
-	}
+		if (!isSpinning){
+			x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
+			y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
+		}
 
-	if (!isSpinning){
-		x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
-		y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
-	}
-
-	if (turnAngle) {
-		yaw += limitTurn(turnAngle, (PI/2.456) * simSpeed, cycleTime.toSec());
+		if (turnAngle) {
+			yaw += limitTurn(turnAngle, (PI/2.456) * simSpeed, cycleTime.toSec());
+		} else {
+			isSpinning = false;
+		}
 	} else {
-		isSpinning = false;
+		if (!isStopped){
+			x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
+			y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
+			yaw = atan2(-x, y);
+		} else {
+			isStopped = false;
+		}
 	}
 
 	refreshTransform();
@@ -106,8 +119,11 @@ void GroundRobot::touch(){
 }
 
 void GroundRobot::collide(){
-	if (!isSpinning){
-		reverse();
+	switch (robotType){
+	case TARGET_ROBOT: if (!isSpinning) reverse();
+	break;
+	default: isStopped = true;
+	break;
 	}
 }
 

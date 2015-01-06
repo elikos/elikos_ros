@@ -31,7 +31,7 @@ public:
 private:
 	int robotID, robotType, nRobots;
 	std::string robotName;
-	bool isSpinning;
+	bool isSpinning, isStopped;
 	double x, y, z, yaw, turnAngle, simSpeed;
 	tf::Transform t;
 	tf::Vector3 v;

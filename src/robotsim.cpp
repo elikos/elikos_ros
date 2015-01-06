@@ -15,21 +15,26 @@ void setVector(tf::Vector3& v, double x, double y, double z);
 int main(int argc, char** argv){
 	double simSpeed = 1.0;
 	int nTrgtRobots = 10;
+	int nObsRobots = 4;
+	int totalRobots = nTrgtRobots + nObsRobots;
 	ros::init(argc, argv, "robotsim_tf_broadcaster");
 	ros::NodeHandle node;
 	ros::Rate r(30);
 	std::vector<GroundRobot> robot;
 	tf::TransformBroadcaster br;
 
-	robot.reserve(nTrgtRobots);
+	robot.reserve(totalRobots);
 	for (int i = 0; i < nTrgtRobots; i++){
 		robot.push_back(GroundRobot(TARGET_ROBOT, nTrgtRobots, i, simSpeed));
+	}
+	for (int i = 0; i < nObsRobots; i++){
+		robot.push_back(GroundRobot(OBSTACLE_ROBOT_RND, nObsRobots, i, simSpeed));
 	}
 
 	while(ros::ok()) {
 		// Collision checking
-		for (int i = 0; i < nTrgtRobots; i++){
-			for (int j = 0; j < nTrgtRobots; j++){
+		for (int i = 0; i < (totalRobots); i++){
+			for (int j = 0; j < totalRobots; j++){
 				if (i==j) continue;
 				if (checkCollision(robot[i], robot[j])){
 					robot[i].collide();
@@ -37,7 +42,7 @@ int main(int argc, char** argv){
 			}
 		}
 		// Advance robots to next frame and publish tf
-		for (int i = 0; i < nTrgtRobots; i++){
+		for (int i = 0; i < totalRobots; i++){
 			robot[i].advance(r.expectedCycleTime());
 			br.sendTransform(tf::StampedTransform(robot[i].getTransform(), ros::Time::now(), "world", robot[i].getName()));
 		}
