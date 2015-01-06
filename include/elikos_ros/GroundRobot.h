@@ -9,6 +9,7 @@
 #define __GROUNDROBOT_H_
 
 #define PI 3.14159265
+
 enum robot_type {
 	TARGET_ROBOT,
 	OBSTACLE_ROBOT_RND,
@@ -19,6 +20,8 @@ enum robot_type {
 	OBSTACLE_ROBOT_200CM
 };
 
+enum robot_color {RED, GREEN, BLUE, WHITE};
+
 class GroundRobot {
 public:
 	GroundRobot(robot_type type, int nbRobots, int id, double simulationSpeed);
@@ -28,8 +31,12 @@ public:
 	void touch();
 	std::string getName();
 	tf::Transform getTransform();
+	int getID();
+	std::string getType();
+	int getTypeID();
+	int getColor();
 private:
-	int robotID, robotType, nRobots;
+	int robotID, robotType, nRobots, color;
 	std::string robotName;
 	bool isSpinning, isStopped;
 	double x, y, z, yaw, turnAngle, simSpeed;
@@ -42,6 +49,7 @@ private:
 	void noise();
 	void setStartingPose();
 	void setName();
+	void setColor();
 	void refreshTransform();
 	double limitTurn(double& angle, double angularSpeed, double cycleDuration);
 };

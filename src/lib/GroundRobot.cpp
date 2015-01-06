@@ -16,6 +16,7 @@ GroundRobot::GroundRobot(robot_type type, int nbRobots, int id, double simulatio
 	nRobots = nbRobots;
 	setStartingPose();
 	setName();
+	setColor();
 	lastAutoReverse = ros::Time::now();
 	lastNoise = ros::Time::now();
 	srand(time(NULL));
@@ -57,12 +58,46 @@ void GroundRobot::setName(){
 	robotName = ss.str();
 }
 
+void GroundRobot::setColor(){
+	switch (robotType){
+	case TARGET_ROBOT:
+		color = robotID%2 ? RED : GREEN;
+		break;
+	default:
+		color = WHITE;
+		break;
+	}
+}
+
 std::string GroundRobot::getName(){
 	return robotName;
 }
 
 tf::Transform GroundRobot::getTransform(){
 	return t;
+}
+
+int GroundRobot::getID(){
+	return robotID;
+}
+
+int GroundRobot::getColor(){
+	return color;
+}
+
+std::string GroundRobot::getType(){
+	switch (robotType){
+		case TARGET_ROBOT:
+			return "trgtRobot";
+			break;
+		default:
+			return "obsRobot";
+			break;
+		}
+}
+
+int GroundRobot::getTypeID(){
+	return robotType;
 }
 
 void GroundRobot::advance(ros::Duration cycleTime){
@@ -75,21 +110,22 @@ void GroundRobot::advance(ros::Duration cycleTime){
 			noise();
 		}
 
-		if (!isSpinning){
-			x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
-			y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
-		}
-
 		if (turnAngle) {
 			yaw += limitTurn(turnAngle, (PI/2.456) * simSpeed, cycleTime.toSec());
 		} else {
 			isSpinning = false;
 		}
-	} else {
-		if (!isStopped){
+
+		if (!isSpinning){
 			x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
 			y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
+		}
+
+	} else {
+		if (!isStopped){
 			yaw = atan2(-x, y);
+			x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
+			y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
 		} else {
 			isStopped = false;
 		}
