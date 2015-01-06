@@ -12,7 +12,7 @@
 
 class GroundRobot {
 public:
-	GroundRobot(int id);
+	GroundRobot(int id, double simulationSpeed);
 	~GroundRobot();
 	void advance(ros::Duration cycleTime);
 	void collide();
@@ -23,7 +23,7 @@ private:
 	int robotID;
 	std::string robotName;
 	bool isSpinning;
-	double x, y, z, yaw, turnAngle;
+	double x, y, z, yaw, turnAngle, simSpeed;
 	tf::Transform t;
 	tf::Vector3 v;
 	tf::Quaternion q;

@@ -13,16 +13,16 @@ double collisionAngle(tf::Vector3 v, double yaw);
 void setVector(tf::Vector3& v, double x, double y, double z);
 
 int main(int argc, char** argv){
-	const int freq = 30;
+	int simSpeed = 1.0;
 	ros::init(argc, argv, "robotsim_tf_broadcaster");
 	ros::NodeHandle node;
-	ros::Rate r(freq);
+	ros::Rate r(30);
 	std::vector<GroundRobot> robot;
 	tf::TransformBroadcaster br;
 
 	robot.reserve(10);
 	for (int i = 0; i < 10; i++){
-		robot.push_back(GroundRobot(i));
+		robot.push_back(GroundRobot(i, simSpeed));
 	}
 
 	while(ros::ok()) {

@@ -9,8 +9,9 @@
 #include <tf/tf.h>
 #include <elikos_ros/GroundRobot.h>
 
-GroundRobot::GroundRobot(int id){
+GroundRobot::GroundRobot(int id, double simulationSpeed){
 	robotID = id;
+	simSpeed = simulationSpeed;
 	setStartingPose();
 	setName();
 	lastAutoReverse = ros::Time::now();
@@ -44,21 +45,21 @@ tf::Transform GroundRobot::getTransform(){
 
 void GroundRobot::advance(ros::Duration cycleTime){
 
-	if ((ros::Time::now()-lastAutoReverse).toSec() >= 20.0 && !isSpinning) {
+	if ((ros::Time::now()-lastAutoReverse).toSec() >= 20.0/simSpeed && !isSpinning) {
 		autoReverse();
 	}
 
-	if ((ros::Time::now()-lastNoise).toSec() >= 5.0 && !isSpinning) {
+	if ((ros::Time::now()-lastNoise).toSec() >= 5.0/simSpeed && !isSpinning) {
 		noise();
 	}
 
 	if (!isSpinning){
-		x += 0.33 * cycleTime.toSec() * cos(yaw);
-		y += 0.33 * cycleTime.toSec() * sin(yaw);
+		x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
+		y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
 	}
 
 	if (turnAngle) {
-		yaw += limitTurn(turnAngle, (PI/2.456), cycleTime.toSec());
+		yaw += limitTurn(turnAngle, (PI/2.456) * simSpeed, cycleTime.toSec());
 	} else {
 		isSpinning = false;
 	}
