@@ -105,7 +105,7 @@ add_library(elikos_ros
 add_executable( ai src/ai.cpp )
 add_executable( localization src/localization.cpp )
 add_executable( robotdetect src/robotdetect.cpp )
-add_executable( robotsim src/robotsim.cpp )
+add_executable( robotsim src/simulation/robotsim.cpp )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
