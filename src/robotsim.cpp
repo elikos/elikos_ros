@@ -15,18 +15,18 @@ void setVector(tf::Vector3& v, double x, double y, double z);
 visualization_msgs::Marker getRobotMarker(GroundRobot robot);
 
 int main(int argc, char** argv){
-	// Parameter initialization
-	double simSpeed = 1.0;
-	int nTrgtRobots = 10;
-	int nObsRobots = 4;
-	int totalRobots = nTrgtRobots + nObsRobots;
-
 	// ROS initialization
 	ros::init(argc, argv, "robotsim_tf_broadcaster");
 	ros::NodeHandle node;
-	ros::Rate r(30); // Loop rate (Hz)
-	ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
-	tf::TransformBroadcaster br;
+
+	// Parameter initialization
+	double simSpeed;
+	int nTrgtRobots, nObsRobots, frameRate;
+	node.param<double>("simulation_speed", simSpeed, 1.0);
+	node.param<int>("target_robot_count", nTrgtRobots, 10);
+	node.param<int>("obstacle_robot_count", nObsRobots, 4);
+	node.param<int>("frame_rate", frameRate, 30);
+	int totalRobots = nTrgtRobots + nObsRobots;
 
 	// Robot & marker initialization
 	std::vector<GroundRobot> robot;
@@ -41,6 +41,14 @@ int main(int argc, char** argv){
 		robotMarkers.markers.push_back(getRobotMarker(robot[i]));
 	}
 
+	// Publishers
+	ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
+	tf::TransformBroadcaster br;
+
+	// Loop rate (Hz)
+	ros::Rate r(frameRate);
+
+	// Main Loop
 	while(ros::ok()) {
 		// Collision checking
 		for (int i = 0; i < (totalRobots); i++){
