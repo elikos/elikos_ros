@@ -10,20 +10,36 @@
 
 #define PI 3.14159265
 
+enum robot_type {
+	TARGET_ROBOT,
+	OBSTACLE_ROBOT_RND,
+	OBSTACLE_ROBOT_100CM,
+	OBSTACLE_ROBOT_125CM,
+	OBSTACLE_ROBOT_150CM,
+	OBSTACLE_ROBOT_175CM,
+	OBSTACLE_ROBOT_200CM
+};
+
+enum robot_color {RED, GREEN, BLUE, WHITE};
+
 class GroundRobot {
 public:
-	GroundRobot(int id);
+	GroundRobot(robot_type type, int nbRobots, int id, double simulationSpeed);
 	~GroundRobot();
 	void advance(ros::Duration cycleTime);
 	void collide();
 	void touch();
 	std::string getName();
 	tf::Transform getTransform();
+	int getID();
+	std::string getType();
+	int getTypeID();
+	int getColor();
 private:
-	int robotID;
+	int robotID, robotType, nRobots, color;
 	std::string robotName;
-	bool isSpinning;
-	double x, y, z, yaw, turnAngle;
+	bool isSpinning, isStopped;
+	double x, y, z, yaw, turnAngle, simSpeed;
 	tf::Transform t;
 	tf::Vector3 v;
 	tf::Quaternion q;
@@ -33,6 +49,7 @@ private:
 	void noise();
 	void setStartingPose();
 	void setName();
+	void setColor();
 	void refreshTransform();
 	double limitTurn(double& angle, double angularSpeed, double cycleDuration);
 };

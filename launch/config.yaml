@@ -1,0 +1,4 @@
+simulation_speed: 1.0
+target_robot_count: 10
+obstacle_robot_count: 4
+frame_rate: 30
