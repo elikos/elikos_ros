@@ -110,22 +110,22 @@ void GroundRobot::advance(ros::Duration cycleTime){
 			noise();
 		}
 
+		if (!isSpinning){
+			x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
+			y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
+		}
+
 		if (turnAngle) {
 			yaw += limitTurn(turnAngle, (PI/2.456) * simSpeed, cycleTime.toSec());
 		} else {
 			isSpinning = false;
 		}
 
-		if (!isSpinning){
-			x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
-			y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
-		}
-
 	} else {
 		if (!isStopped){
-			yaw = atan2(-x, y);
 			x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
 			y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
+			yaw = atan2(-x, y) - (0.33 * simSpeed * cycleTime.toSec())/10;
 		} else {
 			isStopped = false;
 		}

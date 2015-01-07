@@ -16,16 +16,16 @@ visualization_msgs::Marker getRobotMarker(GroundRobot robot);
 
 int main(int argc, char** argv){
 	// Parameter initialization
-	double simSpeed = 100.0;
-	int nTrgtRobots = 0;
-	int nObsRobots = 10;
+	double simSpeed = 1.0;
+	int nTrgtRobots = 10;
+	int nObsRobots = 4;
 	int totalRobots = nTrgtRobots + nObsRobots;
 
 	// ROS initialization
 	ros::init(argc, argv, "robotsim_tf_broadcaster");
 	ros::NodeHandle node;
 	ros::Rate r(30); // Loop rate (Hz)
-	ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 1);
+	ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
 	tf::TransformBroadcaster br;
 
 	// Robot & marker initialization
@@ -55,7 +55,6 @@ int main(int argc, char** argv){
 		for (int i = 0; i < totalRobots; i++){
 			robot[i].advance(r.expectedCycleTime());
 			robotMarkers.markers[i] = getRobotMarker(robot[i]);
-
 			br.sendTransform(tf::StampedTransform(robot[i].getTransform(), ros::Time::now(), "world", robot[i].getName()));
 		}
 		marker_pub.publish(robotMarkers);
