@@ -6,6 +6,7 @@
 #include <tf/transform_broadcaster.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <elikos_lib/GroundRobot.h>
+#include <elikos_lib/pid.hpp>
 #include <vector>
 
 bool checkCollision(GroundRobot* robotA, GroundRobot* robotB);
@@ -42,7 +43,7 @@ int main(int argc, char **argv) {
         robots.push_back(new GroundRobot(OBSTACLE_ROBOT_RND, nObsRobots, i, simSpeed));
         robotMarkers.markers.push_back(getRobotMarker(robots[i]));
     }
-
+    
     // Publishers
     ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
     tf::TransformBroadcaster br;
