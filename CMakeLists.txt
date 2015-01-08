@@ -95,8 +95,9 @@ catkin_package(
 include_directories( include ${catkin_INCLUDE_DIRS} )
 
 ## Declare a cpp library
-add_library(elikos_ros
-  src/lib/GroundRobot.cpp
+add_library(elikos_lib
+  src/elikos_lib/GroundRobot.cpp
+  src/elikos_lib/pid.cpp
 )
 
 ## Declare a cpp executable
@@ -105,11 +106,11 @@ add_library(elikos_ros
 add_executable( ai src/ai.cpp )
 add_executable( localization src/localization.cpp )
 add_executable( robotdetect src/robotdetect.cpp )
-add_executable( robotsim src/simulation/robotsim.cpp )
+add_executable( robotsim src/simulation/simulation.cpp )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-#add_dependencies(robotsim elikos_ros)
+#add_dependencies(robotsim elikos_lib)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(elikos_node
@@ -119,7 +120,7 @@ add_executable( robotsim src/simulation/robotsim.cpp )
 target_link_libraries( ai ${catkin_LIBRARIES})
 target_link_libraries( localization ${catkin_LIBRARIES})
 target_link_libraries( robotdetect ${catkin_LIBRARIES})
-target_link_libraries( robotsim elikos_ros ${catkin_LIBRARIES}
+target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES}
 )
 
 #############

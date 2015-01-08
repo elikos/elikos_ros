@@ -7,7 +7,7 @@
 
 #include <ros/ros.h>
 #include <tf/tf.h>
-#include <elikos_ros/GroundRobot.h>
+#include <elikos_lib/GroundRobot.h>
 
 GroundRobot::GroundRobot(robot_type type, int nbRobots, int id, double simulationSpeed){
 	robotID = id;
