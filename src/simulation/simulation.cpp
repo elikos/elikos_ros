@@ -5,7 +5,7 @@
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <elikos_ros/GroundRobot.h>
+#include <elikos_lib/GroundRobot.h>
 #include <vector>
 
 bool checkCollision(GroundRobot* robotA, GroundRobot* robotB);
