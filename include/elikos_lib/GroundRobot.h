@@ -5,8 +5,8 @@
  *      Author: Antonio Sanniravong
  */
 
-#ifndef __GROUNDROBOT_H_
-#define __GROUNDROBOT_H_
+#ifndef GROUNDROBOT_H
+#define GROUNDROBOT_H
 
 #define PI 3.14159265
 
