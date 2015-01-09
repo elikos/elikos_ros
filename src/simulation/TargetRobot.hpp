@@ -13,7 +13,7 @@ public:
         GREEN
     };
 
-    TargetRobot(int id);
+    TargetRobot(int id, int numRobots);
     ~TargetRobot() {
     }
 
@@ -22,6 +22,9 @@ public:
 
 private:
     tf::Transform transform;
+    double x, y, z, yaw, turnAngle, simSpeed;
+    ros::Time lastNoise, lastAutoReverse;
+
 };
 
 #endif /* TARGET_ROBOT_H */
