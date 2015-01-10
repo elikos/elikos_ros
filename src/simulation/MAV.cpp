@@ -7,8 +7,7 @@
 
 #include <ros/ros.h>
 #include <tf/tf.h>
-#include <elikos_lib/MAV.h>
-#include <elikos_lib/GroundRobot.h>
+#include "MAV.h"
 #include <elikos_lib/pid.hpp>
 
 MAV::MAV(int id, double simulationSpeed){

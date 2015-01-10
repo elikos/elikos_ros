@@ -110,6 +110,7 @@ add_executable( robotsim
   src/simulation/Robot.cpp
   src/simulation/TargetRobot.cpp
   src/simulation/ObstacleRobot.cpp
+  src/simulation/MAV.cpp
 )
 
 ## Add cmake target dependencies of the executable/library
