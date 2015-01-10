@@ -78,7 +78,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp tf)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
 catkin_package(
-#  INCLUDE_DIRS include
+INCLUDE_DIRS include
 #  LIBRARIES elikos
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
@@ -96,18 +96,21 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 
 ## Declare a cpp library
 add_library(elikos_lib
-  src/elikos_lib/GroundRobot.cpp
-  src/elikos_lib/MAV.cpp
   src/elikos_lib/pid.cpp
 )
 
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
-add_executable( ai src/ai.cpp )
+add_executable( ai src/ai/ai.cpp )
 add_executable( localization src/localization.cpp )
 add_executable( robotdetect src/robotdetect.cpp )
-add_executable( robotsim src/simulation/simulation.cpp )
+add_executable( robotsim
+  src/simulation/simulation.cpp
+  src/simulation/Robot.cpp
+  src/simulation/TargetRobot.cpp
+  src/simulation/ObstacleRobot.cpp
+)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
