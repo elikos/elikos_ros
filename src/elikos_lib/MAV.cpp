@@ -11,11 +11,27 @@
 #include <elikos_lib/GroundRobot.h>
 #include <elikos_lib/pid.hpp>
 
-MAV::MAV(int id, double simulationSpeed) : Vel_X_PID(0.0, 0.0, 0.0, 0, 33.3, 0.0, 5.0, 0){
+MAV::MAV(int id, double simulationSpeed){
 	ID = id;
 	simSpeed = simulationSpeed;
 	setStartingPose();
 	setName();
+	/*
+	    //! @brief 		Init function
+        //! @details   	The parameters specified here are those for for which we can't set up
+        //!    			reliable defaults, so we need to have the user set them.
+        Pid(
+                dataType kp,
+                dataType ki,
+                dataType kd,
+                ControllerDirection controllerDir,
+                OutputMode outputMode,
+                double samplePeriodMs,
+                dataType minOutput,
+                dataType maxOutput,
+                dataType setPoint);
+	 */
+	Vel_X_PID = new Pid<double>(0.0, 0.0, 0.0, Pid<double>::PID_DIRECT, Pid<double>::DONT_ACCUMULATE_OUTPUT, 33.0, 0.0, 0.0, 0.0);
 };
 
 MAV::~MAV(){};

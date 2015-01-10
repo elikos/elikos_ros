@@ -38,7 +38,7 @@ private:
 	void setName();
 	void refreshTransform();
 	double limitTurn(double& angle, double angularSpeed, double cycleDuration);
-	Pid<double> Vel_X_PID;
+	Pid<double>* Vel_X_PID;
 
 };
 
