@@ -6,6 +6,7 @@
 #include <tf/transform_broadcaster.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <elikos_lib/GroundRobot.h>
+#include <elikos_lib/MAV.h>
 #include <elikos_lib/pid.hpp>
 #include <vector>
 
