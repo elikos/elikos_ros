@@ -102,7 +102,7 @@ add_library(elikos_ros
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
-add_executable( ai src/ai.cpp )
+add_executable( ai src/ai/ai.cpp )
 add_executable( localization src/localization.cpp )
 add_executable( robotdetect src/robotdetect.cpp )
 add_executable( robotsim src/robotsim.cpp )
