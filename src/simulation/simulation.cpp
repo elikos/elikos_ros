@@ -36,7 +36,6 @@ int main(int argc, char **argv) {
 
     // Robot & marker initialization
     std::vector<Robot *> robots;
-    robots.reserve(totalRobots);
     visualization_msgs::MarkerArray robotMarkers;
     for (int i = 0; i < nTrgtRobots; ++i) {
         robots.push_back(new TargetRobot(i, nTrgtRobots, simSpeed));

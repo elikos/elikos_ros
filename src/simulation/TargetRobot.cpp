@@ -13,10 +13,16 @@ TargetRobot::TargetRobot(int id, int numRobots, double simulationSpeed) : Robot(
     z = 0;
     yaw = id * 2 * PI / numRobots;
 
-    this->name = ROBOT_TYPE + id;
+    char buf[15];
+    sprintf(buf, "trgtRobot%d", id);
+    this->name = buf;
+    this->isSpinning = false;
+    this->isStopped = false;
+    this->color = id%2 ? RED : GREEN;
 
     lastAutoReverse = ros::Time::now();
     lastNoise = ros::Time::now();
+    refreshTransform();
 }
 
 void TargetRobot::move(ros::Duration cycleTime) {
@@ -81,7 +87,7 @@ visualization_msgs::Marker TargetRobot::getVizMarker() {
 
     marker.header.frame_id = "world";
     marker.header.stamp = ros::Time();
-    marker.ns = ROBOT_TYPE;
+    marker.ns = this->name;
     marker.id = this->id;
     marker.type = visualization_msgs::Marker::CYLINDER;
     marker.action = visualization_msgs::Marker::ADD;
