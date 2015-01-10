@@ -3,7 +3,6 @@
 #ifndef PI
 #define PI 3.14159265
 #endif
-#define ROBOT_TYPE "obsRobot"
 
 ObstacleRobot::ObstacleRobot(int id, int numRobots, double simulationSpeed) : Robot(id, simulationSpeed) {
     //starting pose
@@ -11,20 +10,27 @@ ObstacleRobot::ObstacleRobot(int id, int numRobots, double simulationSpeed) : Ro
     y = 5 * sin(id * (2 * PI / numRobots));
     z = 0;
     yaw = atan2(-x, y);
+    this->isStopped = false;
+    this->simSpeed = simulationSpeed;
+    char buf[15];
+    sprintf(buf, "obsRobot%d", id);
+    this->name = buf;
+    refreshTransform();
 }
 
 void ObstacleRobot::collide() {
-
+    isStopped=true;
 }
 
 void ObstacleRobot::move(ros::Duration cycleTime) {
     if (!isStopped){
-        x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
-        y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
-        yaw = atan2(-x, y) - (0.33 * simSpeed * cycleTime.toSec())/10;
+        x += 0.33 *  cycleTime.toSec() * cos(yaw);
+        y += 0.33 *  cycleTime.toSec() * sin(yaw);
+        yaw = atan2(-x, y) - (0.33 *  cycleTime.toSec())/10;
     } else {
         isStopped = false;
     }
+    this->refreshTransform();
 }
 
 visualization_msgs::Marker ObstacleRobot::getVizMarker() {
@@ -32,7 +38,7 @@ visualization_msgs::Marker ObstacleRobot::getVizMarker() {
 
     marker.header.frame_id = "world";
     marker.header.stamp = ros::Time();
-    marker.ns = ROBOT_TYPE;
+    marker.ns = this->name;
     marker.id = this->id;
     marker.type = visualization_msgs::Marker::CYLINDER;
     marker.action = visualization_msgs::Marker::ADD;

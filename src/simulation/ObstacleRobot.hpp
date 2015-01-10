@@ -1,3 +1,5 @@
+#ifndef OBSTACLE_ROBOT_H
+#define OBSTACLE_ROBOT_H
 #include "Robot.hpp"
 
 /**
@@ -16,3 +18,5 @@ public:
 private:
     bool isStopped;
 };
+
+#endif /* OBSTACLE_ROBOT_H */

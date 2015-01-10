@@ -107,6 +107,9 @@ visualization_msgs::Marker TargetRobot::getVizMarker() {
     } else {
         g = 1.0;
     }
+    if(id == 1){
+        b = 1.0;
+    }
     marker.color.a = 1.0;
     marker.color.r = r;
     marker.color.g = g;

@@ -20,7 +20,7 @@ public:
     virtual void move(ros::Duration cycleTime) = 0;
 
 protected:
-    Robot(int id, double simSpeed) : id(id), simSpeed(simSpeed) { }
+    Robot(int id, double simSpeed) : id(id), simSpeed(simSpeed) { srand(time(NULL)); }
     ~Robot() { }
     void refreshTransform();
 

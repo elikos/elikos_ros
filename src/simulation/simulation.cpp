@@ -3,21 +3,24 @@
 */
 
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <tf/transform_broadcaster.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <vector>
-#include <elikos_lib/GroundRobot.h>
 #include <elikos_lib/pid.hpp>
 #include "Robot.hpp"
 #include "TargetRobot.hpp"
+#include "ObstacleRobot.hpp"
+
+#ifndef PI
+#define PI 3.14159265
+#endif
 
 bool checkCollision(Robot* ra, Robot* rb);
 
 double collisionAngle(tf::Vector3 v, double yaw);
 
 void setVector(tf::Vector3 &v, double x, double y, double z);
-
-visualization_msgs::Marker getRobotMarker(GroundRobot *robot);
 
 int main(int argc, char **argv) {
     // ROS initialization
@@ -32,18 +35,22 @@ int main(int argc, char **argv) {
     node.param<int>("obstacle_robot_count", nObsRobots, 4);
     node.param<int>("frame_rate", frameRate, 30);
     int totalRobots = nTrgtRobots + nObsRobots;
-    srand(time(NULL));
+
 
     // Robot & marker initialization
     std::vector<Robot *> robots;
     visualization_msgs::MarkerArray robotMarkers;
     for (int i = 0; i < nTrgtRobots; ++i) {
         robots.push_back(new TargetRobot(i, nTrgtRobots, simSpeed));
-        robotMarkers.markers.push_back(robots[i]->getVizMarker());
+        robotMarkers.markers.push_back(robots.back()->getVizMarker());
     }
     for (int i = 0; i < nObsRobots; ++i) {
-
+        robots.push_back(new ObstacleRobot(i, nObsRobots, simSpeed));
+        robotMarkers.markers.push_back(robots.back()->getVizMarker());
     }
+
+    ROS_DEBUG("Robot markers legnth: %lu", robotMarkers.markers.size());
+
 
     // Publishers
     ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
@@ -148,49 +155,4 @@ void setVector(tf::Vector3 &v, double x, double y, double z) {
     v.setX(x);
     v.setY(y);
     v.setZ(z);
-}
-
-visualization_msgs::Marker getRobotMarker(GroundRobot *robot) {
-    visualization_msgs::Marker marker;
-    tf::Transform t = robot->getTransform();
-    int r = 0, g = 0, b = 0;
-
-    marker.header.frame_id = "world";
-    marker.header.stamp = ros::Time();
-    marker.ns = robot->getType();
-    marker.id = robot->getID();
-    marker.type = visualization_msgs::Marker::CYLINDER;
-    marker.action = visualization_msgs::Marker::ADD;
-    marker.scale.x = 0.35;
-    marker.scale.y = 0.35;
-    marker.scale.z = robot->getTypeID() ? 1.5 : 0.1;
-    marker.pose.position.x = t.getOrigin().getX();
-    marker.pose.position.y = t.getOrigin().getY();
-    marker.pose.position.z = t.getOrigin().getZ() + marker.scale.z / 2;
-    marker.pose.orientation.x = t.getRotation().getX();
-    marker.pose.orientation.y = t.getRotation().getY();
-    marker.pose.orientation.z = t.getRotation().getZ();
-    marker.pose.orientation.w = t.getRotation().getW();
-
-    switch (robot->getColor()) {
-        case RED:
-            r = 1.0;
-            break;
-        case GREEN:
-            g = 1.0;
-            break;
-        case BLUE:
-            b = 1.0;
-            break;
-        default :
-            r = 1.0;
-            g = 1.0;
-            b = 1.0;
-            break;
-    }
-    marker.color.a = 1.0;
-    marker.color.r = r;
-    marker.color.g = g;
-    marker.color.b = b;
-    return marker;
 }
