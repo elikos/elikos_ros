@@ -96,7 +96,6 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 
 ## Declare a cpp library
 add_library(elikos_lib
-  src/elikos_lib/GroundRobot.cpp
   src/elikos_lib/pid.cpp
 )
 

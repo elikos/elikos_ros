@@ -44,7 +44,21 @@ visualization_msgs::Marker ObstacleRobot::getVizMarker() {
     marker.action = visualization_msgs::Marker::ADD;
     marker.scale.x = 0.35;
     marker.scale.y = 0.35;
-    marker.scale.z = 1.5;
+    switch(id){
+        case 0:
+            marker.scale.z = 1.0;
+            break;
+        case 1:
+            marker.scale.z = 1.25;
+            break;
+        case 2:
+            marker.scale.z = 1.50;
+            break;
+        case 3:
+        default:
+            marker.scale.z = 1.75;
+            break;
+    }
     marker.pose.position.x = transform.getOrigin().getX();
     marker.pose.position.y = transform.getOrigin().getY();
     marker.pose.position.z = transform.getOrigin().getZ() + marker.scale.z / 2;

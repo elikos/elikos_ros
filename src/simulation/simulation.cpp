@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
         robotMarkers.markers.push_back(robots.back()->getVizMarker());
     }
 
-    ROS_DEBUG("Robot markers legnth: %lu", robotMarkers.markers.size());
+    ROS_INFO("Robot markers legnth: %lu", robotMarkers.markers.size());
 
 
     // Publishers
