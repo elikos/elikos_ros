@@ -8,15 +8,16 @@
 #include <vector>
 #include <elikos_lib/GroundRobot.h>
 #include <elikos_lib/pid.hpp>
+#include "Robot.hpp"
 #include "TargetRobot.hpp"
 
-bool checkCollision(GroundRobot* robotA, GroundRobot* robotB);
+bool checkCollision(Robot* ra, Robot* rb);
 
 double collisionAngle(tf::Vector3 v, double yaw);
 
 void setVector(tf::Vector3 &v, double x, double y, double z);
 
-visualization_msgs::Marker getRobotMarker(GroundRobot* robot);
+visualization_msgs::Marker getRobotMarker(GroundRobot *robot);
 
 int main(int argc, char **argv) {
     // ROS initialization
@@ -31,18 +32,18 @@ int main(int argc, char **argv) {
     node.param<int>("obstacle_robot_count", nObsRobots, 4);
     node.param<int>("frame_rate", frameRate, 30);
     int totalRobots = nTrgtRobots + nObsRobots;
+    srand(time(NULL));
 
     // Robot & marker initialization
-    std::vector <GroundRobot *> robots;
+    std::vector<Robot *> robots;
     robots.reserve(totalRobots);
     visualization_msgs::MarkerArray robotMarkers;
-    for (int i = 0; i < nTrgtRobots; i++) {
-        robots.push_back(new GroundRobot(TARGET_ROBOT, nTrgtRobots, i, simSpeed));
-        robotMarkers.markers.push_back(getRobotMarker(robots[i]));
+    for (int i = 0; i < nTrgtRobots; ++i) {
+        robots.push_back(new TargetRobot(i, nTrgtRobots, simSpeed));
+        robotMarkers.markers.push_back(robots[i]->getVizMarker());
     }
-    for (int i = 0; i < nObsRobots; i++) {
-        robots.push_back(new GroundRobot(OBSTACLE_ROBOT_RND, nObsRobots, i, simSpeed));
-        robotMarkers.markers.push_back(getRobotMarker(robots[i]));
+    for (int i = 0; i < nObsRobots; ++i) {
+
     }
 
     // Publishers
@@ -52,37 +53,81 @@ int main(int argc, char **argv) {
     // Loop rate (Hz)
     ros::Rate r(frameRate);
 
-    // Main Loop
-    while (ros::ok()) {
-        // Collision checking
-        for (int i = 0; i < (totalRobots); i++) {
-            for (int j = 0; j < totalRobots; j++) {
-                if (i == j) continue;
-                if (checkCollision(robots[i], robots[j])) {
-                    robots[i]->collide();
+    while(ros::ok()){
+        //Collision checking
+        for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
+            for(std::vector<Robot*>::iterator it2 = robots.begin(); it2 != robots.end(); ++it2){
+                if(*it != *it2){
+                    if(checkCollision(*it, *it2)){
+                        (*it)->collide();
+                    }
                 }
             }
         }
-        // Advance robots to next frame and publish tf & marker
-        for (int i = 0; i < totalRobots; i++) {
-            robots[i]->advance(r.expectedCycleTime());
-            robotMarkers.markers[i] = getRobotMarker(robots[i]);
-            br.sendTransform(tf::StampedTransform(robots[i]->getTransform(), ros::Time::now(), "world", robots[i]->getName()));
+
+        std::vector<visualization_msgs::Marker>::iterator mit = robotMarkers.markers.begin();
+        for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
+            (*it)->move(r.expectedCycleTime());
+            (*mit) = (*it)->getVizMarker();
+            ++mit;
+            br.sendTransform(tf::StampedTransform((*it)->getTransform(), ros::Time::now(), "world", (*it)->getName()));
         }
         marker_pub.publish(robotMarkers);
         r.sleep();
     }
+
+//
+//    // Robot & marker initialization
+//    std::vector <GroundRobot *> robots;
+//    robots.reserve(totalRobots);
+//    visualization_msgs::MarkerArray robotMarkers;
+//    for (int i = 0; i < nTrgtRobots; i++) {
+//        robots.push_back(new GroundRobot(TARGET_ROBOT, nTrgtRobots, i, simSpeed));
+//        robotMarkers.markers.push_back(getRobotMarker(robots[i]));
+//    }
+//    for (int i = 0; i < nObsRobots; i++) {
+//        robots.push_back(new GroundRobot(OBSTACLE_ROBOT_RND, nObsRobots, i, simSpeed));
+//        robotMarkers.markers.push_back(getRobotMarker(robots[i]));
+//    }
+//
+//    // Publishers
+//    ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
+//    tf::TransformBroadcaster br;
+//
+//    // Loop rate (Hz)
+//    ros::Rate r(frameRate);
+//
+//    // Main Loop
+//    while (ros::ok()) {
+//        // Collision checking
+//        for (int i = 0; i < (totalRobots); i++) {
+//            for (int j = 0; j < totalRobots; j++) {
+//                if (i == j) continue;
+//                if (checkCollision(robots[i], robots[j])) {
+//                    robots[i]->collide();
+//                }
+//            }
+//        }
+//        // Advance robots to next frame and publish tf & marker
+//        for (int i = 0; i < totalRobots; i++) {
+//            robots[i]->advance(r.expectedCycleTime());
+//            robotMarkers.markers[i] = getRobotMarker(robots[i]);
+//            br.sendTransform(tf::StampedTransform(robots[i]->getTransform(), ros::Time::now(), "world", robots[i]->getName()));
+//        }
+//        marker_pub.publish(robotMarkers);
+//        r.sleep();
+//    }
     return 0;
 };
 
-bool checkCollision(GroundRobot* robotA, GroundRobot* robotB) {
-    tf::Vector3 vA = robotA->getTransform().getOrigin();
-    tf::Vector3 vB = robotB->getTransform().getOrigin();
+bool checkCollision(Robot* ra, Robot* rb){
+    tf::Vector3 vA = ra->getTransform().getOrigin();
+    tf::Vector3 vB = rb->getTransform().getOrigin();
     tf::Vector3 xAxis;
-    setVector(xAxis, 1, 0, 0);
-    tf::Quaternion qA = robotA->getTransform().getRotation();
-//	if (robotA.getName() == "robot0" && robotB.getName() == "robot1")
-//		std::cout << "Collision vector angle: " << atan2((vB-vA).getY(), (vB-vA).getX()) << "\tYaw:" << tf::getYaw(qA) << "\tcollisionAngle:" << collisionAngle(vB-vA, tf::getYaw(qA)) << "\n";
+    xAxis.setX(1);
+    xAxis.setY(0);
+    xAxis.setZ(0);
+    tf::Quaternion qA = ra->getTransform().getRotation();
 
     if (vA.distance(vB) > 0.35) {
         return false;
@@ -106,7 +151,7 @@ void setVector(tf::Vector3 &v, double x, double y, double z) {
     v.setZ(z);
 }
 
-visualization_msgs::Marker getRobotMarker(GroundRobot* robot) {
+visualization_msgs::Marker getRobotMarker(GroundRobot *robot) {
     visualization_msgs::Marker marker;
     tf::Transform t = robot->getTransform();
     int r = 0, g = 0, b = 0;

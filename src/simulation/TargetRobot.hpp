@@ -13,18 +13,23 @@ public:
         GREEN
     };
 
-    TargetRobot(int id, int numRobots);
-    ~TargetRobot() {
-    }
+    TargetRobot(int id, int numRobots, double simulationSpeed);
+    ~TargetRobot() { }
 
-    tf::Transform getTransform();
     visualization_msgs::Marker getVizMarker();
+    Color getColor() { return this->color; }
 
+    void move(ros::Duration cycleTime);
+    void collide();
 private:
-    tf::Transform transform;
-    double x, y, z, yaw, turnAngle, simSpeed;
+    Color color;
     ros::Time lastNoise, lastAutoReverse;
+    bool isSpinning, isStopped;
 
+    void reverse();
+    void autoReverse();
+    void noise();
+    double limitTurn(double& angle, double angularSpeed, double cycleDuration);
 };
 
 #endif /* TARGET_ROBOT_H */

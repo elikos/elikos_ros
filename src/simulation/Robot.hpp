@@ -11,21 +11,27 @@
 */
 class Robot{
 public:
-    Robot(int id) : id(id) { }
-    ~Robot();
-
     std::string getName() const { return this->name; }
     int getID() { return this->id; }
-    virtual tf::Transform getTransform() = 0;
+    tf::Transform getTransform() const { return this->transform; }
     virtual visualization_msgs::Marker getVizMarker() = 0;
 
     virtual void collide() = 0;
     virtual void move(ros::Duration cycleTime) = 0;
-private:
-    Robot();
+
+protected:
+    Robot(int id, double simSpeed) : id(id), simSpeed(simSpeed) { }
+    ~Robot() { }
+    void refreshTransform();
 
     int id;
     std::string name;
+    double x, y, z, yaw, turnAngle, simSpeed;
+    tf::Transform transform;
+    tf::Vector3 v;
+    tf::Quaternion q;
+private:
+    Robot();
 };
 
 #endif /* GROUNDROBOT_H */
