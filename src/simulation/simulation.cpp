@@ -82,47 +82,7 @@ int main(int argc, char **argv) {
         r.sleep();
     }
 
-//
-//    // Robot & marker initialization
-//    std::vector <GroundRobot *> robots;
-//    robots.reserve(totalRobots);
-//    visualization_msgs::MarkerArray robotMarkers;
-//    for (int i = 0; i < nTrgtRobots; i++) {
-//        robots.push_back(new GroundRobot(TARGET_ROBOT, nTrgtRobots, i, simSpeed));
-//        robotMarkers.markers.push_back(getRobotMarker(robots[i]));
-//    }
-//    for (int i = 0; i < nObsRobots; i++) {
-//        robots.push_back(new GroundRobot(OBSTACLE_ROBOT_RND, nObsRobots, i, simSpeed));
-//        robotMarkers.markers.push_back(getRobotMarker(robots[i]));
-//    }
-//
-//    // Publishers
-//    ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
-//    tf::TransformBroadcaster br;
-//
-//    // Loop rate (Hz)
-//    ros::Rate r(frameRate);
-//
-//    // Main Loop
-//    while (ros::ok()) {
-//        // Collision checking
-//        for (int i = 0; i < (totalRobots); i++) {
-//            for (int j = 0; j < totalRobots; j++) {
-//                if (i == j) continue;
-//                if (checkCollision(robots[i], robots[j])) {
-//                    robots[i]->collide();
-//                }
-//            }
-//        }
-//        // Advance robots to next frame and publish tf & marker
-//        for (int i = 0; i < totalRobots; i++) {
-//            robots[i]->advance(r.expectedCycleTime());
-//            robotMarkers.markers[i] = getRobotMarker(robots[i]);
-//            br.sendTransform(tf::StampedTransform(robots[i]->getTransform(), ros::Time::now(), "world", robots[i]->getName()));
-//        }
-//        marker_pub.publish(robotMarkers);
-//        r.sleep();
-//    }
+
     return 0;
 };
 
