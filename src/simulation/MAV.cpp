@@ -11,84 +11,81 @@
 #include <elikos_lib/pid.hpp>
 
 MAV::MAV(int id, double simulationSpeed){
-	ID = id;
-	simSpeed = simulationSpeed;
-	setStartingPose();
-	setName();
-	/*
-	    //! @brief 		Init function
-        //! @details   	The parameters specified here are those for for which we can't set up
-        //!    			reliable defaults, so we need to have the user set them.
-        Pid(
-                dataType kp,
-                dataType ki,
-                dataType kd,
-                ControllerDirection controllerDir,
-                OutputMode outputMode,
-                double samplePeriodMs,
-                dataType minOutput,
-                dataType maxOutput,
-                dataType setPoint);
-	 */
-	Vel_X_PID = new Pid<double>(0.0, 0.0, 0.0, Pid<double>::PID_DIRECT, Pid<double>::DONT_ACCUMULATE_OUTPUT, 33.0, 0.0, 0.0, 0.0);
+    x = 0;
+    y = 0;
+    z = 0;
+    yaw = 0;
+    isLanded = false;
+    ID = id;
+    simSpeed = simulationSpeed;
+    Name = "MAV";
+    vel_xy_pid = new Pid<double>(0.0, 0.0, 0.0, Pid<double>::PID_DIRECT, Pid<double>::DONT_ACCUMULATE_OUTPUT, 33.0, 0.0, 0.0, 0.0);
+    vel_z_pid = new Pid<double>(0.0, 0.0, 0.0, Pid<double>::PID_DIRECT, Pid<double>::DONT_ACCUMULATE_OUTPUT, 33.0, 0.0, 0.0, 0.0);
+    this->refreshTransform();
 };
 
-MAV::~MAV(){};
-
-void MAV::setStartingPose(){
-	x = 0;
-	y = 0;
-	z = 0;
-	yaw = 0;
-
-	refreshTransform();
+MAV::~MAV(){
+    delete vel_xy_pid;
+    delete vel_z_pid;
 }
 
-void MAV::setName(){
-	std::stringstream ss;
-	ss << "MAV" << ID;
-	Name = ss.str();
+void MAV::setVelXYPID(double kp, double ki, double kd, ros::Duration cycleTime){
+    vel_xy_pid->SetTunings(kp, ki, kd);
+    vel_xy_pid->SetSamplePeriod(cycleTime.toSec() * 1000);
+}
+
+void MAV::setVelZPID(double kp, double ki, double kd, ros::Duration cycleTime){
+    vel_z_pid->SetTunings(kp, ki, kd);
+    vel_z_pid->SetSamplePeriod(cycleTime.toSec() * 1000);
+}
+
+void MAV::setPosTarget(){
+    // TODO
+}
+
+void MAV::setVelTarget(){
+    // TODO
 }
 
 std::string MAV::getName(){
-	return Name;
+    return Name;
 }
 
 tf::Transform MAV::getTransform(){
-	return t;
+    return t;
 }
 
 int MAV::getID(){
-	return ID;
+    return ID;
 }
 
-void MAV::advance(ros::Duration cycleTime){
+void MAV::move(ros::Duration cycleTime){
 
-	refreshTransform();
+    this->refreshTransform();
 }
 
 void MAV::collide(){
-	// TODO
+    // TODO
 }
 
 void MAV::refreshTransform(){
-	v.setX(x);
-	v.setY(y);
-	v.setZ(z);
-	q.setRPY(0, 0, yaw);
-	t.setOrigin(v);
-	t.setRotation(q);
+    v.setX(x);
+    v.setY(y);
+    v.setZ(z);
+    q.setRPY(0, 0, yaw);
+    t.setOrigin(v);
+    t.setRotation(q);
 }
 
 double MAV::limitTurn(double& angle, double angularSpeed, double cycleDuration){
-	double limitedAngle;
-	double maxAngle = angularSpeed * cycleDuration;
-	if (fabs(angle) > maxAngle){
-		limitedAngle = (angle > 0) ? maxAngle : -maxAngle;
-		angle -= limitedAngle;
-	} else {
-		limitedAngle = angle;
-		angle = 0;
-	}
-	return limitedAngle;
+    double limitedAngle;
+    double maxAngle = angularSpeed * cycleDuration;
+    if (fabs(angle) > maxAngle){
+        limitedAngle = (angle > 0) ? maxAngle : -maxAngle;
+        angle -= limitedAngle;
+    } else {
+        limitedAngle = angle;
+        angle = 0;
+    }
+    return limitedAngle;
 }
