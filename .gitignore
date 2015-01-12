@@ -31,5 +31,7 @@
 *.*~
 
 # Files from Clion project
-*.idea/*
-*.idea/**/*
+.idea
+.idea/*
+.idea/**/*
+.idea/.name
