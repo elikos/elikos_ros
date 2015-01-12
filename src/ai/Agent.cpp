@@ -5,7 +5,14 @@
  *      Author: Myriam Claveau-Mallet
  */
 
-#include <ros/ros.h>
-#include <Agent.h>
+#include "Agent.h"
 
+Agent::Agent()
+{
 
+}
+
+void Agent::init()
+{
+
+}

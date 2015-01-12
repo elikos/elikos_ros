@@ -8,11 +8,14 @@
 #ifndef __AGENT_H_
 #define __AGENT_H_
 
+#include <ros/ros.h>
+
 class Agent
 {
 
 public:
-    
+
+    Agent();
     void init();  // start the agent (the elikos::ai node should do that)
     
 private:
@@ -41,6 +44,9 @@ private:
 
     // Missing: loop of functions' calls (in some "run" function)
 
+    // Hidden constructors
+
+    Agent( const Agent& agent  ); // do not implement
 };
 
 #endif /* __AGENT_H_ */
