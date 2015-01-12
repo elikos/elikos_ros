@@ -23,22 +23,22 @@ public:
     int getID();
     void setVelXYPID(double kp, double ki, double kd, ros::Duration cycleTime);
     void setVelZPID(double kp, double ki, double kd, ros::Duration cycleTime);
-    void setPosTarget(double x, double y, double z);
-    void setVelTarget();
+    void MAV::setVelXYMax(double vel);
+    void MAV::setVelZMax(double vel);
+    void setPosTarget(geometry_msgs::PoseStamped position_sp);
 private:
     int ID;
     std::string Name;
     bool isLanded;
-    double x, y, z, yaw, simSpeed;
+    double x, y, z, yaw, vel_xy_max, vel_z_max, simSpeed;
     double x_sp, y_sp, z_sp, yaw_sp;
-    double vel_x, vel_y, vel_z;
-    double vel_x_sp, vel_y_sp, vel_z_sp;
+    tf::Vector3 vel_xy, vel_xy_sp;
+    double vel_z, vel_z_sp;
     tf::Transform t;
     tf::Vector3 v;
     tf::Quaternion q;
     void refreshTransform();
-    double limitTurn(double& angle, double angularSpeed, double cycleDuration);
-    Pid<double>* vel_xy_pid, * vel_z_pid;
+    Pid<double>* vel_x_pid, * vel_y_pid, * vel_z_pid;
 
 };
 
