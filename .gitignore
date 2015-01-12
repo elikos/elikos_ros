@@ -29,3 +29,6 @@
 
 # Open files meta-file (example.extension~)
 *.*~
+
+# Files from Clion project
+*.idea/
