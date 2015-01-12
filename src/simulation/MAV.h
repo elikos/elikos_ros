@@ -31,8 +31,8 @@ private:
     std::string Name;
     bool isLanded;
     double x, y, z, yaw, vel_xy_max, simSpeed;
-    double x_sp, y_sp, z_sp, yaw_sp;
-    tf::Vector3 vel_xy, vel_xy_sp;
+    double z_sp, yaw_sp;
+    tf::Vector3 vel_xy, vel_xy_sp, xy_sp, direction;
     double vel_z, vel_z_sp;
     tf::Transform t;
     tf::Vector3 v;

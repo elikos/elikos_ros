@@ -43,8 +43,8 @@ int main(int argc, char **argv) {
 
     // MAV initialization
     MAV * mav = new MAV(1, simSpeed);
-    mav->setVelXYPID(0.5, 0.0, 0.0, r.expectedCycleTime());
-    mav->setVelXYMax(5.0);
+    mav->setVelXYPID(2.0, 0.5, 1.0, r.expectedCycleTime());
+    mav->setVelXYMax(0.75);
     mav->setVelZMax(5.0);
 
     // Robot & marker initialization

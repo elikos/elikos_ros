@@ -21,17 +21,17 @@ MAV::MAV(int id, double simulationSpeed){
     Name = "MAV";
     vel_x_pid = new Pid<double>(0.0, 0.0, 0.0, // PID
                                 Pid<double>::PID_DIRECT, // Controller direction
-                                Pid<double>::DONT_ACCUMULATE_OUTPUT, // Output mode
+                                Pid<double>::ACCUMULATE_OUTPUT, // Output mode
                                 33.3 / simSpeed, // Sample period
                                 0.0, 5.0, 0.0); // Min output, Max output, Setpoint
     vel_y_pid = new Pid<double>(0.0, 0.0, 0.0,
                                 Pid<double>::PID_DIRECT,
-                                Pid<double>::DONT_ACCUMULATE_OUTPUT,
+                                Pid<double>::ACCUMULATE_OUTPUT,
                                 33.3 / simSpeed,
                                 0.0, 5.0, 0.0);
     vel_z_pid = new Pid<double>(0.0, 0.0, 0.0,
                                 Pid<double>::PID_DIRECT,
-                                Pid<double>::DONT_ACCUMULATE_OUTPUT,
+                                Pid<double>::ACCUMULATE_OUTPUT,
                                 33.3 / simSpeed,
                                 0.0, 5.0, 0.0);
     refreshTransform();
@@ -65,12 +65,12 @@ void MAV::setVelXYMax(double vel){
 }
 
 void MAV::setVelZMax(double vel){
-    vel_z_pid->SetOutputLimits(0.0, vel);
+    vel_z_pid->SetOutputLimits(-vel, vel);
 }
 
 void MAV::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg){
-    x_sp = msg->pose.position.x;
-    y_sp = msg->pose.position.y;
+    xy_sp.setX(msg->pose.position.x);
+    xy_sp.setY(msg->pose.position.y);
     z_sp = msg->pose.position.z;
     // TODO: Yaw
 
@@ -91,14 +91,20 @@ int MAV::getID(){
 void MAV::move(ros::Duration cycleTime){
     // Generate velocity setpoint
         // XY
-    vel_xy_sp.setX(x_sp - x);
-    vel_xy_sp.setY(y_sp - y);
-    vel_xy_sp.normalize();
+    vel_xy_sp.setX(x - xy_sp.getX());
+    vel_xy_sp.setY(y - xy_sp.getY());
+    if (vel_xy_sp.length() > vel_xy_max) {
+        vel_xy_sp.normalize();
+        vel_xy_sp *= vel_xy_max;
+    }
         // Z
-    vel_z_sp = z_sp - z;
+    vel_z_sp = z - z_sp;
     if (fabs(vel_z_sp) > 1.0) {
         vel_z_sp /= fabs(vel_z_sp);
     }
+
+    std::cout << vel_xy_sp.getX() << "\t" << vel_xy_sp.getY() << "\t"
+            << (xy_sp * vel_xy_max).getX() << "\t" << (xy_sp * vel_xy_max).getX() << "\n";
 
     // Compute new velocities
         // XY
@@ -106,10 +112,7 @@ void MAV::move(ros::Duration cycleTime){
     vel_y_pid->Run(vel_xy_sp.getY());
     vel_xy.setX(vel_x_pid->output);
     vel_xy.setY(vel_y_pid->output);
-    if (vel_xy.length() > vel_xy_max) {
-        vel_xy.normalize();
-        vel_xy *= vel_xy_max;
-    }
+
         // Z
     vel_z_pid->Run(vel_z_sp);
     vel_z = vel_z_pid->output;
