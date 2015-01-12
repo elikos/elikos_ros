@@ -21,17 +21,17 @@ MAV::MAV(int id, double simulationSpeed){
     Name = "MAV";
     vel_x_pid = new Pid<double>(0.0, 0.0, 0.0, // PID
                                 Pid<double>::PID_DIRECT, // Controller direction
-                                Pid<double>::ACCUMULATE_OUTPUT, // Output mode
+                                Pid<double>::DONT_ACCUMULATE_OUTPUT, // Output mode
                                 33.3 / simSpeed, // Sample period
                                 0.0, 5.0, 0.0); // Min output, Max output, Setpoint
     vel_y_pid = new Pid<double>(0.0, 0.0, 0.0,
                                 Pid<double>::PID_DIRECT,
-                                Pid<double>::ACCUMULATE_OUTPUT,
+                                Pid<double>::DONT_ACCUMULATE_OUTPUT,
                                 33.3 / simSpeed,
                                 0.0, 5.0, 0.0);
     vel_z_pid = new Pid<double>(0.0, 0.0, 0.0,
                                 Pid<double>::PID_DIRECT,
-                                Pid<double>::ACCUMULATE_OUTPUT,
+                                Pid<double>::DONT_ACCUMULATE_OUTPUT,
                                 33.3 / simSpeed,
                                 0.0, 5.0, 0.0);
     refreshTransform();
@@ -60,19 +60,18 @@ void MAV::setVelZPID(double kp, double ki, double kd, ros::Duration cycleTime){
 
 void MAV::setVelXYMax(double vel){
     vel_xy_max = vel;
-    vel_x_pid->SetOutputLimits(0.0, vel);
-    vel_y_pid->SetOutputLimits(0.0, vel);
+    vel_x_pid->SetOutputLimits(-vel, vel);
+    vel_y_pid->SetOutputLimits(-vel, vel);
 }
 
 void MAV::setVelZMax(double vel){
-    vel_z_max = vel;
     vel_z_pid->SetOutputLimits(0.0, vel);
 }
 
-void MAV::setPosTarget(geometry_msgs::PoseStamped position_sp){
-    x_sp = position_sp.pose.position.x;
-    y_sp = position_sp.pose.position.y;
-    z_sp = position_sp.pose.position.z;
+void MAV::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg){
+    x_sp = msg->pose.position.x;
+    y_sp = msg->pose.position.y;
+    z_sp = msg->pose.position.z;
     // TODO: Yaw
 
 }

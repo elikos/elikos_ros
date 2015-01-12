@@ -4,14 +4,17 @@
 
 #include <ros/ros.h>
 #include <ros/console.h>
+#include <std_msgs/String.h>
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <visualization_msgs/MarkerArray.h>
-#include "MAV.h"
 #include <vector>
 #include <elikos_lib/pid.hpp>
 #include "Robot.hpp"
 #include "TargetRobot.hpp"
 #include "ObstacleRobot.hpp"
+#include "MAV.h"
 
 #ifndef PI
 #define PI 3.14159265
@@ -20,8 +23,6 @@
 bool checkCollision(Robot* ra, Robot* rb);
 
 double collisionAngle(tf::Vector3 v, double yaw);
-
-void setVector(tf::Vector3 &v, double x, double y, double z);
 
 int main(int argc, char **argv) {
     // ROS initialization
@@ -37,6 +38,14 @@ int main(int argc, char **argv) {
     node.param<int>("frame_rate", frameRate, 30);
     int totalRobots = nTrgtRobots + nObsRobots;
 
+    // Loop rate (Hz)
+    ros::Rate r(frameRate);
+
+    // MAV initialization
+    MAV * mav = new MAV(1, simSpeed);
+    mav->setVelXYPID(0.5, 0.0, 0.0, r.expectedCycleTime());
+    mav->setVelXYMax(5.0);
+    mav->setVelZMax(5.0);
 
     // Robot & marker initialization
     std::vector<Robot *> robots;
@@ -57,10 +66,14 @@ int main(int argc, char **argv) {
     ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
     tf::TransformBroadcaster br;
 
-    // Loop rate (Hz)
-    ros::Rate r(frameRate);
+    // Subscribers
+    ros::Subscriber pose_sub = node.subscribe("mavros/setpoint/local_position", 1000, &MAV::poseCallback, mav);
 
     while(ros::ok()){
+        // Receive and set mav setpoints
+        ros::spinOnce();
+        mav->move(r.expectedCycleTime());
+
         //Collision checking
         for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
             for(std::vector<Robot*>::iterator it2 = robots.begin(); it2 != robots.end(); ++it2){
@@ -79,6 +92,7 @@ int main(int argc, char **argv) {
             ++mit;
             br.sendTransform(tf::StampedTransform((*it)->getTransform(), ros::Time::now(), "world", (*it)->getName()));
         }
+        br.sendTransform(tf::StampedTransform(mav->getTransform(), ros::Time::now(), "world", mav->getName()));
         marker_pub.publish(robotMarkers);
         r.sleep();
     }
@@ -150,10 +164,4 @@ double collisionAngle(tf::Vector3 v, double yaw) {
     if (angle > PI) angle -= 2 * PI;
     else if (angle <= -PI) angle += 2 * PI;
     return fabs(angle);
-}
-
-void setVector(tf::Vector3 &v, double x, double y, double z) {
-    v.setX(x);
-    v.setY(y);
-    v.setZ(z);
 }

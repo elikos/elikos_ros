@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 
 geometry_msgs::PoseStamped getPoseStamped(float angle){
     geometry_msgs::PoseStamped pose;
-    pose.header.frame_id = "/local_origin";
+    pose.header.frame_id = "world";
     pose.header.stamp = ros::Time::now();
     pose.pose.position.x = cos(angle);
     pose.pose.position.y = sin(2*angle)/2;
