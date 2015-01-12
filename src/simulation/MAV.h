@@ -1,10 +1,3 @@
-/*
- * MAV.h
- *
- *  Created on: Jan 9, 2015
- *      Author: Antonio Sanniravong
- */
-
 #ifndef __MAV_H_
 #define __MAV_H_
 
@@ -14,26 +7,21 @@
 
 class MAV {
 public:
-    MAV(int id, double simulationSpeed);
+    MAV(double simulationSpeed);
     ~MAV();
-    void move(ros::Duration cycleTime);
-    void collide();
-    std::string getName();
-    tf::Transform getTransform();
-    int getID();
     void setVelXYPID(double kp, double ki, double kd, ros::Duration cycleTime);
     void setVelZPID(double kp, double ki, double kd, ros::Duration cycleTime);
     void setVelXYMax(double vel);
     void setVelZMax(double vel);
+    std::string getName();
+    tf::Transform getTransform();
+    void move(ros::Duration cycleTime);
+    void collide();
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
 private:
-    int ID;
     std::string Name;
-    bool isLanded;
-    double x, y, z, yaw, vel_xy_max, simSpeed;
-    double z_sp, yaw_sp;
+    double x, y, z, yaw, z_sp, yaw_sp, vel_xy_max, vel_z, vel_z_sp, simSpeed;
     tf::Vector3 vel_xy, vel_xy_sp, xy_sp, direction;
-    double vel_z, vel_z_sp;
     tf::Transform t;
     tf::Vector3 v;
     tf::Quaternion q;

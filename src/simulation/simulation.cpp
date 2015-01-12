@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     ros::Rate r(frameRate);
 
     // MAV initialization
-    MAV * mav = new MAV(1, simSpeed);
+    MAV * mav = new MAV(simSpeed);
     mav->setVelXYPID(2.0, 0.5, 1.0, r.expectedCycleTime());
     mav->setVelXYMax(0.75);
     mav->setVelZMax(5.0);

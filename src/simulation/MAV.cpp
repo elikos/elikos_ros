@@ -1,39 +1,23 @@
-/*
- * MAV.cpp
- *
- *  Created on: Jan 3, 2015
- *      Author: Antonio Sanniravong
- */
-
 #include <ros/ros.h>
 #include <tf/tf.h>
 #include "MAV.h"
-#include <elikos_lib/pid.hpp>
 
-MAV::MAV(int id, double simulationSpeed){
-    x = 0;
-    y = 0;
-    z = 0;
-    yaw = 0;
-    isLanded = false;
-    ID = id;
-    simSpeed = simulationSpeed;
-    Name = "MAV";
+MAV::MAV(double simulationSpeed): simSpeed(simulationSpeed), Name("MAV") {
     vel_x_pid = new Pid<double>(0.0, 0.0, 0.0, // PID
                                 Pid<double>::PID_DIRECT, // Controller direction
                                 Pid<double>::ACCUMULATE_OUTPUT, // Output mode
                                 33.3 / simSpeed, // Sample period
-                                0.0, 5.0, 0.0); // Min output, Max output, Setpoint
+                                -5.0, 5.0, 0.0); // Min output, Max output, Setpoint
     vel_y_pid = new Pid<double>(0.0, 0.0, 0.0,
                                 Pid<double>::PID_DIRECT,
                                 Pid<double>::ACCUMULATE_OUTPUT,
                                 33.3 / simSpeed,
-                                0.0, 5.0, 0.0);
+                                -5.0, 5.0, 0.0);
     vel_z_pid = new Pid<double>(0.0, 0.0, 0.0,
                                 Pid<double>::PID_DIRECT,
                                 Pid<double>::ACCUMULATE_OUTPUT,
                                 33.3 / simSpeed,
-                                0.0, 5.0, 0.0);
+                                -5.0, 5.0, 0.0);
     refreshTransform();
 };
 
@@ -68,14 +52,6 @@ void MAV::setVelZMax(double vel){
     vel_z_pid->SetOutputLimits(-vel, vel);
 }
 
-void MAV::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg){
-    xy_sp.setX(msg->pose.position.x);
-    xy_sp.setY(msg->pose.position.y);
-    z_sp = msg->pose.position.z;
-    // TODO: Yaw
-
-}
-
 std::string MAV::getName(){
     return Name;
 }
@@ -84,36 +60,24 @@ tf::Transform MAV::getTransform(){
     return t;
 }
 
-int MAV::getID(){
-    return ID;
-}
-
 void MAV::move(ros::Duration cycleTime){
-    // Generate velocity setpoint
-        // XY
+    // Generate XY velocity setpoints
     vel_xy_sp.setX(x - xy_sp.getX());
     vel_xy_sp.setY(y - xy_sp.getY());
     if (vel_xy_sp.length() > vel_xy_max) {
         vel_xy_sp.normalize();
         vel_xy_sp *= vel_xy_max;
     }
-        // Z
+    // Generate Z velocity setpoint
     vel_z_sp = z - z_sp;
-    if (fabs(vel_z_sp) > 1.0) {
-        vel_z_sp /= fabs(vel_z_sp);
-    }
 
-    std::cout << vel_xy_sp.getX() << "\t" << vel_xy_sp.getY() << "\t"
-            << (xy_sp * vel_xy_max).getX() << "\t" << (xy_sp * vel_xy_max).getX() << "\n";
-
-    // Compute new velocities
-        // XY
+    // Compute new XY velocities
     vel_x_pid->Run(vel_xy_sp.getX());
     vel_y_pid->Run(vel_xy_sp.getY());
     vel_xy.setX(vel_x_pid->output);
     vel_xy.setY(vel_y_pid->output);
 
-        // Z
+    // Compute new Z velocity
     vel_z_pid->Run(vel_z_sp);
     vel_z = vel_z_pid->output;
 
@@ -127,6 +91,13 @@ void MAV::move(ros::Duration cycleTime){
 
 void MAV::collide(){
     // TODO
+}
+
+void MAV::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg){
+    xy_sp.setX(msg->pose.position.x);
+    xy_sp.setY(msg->pose.position.y);
+    z_sp = msg->pose.position.z;
+    // TODO: Yaw
 }
 
 void MAV::refreshTransform(){
