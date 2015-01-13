@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     // Establish this program as a ROS node
     ros::NodeHandle nh;
     ros::Publisher pose_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/setpoint/local_position", 1);
-    ros::Rate r(10);    //10 hz
+    ros::Rate r(30);    //10 hz
 
     float angle = 0.0;
 
@@ -44,11 +44,11 @@ int main(int argc, char **argv) {
 
 geometry_msgs::PoseStamped getPoseStamped(float angle){
     geometry_msgs::PoseStamped pose;
-    pose.header.frame_id = "/local_origin";
+    pose.header.frame_id = "world";
     pose.header.stamp = ros::Time::now();
     pose.pose.position.x = cos(angle);
     pose.pose.position.y = sin(2*angle)/2;
-    pose.pose.position.z = 0.0;
+    pose.pose.position.z = 1.5 + sin(3*angle)/2;
     pose.pose.orientation.x = 0.0;
     pose.pose.orientation.y = 0.0;
     pose.pose.orientation.z = 0.0;

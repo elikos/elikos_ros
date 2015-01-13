@@ -11,6 +11,7 @@
 #include "Robot.hpp"
 #include "TargetRobot.hpp"
 #include "ObstacleRobot.hpp"
+#include "MAV.h"
 
 #ifndef PI
 #define PI 3.14159265
@@ -20,7 +21,6 @@ bool checkCollision(Robot* ra, Robot* rb);
 
 double collisionAngle(tf::Vector3 v, double yaw);
 
-void setVector(tf::Vector3 &v, double x, double y, double z);
 void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers);
 
 int main(int argc, char **argv) {
@@ -29,13 +29,36 @@ int main(int argc, char **argv) {
     ros::NodeHandle node;
 
     // Parameter initialization
-    double simSpeed;
+    double simSpeed, vel_xy_p, vel_xy_i, vel_xy_d, vel_z_p, vel_z_i, vel_z_d;
+    double vel_xy_max, vel_z_max;
     int nTrgtRobots, nObsRobots, frameRate;
     node.param<double>("simulation_speed", simSpeed, 1.0);
     node.param<int>("target_robot_count", nTrgtRobots, 10);
     node.param<int>("obstacle_robot_count", nObsRobots, 4);
     node.param<int>("frame_rate", frameRate, 30);
+
+    // PIDs & max velocities
+    node.param<double>("vel_xy_p", vel_xy_p, 2.0);
+    node.param<double>("vel_xy_i", vel_xy_i, 0.5);
+    node.param<double>("vel_xy_d", vel_xy_d, 1.0);
+    node.param<double>("vel_xy_max", vel_xy_max, 1.0);
+    node.param<double>("vel_z_p", vel_z_p, 2.0);
+    node.param<double>("vel_z_i", vel_z_i, 0.5);
+    node.param<double>("vel_z_d", vel_z_d, 1.0);
+    node.param<double>("vel_z_max", vel_z_max, 0.5);
     int totalRobots = nTrgtRobots + nObsRobots;
+
+    // Loop rate (Hz)
+    ros::Rate r(frameRate);
+
+    // MAV initialization
+    MAV * mav = new MAV(simSpeed, r.expectedCycleTime());
+    mav->setVelXYPID(vel_xy_p, vel_xy_i, vel_xy_d);
+    mav->setVelXYMax(vel_xy_max);
+    mav->setVelZPID(vel_z_p, vel_z_i, vel_z_d);
+    mav->setVelZMax(vel_z_max);
+    visualization_msgs::Marker mavMarker;
+    visualization_msgs::Marker setpointMarker;
 
     // Robot & marker initialization
     std::vector<Robot *> robots;
@@ -49,20 +72,29 @@ int main(int argc, char **argv) {
         robotMarkers.markers.push_back(robots.back()->getVizMarker());
     }
 
+    ROS_INFO("Robot markers length: %lu", robotMarkers.markers.size());
+
     // Publishers
     ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
+    ros::Publisher mav_marker_pub = node.advertise<visualization_msgs::Marker>("robotsim/mav_marker", 0);
+    ros::Publisher setpoint_marker_pub = node.advertise<visualization_msgs::Marker>("robotsim/setpoint_marker", 0);
     ros::Publisher arena_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/arena_marker", 0);
-
     tf::TransformBroadcaster br;
+
+    // Subscribers
+    ros::Subscriber pose_sub = node.subscribe("mavros/setpoint/local_position", 1000, &MAV::poseCallback, mav);
 
     //Arena setup
     visualization_msgs::MarkerArray arenaMarkers;
     setupArenaBoundaries(&arenaMarkers);
 
-    // Loop rate (Hz)
-    ros::Rate r(frameRate);
-
     while(ros::ok()){
+        // Receive and set mav setpoints
+        ros::spinOnce();
+        mav->move();
+        mavMarker = mav->getVizMarker();
+        setpointMarker = mav ->getSetpointMarker();
+
         //Collision checking
         for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
             for(std::vector<Robot*>::iterator it2 = robots.begin(); it2 != robots.end(); ++it2){
@@ -81,8 +113,9 @@ int main(int argc, char **argv) {
             ++mit;
             br.sendTransform(tf::StampedTransform((*it)->getTransform(), ros::Time::now(), "world", (*it)->getName()));
         }
-
-        //update markers
+        br.sendTransform(tf::StampedTransform(mav->getTransform(), ros::Time::now(), "world", mav->getName()));
+        mav_marker_pub.publish(mavMarker);
+        setpoint_marker_pub.publish(setpointMarker);
         marker_pub.publish(robotMarkers);
         arena_pub.publish(arenaMarkers);
         r.sleep();
@@ -114,12 +147,6 @@ double collisionAngle(tf::Vector3 v, double yaw) {
     if (angle > PI) angle -= 2 * PI;
     else if (angle <= -PI) angle += 2 * PI;
     return fabs(angle);
-}
-
-void setVector(tf::Vector3 &v, double x, double y, double z) {
-    v.setX(x);
-    v.setY(y);
-    v.setZ(z);
 }
 
 void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers){
