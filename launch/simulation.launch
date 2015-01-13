@@ -2,5 +2,7 @@
     <node name="simulator" pkg="elikos_ros" type="robotsim" output="screen"/>
     	<rosparam command="load" file="$(find elikos_ros)/launch/config.yaml" />
 
+    <node name="ai" pkg="elikos_ros" type="ai" output="screen"/>
+
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_ros)/launch/tf_markerarray.rviz" />
 </launch>
