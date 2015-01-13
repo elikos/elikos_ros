@@ -4,10 +4,7 @@
 
 #include <ros/ros.h>
 #include <ros/console.h>
-#include <std_msgs/String.h>
 #include <tf/transform_broadcaster.h>
-#include <tf/transform_datatypes.h>
-#include <geometry_msgs/PoseStamped.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <vector>
 #include <elikos_lib/pid.hpp>
