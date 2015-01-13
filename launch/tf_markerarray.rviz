@@ -70,7 +70,10 @@ Visualization Manager:
       Marker Topic: /robotsim/robot_markers
       Name: MarkerArray
       Namespaces:
-        obsRobot: true
+        obsRobot0: true
+        obsRobot1: true
+        obsRobot2: true
+        obsRobot3: true
         trgtRobot0: true
         trgtRobot1: true
         trgtRobot2: true
@@ -81,6 +84,15 @@ Visualization Manager:
         trgtRobot7: true
         trgtRobot8: true
         trgtRobot9: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /robotsim/arena_marker
+      Name: MarkerArray
+      Namespaces:
+        greenLine: true
+        redLine: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -119,10 +131,10 @@ Visualization Manager:
         Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.784797
+      Pitch: 0.544797
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.27127
+      Yaw: 6.07627
     Saved: ~
 Window Geometry:
   Displays:

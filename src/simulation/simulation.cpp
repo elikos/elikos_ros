@@ -21,6 +21,7 @@ bool checkCollision(Robot* ra, Robot* rb);
 double collisionAngle(tf::Vector3 v, double yaw);
 
 void setVector(tf::Vector3 &v, double x, double y, double z);
+void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers);
 
 int main(int argc, char **argv) {
     // ROS initialization
@@ -36,7 +37,6 @@ int main(int argc, char **argv) {
     node.param<int>("frame_rate", frameRate, 30);
     int totalRobots = nTrgtRobots + nObsRobots;
 
-
     // Robot & marker initialization
     std::vector<Robot *> robots;
     visualization_msgs::MarkerArray robotMarkers;
@@ -49,12 +49,15 @@ int main(int argc, char **argv) {
         robotMarkers.markers.push_back(robots.back()->getVizMarker());
     }
 
-    ROS_INFO("Robot markers legnth: %lu", robotMarkers.markers.size());
-
-
     // Publishers
     ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
+    ros::Publisher arena_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/arena_marker", 0);
+
     tf::TransformBroadcaster br;
+
+    //Arena setup
+    visualization_msgs::MarkerArray arenaMarkers;
+    setupArenaBoundaries(&arenaMarkers);
 
     // Loop rate (Hz)
     ros::Rate r(frameRate);
@@ -78,10 +81,12 @@ int main(int argc, char **argv) {
             ++mit;
             br.sendTransform(tf::StampedTransform((*it)->getTransform(), ros::Time::now(), "world", (*it)->getName()));
         }
+
+        //update markers
         marker_pub.publish(robotMarkers);
+        arena_pub.publish(arenaMarkers);
         r.sleep();
     }
-
 
     return 0;
 };
@@ -115,4 +120,100 @@ void setVector(tf::Vector3 &v, double x, double y, double z) {
     v.setX(x);
     v.setY(y);
     v.setZ(z);
+}
+
+void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers){
+    visualization_msgs::Marker greenLine, redLine, whiteLine1, whiteLine2;
+    greenLine.header.frame_id = "world";
+    greenLine.header.stamp = ros::Time();
+    greenLine.lifetime = ros::Duration();
+    greenLine.ns = "greenLine";
+    greenLine.id = 0;
+    greenLine.type = visualization_msgs::Marker::CUBE;
+    greenLine.action = visualization_msgs::Marker::ADD;
+    greenLine.scale.x = 20;
+    greenLine.scale.y = 0.1;
+    greenLine.scale.z = 0.001;
+    greenLine.pose.position.x = 0;
+    greenLine.pose.position.y = 10;
+    greenLine.pose.position.z = 0;
+    greenLine.pose.orientation.x = 0.0;
+    greenLine.pose.orientation.y = 0.0;
+    greenLine.pose.orientation.z = 0.0;
+    greenLine.pose.orientation.w = 0.0;
+    greenLine.color.a = 1.0;
+    greenLine.color.r = 0.0;
+    greenLine.color.g = 1.0;
+    greenLine.color.b = 0.0;
+
+    redLine.header.frame_id = "world";
+    redLine.header.stamp = ros::Time();
+    redLine.lifetime = ros::Duration();
+    redLine.ns = "redLine";
+    redLine.id = 0;
+    redLine.type = visualization_msgs::Marker::CUBE;
+    redLine.action = visualization_msgs::Marker::ADD;
+    redLine.scale.x = 20;
+    redLine.scale.y = 0.1;
+    redLine.scale.z = 0.001;
+    redLine.pose.position.x = 0;
+    redLine.pose.position.y = -10;
+    redLine.pose.position.z = 0;
+    redLine.pose.orientation.x = 0.0;
+    redLine.pose.orientation.y = 0.0;
+    redLine.pose.orientation.z = 0.0;
+    redLine.pose.orientation.w = 0.0;
+    redLine.color.a = 1.0;
+    redLine.color.r = 1.0;
+    redLine.color.g = 0.0;
+    redLine.color.b = 0.0;
+
+    whiteLine1.header.frame_id = "world";
+    whiteLine1.header.stamp = ros::Time();
+    whiteLine1.lifetime = ros::Duration();
+    whiteLine1.ns = "whiteLine";
+    whiteLine1.id = 0;
+    whiteLine1.type = visualization_msgs::Marker::CUBE;
+    whiteLine1.action = visualization_msgs::Marker::ADD;
+    whiteLine1.scale.x = 0.1;
+    whiteLine1.scale.y = 20;
+    whiteLine1.scale.z = 0.001;
+    whiteLine1.pose.position.x = -10;
+    whiteLine1.pose.position.y = 0;
+    whiteLine1.pose.position.z = 0;
+    whiteLine1.pose.orientation.x = 0.0;
+    whiteLine1.pose.orientation.y = 0.0;
+    whiteLine1.pose.orientation.z = 0.0;
+    whiteLine1.pose.orientation.w = 0.0;
+    whiteLine1.color.a = 1.0;
+    whiteLine1.color.r = 1.0;
+    whiteLine1.color.g = 1.0;
+    whiteLine1.color.b = 1.0;
+
+    whiteLine2.header.frame_id = "world";
+    whiteLine2.header.stamp = ros::Time();
+    whiteLine2.lifetime = ros::Duration();
+    whiteLine2.ns = "whiteLine";
+    whiteLine2.id = 1;
+    whiteLine2.type = visualization_msgs::Marker::CUBE;
+    whiteLine2.action = visualization_msgs::Marker::ADD;
+    whiteLine2.scale.x = 0.1;
+    whiteLine2.scale.y = 20;
+    whiteLine2.scale.z = 0.001;
+    whiteLine2.pose.position.x = 10;
+    whiteLine2.pose.position.y = 0;
+    whiteLine2.pose.position.z = 0;
+    whiteLine2.pose.orientation.x = 0.0;
+    whiteLine2.pose.orientation.y = 0.0;
+    whiteLine2.pose.orientation.z = 0.0;
+    whiteLine2.pose.orientation.w = 0.0;
+    whiteLine2.color.a = 1.0;
+    whiteLine2.color.r = 1.0;
+    whiteLine2.color.g = 1.0;
+    whiteLine2.color.b = 1.0;
+
+    arenaMarkers->markers.push_back(greenLine);
+    arenaMarkers->markers.push_back(redLine);
+    arenaMarkers->markers.push_back(whiteLine1);
+    arenaMarkers->markers.push_back(whiteLine2);
 }
