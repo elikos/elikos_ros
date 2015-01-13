@@ -102,6 +102,16 @@ Visualization Manager:
         MAV: true
       Queue Size: 100
       Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /robotsim/arena_marker
+      Name: MarkerArray
+      Namespaces:
+        greenLine: true
+        redLine: true
+        whiteLine: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
