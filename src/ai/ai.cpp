@@ -48,7 +48,7 @@ geometry_msgs::PoseStamped getPoseStamped(float angle){
     pose.header.stamp = ros::Time::now();
     pose.pose.position.x = cos(angle);
     pose.pose.position.y = sin(2*angle)/2;
-    pose.pose.position.z = 0.0;
+    pose.pose.position.z = 1.5 + sin(3*angle)/2;
     pose.pose.orientation.x = 0.0;
     pose.pose.orientation.y = 0.0;
     pose.pose.orientation.z = 0.0;

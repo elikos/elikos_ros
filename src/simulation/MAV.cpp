@@ -2,7 +2,8 @@
 #include <tf/tf.h>
 #include "MAV.h"
 
-MAV::MAV(double simulationSpeed): simSpeed(simulationSpeed), Name("MAV") {
+MAV::MAV(double simulationSpeed, ros::Duration cycleTime):
+simSpeed(simulationSpeed), Name("MAV"), cycleTime(cycleTime) {
     vel_x_pid = new Pid<double>(0.0, 0.0, 0.0, // PID
                                 Pid<double>::PID_DIRECT, // Controller direction
                                 Pid<double>::ACCUMULATE_OUTPUT, // Output mode
@@ -30,14 +31,14 @@ MAV::~MAV(){
     vel_z_pid = NULL;
 }
 
-void MAV::setVelXYPID(double kp, double ki, double kd, ros::Duration cycleTime){
+void MAV::setVelXYPID(double kp, double ki, double kd){
     vel_x_pid->SetTunings(kp, ki, kd);
     vel_x_pid->SetSamplePeriod((cycleTime.toSec() / simSpeed) * 1000);
     vel_y_pid->SetTunings(kp, ki, kd);
     vel_y_pid->SetSamplePeriod((cycleTime.toSec() / simSpeed) * 1000);
 }
 
-void MAV::setVelZPID(double kp, double ki, double kd, ros::Duration cycleTime){
+void MAV::setVelZPID(double kp, double ki, double kd){
     vel_z_pid->SetTunings(kp, ki, kd);
     vel_z_pid->SetSamplePeriod((cycleTime.toSec() / simSpeed) * 1000);
 }
@@ -60,7 +61,7 @@ tf::Transform MAV::getTransform(){
     return t;
 }
 
-void MAV::move(ros::Duration cycleTime){
+void MAV::move(){
     // Generate XY velocity setpoints
     vel_xy_sp.setX(x - xy_sp.getX());
     vel_xy_sp.setY(y - xy_sp.getY());
@@ -107,4 +108,56 @@ void MAV::refreshTransform(){
     q.setRPY(0, 0, yaw);
     t.setOrigin(v);
     t.setRotation(q);
+}
+
+visualization_msgs::Marker MAV::getVizMarker() {
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "world";
+    marker.header.stamp = ros::Time();
+    marker.ns = Name;
+    marker.id = 1;
+    marker.type = visualization_msgs::Marker::CUBE;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.scale.x = 0.5;
+    marker.scale.y = 0.5;
+    marker.scale.z = 0.1;
+    marker.pose.position.x = t.getOrigin().getX();
+    marker.pose.position.y = t.getOrigin().getY();
+    marker.pose.position.z = t.getOrigin().getZ() + marker.scale.z / 2;
+    marker.pose.orientation.x = t.getRotation().getX();
+    marker.pose.orientation.y = t.getRotation().getY();
+    marker.pose.orientation.z = t.getRotation().getZ();
+    marker.pose.orientation.w = t.getRotation().getW();
+    marker.color.a = 1.0;
+    marker.color.r = 0.0;
+    marker.color.g = 0.0;
+    marker.color.b = 1.0;
+    return marker;
+}
+
+visualization_msgs::Marker MAV::getSetpointMarker() {
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "world";
+    marker.header.stamp = ros::Time();
+    marker.ns = Name;
+    marker.id = 2;
+    marker.type = visualization_msgs::Marker::CUBE;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.scale.x = 0.5;
+    marker.scale.y = 0.5;
+    marker.scale.z = 0.1;
+    marker.pose.position.x = xy_sp.getX();
+    marker.pose.position.y = xy_sp.getY();
+    marker.pose.position.z = z_sp + marker.scale.z / 2;
+    marker.pose.orientation.x = 0;
+    marker.pose.orientation.y = 0;
+    marker.pose.orientation.z = 0;
+    marker.pose.orientation.w = 0;
+    marker.color.a = 0.5;
+    marker.color.r = 0.5;
+    marker.color.g = 0.5;
+    marker.color.b = 1.0;
+    return marker;
 }
