@@ -3,19 +3,25 @@
 */
 
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <tf/transform_broadcaster.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <elikos_lib/GroundRobot.h>
-#include <elikos_lib/pid.hpp>
 #include <vector>
+#include <elikos_lib/pid.hpp>
+#include "Robot.hpp"
+#include "TargetRobot.hpp"
+#include "ObstacleRobot.hpp"
+#include "MAV.h"
 
-bool checkCollision(GroundRobot* robotA, GroundRobot* robotB);
+#ifndef PI
+#define PI 3.14159265
+#endif
+
+bool checkCollision(Robot* ra, Robot* rb);
 
 double collisionAngle(tf::Vector3 v, double yaw);
 
-void setVector(tf::Vector3 &v, double x, double y, double z);
-
-visualization_msgs::Marker getRobotMarker(GroundRobot* robot);
+void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers);
 
 int main(int argc, char **argv) {
     // ROS initialization
@@ -23,65 +29,109 @@ int main(int argc, char **argv) {
     ros::NodeHandle node;
 
     // Parameter initialization
-    double simSpeed;
+    double simSpeed, vel_xy_p, vel_xy_i, vel_xy_d, vel_z_p, vel_z_i, vel_z_d;
+    double vel_xy_max, vel_z_max;
     int nTrgtRobots, nObsRobots, frameRate;
     node.param<double>("simulation_speed", simSpeed, 1.0);
     node.param<int>("target_robot_count", nTrgtRobots, 10);
     node.param<int>("obstacle_robot_count", nObsRobots, 4);
     node.param<int>("frame_rate", frameRate, 30);
-    int totalRobots = nTrgtRobots + nObsRobots;
 
-    // Robot & marker initialization
-    std::vector <GroundRobot *> robots;
-    robots.reserve(totalRobots);
-    visualization_msgs::MarkerArray robotMarkers;
-    for (int i = 0; i < nTrgtRobots; i++) {
-        robots.push_back(new GroundRobot(TARGET_ROBOT, nTrgtRobots, i, simSpeed));
-        robotMarkers.markers.push_back(getRobotMarker(robots[i]));
-    }
-    for (int i = 0; i < nObsRobots; i++) {
-        robots.push_back(new GroundRobot(OBSTACLE_ROBOT_RND, nObsRobots, i, simSpeed));
-        robotMarkers.markers.push_back(getRobotMarker(robots[i]));
-    }
-    
-    // Publishers
-    ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
-    tf::TransformBroadcaster br;
+    // PIDs & max velocities
+    node.param<double>("vel_xy_p", vel_xy_p, 2.0);
+    node.param<double>("vel_xy_i", vel_xy_i, 0.5);
+    node.param<double>("vel_xy_d", vel_xy_d, 1.0);
+    node.param<double>("vel_xy_max", vel_xy_max, 1.0);
+    node.param<double>("vel_z_p", vel_z_p, 2.0);
+    node.param<double>("vel_z_i", vel_z_i, 0.5);
+    node.param<double>("vel_z_d", vel_z_d, 1.0);
+    node.param<double>("vel_z_max", vel_z_max, 0.5);
+    int totalRobots = nTrgtRobots + nObsRobots;
 
     // Loop rate (Hz)
     ros::Rate r(frameRate);
 
-    // Main Loop
-    while (ros::ok()) {
-        // Collision checking
-        for (int i = 0; i < (totalRobots); i++) {
-            for (int j = 0; j < totalRobots; j++) {
-                if (i == j) continue;
-                if (checkCollision(robots[i], robots[j])) {
-                    robots[i]->collide();
+    // MAV initialization
+    MAV * mav = new MAV(simSpeed, r.expectedCycleTime());
+    mav->setVelXYPID(vel_xy_p, vel_xy_i, vel_xy_d);
+    mav->setVelXYMax(vel_xy_max);
+    mav->setVelZPID(vel_z_p, vel_z_i, vel_z_d);
+    mav->setVelZMax(vel_z_max);
+    visualization_msgs::Marker mavMarker;
+    visualization_msgs::Marker setpointMarker;
+
+    // Robot & marker initialization
+    std::vector<Robot *> robots;
+    visualization_msgs::MarkerArray robotMarkers;
+    for (int i = 0; i < nTrgtRobots; ++i) {
+        robots.push_back(new TargetRobot(i, nTrgtRobots, simSpeed));
+        robotMarkers.markers.push_back(robots.back()->getVizMarker());
+    }
+    for (int i = 0; i < nObsRobots; ++i) {
+        robots.push_back(new ObstacleRobot(i, nObsRobots, simSpeed));
+        robotMarkers.markers.push_back(robots.back()->getVizMarker());
+    }
+
+    ROS_INFO("Robot markers length: %lu", robotMarkers.markers.size());
+
+    // Publishers
+    ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
+    ros::Publisher mav_marker_pub = node.advertise<visualization_msgs::Marker>("robotsim/mav_marker", 0);
+    ros::Publisher setpoint_marker_pub = node.advertise<visualization_msgs::Marker>("robotsim/setpoint_marker", 0);
+    ros::Publisher arena_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/arena_marker", 0);
+    tf::TransformBroadcaster br;
+
+    // Subscribers
+    ros::Subscriber pose_sub = node.subscribe("mavros/setpoint/local_position", 1000, &MAV::poseCallback, mav);
+
+    //Arena setup
+    visualization_msgs::MarkerArray arenaMarkers;
+    setupArenaBoundaries(&arenaMarkers);
+
+    while(ros::ok()){
+        // Receive and set mav setpoints
+        ros::spinOnce();
+        mav->move();
+        mavMarker = mav->getVizMarker();
+        setpointMarker = mav ->getSetpointMarker();
+
+        //Collision checking
+        for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
+            for(std::vector<Robot*>::iterator it2 = robots.begin(); it2 != robots.end(); ++it2){
+                if(*it != *it2){
+                    if(checkCollision(*it, *it2)){
+                        (*it)->collide();
+                    }
                 }
             }
         }
-        // Advance robots to next frame and publish tf & marker
-        for (int i = 0; i < totalRobots; i++) {
-            robots[i]->advance(r.expectedCycleTime());
-            robotMarkers.markers[i] = getRobotMarker(robots[i]);
-            br.sendTransform(tf::StampedTransform(robots[i]->getTransform(), ros::Time::now(), "world", robots[i]->getName()));
+
+        std::vector<visualization_msgs::Marker>::iterator mit = robotMarkers.markers.begin();
+        for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
+            (*it)->move(r.expectedCycleTime());
+            (*mit) = (*it)->getVizMarker();
+            ++mit;
+            br.sendTransform(tf::StampedTransform((*it)->getTransform(), ros::Time::now(), "world", (*it)->getName()));
         }
+        br.sendTransform(tf::StampedTransform(mav->getTransform(), ros::Time::now(), "world", mav->getName()));
+        mav_marker_pub.publish(mavMarker);
+        setpoint_marker_pub.publish(setpointMarker);
         marker_pub.publish(robotMarkers);
+        arena_pub.publish(arenaMarkers);
         r.sleep();
     }
+
     return 0;
 };
 
-bool checkCollision(GroundRobot* robotA, GroundRobot* robotB) {
-    tf::Vector3 vA = robotA->getTransform().getOrigin();
-    tf::Vector3 vB = robotB->getTransform().getOrigin();
+bool checkCollision(Robot* ra, Robot* rb){
+    tf::Vector3 vA = ra->getTransform().getOrigin();
+    tf::Vector3 vB = rb->getTransform().getOrigin();
     tf::Vector3 xAxis;
-    setVector(xAxis, 1, 0, 0);
-    tf::Quaternion qA = robotA->getTransform().getRotation();
-//	if (robotA.getName() == "robot0" && robotB.getName() == "robot1")
-//		std::cout << "Collision vector angle: " << atan2((vB-vA).getY(), (vB-vA).getX()) << "\tYaw:" << tf::getYaw(qA) << "\tcollisionAngle:" << collisionAngle(vB-vA, tf::getYaw(qA)) << "\n";
+    xAxis.setX(1);
+    xAxis.setY(0);
+    xAxis.setZ(0);
+    tf::Quaternion qA = ra->getTransform().getRotation();
 
     if (vA.distance(vB) > 0.35) {
         return false;
@@ -99,53 +149,98 @@ double collisionAngle(tf::Vector3 v, double yaw) {
     return fabs(angle);
 }
 
-void setVector(tf::Vector3 &v, double x, double y, double z) {
-    v.setX(x);
-    v.setY(y);
-    v.setZ(z);
-}
+void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers){
+    visualization_msgs::Marker greenLine, redLine, whiteLine1, whiteLine2;
+    greenLine.header.frame_id = "world";
+    greenLine.header.stamp = ros::Time();
+    greenLine.lifetime = ros::Duration();
+    greenLine.ns = "greenLine";
+    greenLine.id = 0;
+    greenLine.type = visualization_msgs::Marker::CUBE;
+    greenLine.action = visualization_msgs::Marker::ADD;
+    greenLine.scale.x = 20;
+    greenLine.scale.y = 0.1;
+    greenLine.scale.z = 0.001;
+    greenLine.pose.position.x = 0;
+    greenLine.pose.position.y = 10;
+    greenLine.pose.position.z = 0;
+    greenLine.pose.orientation.x = 0.0;
+    greenLine.pose.orientation.y = 0.0;
+    greenLine.pose.orientation.z = 0.0;
+    greenLine.pose.orientation.w = 0.0;
+    greenLine.color.a = 1.0;
+    greenLine.color.r = 0.0;
+    greenLine.color.g = 1.0;
+    greenLine.color.b = 0.0;
 
-visualization_msgs::Marker getRobotMarker(GroundRobot* robot) {
-    visualization_msgs::Marker marker;
-    tf::Transform t = robot->getTransform();
-    int r = 0, g = 0, b = 0;
+    redLine.header.frame_id = "world";
+    redLine.header.stamp = ros::Time();
+    redLine.lifetime = ros::Duration();
+    redLine.ns = "redLine";
+    redLine.id = 0;
+    redLine.type = visualization_msgs::Marker::CUBE;
+    redLine.action = visualization_msgs::Marker::ADD;
+    redLine.scale.x = 20;
+    redLine.scale.y = 0.1;
+    redLine.scale.z = 0.001;
+    redLine.pose.position.x = 0;
+    redLine.pose.position.y = -10;
+    redLine.pose.position.z = 0;
+    redLine.pose.orientation.x = 0.0;
+    redLine.pose.orientation.y = 0.0;
+    redLine.pose.orientation.z = 0.0;
+    redLine.pose.orientation.w = 0.0;
+    redLine.color.a = 1.0;
+    redLine.color.r = 1.0;
+    redLine.color.g = 0.0;
+    redLine.color.b = 0.0;
 
-    marker.header.frame_id = "world";
-    marker.header.stamp = ros::Time();
-    marker.ns = robot->getType();
-    marker.id = robot->getID();
-    marker.type = visualization_msgs::Marker::CYLINDER;
-    marker.action = visualization_msgs::Marker::ADD;
-    marker.scale.x = 0.35;
-    marker.scale.y = 0.35;
-    marker.scale.z = robot->getTypeID() ? 1.5 : 0.1;
-    marker.pose.position.x = t.getOrigin().getX();
-    marker.pose.position.y = t.getOrigin().getY();
-    marker.pose.position.z = t.getOrigin().getZ() + marker.scale.z / 2;
-    marker.pose.orientation.x = t.getRotation().getX();
-    marker.pose.orientation.y = t.getRotation().getY();
-    marker.pose.orientation.z = t.getRotation().getZ();
-    marker.pose.orientation.w = t.getRotation().getW();
+    whiteLine1.header.frame_id = "world";
+    whiteLine1.header.stamp = ros::Time();
+    whiteLine1.lifetime = ros::Duration();
+    whiteLine1.ns = "whiteLine";
+    whiteLine1.id = 0;
+    whiteLine1.type = visualization_msgs::Marker::CUBE;
+    whiteLine1.action = visualization_msgs::Marker::ADD;
+    whiteLine1.scale.x = 0.1;
+    whiteLine1.scale.y = 20;
+    whiteLine1.scale.z = 0.001;
+    whiteLine1.pose.position.x = -10;
+    whiteLine1.pose.position.y = 0;
+    whiteLine1.pose.position.z = 0;
+    whiteLine1.pose.orientation.x = 0.0;
+    whiteLine1.pose.orientation.y = 0.0;
+    whiteLine1.pose.orientation.z = 0.0;
+    whiteLine1.pose.orientation.w = 0.0;
+    whiteLine1.color.a = 1.0;
+    whiteLine1.color.r = 1.0;
+    whiteLine1.color.g = 1.0;
+    whiteLine1.color.b = 1.0;
 
-    switch (robot->getColor()) {
-        case RED:
-            r = 1.0;
-            break;
-        case GREEN:
-            g = 1.0;
-            break;
-        case BLUE:
-            b = 1.0;
-            break;
-        default :
-            r = 1.0;
-            g = 1.0;
-            b = 1.0;
-            break;
-    }
-    marker.color.a = 1.0;
-    marker.color.r = r;
-    marker.color.g = g;
-    marker.color.b = b;
-    return marker;
+    whiteLine2.header.frame_id = "world";
+    whiteLine2.header.stamp = ros::Time();
+    whiteLine2.lifetime = ros::Duration();
+    whiteLine2.ns = "whiteLine";
+    whiteLine2.id = 1;
+    whiteLine2.type = visualization_msgs::Marker::CUBE;
+    whiteLine2.action = visualization_msgs::Marker::ADD;
+    whiteLine2.scale.x = 0.1;
+    whiteLine2.scale.y = 20;
+    whiteLine2.scale.z = 0.001;
+    whiteLine2.pose.position.x = 10;
+    whiteLine2.pose.position.y = 0;
+    whiteLine2.pose.position.z = 0;
+    whiteLine2.pose.orientation.x = 0.0;
+    whiteLine2.pose.orientation.y = 0.0;
+    whiteLine2.pose.orientation.z = 0.0;
+    whiteLine2.pose.orientation.w = 0.0;
+    whiteLine2.color.a = 1.0;
+    whiteLine2.color.r = 1.0;
+    whiteLine2.color.g = 1.0;
+    whiteLine2.color.b = 1.0;
+
+    arenaMarkers->markers.push_back(greenLine);
+    arenaMarkers->markers.push_back(redLine);
+    arenaMarkers->markers.push_back(whiteLine1);
+    arenaMarkers->markers.push_back(whiteLine2);
 }
