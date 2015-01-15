@@ -9,6 +9,8 @@
 #define __AGENT_H_
 
 #include <ros/ros.h>
+#include <vector>
+#include <string>
 
 class Agent
 {
@@ -17,8 +19,10 @@ public:
 
     Agent();
     void init();  // start the agent (the elikos::ai node should do that)
+    void run();
     
 private:
+    // AI RELATED FUNCTIONS
     // Missing: the agent's internal model ->> envionment, robots, obstacles
     // Missing: the agent's possible actions
     // Missing: the agent's rules of action and utility decision's rules
@@ -43,6 +47,24 @@ private:
     bool actionIsDone();
 
     // Missing: loop of functions' calls (in some "run" function)
+
+
+    // Publishers and subscribers
+    void setPublishers();
+    void setSubscribers();
+
+    // Attributes
+    std::string Name;
+    ros::Duration cycleTime;
+    tf::Vector3 direction;
+    tf::Transform t;
+    tf::Vector3 v;
+    tf::Quaternion q;
+
+    // Attributes : publishers, subscribers
+    ros::Publisher pub_orders;
+    sdt::vector<ros::Subscriber> subs;
+
 
     // Hidden constructors
 
