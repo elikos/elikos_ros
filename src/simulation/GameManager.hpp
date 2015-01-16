@@ -7,7 +7,8 @@ public:
     ~GameManager();
 
 private:
-    
+    int score;
+
 };
 
 #endif /* __GAME_MANAGER_H_ */
