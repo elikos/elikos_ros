@@ -7,6 +7,7 @@ project(elikos_ros)
 
 find_package(catkin REQUIRED)
 find_package(catkin REQUIRED COMPONENTS roscpp tf)
+find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -111,6 +112,12 @@ add_executable( robotsim
   src/simulation/TargetRobot.cpp
   src/simulation/ObstacleRobot.cpp
   src/simulation/MAV.cpp
+)
+
+add_executable( tracking
+  src/RobotDetection/tracking.cpp
+  src/RobotDetection/RobotDesc.h
+  src/RobotDetection/RobotDesc.cpp
 )
 
 ## Add cmake target dependencies of the executable/library
