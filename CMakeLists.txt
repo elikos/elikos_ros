@@ -132,8 +132,8 @@ add_executable( tracking
 target_link_libraries( ai ${catkin_LIBRARIES})
 target_link_libraries( localization ${catkin_LIBRARIES})
 target_link_libraries( robotdetect ${catkin_LIBRARIES})
-target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES}
-)
+target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##
