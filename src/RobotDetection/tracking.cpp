@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
 {
 
     //init ROS
-    ros::init( argc, argv, "elikos_robotdetect_hello" );
+    //ros::init( argc, argv, "elikos_robotdetect_hello" );
 
     //if we would like to calibrate our filter values, set to true.
     bool calibrationMode = true ;
