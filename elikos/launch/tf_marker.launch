@@ -1,0 +1,4 @@
+<launch>
+    <node name="simulator" pkg="elikos_ros" type="robotsim" output="screen"/>
+    	<rosparam command="load" file="$(find elikos_ros)/launch/config.yaml" />
+</launch>
