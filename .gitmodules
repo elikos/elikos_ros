@@ -1,3 +1,7 @@
 [submodule "camera1394"]
 	path = camera1394
 	url = git@github.com:ros-drivers/camera1394.git
+[submodule "urg_node"]
+	path = urg_node
+	url = git@github.com:ros-drivers/urg_node.git
+	branch = indigo-devel
