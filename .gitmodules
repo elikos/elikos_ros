@@ -5,3 +5,9 @@
 	path = urg_node
 	url = git@github.com:ros-drivers/urg_node.git
 	branch = indigo-devel
+[submodule "deps/urg_c"]
+	path = deps/urg_c
+	url = git@github.com:ros-drivers/urg_c.git
+[submodule "deps/laser_proc"]
+	path = deps/laser_proc
+	url = git@github.com:ros-perception/laser_proc.git
