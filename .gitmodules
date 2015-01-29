@@ -1,0 +1,3 @@
+[submodule "camera1394"]
+	path = camera1394
+	url = git@github.com:ros-drivers/camera1394.git
