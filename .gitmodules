@@ -11,3 +11,6 @@
 [submodule "deps/laser_proc"]
 	path = deps/laser_proc
 	url = git@github.com:ros-perception/laser_proc.git
+[submodule "mavros"]
+	path = mavros
+	url = https://github.com/mavlink/mavros.git
