@@ -12,6 +12,7 @@
 #include "TargetRobot.hpp"
 #include "ObstacleRobot.hpp"
 #include "MAV.h"
+#include "GameManager.hpp"
 
 #ifndef PI
 #define PI 3.14159265
@@ -22,6 +23,8 @@ bool checkCollision(Robot* ra, Robot* rb);
 double collisionAngle(tf::Vector3 v, double yaw);
 
 void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers);
+
+bool isOutOfBounds(const Robot* robot);
 
 int main(int argc, char **argv) {
     // ROS initialization
@@ -106,13 +109,19 @@ int main(int argc, char **argv) {
             }
         }
 
-        std::vector<visualization_msgs::Marker>::iterator mit = robotMarkers.markers.begin();
-        for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
+        robotMarkers.markers.clear();
+        for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); /*no increment*/){
             (*it)->move(r.expectedCycleTime());
-            (*mit) = (*it)->getVizMarker();
-            ++mit;
+            robotMarkers.markers.push_back((*it)->getVizMarker());
             br.sendTransform(tf::StampedTransform((*it)->getTransform(), ros::Time::now(), "world", (*it)->getName()));
+
+            if(isOutOfBounds((*it))){
+                it = robots.erase(it);
+            } else{
+                ++it;
+            }
         }
+
         br.sendTransform(tf::StampedTransform(mav->getTransform(), ros::Time::now(), "world", mav->getName()));
         mav_marker_pub.publish(mavMarker);
         setpoint_marker_pub.publish(setpointMarker);
@@ -147,6 +156,34 @@ double collisionAngle(tf::Vector3 v, double yaw) {
     if (angle > PI) angle -= 2 * PI;
     else if (angle <= -PI) angle += 2 * PI;
     return fabs(angle);
+}
+
+bool isOutOfBounds(const Robot* robot){
+    bool result = false;
+
+    if(robot->getTransform().getOrigin().getY() > 10){
+        //green line
+        result = true;
+        ROS_INFO("Green line crossed");
+        //notify manager green line
+    } else if(robot->getTransform().getOrigin().getY() < -10){
+        //red line
+        result = true;
+        ROS_INFO("Red line crossed");
+        //notify manager red line
+    } else if(robot->getTransform().getOrigin().getX() < -10){
+        //white line -10
+        result = true;
+        ROS_INFO("White line 01 crossed");
+        //notify manager white line 1
+    } else if(robot->getTransform().getOrigin().getX() > 10){
+        //white line +10
+        result = true;
+        ROS_INFO("White line 02 crossed");
+        //notify manager white line 2
+    }
+
+    return result;
 }
 
 void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers){
