@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 
+namespace elikos_ai {
+
 class Agent
 {
 
@@ -19,6 +21,7 @@ public:
 
     Agent();
     void init();  // start the agent (the elikos::ai node should do that)
+    void destroy();
     void run();
     
 private:
@@ -35,13 +38,13 @@ private:
     // a sketch and might change.
 
     void percept();       // get data from other ROS nodes (topics and services)
+    void updateModel();
 
     void chooseAction();
     void predictImpactActionOnModel();
     void evaluateUtility();
 
     void executeAction(); // communicate with ROS
-    void updateModel();
 
     
     bool actionIsDone();
@@ -53,17 +56,20 @@ private:
     void setPublishers();
     void setSubscribers();
 
+    void removePublishers();
+    void removeSubscribers();
+
     // Attributes
-    std::string Name;
+    /*std::string Name;
     ros::Duration cycleTime;
     tf::Vector3 direction;
     tf::Transform t;
     tf::Vector3 v;
-    tf::Quaternion q;
+    tf::Quaternion q;*/
 
     // Attributes : publishers, subscribers
     ros::Publisher pub_orders;
-    sdt::vector<ros::Subscriber> subs;
+    std::vector<ros::Subscriber> subs;
 
 
     // Hidden constructors
@@ -71,4 +77,6 @@ private:
     Agent( const Agent& agent  ); // do not implement
 };
 
-#endif /* __AGENT_H_ */
+} // namespace elikos_ai
+
+#endif // __AGENT_H_

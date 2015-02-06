@@ -6,7 +6,9 @@
  */
 
 #include "Agent.h"
-#include "topics.cpp"
+#include "./../defines.cpp"
+
+namespace elikos_ai {
 
 Agent::Agent()
 {
@@ -15,7 +17,14 @@ Agent::Agent()
 
 void Agent::init()
 {
+    setPublishers();
+    setSubscribers();
+}
 
+void Agent::destroy()
+{
+    //removePublishers();
+    //removeSubscribers();
 }
 
 ///
@@ -34,3 +43,5 @@ void Agent::setSubscribers()
 {
     // Subscribe to all robots' positions' topics
 }
+
+} // namespace elikos_ai
