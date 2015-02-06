@@ -6,6 +6,8 @@
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
 
+namespace elikos_sim {
+
 /**
 * Abstract base class representing robots in the arena (obstacles and targets)
 */
@@ -33,5 +35,7 @@ protected:
 private:
     Robot();
 };
+
+} // namespace elikos_sim
 
 #endif /* GROUNDROBOT_H */

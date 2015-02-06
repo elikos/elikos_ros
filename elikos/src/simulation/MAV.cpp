@@ -2,6 +2,8 @@
 #include <tf/tf.h>
 #include "MAV.h"
 
+namespace elikos_sim {
+
 MAV::MAV(double simulationSpeed, ros::Duration cycleTime):
 simSpeed(simulationSpeed), Name("MAV"), cycleTime(cycleTime) {
     x = 0;
@@ -165,3 +167,5 @@ visualization_msgs::Marker MAV::getSetpointMarker() {
     marker.color.b = 1.0;
     return marker;
 }
+
+} // namespace elikos_sim

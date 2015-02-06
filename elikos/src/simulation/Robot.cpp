@@ -1,5 +1,7 @@
 #include "Robot.hpp"
 
+namespace elikos_sim {
+
 Robot::Robot(int id, double simSpeed) : id(id), simSpeed(simSpeed) {
     x = 0;
     y = 0;
@@ -16,3 +18,5 @@ void Robot::refreshTransform(){
     transform.setOrigin(v);
     transform.setRotation(q);
 }
+
+} // namespace elikos_sim

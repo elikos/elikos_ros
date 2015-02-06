@@ -3,8 +3,9 @@
 
 #include <elikos_lib/pid.hpp>
 #include <visualization_msgs/Marker.h>
+#include "./../defines.cpp"
 
-#define PI 3.14159265
+namespace elikos_sim {
 
 class MAV {
 public:
@@ -33,5 +34,7 @@ private:
     Pid<double>* vel_x_pid, * vel_y_pid, * vel_z_pid;
 
 };
+
+} // namespace elikos_sim
 
 #endif /* __MAV_H_ */

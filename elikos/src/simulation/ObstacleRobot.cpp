@@ -1,8 +1,8 @@
 #include "ObstacleRobot.hpp"
+#include "./../defines.cpp"
 
-#ifndef PI
-#define PI 3.14159265
-#endif
+
+namespace elikos_sim {
 
 ObstacleRobot::ObstacleRobot(int id, int numRobots, double simulationSpeed) : Robot(id, simulationSpeed) {
     //starting pose
@@ -73,3 +73,5 @@ visualization_msgs::Marker ObstacleRobot::getVizMarker() {
     marker.color.b = 1.0;
     return marker;
 }
+
+} // namespace elikos_sim
