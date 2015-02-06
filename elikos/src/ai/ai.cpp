@@ -6,7 +6,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 
-#define PI 3.14159265
+#include "./../defines.cpp"
 
 
 geometry_msgs::PoseStamped getPoseStamped(float angle);
@@ -56,3 +56,4 @@ geometry_msgs::PoseStamped getPoseStamped(float angle){
 
     return pose;
 }
+

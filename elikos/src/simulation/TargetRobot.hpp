@@ -3,6 +3,9 @@
 
 #include <tf/tf.h>
 #include "Robot.hpp"
+
+namespace elikos_sim {
+
 /**
 * Class representing target robots in the arena
 */
@@ -31,5 +34,7 @@ private:
     void noise();
     double limitTurn(double& angle, double angularSpeed, double cycleDuration);
 };
+
+} // namespace elikos_sim
 
 #endif /* TARGET_ROBOT_H */

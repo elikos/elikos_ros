@@ -2,6 +2,8 @@
 #define OBSTACLE_ROBOT_H
 #include "Robot.hpp"
 
+namespace elikos_sim {
+
 /**
 * Class representing obstacle robots
 */
@@ -18,5 +20,7 @@ public:
 private:
     bool isStopped;
 };
+
+} // namespace elikos_sim
 
 #endif /* OBSTACLE_ROBOT_H */
