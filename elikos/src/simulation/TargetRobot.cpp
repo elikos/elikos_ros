@@ -1,10 +1,12 @@
 #include <ros/ros.h>
 #include "TargetRobot.hpp"
+#include "./../defines.cpp"
 
-#ifndef PI
-#define PI 3.14159265
-#endif
+#ifndef ROBOT_TYPE
 #define ROBOT_TYPE "trgtRobot"
+#endif // ROBOT_TYPE
+
+namespace elikos_sim {
 
 TargetRobot::TargetRobot(int id, int numRobots, double simulationSpeed) : Robot(id, simulationSpeed) {
     //Starting pose
@@ -116,3 +118,5 @@ visualization_msgs::Marker TargetRobot::getVizMarker() {
     marker.color.b = b;
     return marker;
 }
+
+} // namespace elikos_sim

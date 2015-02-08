@@ -30,5 +30,10 @@
 # Open files meta-file (example.extension~)
 *.*~
 
-#clion files
+# clion files
+.idea
+.idea/*
+.idea/**/*
+.idea/.name
 .idea/*.xml
+

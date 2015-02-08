@@ -102,6 +102,10 @@ add_library(elikos_lib
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
+add_executable( ai_agent
+ src/ai/ai_agent.cpp
+ src/ai/Agent.cpp
+ )
 add_executable( ai src/ai/ai.cpp )
 add_executable( localization src/localization.cpp )
 add_executable( robotdetect src/robotdetect.cpp )
@@ -122,6 +126,7 @@ add_executable( robotsim
 #   ${catkin_LIBRARIES}
 # )
 
+target_link_libraries( ai_agent ${catkin_LIBRARIES})
 target_link_libraries( ai ${catkin_LIBRARIES})
 target_link_libraries( localization ${catkin_LIBRARIES})
 target_link_libraries( robotdetect ${catkin_LIBRARIES})

@@ -12,16 +12,26 @@
 #include "TargetRobot.hpp"
 #include "ObstacleRobot.hpp"
 #include "MAV.h"
+#include "GameManager.hpp"
 
-#ifndef PI
-#define PI 3.14159265
-#endif
+#include "./../defines.cpp"
 
-bool checkCollision(Robot* ra, Robot* rb);
 
-double collisionAngle(tf::Vector3 v, double yaw);
+/* *************************************************************************************************
+ * ***           FUNCTIONS DECLARATIONS
+ * *************************************************************************************************
+ */
 
-void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers);
+bool 	checkCollision(elikos_sim::Robot* ra, elikos_sim::Robot* rb);
+double 	collisionAngle(tf::Vector3 v, double yaw);
+void 	setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers);
+bool 	isOutOfBounds(const elikos_sim::Robot* robot);
+
+
+/* *************************************************************************************************
+ * ***           MAIN
+ * *************************************************************************************************
+ */
 
 int main(int argc, char **argv) {
     // ROS initialization
@@ -52,7 +62,7 @@ int main(int argc, char **argv) {
     ros::Rate r(frameRate);
 
     // MAV initialization
-    MAV * mav = new MAV(simSpeed, r.expectedCycleTime());
+    elikos_sim::MAV * mav = new elikos_sim::MAV(simSpeed, r.expectedCycleTime());
     mav->setVelXYPID(vel_xy_p, vel_xy_i, vel_xy_d);
     mav->setVelXYMax(vel_xy_max);
     mav->setVelZPID(vel_z_p, vel_z_i, vel_z_d);
@@ -61,28 +71,28 @@ int main(int argc, char **argv) {
     visualization_msgs::Marker setpointMarker;
 
     // Robot & marker initialization
-    std::vector<Robot *> robots;
+    std::vector<elikos_sim::Robot *> robots;
     visualization_msgs::MarkerArray robotMarkers;
     for (int i = 0; i < nTrgtRobots; ++i) {
-        robots.push_back(new TargetRobot(i, nTrgtRobots, simSpeed));
+        robots.push_back(new elikos_sim::TargetRobot(i, nTrgtRobots, simSpeed));
         robotMarkers.markers.push_back(robots.back()->getVizMarker());
     }
     for (int i = 0; i < nObsRobots; ++i) {
-        robots.push_back(new ObstacleRobot(i, nObsRobots, simSpeed));
+        robots.push_back(new elikos_sim::ObstacleRobot(i, nObsRobots, simSpeed));
         robotMarkers.markers.push_back(robots.back()->getVizMarker());
     }
 
     ROS_INFO("Robot markers length: %lu", robotMarkers.markers.size());
 
     // Publishers
-    ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/robot_markers", 0);
-    ros::Publisher mav_marker_pub = node.advertise<visualization_msgs::Marker>("robotsim/mav_marker", 0);
-    ros::Publisher setpoint_marker_pub = node.advertise<visualization_msgs::Marker>("robotsim/setpoint_marker", 0);
-    ros::Publisher arena_pub = node.advertise<visualization_msgs::MarkerArray>("robotsim/arena_marker", 0);
+    ros::Publisher marker_pub = node.advertise<visualization_msgs::MarkerArray>(TOPICS_NAMES[robotsim_robot_markers], 0); // "robotsim/robot_markers"
+    ros::Publisher mav_marker_pub = node.advertise<visualization_msgs::Marker>(TOPICS_NAMES[robotsim_mav_marker], 0); // "robotsim/mav_marker"
+    ros::Publisher setpoint_marker_pub = node.advertise<visualization_msgs::Marker>(TOPICS_NAMES[robotsim_setpoint_marker], 0); // "robotsim/setpoint_marker"
+    ros::Publisher arena_pub = node.advertise<visualization_msgs::MarkerArray>(TOPICS_NAMES[robotsim_arena_marker], 0); // "robotsim/arena_marker"
     tf::TransformBroadcaster br;
 
     // Subscribers
-    ros::Subscriber pose_sub = node.subscribe("mavros/setpoint/local_position", 1000, &MAV::poseCallback, mav);
+    ros::Subscriber pose_sub = node.subscribe(TOPICS_NAMES[mavros_setpoint_local_position], 1000, &elikos_sim::MAV::poseCallback, mav); // "mavros/setpoint/local_position"
 
     //Arena setup
     visualization_msgs::MarkerArray arenaMarkers;
@@ -96,8 +106,8 @@ int main(int argc, char **argv) {
         setpointMarker = mav ->getSetpointMarker();
 
         //Collision checking
-        for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
-            for(std::vector<Robot*>::iterator it2 = robots.begin(); it2 != robots.end(); ++it2){
+        for(std::vector<elikos_sim::Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
+            for(std::vector<elikos_sim::Robot*>::iterator it2 = robots.begin(); it2 != robots.end(); ++it2){
                 if(*it != *it2){
                     if(checkCollision(*it, *it2)){
                         (*it)->collide();
@@ -106,13 +116,19 @@ int main(int argc, char **argv) {
             }
         }
 
-        std::vector<visualization_msgs::Marker>::iterator mit = robotMarkers.markers.begin();
-        for(std::vector<Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
+        robotMarkers.markers.clear();
+        for(std::vector<elikos_sim::Robot*>::iterator it = robots.begin(); it != robots.end(); /*no increment*/){
             (*it)->move(r.expectedCycleTime());
-            (*mit) = (*it)->getVizMarker();
-            ++mit;
+            robotMarkers.markers.push_back((*it)->getVizMarker());
             br.sendTransform(tf::StampedTransform((*it)->getTransform(), ros::Time::now(), "world", (*it)->getName()));
+
+            if(isOutOfBounds((*it))){
+                it = robots.erase(it);
+            } else{
+                ++it;
+            }
         }
+
         br.sendTransform(tf::StampedTransform(mav->getTransform(), ros::Time::now(), "world", mav->getName()));
         mav_marker_pub.publish(mavMarker);
         setpoint_marker_pub.publish(setpointMarker);
@@ -124,7 +140,13 @@ int main(int argc, char **argv) {
     return 0;
 };
 
-bool checkCollision(Robot* ra, Robot* rb){
+
+/* *************************************************************************************************
+ * ***           FUNCTIONS
+ * *************************************************************************************************
+ */
+
+bool checkCollision(elikos_sim::Robot* ra, elikos_sim::Robot* rb){
     tf::Vector3 vA = ra->getTransform().getOrigin();
     tf::Vector3 vB = rb->getTransform().getOrigin();
     tf::Vector3 xAxis;
@@ -147,6 +169,34 @@ double collisionAngle(tf::Vector3 v, double yaw) {
     if (angle > PI) angle -= 2 * PI;
     else if (angle <= -PI) angle += 2 * PI;
     return fabs(angle);
+}
+
+bool isOutOfBounds(const elikos_sim::Robot* robot){
+    bool result = false;
+
+    if(robot->getTransform().getOrigin().getY() > 10){
+        //green line
+        result = true;
+        ROS_INFO("Green line crossed");
+        //notify manager green line
+    } else if(robot->getTransform().getOrigin().getY() < -10){
+        //red line
+        result = true;
+        ROS_INFO("Red line crossed");
+        //notify manager red line
+    } else if(robot->getTransform().getOrigin().getX() < -10){
+        //white line -10
+        result = true;
+        ROS_INFO("White line 01 crossed");
+        //notify manager white line 1
+    } else if(robot->getTransform().getOrigin().getX() > 10){
+        //white line +10
+        result = true;
+        ROS_INFO("White line 02 crossed");
+        //notify manager white line 2
+    }
+
+    return result;
 }
 
 void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers){
@@ -244,3 +294,4 @@ void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers){
     arenaMarkers->markers.push_back(whiteLine1);
     arenaMarkers->markers.push_back(whiteLine2);
 }
+
