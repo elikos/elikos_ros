@@ -8,6 +8,8 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <vector>
 #include <elikos_lib/pid.hpp>
+#include <algorithm>
+#include <memory>
 #include "Robot.hpp"
 #include "TargetRobot.hpp"
 #include "ObstacleRobot.hpp"
@@ -22,7 +24,7 @@
  * *************************************************************************************************
  */
 
-bool 	checkCollision(elikos_sim::Robot* ra, elikos_sim::Robot* rb);
+bool 	checkCollision(const elikos_sim::Robot* ra, const elikos_sim::Robot* rb);
 double 	collisionAngle(tf::Vector3 v, double yaw);
 void 	setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers);
 bool 	isOutOfBounds(const elikos_sim::Robot* robot);
@@ -71,15 +73,17 @@ int main(int argc, char **argv) {
     visualization_msgs::Marker setpointMarker;
 
     // Robot & marker initialization
-    std::vector<elikos_sim::Robot *> robots;
+    std::vector<elikos_sim::Robot*> robots;
     visualization_msgs::MarkerArray robotMarkers;
     for (int i = 0; i < nTrgtRobots; ++i) {
-        robots.push_back(new elikos_sim::TargetRobot(i, nTrgtRobots, simSpeed));
-        robotMarkers.markers.push_back(robots.back()->getVizMarker());
+        elikos_sim::TargetRobot* robot = new elikos_sim::TargetRobot(i, nTrgtRobots, simSpeed);
+        robots.push_back(robot);
+        robotMarkers.markers.push_back(robot->getVizMarker());
     }
     for (int i = 0; i < nObsRobots; ++i) {
-        robots.push_back(new elikos_sim::ObstacleRobot(i, nObsRobots, simSpeed));
-        robotMarkers.markers.push_back(robots.back()->getVizMarker());
+        elikos_sim::ObstacleRobot* robot = new elikos_sim::ObstacleRobot(i, nObsRobots, simSpeed);
+        robots.push_back(robot);
+        robotMarkers.markers.push_back(robot->getVizMarker());
     }
 
     ROS_INFO("Robot markers length: %lu", robotMarkers.markers.size());
@@ -106,28 +110,22 @@ int main(int argc, char **argv) {
         setpointMarker = mav ->getSetpointMarker();
 
         //Collision checking
-        for(std::vector<elikos_sim::Robot*>::iterator it = robots.begin(); it != robots.end(); ++it){
-            for(std::vector<elikos_sim::Robot*>::iterator it2 = robots.begin(); it2 != robots.end(); ++it2){
-                if(*it != *it2){
-                    if(checkCollision(*it, *it2)){
-                        (*it)->collide();
-                    }
-                }
-            }
-        }
+        for(auto& robot1 : robots)
+            for(auto& robot2 : robots)
+                if( robot1 != robot2 && checkCollision(robot1, robot2))
+                    robot1->collide();
 
         robotMarkers.markers.clear();
-        for(std::vector<elikos_sim::Robot*>::iterator it = robots.begin(); it != robots.end(); /*no increment*/){
-            (*it)->move(r.expectedCycleTime());
-            robotMarkers.markers.push_back((*it)->getVizMarker());
-            br.sendTransform(tf::StampedTransform((*it)->getTransform(), ros::Time::now(), "world", (*it)->getName()));
 
-            if(isOutOfBounds((*it))){
-                it = robots.erase(it);
-            } else{
-                ++it;
-            }
+        //Move the robot
+        for(auto robot : robots) {
+            robot->move(r.expectedCycleTime());
+            robotMarkers.markers.push_back(robot->getVizMarker());
+            br.sendTransform(tf::StampedTransform(robot->getTransform(), ros::Time::now(), "world", robot->getName()));
         }
+        //Remove the robot that are out of bound
+        std::remove_if(robots.begin(), robots.end(),isOutOfBounds);
+
 
         br.sendTransform(tf::StampedTransform(mav->getTransform(), ros::Time::now(), "world", mav->getName()));
         mav_marker_pub.publish(mavMarker);
@@ -135,7 +133,7 @@ int main(int argc, char **argv) {
         marker_pub.publish(robotMarkers);
         arena_pub.publish(arenaMarkers);
         r.sleep();
-    }
+    };
 
     return 0;
 };
@@ -146,7 +144,7 @@ int main(int argc, char **argv) {
  * *************************************************************************************************
  */
 
-bool checkCollision(elikos_sim::Robot* ra, elikos_sim::Robot* rb){
+bool checkCollision(const elikos_sim::Robot* ra, const elikos_sim::Robot* rb){
     tf::Vector3 vA = ra->getTransform().getOrigin();
     tf::Vector3 vB = rb->getTransform().getOrigin();
     tf::Vector3 xAxis;
