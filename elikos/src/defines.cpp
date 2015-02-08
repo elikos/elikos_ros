@@ -35,7 +35,7 @@
 
 
 /* *************************************************************************************************
- * ***           STATIC VARIABLES
+ * ***           ENUMS
  * *************************************************************************************************
  */
 
@@ -57,16 +57,7 @@
 ///
 enum topics
 {
-    pos_robot_1 = 0,
-    pos_robot_2,
-    pos_robot_3,
-    pos_robot_4,
-    pos_robot_5,
-    pos_robot_6,
-    pos_robot_7,
-    pos_robot_8,
-    pos_robot_9,
-    pos_robot_10,
+    robotsPos = 0,
     robotsim_robot_markers,
     robotsim_mav_marker,
     robotsim_setpoint_marker,
@@ -75,21 +66,31 @@ enum topics
     NB_TOPICS
 };
 
+
+///
+/// Define robots possible types. Will be used to identify robots types
+/// in the message RobotPos.
+///
+enum robotTypes
+{
+	groundRobot = 0,
+	obstacleRobot,
+	quadRobot,
+	unknow
+};
+
+
+/* *************************************************************************************************
+ * ***           STATIC VARIABLES
+ * *************************************************************************************************
+ */
+
 ///
 /// Provide access to enum names
 ///
 const std::string arr[] = // TOPICS_NAMES
 {
-	"pos_robot_1",
-	"pos_robot_2",
-	"pos_robot_3",
-	"pos_robot_4",
-	"pos_robot_5",
-	"pos_robot_6",
-	"pos_robot_7",
-	"pos_robot_8",
-	"pos_robot_9",
-	"pos_robot_10",
+	"robotDetect/robotsPos",
 	"robotsim/robot_markers",
 	"robotsim/mav_marker",
 	"robotsim/setpoint_marker",
