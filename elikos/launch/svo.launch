@@ -1,0 +1,28 @@
+<launch>
+  <node pkg="camera1394" type="camera1394_node" name="camera1394">
+    <param name="guid" value="00b09d010099d8be" />
+    <param name="video_mode" value="640x480_mono8" />
+    <param name="frame_rate" value="60" />
+  </node>
+ <!-- <node pkg="image_view" type="image_view" name="img_view" output="screen">
+    <param name="image" value="camera/image_raw" />
+  </node> -->
+
+  <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen">
+
+    <!-- Camera topic to subscribe to -->
+    <param name="cam_topic" value="/camera/image_raw" type="str" />
+    
+    <!-- Camera calibration file -->
+    <rosparam file="$(find elikos_ros)/launch/camera-firefly-2.1-F2.2.yaml" />
+
+    <!-- Default parameter settings: choose between vo_fast and vo_accurate -->
+    <rosparam file="$(find elikos_ros)/launch/vo_fast.yaml" />
+    
+    <!-- Initial camera orientation, make it point downwards -->
+    <param name="init_rx" value="3.14" />
+    <param name="init_ry" value="0.00" />
+    <param name="init_rz" value="0.00" />
+
+  </node>
+</launch>
