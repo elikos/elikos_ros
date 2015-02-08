@@ -16,16 +16,13 @@ int main( int argc, char **argv )
     ros::NodeHandle nh;
     ros::Rate r(30);    //10 hz
 
-    // Send some output as a log message
-    ROS_INFO_STREAM( "Hello, ai agent!" );
-
     // Create the quad AI Agent
     elikos_ai::Agent agent(&nh);
     agent.init();
 
     while (ros::ok())
     {
-    	// Pas sûr c'est nécessaire de vérifier s'il y a des subscriber au topic...
+    	// Pas sûr c'est nécessaire de vérifier s'il y a des subscribers abonnés au topic...
     	/*
     	while (pose_pub.getNumSubscribers() < 1)
     	{
