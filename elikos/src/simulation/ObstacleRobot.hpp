@@ -1,5 +1,6 @@
-#ifndef OBSTACLE_ROBOT_H
-#define OBSTACLE_ROBOT_H
+#ifndef SIM_OBSTACLE_ROBOT_HPP
+#define SIM_OBSTACLE_ROBOT_HPP
+
 #include "Robot.hpp"
 
 namespace elikos_sim {
@@ -22,4 +23,4 @@ private:
 
 } // namespace elikos_sim
 
-#endif /* OBSTACLE_ROBOT_H */
+#endif // SIM_OBSTACLE_ROBOT_HPP

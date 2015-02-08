@@ -1,5 +1,5 @@
-#ifndef __GAME_MANAGER_H_
-#define __GAME_MANAGER_H_
+#ifndef SIM_GAME_MANAGER_HPP
+#define SIM_GAME_MANAGER_HPP
 
 
 namespace elikos_sim {
@@ -16,4 +16,4 @@ private:
 
 } // namespace elikos_sim
 
-#endif /* __GAME_MANAGER_H_ */
+#endif // SIM_GAME_MANAGER_HPP
