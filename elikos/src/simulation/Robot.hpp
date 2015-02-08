@@ -23,7 +23,6 @@ public:
 
 protected:
     Robot(int id, double simSpeed);
-    ~Robot() { }
     void refreshTransform();
 
     int id;

@@ -1,9 +1,8 @@
-/**
+/*
 * @brief    Ground robot behavior simulation for the IARC mission 7.
 */
 
 #include <ros/ros.h>
-#include <ros/console.h>
 #include <tf/transform_broadcaster.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <vector>

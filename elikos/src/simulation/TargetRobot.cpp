@@ -2,9 +2,6 @@
 #include "TargetRobot.hpp"
 #include "./../defines.cpp"
 
-#ifndef ROBOT_TYPE
-#define ROBOT_TYPE "trgtRobot"
-#endif // ROBOT_TYPE
 
 namespace elikos_sim {
 
@@ -47,8 +44,6 @@ void TargetRobot::move(ros::Duration cycleTime) {
     } else {
         isSpinning = false;
     }
-
-
 
     this->refreshTransform();
 }
