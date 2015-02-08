@@ -1,5 +1,5 @@
-#ifndef __MAV_H_
-#define __MAV_H_
+#ifndef SIM_MAV_H
+#define SIM_MAV_H
 
 #include <elikos_lib/pid.hpp>
 #include <visualization_msgs/Marker.h>
@@ -37,4 +37,4 @@ private:
 
 } // namespace elikos_sim
 
-#endif /* __MAV_H_ */
+#endif // SIM_MAV_H

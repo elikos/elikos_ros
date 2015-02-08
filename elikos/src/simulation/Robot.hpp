@@ -1,5 +1,5 @@
-#ifndef ROBOT_H
-#define ROBOT_H
+#ifndef SIM_ROBOT_HPP
+#define SIM_ROBOT_HPP
 
 #include <ros/ros.h>
 #include <tf/tf.h>
@@ -38,4 +38,4 @@ private:
 
 } // namespace elikos_sim
 
-#endif /* GROUNDROBOT_H */
+#endif // SIM_ROBOT_HPP

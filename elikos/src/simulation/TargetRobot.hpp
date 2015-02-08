@@ -1,5 +1,5 @@
-#ifndef TARGET_ROBOT_H
-#define TARGET_ROBOT_H
+#ifndef SIM_TARGET_ROBOT_HPP
+#define SIM_TARGET_ROBOT_HPP
 
 #include <tf/tf.h>
 #include "Robot.hpp"
@@ -37,4 +37,4 @@ private:
 
 } // namespace elikos_sim
 
-#endif /* TARGET_ROBOT_H */
+#endif //SIM_TARGET_ROBOT_HPP
