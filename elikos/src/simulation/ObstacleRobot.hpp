@@ -11,7 +11,6 @@ namespace elikos_sim {
 class ObstacleRobot : public Robot{
 public:
     ObstacleRobot(int id, int numRobots, double simulationSpeed);
-    ~ObstacleRobot();
 
     visualization_msgs::Marker getVizMarker();
 

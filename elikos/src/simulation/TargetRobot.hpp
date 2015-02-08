@@ -17,7 +17,6 @@ public:
     };
 
     TargetRobot(int id, int numRobots, double simulationSpeed);
-    ~TargetRobot() { }
 
     visualization_msgs::Marker getVizMarker();
     Color getColor() { return this->color; }
