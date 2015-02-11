@@ -1,8 +1,11 @@
-#ifndef TARGET_ROBOT_H
-#define TARGET_ROBOT_H
+#ifndef SIM_TARGET_ROBOT_HPP
+#define SIM_TARGET_ROBOT_HPP
 
 #include <tf/tf.h>
 #include "Robot.hpp"
+
+namespace elikos_sim {
+
 /**
 * Class representing target robots in the arena
 */
@@ -14,7 +17,6 @@ public:
     };
 
     TargetRobot(int id, int numRobots, double simulationSpeed);
-    ~TargetRobot() { }
 
     visualization_msgs::Marker getVizMarker();
     Color getColor() { return this->color; }
@@ -32,4 +34,6 @@ private:
     double limitTurn(double& angle, double angularSpeed, double cycleDuration);
 };
 
-#endif /* TARGET_ROBOT_H */
+} // namespace elikos_sim
+
+#endif //SIM_TARGET_ROBOT_HPP

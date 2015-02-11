@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(elikos_ros)
-
+set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -103,6 +103,13 @@ add_library(elikos_lib
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
+add_executable( ai_agent
+ src/ai/ai_agent.cpp
+ src/ai/Agent.cpp
+ src/ai/internalModel/Robot.cpp
+ src/ai/internalModel/TargetRobot.cpp
+ src/ai/internalModel/ObstacleRobot.cpp
+ )
 add_executable( ai src/ai/ai.cpp )
 add_executable( localization src/localization.cpp )
 add_executable( robotdetect src/robotdetect.cpp )
@@ -129,6 +136,7 @@ add_executable( tracking
 #   ${catkin_LIBRARIES}
 # )
 
+target_link_libraries( ai_agent ${catkin_LIBRARIES})
 target_link_libraries( ai ${catkin_LIBRARIES})
 target_link_libraries( localization ${catkin_LIBRARIES})
 target_link_libraries( robotdetect ${catkin_LIBRARIES})

@@ -1,10 +1,11 @@
-#ifndef __MAV_H_
-#define __MAV_H_
+#ifndef SIM_MAV_H
+#define SIM_MAV_H
 
 #include <elikos_lib/pid.hpp>
 #include <visualization_msgs/Marker.h>
+#include "./../defines.cpp"
 
-#define PI 3.14159265
+namespace elikos_sim {
 
 class MAV {
 public:
@@ -34,4 +35,6 @@ private:
 
 };
 
-#endif /* __MAV_H_ */
+} // namespace elikos_sim
+
+#endif // SIM_MAV_H

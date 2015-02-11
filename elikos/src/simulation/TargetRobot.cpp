@@ -1,10 +1,9 @@
 #include <ros/ros.h>
 #include "TargetRobot.hpp"
+#include "./../defines.cpp"
 
-#ifndef PI
-#define PI 3.14159265
-#endif
-#define ROBOT_TYPE "trgtRobot"
+
+namespace elikos_sim {
 
 TargetRobot::TargetRobot(int id, int numRobots, double simulationSpeed) : Robot(id, simulationSpeed) {
     //Starting pose
@@ -26,26 +25,25 @@ TargetRobot::TargetRobot(int id, int numRobots, double simulationSpeed) : Robot(
 }
 
 void TargetRobot::move(ros::Duration cycleTime) {
-    if ((ros::Time::now() - lastAutoReverse).toSec() >= 20.0 / simSpeed && !isSpinning) {
-        autoReverse();
-    }
 
-    if ((ros::Time::now() - lastNoise).toSec() >= 5.0 / simSpeed && !isSpinning) {
-        noise();
-    }
+    if(!isSpinning)
+    {
+        if ((ros::Time::now() - lastAutoReverse).toSec() >= (20.0 / simSpeed))
+            autoReverse();
 
-    if (!isSpinning) {
+        if ((ros::Time::now() - lastNoise).toSec() >= (5.0 / simSpeed))
+            noise();
+
         x += 0.33 * simSpeed * cycleTime.toSec() * cos(yaw);
         y += 0.33 * simSpeed * cycleTime.toSec() * sin(yaw);
     }
+
 
     if (turnAngle) {
         yaw += limitTurn(turnAngle, (PI / 2.456) * simSpeed, cycleTime.toSec());
     } else {
         isSpinning = false;
     }
-
-
 
     this->refreshTransform();
 }
@@ -116,3 +114,5 @@ visualization_msgs::Marker TargetRobot::getVizMarker() {
     marker.color.b = b;
     return marker;
 }
+
+} // namespace elikos_sim

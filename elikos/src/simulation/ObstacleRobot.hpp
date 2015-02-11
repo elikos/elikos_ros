@@ -1,6 +1,9 @@
-#ifndef OBSTACLE_ROBOT_H
-#define OBSTACLE_ROBOT_H
+#ifndef SIM_OBSTACLE_ROBOT_HPP
+#define SIM_OBSTACLE_ROBOT_HPP
+
 #include "Robot.hpp"
+
+namespace elikos_sim {
 
 /**
 * Class representing obstacle robots
@@ -8,7 +11,6 @@
 class ObstacleRobot : public Robot{
 public:
     ObstacleRobot(int id, int numRobots, double simulationSpeed);
-    ~ObstacleRobot();
 
     visualization_msgs::Marker getVizMarker();
 
@@ -19,4 +21,6 @@ private:
     bool isStopped;
 };
 
-#endif /* OBSTACLE_ROBOT_H */
+} // namespace elikos_sim
+
+#endif // SIM_OBSTACLE_ROBOT_HPP

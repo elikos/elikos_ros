@@ -1,10 +1,12 @@
-#ifndef ROBOT_H
-#define ROBOT_H
+#ifndef SIM_ROBOT_HPP
+#define SIM_ROBOT_HPP
 
 #include <ros/ros.h>
 #include <tf/tf.h>
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
+
+namespace elikos_sim {
 
 /**
 * Abstract base class representing robots in the arena (obstacles and targets)
@@ -21,7 +23,6 @@ public:
 
 protected:
     Robot(int id, double simSpeed);
-    ~Robot() { }
     void refreshTransform();
 
     int id;
@@ -34,4 +35,6 @@ private:
     Robot();
 };
 
-#endif /* GROUNDROBOT_H */
+} // namespace elikos_sim
+
+#endif // SIM_ROBOT_HPP

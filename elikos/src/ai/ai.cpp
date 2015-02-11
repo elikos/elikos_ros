@@ -6,7 +6,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 
-#define PI 3.14159265
+#include "./../defines.cpp"
 
 
 geometry_msgs::PoseStamped getPoseStamped(float angle);
@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
     // Establish this program as a ROS node
     ros::NodeHandle nh;
-    ros::Publisher pose_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/setpoint/local_position", 1);
+    ros::Publisher pose_pub = nh.advertise<geometry_msgs::PoseStamped>(TOPICS_NAMES[mavros_setpoint_local_position], 1);
     ros::Rate r(30);    //10 hz
 
     float angle = 0.0;
@@ -56,3 +56,4 @@ geometry_msgs::PoseStamped getPoseStamped(float angle){
 
     return pose;
 }
+
