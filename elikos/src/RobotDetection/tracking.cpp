@@ -21,7 +21,6 @@
 #include "RobotDesc.h"
 #include <ros/ros.h>
 
-
 using namespace cv;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
@@ -45,6 +44,8 @@ const string windowName1 = "HSV Image";
 const string windowName2 = "Thresholded Image";
 const string windowName3 = "After Morphological Operations";
 const string trackbarWindowName = "Trackbars";
+
+
 void on_trackbar( int, void* )
 {//This function gets called whenever a
     // trackbar position is changed
@@ -171,7 +172,13 @@ int main(int argc, char* argv[])
 {
 
     //init ROS
-    //ros::init( argc, argv, "elikos_robotdetect_hello" );
+    ros::init( argc, argv, "elikos_robotdetect" );
+
+    ros::NodeHandle nh;
+
+    ros::Rate r(30);
+
+
 
     //if we would like to calibrate our filter values, set to true.
     bool calibrationMode = true ;
