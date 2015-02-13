@@ -15,7 +15,10 @@
 #include <string>
 #include <cmath>
 
+#include <elikos_ros/RobotsPos.h>
+
 #include "Action.hpp"
+
 
 
 namespace elikos_ai {
@@ -81,6 +84,7 @@ private:
     void removePublishers();
     void removeSubscribers();
 
+    void receiveRobotsPos( const elikos_ros::RobotsPos& msg );
 
 	/* *************************************************************************************************
      * ***           TOOLS
@@ -108,7 +112,7 @@ private:
 
     // ROS publishers, subscribers
     std::map<std::string, ros::Publisher> rosPublishers_; // map< topic name, the publisher object >
-    std::vector<ros::Subscriber> rosSubscribers_;
+    std::map<std::string, ros::Subscriber> rosSubscribers_; // map< topic name, the subscriber object >
 
     // List of actions planned by the agent
     std::vector<Action> actions_;

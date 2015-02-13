@@ -63,6 +63,8 @@ enum topics
     robotsim_setpoint_marker,
     robotsim_arena_marker,
     mavros_setpoint_local_position,
+    mavros_localPosition_local, // quad position
+    mavros_imu_data, // quad orientation
     NB_TOPICS
 };
 
@@ -90,12 +92,14 @@ enum robotTypes
 ///
 const std::string arr[] = // TOPICS_NAMES
 {
-	"robotDetect/robotsPos",
+	"robotDetect/robotsPos", // robotDetec topic : communicate the located robots positions
 	"robotsim/robot_markers",
 	"robotsim/mav_marker",
 	"robotsim/setpoint_marker",
 	"robotsim/arena_marker",
-	"mavros/setpoint/local_position"
+	"mavros/setpoint/local_position", // quad : set position
+	"mavros/localPosition/local", // quad position
+	"mavros/imu/data" // quad orientation
 };
 static const std::vector<std::string> TOPICS_NAMES
 (
