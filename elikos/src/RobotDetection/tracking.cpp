@@ -46,26 +46,29 @@ const string windowName3 = "After Morphological Operations";
 const string trackbarWindowName = "Trackbars";
 
 
+void mavPosCallback(const std_msgs::String::ConstPtr& msg)
+{
+
+}
+
+void cameraCallback(const std_msgs::String::ConstPtr& msg)
+{
+    
+}
+
 void on_trackbar( int, void* )
 {//This function gets called whenever a
     // trackbar position is changed
-
-
-
-
-
 }
-string intToString(int number){
-
-
+string intToString(int number)
+{
     std::stringstream ss;
     ss << number;
     return ss.str();
 }
-void createTrackbars(){
+void createTrackbars()
+{
     //create window for trackbars
-
-
     namedWindow(trackbarWindowName,0);
     //create memory to store trackbar name on window
     char TrackbarName[50];
@@ -111,9 +114,6 @@ void morphOps(Mat &thresh){
 
     erode(thresh,thresh,erodeElement);
     dilate(thresh,thresh,dilateElement);
-
-
-
 }
 void trackFilteredObject(Mat threshold,Mat HSV, Mat &cameraFeed){
 
@@ -170,6 +170,10 @@ void trackFilteredObject(Mat threshold,Mat HSV, Mat &cameraFeed){
 
 int main(int argc, char* argv[])
 {
+    int robotInfo[];
+
+    Mat currentImage;
+    Mat nextImage;
 
     //init ROS
     ros::init( argc, argv, "elikos_robotdetect" );
@@ -178,7 +182,8 @@ int main(int argc, char* argv[])
 
     ros::Rate r(30);
 
-
+    ros::Subscriber mavrosSub = n.subscribe("/mavros/position/local", 1000, mavPosCallback);
+    ros::Subscriber cameraSub = n.subscribe("/camera/image_raw", 100, cameraCallback);
 
     //if we would like to calibrate our filter values, set to true.
     bool calibrationMode = true ;
@@ -201,7 +206,7 @@ int main(int argc, char* argv[])
     capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
     //start an infinite loop where webcam feed is copied to cameraFeed matrix
     //all of our operations will be performed within this loop
-    while(1){
+    while(ros::ok()){
         //store image to matrix
         capture.read(cameraFeed);
         //convert frame from BGR to HSV colorspace
