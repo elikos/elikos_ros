@@ -66,6 +66,15 @@ public:
 
 	bool actionIsDone();
 
+
+	/* *************************************************************************************************
+     * ***           ROS SUBSCRIBERS CALLBACKS
+     * *************************************************************************************************
+     */
+
+	// This needs to be public otherwise ROS won't be able to use the callback
+    void receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg );
+
     
 private:
 

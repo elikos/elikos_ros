@@ -5,11 +5,10 @@
  *  Author: Myriam Claveau-Mallet
  */
 
-#include <elikos_ros/RobotsPos.h>
 
 #include "Agent.h"
 #include "./../defines.cpp"
-//#include "../../../../../devel/include/elikos_ros/RobotsPos.h"
+
 
 namespace elikos_ai {
 
@@ -78,6 +77,22 @@ void Agent::executeAction()
     rosPublishers_[topic].publish(action_->posStamped);
 }
 
+
+/* *************************************************************************************************
+ * ***           ROS SUBSCRIBERS CALLBACKS
+ * *************************************************************************************************
+ */
+
+/**
+ * @fn       void receiveRobotsPos( const elikos_ros::RobotsPos& msg )
+ * @brief    Callback for robotsPos topic
+ */
+void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
+{
+
+}
+
+
 /* *************************************************************************************************
  * ***           ROS RELATED FUNCTIONS
  * *************************************************************************************************
@@ -97,7 +112,7 @@ void Agent::setPublishers()
         // Orders given to MavROS
         std::string topicName = TOPICS_NAMES[mavros_setpoint_local_position];
         ros::Publisher pose_pub = nh_->advertise<geometry_msgs::PoseStamped>(topicName, 1);
-        rosPublishers_.insert( std::pair< std::string, ros::Publisher >( topicName, pose_pub ) );
+        rosPublishers_.insert( std::pair<std::string,ros::Publisher>(topicName, pose_pub) );
     }
 }
 
@@ -113,8 +128,8 @@ void Agent::setSubscribers()
 {
     // Subscribe to all robots' positions' topics
     std::string robotsPosTopic = TOPICS_NAMES[robotsPos];
-    ros::Subscriber sub = nh_->subscribe(robotsPosTopic, 1000, receiveRobotsPos);
-    rosSubscribers_[robotsPosTopic] = sub;
+    ros::Subscriber sub = nh_->subscribe(robotsPosTopic, 1000, &Agent::receiveRobotsPosCallback, this );
+    rosSubscribers_.insert( std::pair<std::string,ros::Subscriber>(robotsPosTopic, sub) );
 }
 
 /**
@@ -125,6 +140,10 @@ void Agent::removePublishers()
 {
     // Orders given to MavROS
     // TODO:
+    for (std::map<std::string,ros::Publisher>::iterator it=rosPublishers_.begin(); it!=rosPublishers_.end(); ++it)
+    {
+        it->second.shutdown();
+    }
 }
 
 /**
@@ -135,15 +154,10 @@ void Agent::removeSubscribers()
 {
     // Subscribe to all robots' positions' topics
     // TODO:
-}
-
-/**
- * @fn       void receiveRobotsPos( const elikos_ros::RobotsPos& msg )
- * @brief    Removes the Agent's subscribers to ROS.
- */
-void receiveRobotsPos( const elikos_ros::RobotsPos& msg )
-{
-
+    for (std::map<std::string,ros::Subscriber>::iterator it=rosSubscribers_.begin(); it!=rosSubscribers_.end(); ++it)
+    {
+        it->second.shutdown();
+    }
 }
 
 
