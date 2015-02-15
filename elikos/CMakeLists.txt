@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 ## is used, also find other catkin packages
 
 find_package(catkin REQUIRED)
-find_package(catkin REQUIRED COMPONENTS roscpp tf)
+find_package(catkin REQUIRED COMPONENTS roscpp tf std_msgs std_srvs)
 find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
@@ -63,10 +63,10 @@ find_package(OpenCV REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   std_msgs std_srvs  # Or other packages containing msgs
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -81,7 +81,7 @@ find_package(OpenCV REQUIRED)
 catkin_package(
 INCLUDE_DIRS include
 #  LIBRARIES elikos
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS std_msgs std_srvs
 #  DEPENDS system_lib
 )
 
