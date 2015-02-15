@@ -22,6 +22,10 @@ InternalModel::InternalModel()
 
 InternalModel::~InternalModel()
 {
+    for ( std::map<int, Robot*>::iterator it = robots.begin(); it != robots.end(); ++it )
+    {
+        delete it->second;
+    }
 }
 
 /**
@@ -45,7 +49,18 @@ void InternalModel::updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs )
         {
             elikos_ros::RobotPos& robotPos = robotsPos[j];
 
+            // Check if the robot has already been identified and created
+            std::map<int, Robot*>::iterator it = robots.find((int)robotPos.id);
 
+            // TODO: finish this (updating the robots positions, including checking robot type)
+            if ( it == robots.end() ) // the robot does not exist yet
+            {
+                robots[(int)robotPos.id] = new TargetRobot();
+            }
+            else
+            {
+
+            }
         }
 
         // Clear queue

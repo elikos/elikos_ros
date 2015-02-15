@@ -113,10 +113,11 @@ add_library(elikos_lib
 add_executable( ai_agent
  src/ai/ai_agent.cpp
  src/ai/Agent.cpp
+ src/ai/Action.cpp
+ src/ai/internalModel/InternalModel.cpp
  src/ai/internalModel/Robot.cpp
  src/ai/internalModel/TargetRobot.cpp
  src/ai/internalModel/ObstacleRobot.cpp
- src/ai/internalModel/InternalModel.cpp
  )
 add_executable( ai src/ai/ai.cpp )
 add_executable( localization src/localization.cpp )

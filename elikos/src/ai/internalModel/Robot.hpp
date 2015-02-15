@@ -17,7 +17,8 @@ namespace elikos_ai {
 class Robot
 {
 public:
-	virtual ~Robot(); // virtual destructor
+    Robot();
+	virtual ~Robot() {} // virtual destructor
 
 private:
 

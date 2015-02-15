@@ -8,6 +8,8 @@
 #define AI_INTERNAL_MODEL_HPP
 
 #include "Robot.hpp"
+#include "TargetRobot.hpp"
+#include "ObstacleRobot.hpp"
 
 #include <map>
 #include <queue>

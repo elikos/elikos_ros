@@ -8,6 +8,9 @@
 
 namespace elikos_ai {
 
+TargetRobot::TargetRobot() : Robot()
+{
 
+}
 
 } // namespace elikos_ai

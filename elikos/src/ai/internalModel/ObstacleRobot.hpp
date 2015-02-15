@@ -19,6 +19,8 @@ namespace elikos_ai {
 class ObstacleRobot : public Robot
 {
 public:
+    ObstacleRobot();
+    virtual ~ObstacleRobot() {}
 
 private:
 
