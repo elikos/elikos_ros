@@ -11,6 +11,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <vector>
+#include <queue>
 #include <map>
 #include <string>
 #include <cmath>
@@ -18,6 +19,7 @@
 #include <elikos_ros/RobotsPos.h>
 
 #include "Action.hpp"
+#include "internalModel/InternalModel.hpp"
 
 
 
@@ -111,17 +113,23 @@ private:
     // ROS node handle
     ros::NodeHandle* nh_;
 
-    // Attributes
-    /*std::string Name;
-    ros::Duration cycleTime;
-    tf::Vector3 direction;
-    tf::Transform t;
-    tf::Vector3 v;
-    tf::Quaternion q;*/
 
     // ROS publishers, subscribers
-    std::map<std::string, ros::Publisher> rosPublishers_; // map< topic name, the publisher object >
-    std::map<std::string, ros::Subscriber> rosSubscribers_; // map< topic name, the subscriber object >
+    std::map<std::string, ros::Publisher> rosPublishers_; /**< @note map< topic name, the publisher object > */
+    std::map<std::string, ros::Subscriber> rosSubscribers_; /**< @note map< topic name, the subscriber object > */
+
+
+    /** @note   No pointer-reference to the message (RobotsPos instead of RobotsPos*)
+     *          because the actual ROS's topic queue can dump out messages when it reaches
+     *          its limit (the ROS's topic queue is where the original messages are from).
+     *          Safer to make a copy of the message.
+     */
+    std::queue<elikos_ros::RobotsPos> queueRobotsPos_; /**< queue for robots positions from robot detection */
+
+
+    // Internal model
+    InternalModel* internalModel_;
+
 
     // List of actions planned by the agent
     std::vector<Action> actions_;

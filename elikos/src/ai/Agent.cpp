@@ -33,6 +33,7 @@ void Agent::init()
     setPublishers();
     setSubscribers();
 
+    internalModel_ = new InternalModel();
     action_ = new Action();
 }
 
@@ -42,6 +43,7 @@ void Agent::destroy()
     removeSubscribers();
 
     delete action_;
+    delete internalModel_;
     nh_ = 0;
 }
 
@@ -53,7 +55,12 @@ void Agent::destroy()
 
 void Agent::percept()
 {
-    // TODO: do nothing for now!
+    // TODO: protect this call from multi-threads problems ->> the queue could be used in the
+    //       ROS subscribers callbacks (this.receiveRobotsPosCallback) and in this function.
+
+    // This call empties the queue of latest received robots positions from the robotDetect node
+    // and updates the Agent's internal model.
+    internalModel_->updateModel( queueRobotsPos_ );
 }
 
 void Agent::chooseAction()
@@ -86,10 +93,14 @@ void Agent::executeAction()
 /**
  * @fn       void receiveRobotsPos( const elikos_ros::RobotsPos& msg )
  * @brief    Callback for robotsPos topic
+ *
+ * Transfers RobotsPos messages to a queue when they are received. This queue serves as a container
+ * for messages until they are used in the percept() method. Then the queue is emptied.
+ *
  */
 void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
 {
-
+    queueRobotsPos_.push( msg );
 }
 
 
