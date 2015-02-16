@@ -35,7 +35,7 @@
 
 
 /* *************************************************************************************************
- * ***           STATIC VARIABLES
+ * ***           ENUMS
  * *************************************************************************************************
  */
 
@@ -57,44 +57,49 @@
 ///
 enum topics
 {
-    pos_robot_1 = 0,
-    pos_robot_2,
-    pos_robot_3,
-    pos_robot_4,
-    pos_robot_5,
-    pos_robot_6,
-    pos_robot_7,
-    pos_robot_8,
-    pos_robot_9,
-    pos_robot_10,
+    robotsPos = 0,
     robotsim_robot_markers,
     robotsim_mav_marker,
     robotsim_setpoint_marker,
     robotsim_arena_marker,
     mavros_setpoint_local_position,
+    mavros_localPosition_local, // quad position
+    mavros_imu_data, // quad orientation
     NB_TOPICS
 };
+
+
+///
+/// Define robots possible types. Will be used to identify robots types
+/// in the message RobotPos.
+///
+enum robotTypes
+{
+	groundRobot = 0,
+	obstacleRobot,
+	quadRobot,
+	unknow
+};
+
+
+/* *************************************************************************************************
+ * ***           STATIC VARIABLES
+ * *************************************************************************************************
+ */
 
 ///
 /// Provide access to enum names
 ///
 const std::string arr[] = // TOPICS_NAMES
 {
-	"pos_robot_1",
-	"pos_robot_2",
-	"pos_robot_3",
-	"pos_robot_4",
-	"pos_robot_5",
-	"pos_robot_6",
-	"pos_robot_7",
-	"pos_robot_8",
-	"pos_robot_9",
-	"pos_robot_10",
+	"robotDetect/robotsPos", // robotDetec topic : communicate the located robots positions
 	"robotsim/robot_markers",
 	"robotsim/mav_marker",
 	"robotsim/setpoint_marker",
 	"robotsim/arena_marker",
-	"mavros/setpoint/local_position"
+	"mavros/setpoint/local_position", // quad : set position
+	"mavros/localPosition/local", // quad position
+	"mavros/imu/data" // quad orientation
 };
 static const std::vector<std::string> TOPICS_NAMES
 (
