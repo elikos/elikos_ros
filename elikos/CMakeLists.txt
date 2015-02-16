@@ -5,8 +5,14 @@ set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
-find_package(catkin REQUIRED)
-find_package(catkin REQUIRED COMPONENTS roscpp tf std_msgs std_srvs)
+find_package( catkin REQUIRED)
+find_package( catkin REQUIRED COMPONENTS 
+   roscpp 
+   tf 
+   std_msgs
+   message_generation
+   genmsg
+)
 find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
@@ -42,11 +48,11 @@ find_package(OpenCV REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  RobotPos.msg
+  RobotsPos.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -63,10 +69,11 @@ find_package(OpenCV REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs std_srvs  # Or other packages containing msgs
- )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -80,6 +87,7 @@ find_package(OpenCV REQUIRED)
 
 catkin_package(
 INCLUDE_DIRS include
+CATKIN_DEPENDS message_runtime
 #  LIBRARIES elikos
   CATKIN_DEPENDS std_msgs std_srvs
 #  DEPENDS system_lib
@@ -106,6 +114,8 @@ add_library(elikos_lib
 add_executable( ai_agent
  src/ai/ai_agent.cpp
  src/ai/Agent.cpp
+ src/ai/Action.cpp
+ src/ai/internalModel/InternalModel.cpp
  src/ai/internalModel/Robot.cpp
  src/ai/internalModel/TargetRobot.cpp
  src/ai/internalModel/ObstacleRobot.cpp
@@ -130,6 +140,11 @@ add_executable( tracking
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(robotsim elikos_lib)
+
+
+add_dependencies(ai_agent
+elikos_ros_generate_messages_cpp
+)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(elikos_node
