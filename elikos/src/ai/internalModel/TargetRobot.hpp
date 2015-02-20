@@ -12,7 +12,7 @@
 namespace elikos_ai {
 
 /**
- * @class	namespace::TargetRobot	TargetRobot.hpp	"Definition"
+ * @class	elikos_ai::TargetRobot	TargetRobot.hpp	"Definition"
  * @brief	class for TargetRobot in the ai's internal model
  */
 
@@ -20,11 +20,16 @@ class TargetRobot : public Robot
 {
 public:
 
+    TargetRobot();
+    virtual ~TargetRobot() {}
 	TargetRobot(int id, tf::Transform transform, float orientation, tf::Vector3 spped); //constructor
 
 	Color getColor () { return this->color; }
 
 	enum Color {RED, GREEN};
+
+
+
 
 private:
 

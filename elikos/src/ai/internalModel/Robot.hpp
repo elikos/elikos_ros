@@ -21,8 +21,9 @@ class Robot
 {
 public:
 
+    Robot();
+	virtual ~Robot() {} // virtual destructor
 
-	virtual ~Robot(); // virtual destructor
 
 	int getID(){return this->id;}
 

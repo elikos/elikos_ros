@@ -11,6 +11,7 @@ find_package( catkin REQUIRED COMPONENTS
    tf 
    std_msgs
    message_generation
+   genmsg
 )
 
 ## System dependencies are found with CMake's conventions
@@ -112,6 +113,8 @@ add_library(elikos_lib
 add_executable( ai_agent
  src/ai/ai_agent.cpp
  src/ai/Agent.cpp
+ src/ai/Action.cpp
+ src/ai/internalModel/InternalModel.cpp
  src/ai/internalModel/Robot.cpp
  src/ai/internalModel/TargetRobot.cpp
  src/ai/internalModel/ObstacleRobot.cpp
@@ -131,17 +134,21 @@ add_executable( robotsim
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(robotsim elikos_lib)
 
+
+add_dependencies(ai_agent
+elikos_ros_generate_messages_cpp
+)
+
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(elikos_node
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries( ai_agent ${catkin_LIBRARIES})
-target_link_libraries( ai ${catkin_LIBRARIES})
-target_link_libraries( localization ${catkin_LIBRARIES})
-target_link_libraries( robotdetect ${catkin_LIBRARIES})
-target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES}
-)
+target_link_libraries( ai_agent ${catkin_LIBRARIES} )
+target_link_libraries( ai ${catkin_LIBRARIES} )
+target_link_libraries( localization ${catkin_LIBRARIES} )
+target_link_libraries( robotdetect ${catkin_LIBRARIES} )
+target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES} )
 
 #############
 ## Install ##

@@ -8,9 +8,10 @@
 
 namespace elikos_ai {
 
-TargetRobot::TargetRobot (float x, float y, float vx, float vy, float oz){
 
-	type=groundRobot;
+
+TargetRobot::TargetRobot() : Robot()
+{
 
 }
 

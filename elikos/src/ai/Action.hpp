@@ -7,6 +7,8 @@
 #ifndef AI_ACTION_HPP
 #define AI_ACTION_HPP
 
+#include <geometry_msgs/PoseStamped.h>
+
 namespace elikos_ai {
 
 /**
@@ -17,6 +19,9 @@ namespace elikos_ai {
 class Action
 {
 public:
+
+    Action();
+    virtual ~Action() {}
 
 	// Pose stamped for MAVROS
 	geometry_msgs::PoseStamped posStamped;
