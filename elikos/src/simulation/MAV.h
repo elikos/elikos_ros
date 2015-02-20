@@ -27,7 +27,7 @@ private:
     ros::Duration cycleTime;
     double x, y, z, yaw, z_sp, yaw_sp, vel_xy_max, vel_z, vel_z_sp, simSpeed;
     tf::Vector3 vel_xy, vel_xy_sp, xy_sp, direction;
-    tf::Transform t;
+    tf::Transform transform_;
     tf::Vector3 v;
     tf::Quaternion q;
     void refreshTransform();

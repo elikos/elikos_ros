@@ -12,14 +12,15 @@
 namespace elikos_ai {
 
 /**
- * @class	namespace::TargetRobot	TargetRobot.hpp	"Definition"
+ * @class	elikos_ai::TargetRobot	TargetRobot.hpp	"Definition"
  * @brief	class for TargetRobot in the ai's internal model
  */
 
 class TargetRobot : public Robot
 {
 public:
-
+    TargetRobot();
+    virtual ~TargetRobot() {}
 
 private:
 

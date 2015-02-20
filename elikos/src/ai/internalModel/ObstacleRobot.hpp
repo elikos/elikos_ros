@@ -12,13 +12,15 @@
 namespace elikos_ai {
 
 /**
- * @class	namespace::ObstacleRobot	ObstacleRobot.hpp	"Definition"
+ * @class	elikos_ai::ObstacleRobot	ObstacleRobot.hpp	"Definition"
  * @brief	class for ObstacleRobot in the ai's internal model
  */
 
 class ObstacleRobot : public Robot
 {
 public:
+    ObstacleRobot();
+    virtual ~ObstacleRobot() {}
 
 private:
 
