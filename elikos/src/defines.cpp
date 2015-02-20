@@ -63,12 +63,9 @@ enum topics
     robotsim_setpoint_marker,
     robotsim_arena_marker,
     mavros_setpoint_local_position,
-<<<<<<< HEAD
     camera_image_raw,
-=======
     mavros_localPosition_local, // quad position
     mavros_imu_data, // quad orientation
->>>>>>> upstream/master
     NB_TOPICS
 };
 
@@ -105,7 +102,7 @@ const std::string arr[] = // TOPICS_NAMES
 	"mavros/setpoint/local_position", // quad : set position
 	"mavros/localPosition/local", // quad position
 	"mavros/imu/data" // quad orientation
-		
+
 };
 static const std::vector<std::string> TOPICS_NAMES
 (
