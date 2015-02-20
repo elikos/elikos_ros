@@ -105,6 +105,7 @@ const std::string arr[] = // TOPICS_NAMES
 	"mavros/setpoint/local_position", // quad : set position
 	"mavros/localPosition/local", // quad position
 	"mavros/imu/data" // quad orientation
+		
 };
 static const std::vector<std::string> TOPICS_NAMES
 (
