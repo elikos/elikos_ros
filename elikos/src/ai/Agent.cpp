@@ -55,17 +55,14 @@ void Agent::destroy()
 
 void Agent::percept()
 {
-<<<<<<< HEAD
-	// TODO: do nothing for now!
 
-=======
     // TODO: protect this call from multi-threads problems ->> the queue could be used in the
     //       ROS subscribers callbacks (this.receiveRobotsPosCallback) and in this function.
 
     // This call empties the queue of latest received robots positions from the robotDetect node
     // and updates the Agent's internal model.
     internalModel_->updateModel( queueRobotsPos_ );
->>>>>>> ffd7f8e07d6e7ceabd3f2b4a18d2b6863830f50a
+
 }
 
 void Agent::updateModel(){
