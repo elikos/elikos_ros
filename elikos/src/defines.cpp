@@ -76,7 +76,7 @@ enum robotTypes
 	groundRobot = 0,
 	obstacleRobot,
 	quadRobot,
-	unknow
+	unknown
 };
 
 

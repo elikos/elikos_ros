@@ -19,7 +19,7 @@ namespace elikos_ai {
 class ObstacleRobot : public Robot
 {
 public:
-
+	ObstacleRobot();
 private:
 
 }; // class elikos_ai::ObstacleRobot

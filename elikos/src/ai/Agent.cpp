@@ -50,8 +50,14 @@ void Agent::destroy()
 void Agent::percept()
 {
 	// TODO: do nothing for now!
+
 }
 
+void Agent::updateModel(){
+
+	// update robots position, speed, and orientation
+
+}
 void Agent::chooseAction()
 {
 	// Mouvement en forme de "8"

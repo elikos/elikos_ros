@@ -7,6 +7,8 @@
 #ifndef AI_ROBOT_HPP
 #define AI_ROBOT_HPP
 
+#include "./../defines.cpp"
+#include "RobotPos.msg"
 namespace elikos_ai {
 
 /**
@@ -14,13 +16,42 @@ namespace elikos_ai {
  * @brief	Base class for Robot in the ai's internal model
  */
 
+
 class Robot
 {
 public:
+
+
 	virtual ~Robot(); // virtual destructor
+
+	int getID(){return this->id;}
+
+protected:
+
+	//TODO: constructeur avec position relative
+    Robot (tf::transform relativePosition);
+
+	//TODO: constructeur avec position absolue
+    Robot(tf::Transform absolutePosition);
+
+	//(x,y,z,h) position
+	tf::Transform transform_ ;
+
+	//oz orientation
+	float orientation_;
+
+	//(vx, vy) vitesse
+	tf::Vector3 speed_;
+
+	//type
+	RobotTypes type;
+
+	// id
+	int id_;
 
 private:
 
+	Robot(); //constructor
 }; // class elikos_ai::Robot
 
 } // namespace elikos_ai
