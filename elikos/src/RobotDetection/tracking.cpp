@@ -17,9 +17,11 @@
 #include <string>
 #include <iostream>
 #include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp">
+#include "opencv2/imgproc/imgproc.hpp"
 #include "RobotDesc.h"
 #include <ros/ros.h>
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
 
 using namespace cv;
 //initial min and max HSV filter values.
@@ -45,16 +47,6 @@ const string windowName2 = "Thresholded Image";
 const string windowName3 = "After Morphological Operations";
 const string trackbarWindowName = "Trackbars";
 
-
-void mavPosCallback(const std_msgs::String::ConstPtr& msg)
-{
-
-}
-
-void cameraCallback(const std_msgs::String::ConstPtr& msg)
-{
-    
-}
 
 void on_trackbar( int, void* )
 {//This function gets called whenever a
@@ -170,20 +162,20 @@ void trackFilteredObject(Mat threshold,Mat HSV, Mat &cameraFeed){
 
 int main(int argc, char* argv[])
 {
-    int robotInfo[];
+//    int robotInfo[];
 
     Mat currentImage;
     Mat nextImage;
 
     //init ROS
-    ros::init( argc, argv, "elikos_robotdetect" );
-
-    ros::NodeHandle nh;
-
-    ros::Rate r(30);
-
-    ros::Subscriber mavrosSub = n.subscribe("/mavros/position/local", 1000, mavPosCallback);
-    ros::Subscriber cameraSub = n.subscribe("/camera/image_raw", 100, cameraCallback);
+//    ros::init( argc, argv, "elikos_robotdetect" );
+//
+//    ros::NodeHandle nh;
+//
+//    ros::Rate r(30);
+//
+//    ros::Subscriber mavrosSub = nh.subscribe("/mavros/position/local", 1000, mavPosCallback);
+//    ros::Subscriber cameraSub = nh.subscribe("/camera/image_raw", 100, cameraCallback);
 
     //if we would like to calibrate our filter values, set to true.
     bool calibrationMode = true ;
@@ -206,7 +198,7 @@ int main(int argc, char* argv[])
     capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
     //start an infinite loop where webcam feed is copied to cameraFeed matrix
     //all of our operations will be performed within this loop
-    while(ros::ok()){
+    while(1){
         //store image to matrix
         capture.read(cameraFeed);
         //convert frame from BGR to HSV colorspace
@@ -232,11 +224,6 @@ int main(int argc, char* argv[])
         //image will not appear without this waitKey() command
         waitKey(30);
     }
-
-
-
-
-
 
     return 0;
 }

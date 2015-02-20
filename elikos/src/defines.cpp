@@ -72,6 +72,7 @@ enum topics
     robotsim_setpoint_marker,
     robotsim_arena_marker,
     mavros_setpoint_local_position,
+    camera_image_raw,
     NB_TOPICS
 };
 
@@ -95,6 +96,7 @@ const std::string arr[] = // TOPICS_NAMES
 	"robotsim/setpoint_marker",
 	"robotsim/arena_marker",
 	"mavros/setpoint/local_position"
+    "camera/image_raw"
 };
 static const std::vector<std::string> TOPICS_NAMES
 (
