@@ -8,7 +8,17 @@
 
 namespace elikos_ai {
 
+TargetRobot::TargetRobot( int id, tf::Point relativePosition, float orientation )
+: Robot( id, relativePosition, orientation, tf::Vector3(0.0, 0.0, 0.0), groundRobot )
+{
 
+}
+
+TargetRobot::TargetRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed )
+: Robot( id, relativePosition, orientation, speed, groundRobot )
+{
+
+}
 
 /*TargetRobot::TargetRobot() : Robot()
 {

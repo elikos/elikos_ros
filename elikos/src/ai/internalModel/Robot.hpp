@@ -31,7 +31,7 @@ public:
 protected:
 
 	//TODO: constructeur avec position relative
-    Robot (tf::Transform relativePosition);
+    Robot ( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed, robotTypes type );
 
 	//TODO: constructeur avec position absolue
     //Robot(tf::Transform absolutePosition);
@@ -46,7 +46,7 @@ protected:
 	tf::Vector3 speed_;
 
 	//type
-	robotTypes type;
+	robotTypes type_;
 
 	// id
 	int id_;

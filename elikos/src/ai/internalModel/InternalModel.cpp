@@ -5,6 +5,9 @@
 */
 
 #include "InternalModel.hpp"
+#include "TargetRobot.hpp"
+#include "ObstacleRobot.hpp"
+#include <geometry_msgs/Point.h>
 
 
 namespace elikos_ai {
@@ -55,7 +58,16 @@ void InternalModel::updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs )
             // TODO: finish this (updating the robots positions, including checking robot type)
             if ( it == robots.end() ) // the robot does not exist yet
             {
-                //robots[(int)robotPos.id] = new TargetRobot();
+                // TODO: déplacer ce switch case horrible dans une usine de robots qui gère toute seule les types
+                // TODO: on ferait pas mieux de juste donner un type aux robots et de laisser faire l'héritage "Robot", "TargetRobot, "ObstacleRobot"?
+                if ( robotPos.type == (int)groundRobot )
+                {
+                    robots[(int)robotPos.id] = new TargetRobot( (int)robotPos.id, tf::Point( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
+                }
+                else if ( robotPos.type == (int)obstacleRobot )
+                {
+                    robots[(int)robotPos.id] = new ObstacleRobot( (int)robotPos.id, tf::Point( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
+                }
             }
             else
             {

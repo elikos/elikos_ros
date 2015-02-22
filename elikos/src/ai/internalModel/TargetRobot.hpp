@@ -21,7 +21,8 @@ class TargetRobot : public Robot
 public:
 
     virtual ~TargetRobot() {}
-	TargetRobot(int id, tf::Transform transform, float orientation, tf::Vector3 spped); //constructor
+	TargetRobot( int id, tf::Point relativePosition, float orientation ); //constructor
+    TargetRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed ); //constructor
 
 	Color getColor () { return this->color; }
 

@@ -20,11 +20,14 @@ class ObstacleRobot : public Robot
 {
 public:
 
-    ObstacleRobot();
+    ObstacleRobot( int id, tf::Point relativePosition, float orientation );
+    ObstacleRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed ); //constructor
     virtual ~ObstacleRobot() {}
 
 
 private:
+
+    ObstacleRobot();
 
 }; // class elikos_ai::ObstacleRobot
 
