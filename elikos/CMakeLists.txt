@@ -13,6 +13,7 @@ find_package( catkin REQUIRED COMPONENTS
    message_generation
    genmsg
 )
+find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -88,7 +89,7 @@ catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
 #  LIBRARIES elikos
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS std_msgs std_srvs
 #  DEPENDS system_lib
 )
 
@@ -130,6 +131,12 @@ add_executable( robotsim
   src/simulation/MAV.cpp
 )
 
+add_executable( tracking
+  src/RobotDetection/tracking.cpp
+  src/RobotDetection/RobotDesc.h
+  src/RobotDetection/RobotDesc.cpp
+)
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(robotsim elikos_lib)
@@ -144,11 +151,12 @@ elikos_ros_generate_messages_cpp
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries( ai_agent ${catkin_LIBRARIES} )
-target_link_libraries( ai ${catkin_LIBRARIES} )
-target_link_libraries( localization ${catkin_LIBRARIES} )
-target_link_libraries( robotdetect ${catkin_LIBRARIES} )
-target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES} )
+target_link_libraries( ai_agent ${catkin_LIBRARIES})
+target_link_libraries( ai ${catkin_LIBRARIES})
+target_link_libraries( localization ${catkin_LIBRARIES})
+target_link_libraries( robotdetect ${catkin_LIBRARIES})
+target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##

@@ -64,7 +64,7 @@ std::string MAV::getName(){
 }
 
 tf::Transform MAV::getTransform(){
-    return t;
+    return transform_;
 }
 
 void MAV::move(){
@@ -112,8 +112,8 @@ void MAV::refreshTransform(){
     v.setY(y);
     v.setZ(z);
     q.setRPY(0, 0, yaw);
-    t.setOrigin(v);
-    t.setRotation(q);
+    transform_.setOrigin(v);
+    transform_.setRotation(q);
 }
 
 visualization_msgs::Marker MAV::getVizMarker() {
@@ -128,13 +128,13 @@ visualization_msgs::Marker MAV::getVizMarker() {
     marker.scale.x = 0.5;
     marker.scale.y = 0.5;
     marker.scale.z = 0.1;
-    marker.pose.position.x = t.getOrigin().getX();
-    marker.pose.position.y = t.getOrigin().getY();
-    marker.pose.position.z = t.getOrigin().getZ() + marker.scale.z / 2;
-    marker.pose.orientation.x = t.getRotation().getX();
-    marker.pose.orientation.y = t.getRotation().getY();
-    marker.pose.orientation.z = t.getRotation().getZ();
-    marker.pose.orientation.w = t.getRotation().getW();
+    marker.pose.position.x = transform_.getOrigin().getX();
+    marker.pose.position.y = transform_.getOrigin().getY();
+    marker.pose.position.z = transform_.getOrigin().getZ() + marker.scale.z / 2;
+    marker.pose.orientation.x = transform_.getRotation().getX();
+    marker.pose.orientation.y = transform_.getRotation().getY();
+    marker.pose.orientation.z = transform_.getRotation().getZ();
+    marker.pose.orientation.w = transform_.getRotation().getW();
     marker.color.a = 1.0;
     marker.color.r = 0.0;
     marker.color.g = 0.0;
