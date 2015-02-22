@@ -1,5 +1,8 @@
-//objectTrackingTutorial.cpp
 
+//Current file modified by : Olivier Comtois
+
+//Original file :
+//objectTrackingTutorial.cpp
 //Written by  Kyle Hounslow 2013
 
 //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software")
