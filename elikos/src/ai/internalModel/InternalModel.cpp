@@ -55,7 +55,7 @@ void InternalModel::updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs )
             // TODO: finish this (updating the robots positions, including checking robot type)
             if ( it == robots.end() ) // the robot does not exist yet
             {
-                robots[(int)robotPos.id] = new TargetRobot();
+                //robots[(int)robotPos.id] = new TargetRobot();
             }
             else
             {

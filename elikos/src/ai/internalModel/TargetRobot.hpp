@@ -20,13 +20,11 @@ class TargetRobot : public Robot
 {
 public:
 
-    TargetRobot();
     virtual ~TargetRobot() {}
 	TargetRobot(int id, tf::Transform transform, float orientation, tf::Vector3 spped); //constructor
 
 	Color getColor () { return this->color; }
 
-	enum Color {RED, GREEN};
 
 
 
@@ -35,6 +33,7 @@ private:
 
 	Color color;
 
+	TargetRobot();
 
 }; // class elikos_ai::TargetRobot
 

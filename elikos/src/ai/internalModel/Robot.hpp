@@ -7,8 +7,10 @@
 #ifndef AI_ROBOT_HPP
 #define AI_ROBOT_HPP
 
-#include "./../defines.cpp"
-#include "RobotPos.msg"
+#include "./../../defines.cpp"
+#include <elikos_ros/RobotPos.h>
+#include <tf/tf.h>
+
 namespace elikos_ai {
 
 /**
@@ -21,19 +23,18 @@ class Robot
 {
 public:
 
-    Robot();
 	virtual ~Robot() {} // virtual destructor
 
 
-	int getID(){return this->id;}
+	int getID(){return this->id_;}
 
 protected:
 
 	//TODO: constructeur avec position relative
-    Robot (tf::transform relativePosition);
+    Robot (tf::Transform relativePosition);
 
 	//TODO: constructeur avec position absolue
-    Robot(tf::Transform absolutePosition);
+    //Robot(tf::Transform absolutePosition);
 
 	//(x,y,z,h) position
 	tf::Transform transform_ ;
@@ -45,7 +46,7 @@ protected:
 	tf::Vector3 speed_;
 
 	//type
-	RobotTypes type;
+	robotTypes type;
 
 	// id
 	int id_;
