@@ -59,7 +59,8 @@ void InternalModel::updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs )
             if ( it == robots.end() ) // the robot does not exist yet
             {
                 // TODO: déplacer ce switch case horrible dans une usine de robots qui gère toute seule les types
-                // TODO: on ferait pas mieux de juste donner un type aux robots et de laisser faire l'héritage "Robot", "TargetRobot, "ObstacleRobot"?
+                // QUESTION: on ferait pas mieux de juste donner un type aux robots et de laisser faire l'héritage "Robot", "TargetRobot, "ObstacleRobot"?
+                // TOTEST: création des robots dans le modèle interne à partir des messages RobotsPos
                 if ( robotPos.type == (int)groundRobot )
                 {
                     robots[(int)robotPos.id] = new TargetRobot( (int)robotPos.id, tf::Point( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
