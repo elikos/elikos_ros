@@ -50,6 +50,16 @@ namespace elikos_sim {
 
         visualization_msgs::MarkerArray arenaMarkers;
 
+
+        /* *************************************************************************************************
+         * ***           HIDDEN CONSTRUCTORS (do not implement)
+         * *************************************************************************************************
+         */
+
+        Simulation();
+        Simulation& operator= (const Simulation&);
+        Simulation (const Simulation&);
+
     };
 }
 
