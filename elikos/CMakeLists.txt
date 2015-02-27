@@ -129,7 +129,6 @@ add_executable( ai_agent
  )
 add_executable( ai src/ai/ai.cpp )
 add_executable( localization src/localization.cpp )
-add_executable( robotdetect src/robotdetect.cpp )
 add_executable( robotsim
   src/simulation/simulation.cpp
   src/simulation/Robot.cpp
@@ -166,7 +165,6 @@ elikos_ros_generate_messages_cpp
 target_link_libraries( ai_agent ${catkin_LIBRARIES})
 target_link_libraries( ai ${catkin_LIBRARIES})
 target_link_libraries( localization ${catkin_LIBRARIES})
-target_link_libraries( robotdetect ${catkin_LIBRARIES})
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #target_link_libraries( webcamCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
