@@ -41,6 +41,7 @@ InternalModel::~InternalModel()
 void InternalModel::updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs )
 {
     // TODO: must empty the queue and update internal model
+    // TOTEST: !! this whole function... making sure with empty the messages' queue correctly
 
     // Update internal model
     for ( int i = 0; i < robotsMsgs.size(); ++i )

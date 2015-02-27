@@ -81,6 +81,8 @@ enum robotTypes
 	unknown
 };
 
+typedef robotTypes RobotType;
+
 
 enum Color
 {
