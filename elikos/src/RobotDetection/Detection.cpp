@@ -41,9 +41,9 @@ namespace elikos_detection
         {
             capture.open(0);
         }
-        catch
+        catch (int e)
         {
-            sprintf("No cameras detected");
+            printf("No cameras detected");
         }
 
         capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
