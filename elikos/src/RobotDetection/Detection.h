@@ -14,6 +14,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include "./../defines.cpp"
 #include <sensor_msgs/image_encodings.h>
+#include <elikos_ros/RobotPos.h>
+#include <elikos_ros/RobotsPos.h>
 
 using namespace std;
 using namespace cv;
@@ -83,11 +85,12 @@ namespace elikos_detection {
         int currentPos;
         int lasPos;
 
-        int RobotInfo;
+        elikos_ros::RobotsPos robotsPos_msg;
 
         ros::NodeHandle* nh_;
         image_transport::ImageTransport it_;
         image_transport::Subscriber image_sub_;
+        ros::Publisher robots_publish;
 
     /* *************************************************************************************************
      * ***              DEBUG ATTRIBUTES

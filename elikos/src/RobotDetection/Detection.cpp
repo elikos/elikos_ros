@@ -85,6 +85,11 @@ namespace elikos_detection
     void Detection::setPublishers()
     {
         //TODO : publish robot info
+        if(nh_)
+        {
+            std::string topicName = TOPICS_NAMES[robotsPos];
+            robots_publish = nh_->advertise<elikos_ros::RobotsPos>(topicName,1);
+        }
     }
 
     void Detection::trackFilteredObjects(Mat threshold,Mat HSV, Mat &cameraFeed)
@@ -93,7 +98,6 @@ namespace elikos_detection
         //int x,y;
 
         vector<RobotDesc> vecRobot;
-
         RobotDesc myRobot;
 
         Mat temp;
@@ -133,9 +137,19 @@ namespace elikos_detection
 
                 }
                 //let user know you found an object
-                if(objectFound ==true){
+                if(objectFound ==true) {
                     //draw object location on screen
-                    drawObject(vecRobot,cameraFeed);}
+                    drawObject(vecRobot, cameraFeed);
+                    if (vecRobot.size() != 0)
+                    {
+                        for (int i = 0; i < vecRobot.size(); i++)
+                        {
+                            elikos_ros::RobotPos pos = vecRobot.at(i).toMsg();
+                            robotsPos_msg.robotsPos.push_back(pos);
+                        }
+                        robots_publish.publish(robotsPos_msg);
+                    }
+                }
 
             }else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
         }
@@ -155,7 +169,9 @@ namespace elikos_detection
     {
         //TODO : subscribe to mavros (drone position)
         //TODO : subscribe to camera feed
-        image_sub_ = it_.subscribe("/camera/image_raw", 1, &Detection::cameraCallback, this);
+        std::string robotsPosTopic = TOPICS_NAMES[camera_image_raw];
+        image_sub_ = it_.subscribe(robotsPosTopic, 1, &Detection::cameraCallback, this);
+
     }
 
     void Detection::drawObject(vector<RobotDesc> vecRobot,Mat &frame){

@@ -3,6 +3,9 @@
 
 #include <opencv2/core/core.hpp>
 #include "string"
+#include <elikos_ros/RobotPos.h>
+#include <elikos_ros/RobotsPos.h>
+#include <ros/ros.h>
 
 using namespace std;
 
@@ -28,6 +31,8 @@ public:
     void setHSVmin(cv::Scalar scalar);
 
     void setHSVmax(cv::Scalar scalar);
+
+    elikos_ros::RobotPos toMsg();
 
 private:
     int xPos, yPos;
