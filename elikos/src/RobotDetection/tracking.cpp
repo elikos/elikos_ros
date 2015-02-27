@@ -1,5 +1,8 @@
-//objectTrackingTutorial.cpp
 
+//Current file modified by : Olivier Comtois
+
+//Original file :
+//objectTrackingTutorial.cpp
 //Written by  Kyle Hounslow 2013
 
 //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software")
@@ -20,6 +23,8 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "RobotDesc.h"
 #include <ros/ros.h>
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
 
 using namespace cv;
 //initial min and max HSV filter values.
@@ -49,23 +54,16 @@ const string trackbarWindowName = "Trackbars";
 void on_trackbar( int, void* )
 {//This function gets called whenever a
     // trackbar position is changed
-
-
-
-
-
 }
-string intToString(int number){
-
-
+string intToString(int number)
+{
     std::stringstream ss;
     ss << number;
     return ss.str();
 }
-void createTrackbars(){
+void createTrackbars()
+{
     //create window for trackbars
-
-
     namedWindow(trackbarWindowName,0);
     //create memory to store trackbar name on window
     char TrackbarName[50];
@@ -111,9 +109,6 @@ void morphOps(Mat &thresh){
 
     erode(thresh,thresh,erodeElement);
     dilate(thresh,thresh,dilateElement);
-
-
-
 }
 void trackFilteredObject(Mat threshold,Mat HSV, Mat &cameraFeed){
 
@@ -170,15 +165,20 @@ void trackFilteredObject(Mat threshold,Mat HSV, Mat &cameraFeed){
 
 int main(int argc, char* argv[])
 {
+//    int robotInfo[];
+
+    Mat currentImage;
+    Mat nextImage;
 
     //init ROS
-    ros::init( argc, argv, "elikos_robotdetect" );
-
-    ros::NodeHandle nh;
-
-    ros::Rate r(30);
-
-
+//    ros::init( argc, argv, "elikos_robotdetect" );
+//
+//    ros::NodeHandle nh;
+//
+//    ros::Rate r(30);
+//
+//    ros::Subscriber mavrosSub = nh.subscribe("/mavros/position/local", 1000, mavPosCallback);
+//    ros::Subscriber cameraSub = nh.subscribe("/camera/image_raw", 100, cameraCallback);
 
     //if we would like to calibrate our filter values, set to true.
     bool calibrationMode = true ;
@@ -227,11 +227,6 @@ int main(int argc, char* argv[])
         //image will not appear without this waitKey() command
         waitKey(30);
     }
-
-
-
-
-
 
     return 0;
 }

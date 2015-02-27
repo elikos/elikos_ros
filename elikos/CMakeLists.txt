@@ -12,6 +12,9 @@ find_package( catkin REQUIRED COMPONENTS
    std_msgs
    message_generation
    genmsg
+   sensor_msgs
+   cv_bridge
+   image_transport
 )
 find_package(OpenCV REQUIRED)
 
@@ -136,9 +139,11 @@ add_executable( robotsim
 )
 
 add_executable( tracking
-  src/RobotDetection/tracking.cpp
   src/RobotDetection/RobotDesc.h
   src/RobotDetection/RobotDesc.cpp
+  src/RobotDetection/Detection.h
+  src/RobotDetection/Detection.cpp
+  src/RobotDetection/detectMain.cpp
 )
 
 ## Add cmake target dependencies of the executable/library

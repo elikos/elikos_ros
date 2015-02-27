@@ -50,14 +50,11 @@ public:
 private:
 
     /* *************************************************************************************************
-     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * ***           PRIVATE CONSTRUCTORS
      * *************************************************************************************************
      */
 
-    InternalModel& operator= (const InternalModel&);
-    InternalModel (const InternalModel&);
-    InternalModel ( InternalModel& );
-
+    InternalModel( InternalModel& );
 
 }; // class elikos_ai::InternalModel
 
