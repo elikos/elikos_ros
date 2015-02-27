@@ -19,6 +19,15 @@ public:
 
 private:
     bool isStopped;
+
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    ObstacleRobot();
+    ObstacleRobot& operator= (const ObstacleRobot&);
+    ObstacleRobot (const ObstacleRobot&);
 };
 
 } // namespace elikos_sim

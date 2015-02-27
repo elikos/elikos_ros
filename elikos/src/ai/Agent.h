@@ -145,7 +145,8 @@ private:
      */
 
     Agent();
-    Agent( const Agent& agent  );
+    Agent& operator= (const Agent&);
+    Agent (const Agent&);
 };
 
 } // namespace elikos_ai

@@ -28,6 +28,13 @@ public:
 
 private:
 
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+	Action& operator= (const Action&);
+    Action (const Action&);
 
 
 }; // class elikos_ai::Action

@@ -32,6 +32,16 @@ private:
     void autoReverse();
     void noise();
     double limitTurn(double& angle, double angularSpeed, double cycleDuration);
+
+
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    TargetRobot();
+    TargetRobot& operator= (const TargetRobot&);
+    TargetRobot (const TargetRobot&);
 };
 
 } // namespace elikos_sim

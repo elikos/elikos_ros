@@ -19,10 +19,22 @@ namespace elikos_ai {
 class ObstacleRobot : public Robot
 {
 public:
-    ObstacleRobot();
+
+    ObstacleRobot( int id, tf::Point relativePosition, float orientation );
+    ObstacleRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed ); //constructor
     virtual ~ObstacleRobot() {}
 
+
 private:
+
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    ObstacleRobot();
+    ObstacleRobot& operator= (const ObstacleRobot&);
+    ObstacleRobot (const ObstacleRobot&);
 
 }; // class elikos_ai::ObstacleRobot
 

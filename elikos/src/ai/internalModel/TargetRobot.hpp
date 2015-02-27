@@ -19,10 +19,27 @@ namespace elikos_ai {
 class TargetRobot : public Robot
 {
 public:
-    TargetRobot();
+
     virtual ~TargetRobot() {}
+	TargetRobot( int id, tf::Point relativePosition, float orientation ); //constructor
+    TargetRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed ); //constructor
+
+	Color getColor () { return this->color; }
+
 
 private:
+
+	Color color;
+
+
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    TargetRobot();
+	TargetRobot& operator= (const TargetRobot&);
+	TargetRobot (const TargetRobot&);
 
 }; // class elikos_ai::TargetRobot
 

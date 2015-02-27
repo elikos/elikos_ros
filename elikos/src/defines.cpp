@@ -79,7 +79,15 @@ enum robotTypes
 	groundRobot = 0,
 	obstacleRobot,
 	quadRobot,
-	unknow
+	unknown
+};
+
+typedef robotTypes RobotType;
+
+
+enum Color
+{
+    RED = 0, GREEN
 };
 
 

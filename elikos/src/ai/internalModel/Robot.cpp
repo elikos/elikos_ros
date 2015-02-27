@@ -8,9 +8,10 @@
 
 namespace elikos_ai {
 
-Robot::Robot()
+Robot::Robot ( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed, RobotType type )
+: id_(id), orientation_(orientation), speed_(speed), type_(type)
 {
-
+    // TODO: convertir la position relative dans une position absolue (par rapport au quad) dans this.transform_
 }
 
 } // namespace elikos_ai
