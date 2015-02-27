@@ -37,3 +37,6 @@
 .idea/.name
 .idea/*.xml
 
+# eclipse files
+.project
+.cproject

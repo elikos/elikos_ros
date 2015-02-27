@@ -119,6 +119,10 @@ add_executable( ai_agent
  src/ai/internalModel/Robot.cpp
  src/ai/internalModel/TargetRobot.cpp
  src/ai/internalModel/ObstacleRobot.cpp
+ src/ai/internalModel/Factory/RobotsFactory.cpp
+ src/ai/internalModel/Factory/TargetRobotFactory.cpp
+ src/ai/internalModel/Factory/ObstacleRobotFactory.cpp
+ src/ai/internalModel/Factory/RobotFactoryBase.cpp
  )
 add_executable( ai src/ai/ai.cpp )
 add_executable( localization src/localization.cpp )

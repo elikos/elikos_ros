@@ -55,14 +55,21 @@ void Agent::destroy()
 
 void Agent::percept()
 {
+
     // TODO: protect this call from multi-threads problems ->> the queue could be used in the
     //       ROS subscribers callbacks (this.receiveRobotsPosCallback) and in this function.
 
     // This call empties the queue of latest received robots positions from the robotDetect node
     // and updates the Agent's internal model.
     internalModel_->updateModel( queueRobotsPos_ );
+
 }
 
+void Agent::updateModel(){
+
+	// update robots position, speed, and orientation
+
+}
 void Agent::chooseAction()
 {
     // Mouvement en forme de "8"
@@ -150,7 +157,7 @@ void Agent::setSubscribers()
 void Agent::removePublishers()
 {
     // Orders given to MavROS
-    // TODO:
+    // TOTEST:
     for (std::map<std::string,ros::Publisher>::iterator it=rosPublishers_.begin(); it!=rosPublishers_.end(); ++it)
     {
         it->second.shutdown();
@@ -164,7 +171,7 @@ void Agent::removePublishers()
 void Agent::removeSubscribers()
 {
     // Subscribe to all robots' positions' topics
-    // TODO:
+    // TOTEST:
     for (std::map<std::string,ros::Subscriber>::iterator it=rosSubscribers_.begin(); it!=rosSubscribers_.end(); ++it)
     {
         it->second.shutdown();

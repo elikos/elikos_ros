@@ -5,6 +5,8 @@
 */
 
 #include "InternalModel.hpp"
+#include "Factory/RobotsFactory.hpp"
+#include <geometry_msgs/Point.h>
 
 
 namespace elikos_ai {
@@ -38,6 +40,7 @@ InternalModel::~InternalModel()
 void InternalModel::updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs )
 {
     // TODO: must empty the queue and update internal model
+    // TOTEST: !! this whole function... making sure with empty the messages' queue correctly
 
     // Update internal model
     for ( int i = 0; i < robotsMsgs.size(); ++i )
@@ -55,7 +58,14 @@ void InternalModel::updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs )
             // TODO: finish this (updating the robots positions, including checking robot type)
             if ( it == robots.end() ) // the robot does not exist yet
             {
-                robots[(int)robotPos.id] = new TargetRobot();
+                // TODO: déplacer ce switch case horrible dans une usine de robots qui gère toute seule les types
+                // QUESTION: on ferait pas mieux de juste donner un type aux robots et de laisser faire l'héritage "Robot", "TargetRobot, "ObstacleRobot"?
+                // TOTEST: création des robots dans le modèle interne à partir des messages RobotsPos
+
+                robots[(int)robotPos.id] = RobotsFactory::Instance().newRobot( (RobotType)robotPos.type, (int)robotPos.id, tf::Point( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
+
+                // DEBUG:
+                ROS_INFO_STREAM( "Robot created successfully in ai's InternalModel" );
             }
             else
             {

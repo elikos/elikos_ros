@@ -33,6 +33,15 @@ private:
     void refreshTransform();
     Pid<double>* vel_x_pid, * vel_y_pid, * vel_z_pid;
 
+
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    MAV();
+    MAV& operator= (const MAV&);
+    MAV (const MAV&);
 };
 
 } // namespace elikos_sim
