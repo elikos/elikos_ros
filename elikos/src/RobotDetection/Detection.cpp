@@ -2,17 +2,36 @@
 
 namespace elikos_detection
 {
-    Detection::Detection( ros::NodeHandle *nh ) : nh_(nh)
+    Detection::Detection( ros::NodeHandle *nh ) : nh_(nh),it_(*nh)
     {
-        
+        H_MIN = 0;
+        H_MAX = 256;
+        S_MIN = 0;
+        S_MAX = 256;
+        V_MIN = 0;
+        V_MAX = 256;
     }
 
-    Detection::~Detection(){}
+    Detection::~Detection()
+    {
+    }
 
     void Detection::init()
     {
         setPublishers();
         setSubscribers();
+    }
+
+    string Detection::intToString(int number)
+    {
+        std::stringstream ss;
+        ss << number;
+        return ss.str();
+    }
+
+    void on_trackbar( int, void* )
+    {//This function gets called whenever a
+        // trackbar position is changed
     }
 
     void Detection::setupDebug()
@@ -26,9 +45,10 @@ namespace elikos_detection
     void Detection::captureFrame()
     {
         //store image to matrix
-        capture.read(cameraFeed);
+        capture.read(currentImage);
         //convert frame from BGR to HSV colorspace
-        cvtColor(cameraFeed,hsv,COLOR_BGR2HSV);
+        cvtColor(currentImage,hsv,COLOR_BGR2HSV);
+        //printf("I captured an image with my webcam");
     }
 
     void Detection::createTrackbars()
@@ -37,31 +57,27 @@ namespace elikos_detection
         namedWindow(trackbarWindowName,0);
         //create memory to store trackbar name on window
         char TrackbarName[50];
-        sprintf( TrackbarName, "H_MIN", elikos_detection::H_MIN);
-        sprintf( TrackbarName, "H_MAX", elikos_detection::H_MAX);
-        sprintf( TrackbarName, "S_MIN", elikos_detection::S_MIN);
-        sprintf( TrackbarName, "S_MAX", elikos_detection::S_MAX);
-        sprintf( TrackbarName, "V_MIN", elikos_detection::V_MIN);
-        sprintf( TrackbarName, "V_MAX", elikos_detection::V_MAX);
+        sprintf( TrackbarName, "H_MIN", H_MIN);
+        sprintf( TrackbarName, "H_MAX", H_MAX);
+        sprintf( TrackbarName, "S_MIN", S_MIN);
+        sprintf( TrackbarName, "S_MAX", S_MAX);
+        sprintf( TrackbarName, "V_MIN", V_MIN);
+        sprintf( TrackbarName, "V_MAX", V_MAX);
         //create trackbars and insert them into window
         //3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
         //the max value the trackbar can move (eg. H_HIGH),
         //and the function that is called whenever the trackbar is moved(eg. on_trackbar)
         //                                  ---->    ---->     ---->
-        createTrackbar( "H_MIN", trackbarWindowName, &elikos_detection::H_MIN, elikos_detection::H_MAX, on_trackbar );
-        createTrackbar( "H_MAX", trackbarWindowName, &elikos_detection::H_MAX, elikos_detection::H_MAX, on_trackbar );
-        createTrackbar( "S_MIN", trackbarWindowName, &elikos_detection::S_MIN, elikos_detection::S_MAX, on_trackbar );
-        createTrackbar( "S_MAX", trackbarWindowName, &elikos_detection::S_MAX, elikos_detection::S_MAX, on_trackbar );
-        createTrackbar( "V_MIN", trackbarWindowName, &elikos_detection::V_MIN, elikos_detection::V_MAX, on_trackbar );
-        createTrackbar( "V_MAX", trackbarWindowName, &elikos_detection::V_MAX, elikos_detection::V_MAX, on_trackbar );
+        createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
+        createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
+        createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
+        createTrackbar( "S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar );
+        createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
+        createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
     }
 
-    void Detection::on_trackbar( int, void* )
-    {//This function gets called whenever a
-        // trackbar position is changed
-    }
 
-    void Detection::cameraCallback(const sensor_msgs::ImageConstPtr &msg)
+    void Detection::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     {
         nextImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
@@ -71,48 +87,7 @@ namespace elikos_detection
         //TODO : publish robot info
     }
 
-    void Detection::trackRobots()
-    {
-        cvtColor(currentImage,hsv,COLOR_BGR2HSV);
-        inRange(hsv,Scalar(elikos_detection::H_MIN,elikos_detection::S_MIN,elikos_detection::V_MIN),Scalar(elikos_detection::H_MAX,elikos_detection::S_MAX,elikos_detection::V_MAX),threshold);
-        morphOps(threshold);
-        imshow(windowName2,threshold);
-        trackFilteredObject(threshold,hsv,cameraFeed);
-    }
-
-    void Detection::setSubscribers()
-    {
-        //TODO : subscribe to mavros (drone position)
-        //TODO : subscribe to camera feed
-    }
-
-    void Detection::drawObject(vector<RobotDesc> vecRobot,Mat &frame){
-
-        for(int i = 0; i<vecRobot.size(); i++)
-        {
-            cv::circle(frame, cv::Point(vecRobot.at(i).getXPos(), vecRobot.at(i).getYPos()), 10, cv::Scalar(0, 0, 255));
-            cv::putText(frame, intToString(vecRobot.at(i).getXPos()) + " , " + intToString(vecRobot.at(i).getYPos()), cv::Point(vecRobot.at(i).getXPos(), vecRobot.at(i) .getYPos() + 20), 1, 1, Scalar(0, 255, 0));
-        }
-    }
-
-    void morphOps(Mat &thresh)
-    {
-
-        //create structuring element that will be used to "dilate" and "erode" image.
-        //the element chosen here is a 3px by 3px rectangle
-
-        Mat erodeElement = getStructuringElement( MORPH_RECT,Size(3,3));
-        //dilate with larger element so make sure object is nicely visible
-        Mat dilateElement = getStructuringElement( MORPH_RECT,Size(8,8));
-
-        erode(thresh,thresh,erodeElement);
-        dilate(thresh,thresh,dilateElement);
-
-        erode(thresh,thresh,erodeElement);
-        dilate(thresh,thresh,dilateElement);
-    }
-
-    void trackFilteredObject(Mat threshold,Mat HSV, Mat &cameraFeed)
+    void Detection::trackFilteredObjects(Mat threshold,Mat HSV, Mat &cameraFeed)
     {
 
         //int x,y;
@@ -144,7 +119,7 @@ namespace elikos_detection
                     //if the area is the same as the 3/2 of the image size, probably just a bad filter
                     //we only want the object with the largest area so we safe a reference area each
                     //iteration and compare it to the area in the next iteration.
-                    if(area>elikos_detection::MIN_OBJECT_AREA){
+                    if(area>MIN_OBJECT_AREA){
 
                         myRobot.setXPos(moment.m10/area);
                         myRobot.setYPos(moment.m01/area);
@@ -164,6 +139,54 @@ namespace elikos_detection
 
             }else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
         }
+    }
+
+
+    void Detection::trackRobots()
+    {
+        cvtColor(currentImage,hsv,COLOR_BGR2HSV);
+        inRange(hsv,Scalar(H_MIN,S_MIN,V_MIN),Scalar(H_MAX,S_MAX,V_MAX),threshold);
+        morphOps(threshold);
+        imshow(windowName2,threshold);
+        trackFilteredObjects(threshold,hsv,currentImage);
+    }
+
+    void Detection::setSubscribers()
+    {
+        //TODO : subscribe to mavros (drone position)
+        //TODO : subscribe to camera feed
+        image_sub_ = it_.subscribe("/camera/image_raw", 1, &Detection::cameraCallback, this);
+    }
+
+    void Detection::drawObject(vector<RobotDesc> vecRobot,Mat &frame){
+
+        for(int i = 0; i<vecRobot.size(); i++)
+        {
+            cv::circle(frame, cv::Point(vecRobot.at(i).getXPos(), vecRobot.at(i).getYPos()), 10, cv::Scalar(0, 0, 255));
+            cv::putText(frame, intToString(vecRobot.at(i).getXPos()) + " , " + intToString(vecRobot.at(i).getYPos()), cv::Point(vecRobot.at(i).getXPos(), vecRobot.at(i).getYPos() + 20), 1, 1, Scalar(0, 255, 0));
+        }
+    }
+
+    void Detection::morphOps(Mat &thresh)
+    {
+
+        //create structuring element that will be used to "dilate" and "erode" image.
+        //the element chosen here is a 3px by 3px rectangle
+
+        Mat erodeElement = getStructuringElement( MORPH_RECT,Size(3,3));
+        //dilate with larger element so make sure object is nicely visible
+        Mat dilateElement = getStructuringElement( MORPH_RECT,Size(8,8));
+
+        erode(thresh,thresh,erodeElement);
+        dilate(thresh,thresh,dilateElement);
+
+        erode(thresh,thresh,erodeElement);
+        dilate(thresh,thresh,dilateElement);
+    }
+
+    void Detection::showCurrentImage()
+    {
+        imshow(windowName, currentImage);
     }
 
 }

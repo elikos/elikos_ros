@@ -6,14 +6,14 @@
 #include <string>
 #include <iostream>
 #include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp">
+#include "opencv2/imgproc/imgproc.hpp"
+#include "std_msgs/String.h"
 #include "RobotDesc.h"
 #include <ros/ros.h>
-#include <sensor_msgs.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include "./../defines.cpp"
-#include "detect_constants.h"
+#include <sensor_msgs/image_encodings.h>
 
 using namespace std;
 using namespace cv;
@@ -31,27 +31,21 @@ namespace elikos_detection {
         void mavPosCallback(const std_msgs::String::ConstPtr &msg);
         void cameraCallback(const sensor_msgs::ImageConstPtr &msg);
 
-        int getXPos();
-        int getYPos();
+        Mat getCurrentImage(){return currentImage;}
+        cv_bridge::CvImagePtr getNextImage(){return nextImage;}
 
-        cv_bridge::CvImagePtr getCurrentImage();
-        cv_bridge::CvImagePtr getNextImage();
+        void setCurrentImage(Mat image){currentImage = image;}
+        void setNextImage(cv_bridge::CvImagePtr image){nextImage = image;}
 
-
-
-        void setXPos(int pos);
-        void setYPos(int pos);
         void setCapture(VideoCapture capture) {Detection::capture = capture;}
 
-        cv::Scalar getHSVmin();
-        cv::Scalar getHSVmax();
-
-        VideoCapture getCapture() const {return capture;}
-
-        void setHSVmin(cv::Scalar scalar);
-        void setHSVmax(cv::Scalar scalar);
+        VideoCapture getCapture(){return capture;}
 
         void trackFilteredObjects(Mat threshold,Mat HSV, Mat &cameraFeed);
+        void drawObject(vector<RobotDesc> vecRobot,Mat &frame);
+        void morphOps(Mat &thresh);
+
+        string intToString(int number);
 
     /* *************************************************************************************************
      * ***              DEBUG FUNCTIONS
@@ -62,7 +56,7 @@ namespace elikos_detection {
         void setupDebug();
         void captureFrame();
         void trackRobots();
-        void on_trackbar(int, void*);
+        void showCurrentImage();
 
 
     private:
@@ -92,6 +86,8 @@ namespace elikos_detection {
         int RobotInfo;
 
         ros::NodeHandle* nh_;
+        image_transport::ImageTransport it_;
+        image_transport::Subscriber image_sub_;
 
     /* *************************************************************************************************
      * ***              DEBUG ATTRIBUTES
@@ -101,6 +97,33 @@ namespace elikos_detection {
         Mat threshold;
         Mat hsv;
         VideoCapture capture;
+
+    /* *************************************************************************************************
+     * ***               CLASS CONSTANTS
+     * *************************************************************************************************
+     */
+
+        int H_MIN;
+        int H_MAX;
+        int S_MIN;
+        int S_MAX;
+        int V_MIN;
+        int V_MAX;
+
+        const int FRAME_WIDTH = 640;
+        const int FRAME_HEIGHT = 480;
+
+        const int MAX_NUM_OBJECTS = 50;
+
+        const int MIN_OBJECT_AREA = 40 * 40;
+        const int MAX_OBJECT_AREA = FRAME_HEIGHT * FRAME_WIDTH / 1.5;
+
+        const string windowName = "Original Image";
+        const string windowName1 = "HSV Image";
+        const string windowName2 = "Thresholded Image";
+        const string windowName3 = "After Morphological Operations";
+        const string trackbarWindowName = "Trackbars";
+
 
     };
 

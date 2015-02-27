@@ -2,13 +2,18 @@
 #include <string>
 #include <iostream>
 #include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp">
+#include "opencv2/imgproc/imgproc.hpp"
 #include "RobotDesc.h"
 #include <ros/ros.h>
-#include <sensor_msgs.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include "./../defines.cpp"
+#include "Detection.h"
+#include "std_msgs/String.h"
+
+#define DEBUG_DETECT 1
+
+using namespace cv;
 
 int main(int argc, char* argv[])
 {
@@ -23,24 +28,26 @@ int main(int argc, char* argv[])
 
     bool calibrationMode = true ;
 
-    if(calibrationMode)
-    {
+    if(DEBUG_DETECT) {
         detect_instance.createTrackbars();
+        detect_instance.setupDebug();
     }
-
-    detect_instance.setupDebug();
 
     while(ros::ok())
     {
-        detect_instance.captureFrame();
-        if(calibrationMode == true)
-        {
-            detect_instance.trackRobots();
-        }
+
+        if(DEBUG_DETECT)
+            detect_instance.captureFrame();
+        else
+            detect_instance.setCurrentImage(detect_instance.getNextImage()->image);
+
+        detect_instance.trackRobots();
+
+        if(DEBUG_DETECT)
+            detect_instance.showCurrentImage();
 
 
-
-        waitkey(30);
+        waitKey(30);
     }
 
     return 0;
