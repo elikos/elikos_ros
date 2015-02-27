@@ -53,7 +53,15 @@ protected:
 
 private:
 
-	Robot(); //constructor
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    Robot();
+	Robot& operator= (const Robot&);
+	Robot (const Robot&);
+
 }; // class elikos_ai::Robot
 
 } // namespace elikos_ai

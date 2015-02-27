@@ -27,7 +27,14 @@ public:
 
 private:
 
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
     ObstacleRobot();
+    ObstacleRobot& operator= (const ObstacleRobot&);
+    ObstacleRobot (const ObstacleRobot&);
 
 }; // class elikos_ai::ObstacleRobot
 

@@ -20,9 +20,4 @@ TargetRobot::TargetRobot( int id, tf::Point relativePosition, float orientation,
 
 }
 
-/*TargetRobot::TargetRobot() : Robot()
-{
-
-}*/
-
 } // namespace elikos_ai

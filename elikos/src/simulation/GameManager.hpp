@@ -12,6 +12,14 @@ public:
 private:
     int score;
 
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    GameManager& operator= (const GameManager&);
+    GameManager (const GameManager&);
+
 };
 
 } // namespace elikos_sim

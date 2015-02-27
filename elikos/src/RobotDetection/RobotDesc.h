@@ -25,4 +25,14 @@ private:
     int xPos, yPos;
     string type;
     cv::Scalar HSVmin, HSVmax;
+
+
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    // TODO: check this out! Copy constructor and operator= get called for class RobotDesc. It's impossible to make these constructor private and not implement them.
+    //RobotDesc& operator= (const RobotDesc&);
+    //RobotDesc (const RobotDesc&);
 };

@@ -27,14 +27,19 @@ public:
 	Color getColor () { return this->color; }
 
 
-
-
-
 private:
 
 	Color color;
 
-	TargetRobot();
+
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
+    TargetRobot();
+	TargetRobot& operator= (const TargetRobot&);
+	TargetRobot (const TargetRobot&);
 
 }; // class elikos_ai::TargetRobot
 

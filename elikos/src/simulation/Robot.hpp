@@ -32,7 +32,15 @@ protected:
     tf::Vector3 v;
     tf::Quaternion q;
 private:
+
+    /* *************************************************************************************************
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
+     * *************************************************************************************************
+     */
+
     Robot();
+    Robot& operator= (const Robot&);
+    Robot (const Robot&);
 };
 
 } // namespace elikos_sim

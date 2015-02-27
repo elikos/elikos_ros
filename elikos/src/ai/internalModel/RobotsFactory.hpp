@@ -36,8 +36,8 @@ private:
      * *************************************************************************************************
      */
 
-    RobotsFactory& operator= (const RobotsFactory&) {}
-    RobotsFactory (const RobotsFactory&) {}
+    RobotsFactory& operator= (const RobotsFactory&);
+    RobotsFactory (const RobotsFactory&);
 };
 
 } // namespace elikos_ai
