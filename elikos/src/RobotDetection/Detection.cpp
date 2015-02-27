@@ -37,7 +37,15 @@ namespace elikos_detection
     void Detection::setupDebug()
     {
         //TODO : Change the hardcoding on the camera number
-        capture.open(0);
+        try
+        {
+            capture.open(0);
+        }
+        catch
+        {
+            sprintf("No cameras detected");
+        }
+
         capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
         capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
     }
