@@ -34,7 +34,7 @@ class Agent
 
 public:
 
-    Agent( ros::NodeHandle *nh );
+    Agent( ros::NodeHandle* nh );
     ~Agent();
     void init();  // start the agent (the elikos::ai node should do that)
     void destroy();
@@ -95,8 +95,6 @@ private:
     void removePublishers();
     void removeSubscribers();
 
-    void receiveRobotsPos( const elikos_ros::RobotsPos& msg );
-
 	/* *************************************************************************************************
      * ***           TOOLS
      * *************************************************************************************************
@@ -111,13 +109,15 @@ private:
      */
 
     // ROS node handle
-    ros::NodeHandle* nh_;
+    ros::NodeHandle& nh_;
 
 
     // ROS publishers, subscribers
     std::map<std::string, ros::Publisher> rosPublishers_; /**< @note map< topic name, the publisher object > */
     std::map<std::string, ros::Subscriber> rosSubscribers_; /**< @note map< topic name, the subscriber object > */
 
+    // Test debug callback
+    // ros::Subscriber sub_;
 
     /** @note   No pointer-reference to the message (RobotsPos instead of RobotsPos*)
      *          because the actual ROS's topic queue can dump out messages when it reaches

@@ -6,6 +6,7 @@
  */
 
 
+#include <boost/bind.hpp>
 #include "Agent.h"
 #include "./../defines.cpp"
 
@@ -17,7 +18,7 @@ namespace elikos_ai {
  * *************************************************************************************************
  */
 
-Agent::Agent( ros::NodeHandle *nh ) : nh_(nh)
+Agent::Agent( ros::NodeHandle* nh ) : nh_(*nh)
 {
     angle_ = 0.0;
     action_ = 0;
@@ -25,7 +26,7 @@ Agent::Agent( ros::NodeHandle *nh ) : nh_(nh)
 
 Agent::~Agent()
 {
-    nh_ = 0;
+    //nh_ = 0;
 }
 
 void Agent::init()
@@ -45,7 +46,7 @@ void Agent::destroy()
 
     delete action_;
     delete internalModel_;
-    nh_ = 0;
+    //nh_ = 0;
 }
 
 
@@ -99,7 +100,7 @@ void Agent::executeAction()
  */
 
 /**
- * @fn       void receiveRobotsPos( const elikos_ros::RobotsPos& msg )
+ * @fn       void receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
  * @brief    Callback for robotsPos topic
  *
  * Transfers RobotsPos messages to a queue when they are received. This queue serves as a container
@@ -108,6 +109,8 @@ void Agent::executeAction()
  */
 void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
 {
+    //std::cout << "AGENT CALLBACK" << std::endl;
+    //ROS_INFO_STREAM( "Agent::callback -- Push RobotsPos message" );
     queueRobotsPos_.push( msg );
     ROS_INFO_STREAM("CALL BACK");
 }
@@ -127,13 +130,10 @@ void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
  */
 void Agent::setPublishers()
 {
-    if ( nh_ )
-    {
-        // Orders given to MavROS
-        std::string topicName = TOPICS_NAMES[mavros_setpoint_local_position];
-        ros::Publisher pose_pub = nh_->advertise<geometry_msgs::PoseStamped>(topicName, 1);
-        rosPublishers_.insert( std::pair<std::string,ros::Publisher>(topicName, pose_pub) );
-    }
+    // Orders given to MavROS
+    std::string topicName = TOPICS_NAMES[mavros_setpoint_local_position];
+    ros::Publisher pose_pub = nh_.advertise<geometry_msgs::PoseStamped>(topicName, 1);
+    rosPublishers_.insert( std::pair<std::string,ros::Publisher>(topicName, pose_pub) );
 }
 
 /**
@@ -148,7 +148,7 @@ void Agent::setSubscribers()
 {
     // Subscribe to all robots' positions' topics
     std::string robotsPosTopic = TOPICS_NAMES[robotsPos];
-    ros::Subscriber sub = nh_->subscribe(robotsPosTopic, 1000, &Agent::receiveRobotsPosCallback, this );
+    ros::Subscriber sub = nh_.subscribe(robotsPosTopic, 1000, &Agent::receiveRobotsPosCallback, this );
     rosSubscribers_.insert( std::pair<std::string,ros::Subscriber>(robotsPosTopic, sub) );
 }
 
@@ -160,10 +160,12 @@ void Agent::removePublishers()
 {
     // Orders given to MavROS
     // TOTEST:
-    for (std::map<std::string,ros::Publisher>::iterator it=rosPublishers_.begin(); it!=rosPublishers_.end(); ++it)
+    for (std::map<std::string,ros::Publisher>::iterator it = rosPublishers_.begin(); it != rosPublishers_.end(); ++it)
     {
         it->second.shutdown();
     }
+
+    rosPublishers_.clear();
 }
 
 /**
@@ -174,10 +176,12 @@ void Agent::removeSubscribers()
 {
     // Subscribe to all robots' positions' topics
     // TOTEST:
-    for (std::map<std::string,ros::Subscriber>::iterator it=rosSubscribers_.begin(); it!=rosSubscribers_.end(); ++it)
+    for (std::map<std::string,ros::Subscriber>::iterator it = rosSubscribers_.begin(); it != rosSubscribers_.end(); ++it)
     {
         it->second.shutdown();
     }
+
+    rosSubscribers_.clear();
 }
 
 
