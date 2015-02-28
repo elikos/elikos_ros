@@ -35,6 +35,7 @@ int main( int argc, char **argv )
     	agent.chooseAction(); // choose the best action considering the environnement's current state
     	agent.executeAction(); // action!
 
+    	ros::spinOnce();
 		r.sleep();
 	}
 

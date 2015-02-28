@@ -65,7 +65,7 @@ namespace elikos_ai {
                     robots[(int)robotPos.id] = RobotsFactory::Instance().newRobot( (RobotType)robotPos.type, (int)robotPos.id, tf::Point( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
 
                     // DEBUG:
-                    ROS_INFO_STREAM( "Robot created successfully in ai's InternalModel" );
+                    ROS_INFO_STREAM( "Robot created successfully in the AI's InternalModel" );
                 }
                 else
                 {
