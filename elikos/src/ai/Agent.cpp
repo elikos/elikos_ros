@@ -35,6 +35,7 @@ void Agent::init()
 
     internalModel_ = new InternalModel();
     action_ = new Action();
+    ROS_INFO_STREAM("AI INIT");
 }
 
 void Agent::destroy()
@@ -108,6 +109,7 @@ void Agent::executeAction()
 void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
 {
     queueRobotsPos_.push( msg );
+    ROS_INFO_STREAM("CALL BAC");
 }
 
 

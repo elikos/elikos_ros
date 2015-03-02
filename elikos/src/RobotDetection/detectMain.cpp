@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         if(DEBUG_DETECT)
             detect_instance.showCurrentImage();
 
-
+        ros::spinOnce();
         waitKey(30);
     }
 
