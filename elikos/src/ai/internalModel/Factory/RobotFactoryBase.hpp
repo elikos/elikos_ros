@@ -12,6 +12,13 @@
 
 namespace elikos_ai {
 
+/**
+ * @class   RobotFactoryBase RobotFactoryBase.hpp "Definition"
+ * @brief   The base class for the AI'S internal model's robots' factories.
+ * @note    This base class never gets instantiated, only the children concrete classes.
+ * @note    The robots' factories are contained in another class, RobotsFactory. They are never
+ *          accessed directly in the code, only via this other class, RobotsFactory.
+ */
 class RobotFactoryBase
 {
 public:
@@ -25,7 +32,8 @@ public:
     virtual Robot* newRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed ) = 0;
 
 protected:
-    RobotFactoryBase() {}
+    RobotFactoryBase() {} /**< @note Only concrete classes should be instantiated. The constructor
+                                     is therefore unaccessible except for the children classes. > */
 
 private:
     /* *************************************************************************************************
@@ -33,8 +41,8 @@ private:
      * *************************************************************************************************
      */
 
-    RobotFactoryBase& operator= (const RobotFactoryBase&);
-    RobotFactoryBase (const RobotFactoryBase&);
+    RobotFactoryBase& operator= (const RobotFactoryBase&); /**< @note Do not implement. > */
+    RobotFactoryBase (const RobotFactoryBase&); /**< @note Do not implement. > */
 }; // class elikos_ai::RobotFactoryBase
 
 } // namespace elikos_ai
