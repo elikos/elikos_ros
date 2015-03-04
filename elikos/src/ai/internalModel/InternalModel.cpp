@@ -37,7 +37,7 @@ namespace elikos_ai {
 * @note    The queue parameter HAS to be a copy (it's a multi-threaded environment)
 * @param   robotsMsgs  Copy of the queue containing the latest received robots positions messages.
 */
-    void InternalModel::updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs )
+    void InternalModel::updateModel( std::vector<elikos_ros::RobotsPos>& robotsMsgs )
     {
         // TODO: must empty the queue and update internal model
         // TOTEST: !! this whole function... making sure with empty the messages' queue correctly
@@ -45,8 +45,8 @@ namespace elikos_ai {
         // Update internal model
         for ( int i = 0; i < robotsMsgs.size(); ++i )
         {
-            elikos_ros::RobotsPos msg = robotsMsgs.front();
-            std::vector<elikos_ros::RobotPos> robotsPos = msg.robotsPos;
+            //elikos_ros::RobotsPos msg = robotsMsgs.front();
+            std::vector<elikos_ros::RobotPos> robotsPos = robotsMsgs[i].robotsPos;
 
             for ( int j = 0; j < robotsPos.size(); ++j )
             {
@@ -58,7 +58,6 @@ namespace elikos_ai {
                 // TODO: finish this (updating the robots positions, including checking robot type)
                 if ( it == robots.end() ) // the robot does not exist yet
                 {
-                    // TODO: déplacer ce switch case horrible dans une usine de robots qui gère toute seule les types
                     // QUESTION: on ferait pas mieux de juste donner un type aux robots et de laisser faire l'héritage "Robot", "TargetRobot, "ObstacleRobot"?
                     // TOTEST: création des robots dans le modèle interne à partir des messages RobotsPos
 
@@ -74,8 +73,13 @@ namespace elikos_ai {
             }
 
             // Clear queue
-            robotsMsgs.pop();
+            //robotsMsgs.pop();
         }
+
+        //ROS_INFO_STREAM( "Received vector size : " + robotsMsgs.size() );
+
+        // CHECKTHIS: This was made without the Internet... No way I could check std::vector in more details.
+        robotsMsgs.clear();
     }
 
 

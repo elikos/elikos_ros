@@ -110,7 +110,7 @@ void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
 {
     //std::cout << "AGENT CALLBACK" << std::endl;
     //ROS_INFO_STREAM( "Agent::callback -- Push RobotsPos message" );
-    queueRobotsPos_.push( msg );
+    queueRobotsPos_.push_back( msg );
 }
 
 
