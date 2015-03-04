@@ -13,6 +13,13 @@
 
 namespace elikos_ai {
 
+/**
+ * @class   ObstacleRobotFactory ObstacleRobotFactory.hpp "Definition"
+ * @brief   The AI'S internal model's robots' factory for obstacle robots.
+ * @note    This base class never gets instantiated, only the children concrete classes, like this one.
+ * @note    The robots' factories are contained in another class, RobotsFactory. They are never
+ *          accessed directly in the code, only via this other class, RobotsFactory.
+ */
 class ObstacleRobotFactory : public RobotFactoryBase
 {
 public:

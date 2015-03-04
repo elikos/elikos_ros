@@ -10,15 +10,10 @@
 namespace elikos_ai {
 
 ObstacleRobotFactory::ObstacleRobotFactory()
-{
-    // TODO Auto-generated constructor stub
-
-}
+{}
 
 ObstacleRobotFactory::~ObstacleRobotFactory()
-{
-    // TODO Auto-generated destructor stub
-}
+{}
 
 /* *************************************************************************************************
  * ***           INHERITED MEMBERS

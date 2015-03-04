@@ -9,14 +9,11 @@
 
 namespace elikos_ai {
 
-TargetRobotFactory::TargetRobotFactory() {
-    // TODO Auto-generated constructor stub
+TargetRobotFactory::TargetRobotFactory()
+{}
 
-}
-
-TargetRobotFactory::~TargetRobotFactory() {
-    // TODO Auto-generated destructor stub
-}
+TargetRobotFactory::~TargetRobotFactory()
+{}
 
 
 /* *************************************************************************************************

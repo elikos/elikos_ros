@@ -44,18 +44,6 @@ private:
     std::map<RobotType, RobotFactoryBase*> factoriesMap_;
 
     /* *************************************************************************************************
-     * ***           PRIVATE FACTORY FUNCTIONS
-     * *************************************************************************************************
-     */
-/*
-    TargetRobot* newTargetRobot( int id, tf::Point relativePosition, float orientation );
-    TargetRobot* newTargetRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed );
-
-    ObstacleRobot* newObstacleRobot( int id, tf::Point relativePosition, float orientation );
-    ObstacleRobot* newObstacleRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed );
-*/
-
-    /* *************************************************************************************************
      * ***           HIDDEN CONSTRUCTORS (do not implement)
      * *************************************************************************************************
      */

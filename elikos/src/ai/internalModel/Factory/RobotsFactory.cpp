@@ -30,11 +30,6 @@ RobotsFactory::RobotsFactory()
     // Create all robots' factories
     factoriesMap_[groundRobot] = new TargetRobotFactory();
     factoriesMap_[obstacleRobot] = new ObstacleRobotFactory();
-
-    /*
-    factoriesMap_.insert( std::make_pair(groundRobot, new TargetRobotFactory()) );
-    factoriesMap_.insert( std::make_pair(obstacleRobot, new ObstacleRobotFactory()) );
-    */
 }
 
 RobotsFactory::~RobotsFactory()
@@ -83,29 +78,4 @@ Robot* RobotsFactory::newRobot( RobotType robotType, int id, tf::Point relativeP
 }
 
 
-/* *************************************************************************************************
- * ***           PRIVATE FACTORY FUNCTIONS
- * *************************************************************************************************
- */
-/*
-TargetRobot* RobotsFactory::newTargetRobot( int id, tf::Point relativePosition, float orientation )
-{
-    return new TargetRobot( id, relativePosition, orientation );
-}
-
-TargetRobot* RobotsFactory::newTargetRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed )
-{
-    return new TargetRobot( id, relativePosition, orientation, speed );
-}
-
-ObstacleRobot* RobotsFactory::newObstacleRobot( int id, tf::Point relativePosition, float orientation )
-{
-    return new ObstacleRobot( id, relativePosition, orientation );
-}
-
-ObstacleRobot* RobotsFactory::newObstacleRobot( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed )
-{
-    return new ObstacleRobot( id, relativePosition, orientation, speed );
-}
-*/
 } // namespace elikos_ai
