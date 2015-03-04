@@ -97,7 +97,7 @@ void MAV::move(){
 }
 
 void MAV::collide(){
-    // TODO
+    // TODO: MAV::collide()
 }
 
 void MAV::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg){

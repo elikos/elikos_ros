@@ -12,7 +12,6 @@
 #include "ObstacleRobot.hpp"
 
 #include <map>
-#include <queue>
 #include <vector>
 #include <elikos_ros/RobotsPos.h>
 #include <elikos_ros/RobotPos.h>
@@ -36,7 +35,7 @@ public:
      * *************************************************************************************************
      */
 
-    void updateModel( std::queue<elikos_ros::RobotsPos> robotsMsgs );
+    void updateModel( std::vector<elikos_ros::RobotsPos>& robotsMsgs );
 
 
     /* *************************************************************************************************
@@ -50,11 +49,12 @@ public:
 private:
 
     /* *************************************************************************************************
-     * ***           PRIVATE CONSTRUCTORS
+     * ***           HIDDEN CONSTRUCTORS (do not implement)
      * *************************************************************************************************
      */
 
-    InternalModel( InternalModel& );
+    InternalModel& operator= (const InternalModel&);
+    InternalModel (const InternalModel&);
 
 }; // class elikos_ai::InternalModel
 

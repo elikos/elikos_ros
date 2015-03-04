@@ -11,7 +11,6 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <vector>
-#include <queue>
 #include <map>
 #include <string>
 #include <cmath>
@@ -45,7 +44,7 @@ public:
 	 * *************************************************************************************************
 	 */
 
-	// Missing: the agent's internal model ->> envionment, robots, obstacles
+	// Missing: the agent's internal model ->> environment, robots, obstacles
 	// Missing: the agent's possible actions
 	// Missing: the agent's rules of action and utility decision's rules
 
@@ -124,7 +123,7 @@ private:
      *          its limit (the ROS's topic queue is where the original messages are from).
      *          Safer to make a copy of the message.
      */
-    std::queue<elikos_ros::RobotsPos> queueRobotsPos_; /**< queue for robots positions from robot detection */
+    std::vector<elikos_ros::RobotsPos> queueRobotsPos_; /**< queue for robots positions from robot detection */
 
 
     // Internal model
