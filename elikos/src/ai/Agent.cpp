@@ -51,7 +51,115 @@ void Agent::destroy()
 
 
 /* *************************************************************************************************
- * ***           DECISION-MAKING (THE AI)
+ * ***           DECISION-MAKING - SPECIFIC FUNCTION
+ * *************************************************************************************************
+ */
+
+bool Agent::hasTarget()
+{
+    // if there is a robot in sight (any one)
+    if ( internalModel_->robots.size() > 0 )
+    {
+        // and if we do not have a target yet
+        if ( !hasTarget_ )
+        {
+            // then this robot is the target
+            targetRobotId_ = internalModel_->robots.begin()->first;
+            targetRobot_ = internalModel_->robots.begin()->second;
+
+            hasTarget_ = true;
+        }
+    }
+    else // otherwise
+    {
+        if ( hasTarget_ )
+        {
+            // we remove the old target, which is not valid anymore
+            targetRobotId_ = -1;
+            targetRobot_ = 0;
+
+            hasTarget_ = false;
+        }
+    }
+
+    return hasTarget_;
+}
+
+bool Agent::targetTouched()
+{
+    // TODO
+    // façon facile de faire ça : cheatter avec les mgs ROS (RobotsPos) et indiquer si y'a un overflow sur
+    // les côtés de la caméra
+    return false;
+}
+
+bool Agent::targetCenteredInCamera()
+{
+    // TODO: les dimensions de la caméra sont pour le moment hardcodées et fausses.
+    // J'ai besoin de la largeur et de la hauteur de la caméra...
+    double widthCam = 2000.0;
+    double heightCam = 1000.0;
+
+    // Et j'ai besoin de ça aussi
+    double acceptableCenterWidth = widthCam / 4.0;
+    double acceptableCenterHeigth = heightCam / 4.0;
+
+    double acceptableCenterWidthStartPt  = (widthCam  - acceptableCenterWidth)  / 2.0;
+    double acceptableCenterHeightStartPt = (heightCam - acceptableCenterHeigth) / 2.0;
+
+    double acceptableCenterWidthEndPt  = acceptableCenterWidthStartPt  + acceptableCenterWidth;
+    double acceptableCenterHeightEndPt = acceptableCenterHeightStartPt + acceptableCenterHeigth;
+
+    const tf::Vector3 targetPos = targetRobot_->Transform().getOrigin();
+
+    // Conditions strictement [plus petite, plus grande] ou non strictement? Est-ce que ça change vrmt de quoi?
+    bool isInCenterWidth  = ( acceptableCenterWidthStartPt  < targetPos[0] ) && ( targetPos[0] < acceptableCenterWidthEndPt );
+    bool isInCenterHeight = ( acceptableCenterHeightStartPt < targetPos[1] ) && ( targetPos[1] < acceptableCenterHeightEndPt );
+
+    return ( isInCenterWidth && isInCenterHeight ) ;
+}
+
+void Agent::executePlan()
+{
+    if ( hasTarget() ) // redundant, but safer
+    {
+        // (1) first part of plan: move towards the target and "touch" it (in fact, we
+        //     will stop right before any actual touch to avoid problems :D
+        if ( !targetTouched() )
+        {
+            // (1.1) if the quad is not directly over the robot, then we move horizontally to be
+            //       right above the robot
+            if ( !targetCenteredInCamera() )
+            {
+                // TODO
+                // move towards the center of the robot
+                // MAL NON NON PAS FAIRE ÇA  action_->posStamped = addRelativeDistToPoseStamped( x, y, z, targetRobot_ );
+            }
+            // (1.2) when the quad is right above the robot, then it can slowly move down
+            else
+            {
+                // TODO: movement down value
+                // move down
+                float movmtDown = -1.0;
+                // MAL NON NON PAS FAIRE ÇA  action_->posStamped = addRelativeDistToPoseStamped( 0.0, 0.0, movmtDown, targetRobot_ );
+            }
+        }
+        //  (2) second part of the plan: move back up, and wait there
+        else
+        {
+            // TODO
+        }
+    }
+}
+void Agent::wanderAround()
+{
+    // we just wander around randomly
+    // TODO
+}
+
+
+/* *************************************************************************************************
+ * ***           DECISION-MAKING (THE AI) - MAIN FUNCTIONS
  * *************************************************************************************************
  */
 
@@ -67,13 +175,19 @@ void Agent::percept()
 
 }
 
-void Agent::updateModel(){
-
-	// update robots position, speed, and orientation
-
-}
 void Agent::chooseAction()
 {
+    // For test on Sunday March the 8th, 2015
+    if ( hasTarget() )
+    {
+        executePlan();
+    }
+    else
+    {
+        wanderAround();
+    }
+
+    /*
     // Mouvement en forme de "8"
     action_->posStamped = getPoseStamped(angle_);
 
@@ -83,6 +197,7 @@ void Agent::chooseAction()
     {
         angle_ = 0.0;
     }
+    */
 }
 
 
@@ -205,6 +320,29 @@ geometry_msgs::PoseStamped Agent::getPoseStamped(float angle)
 
     return pose;
 }
+
+// NON ce truc est MAL
+/*
+// adds a relative distance to the quad towards the target robot
+geometry_msgs::PoseStamped Agent::addRelativeDistToPoseStamped( float x, float y, float z, Robot* target )
+{
+    geometry_msgs::PoseStamped pose;
+    pose.header.frame_id = "world";
+    pose.header.stamp = ros::Time::now();
+    if ( target )
+    {
+        pose.pose.position.x = target->Transform().getOrigin()[0] + x;
+        pose.pose.position.y = target->Transform().getOrigin()[1] + y;
+        pose.pose.position.z = target->Transform().getOrigin()[2] + z;
+    }
+    pose.pose.orientation.x = 0.0;
+    pose.pose.orientation.y = 0.0;
+    pose.pose.orientation.z = 0.0;
+    pose.pose.orientation.w = 0.0;
+
+    return pose;
+}
+*/
 
 
 

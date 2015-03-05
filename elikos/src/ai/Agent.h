@@ -37,7 +37,6 @@ public:
     ~Agent();
     void init();  // start the agent (the elikos::ai node should do that)
     void destroy();
-    void run();
     
     /* *************************************************************************************************
 	 * ***           AI RELATED FUNCTIONS (DECISION-MAKING)
@@ -136,6 +135,19 @@ private:
     // Temp action for quick testing
     Action* action_;
     float angle_;
+
+
+    // Temp for tests on Sunday March the 8th, 2015
+    bool hasTarget_ = false;
+    int targetRobotId_ = -1;
+    Robot* targetRobot_ = 0;
+
+    bool hasTarget();
+    bool targetTouched();
+    bool targetCenteredInCamera();
+    void executePlan();
+    void wanderAround();
+    //geometry_msgs::PoseStamped addRelativeDistToPoseStamped( float x, float y, float z, Robot* target );
 
 
     /* *************************************************************************************************
