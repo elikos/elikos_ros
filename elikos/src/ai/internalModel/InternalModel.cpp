@@ -6,7 +6,7 @@
 
 #include "InternalModel.hpp"
 #include "Factory/RobotsFactory.hpp"
-#include <geometry_msgs/Point.h>
+#include <tf/tf.h>
 
 
 namespace elikos_ai {
@@ -61,14 +61,15 @@ namespace elikos_ai {
                     // QUESTION: on ferait pas mieux de juste donner un type aux robots et de laisser faire l'héritage "Robot", "TargetRobot, "ObstacleRobot"?
                     // TOTEST: création des robots dans le modèle interne à partir des messages RobotsPos
 
-                    robots[(int)robotPos.id] = RobotsFactory::Instance().newRobot( (RobotType)robotPos.type, (int)robotPos.id, tf::Point( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
+                    robots[(int)robotPos.id] = RobotsFactory::Instance().newRobot( (RobotType)robotPos.type, (int)robotPos.id, tf::Vector3( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
 
                     // DEBUG:
-                    ROS_INFO_STREAM( "Robot created successfully in the AI's InternalModel" );
+                    ROS_INFO_STREAM( "Robot created successfully in the AI's InternalModel. Robot id : " << (int)robotPos.id );
                 }
                 else
                 {
-
+                    robots[(int)robotPos.id]->updateRelativePosition( tf::Vector3( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
+                    //ROS_INFO_STREAM( "Robot's position updated : (" << robotPos.point.x << " ," << robotPos.point.y << ", " << robotPos.point.z << ")" );
                 }
             }
 
@@ -76,7 +77,7 @@ namespace elikos_ai {
             //robotsMsgs.pop();
         }
 
-        //ROS_INFO_STREAM( "Received vector size : " + robotsMsgs.size() );
+        //ROS_INFO_STREAM( "Received vector size : " << robotsMsgs.size() );
 
         // CHECKTHIS: This was made without the Internet... No way I could check std::vector in more details.
         robotsMsgs.clear();

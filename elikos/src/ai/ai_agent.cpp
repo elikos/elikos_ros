@@ -22,15 +22,6 @@ int main( int argc, char **argv )
 
     while (ros::ok())
     {
-    	// Pas sûr c'est nécessaire de vérifier s'il y a des subscribers abonnés au topic...
-    	/*
-    	while (pose_pub.getNumSubscribers() < 1)
-    	{
-			if(!ros::ok()) return 0;
-			ROS_WARN_ONCE("Please create subscriber to the pose");
-			sleep(1);
-		}*/
-
     	agent.percept(); // get the environnement's state
     	agent.chooseAction(); // choose the best action considering the environnement's current state
     	agent.executeAction(); // action!

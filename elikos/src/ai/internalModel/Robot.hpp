@@ -25,13 +25,17 @@ public:
 
 	virtual ~Robot() {} // virtual destructor
 
+    void updateRelativePosition( tf::Vector3 position, float orientation );
 
 	int getID(){return this->id_;}
+
+	const tf::Transform& Transform() { return transform_; }
+
 
 protected:
 
 	//TODO: constructeur avec position relative
-    Robot ( int id, tf::Point relativePosition, float orientation, tf::Vector3 speed, RobotType type );
+    Robot ( int id, tf::Vector3 relativePosition, float orientation, tf::Vector3 speed, RobotType type );
 
 	//TODO: constructeur avec position absolue
     //Robot(tf::Transform absolutePosition);
