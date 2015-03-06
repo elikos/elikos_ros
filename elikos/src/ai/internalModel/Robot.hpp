@@ -23,14 +23,17 @@ class Robot
 {
 public:
 
-	virtual ~Robot() {} // virtual destructor
+	virtual ~Robot() {}
 
     void updateRelativePosition( tf::Vector3 position, float orientation );
 
-	int getID(){return this->id_;}
+	const int   getID()             { return this->id_; }
+    //      int   getID()             { return this->id_; }
+	const float getOrientation()    { return orientation_; }
 
 	const tf::Transform& Transform() { return transform_; }
 
+	void setOrientation( float o )  { orientation_ = o; }
 
 protected:
 

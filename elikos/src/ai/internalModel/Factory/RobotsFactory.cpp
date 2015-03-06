@@ -8,6 +8,7 @@
 #include "RobotsFactory.hpp"
 #include "TargetRobotFactory.hpp"
 #include "ObstacleRobotFactory.hpp"
+#include "QuadRobotFactory.hpp"
 #include <utility>
 
 namespace elikos_ai {
@@ -30,6 +31,7 @@ RobotsFactory::RobotsFactory()
     // Create all robots' factories
     factoriesMap_[groundRobot] = new TargetRobotFactory();
     factoriesMap_[obstacleRobot] = new ObstacleRobotFactory();
+    factoriesMap_[quadRobot] = new QuadRobotFactory();
 }
 
 RobotsFactory::~RobotsFactory()

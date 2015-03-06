@@ -17,18 +17,18 @@ namespace elikos_ai {
  * *************************************************************************************************
  */
 
-    InternalModel::InternalModel()
-    {
+InternalModel::InternalModel()
+{
+    robots[selfId] = RobotsFactory::Instance().newRobot( quadRobot, selfId, tf::Vector3( 0.0, 0.0, 0.0 ), 0.0 );
+}
 
-    }
-
-    InternalModel::~InternalModel()
+InternalModel::~InternalModel()
+{
+    for ( std::map<int, Robot*>::iterator it = robots.begin(); it != robots.end(); ++it )
     {
-        for ( std::map<int, Robot*>::iterator it = robots.begin(); it != robots.end(); ++it )
-        {
-            delete it->second;
-        }
+        delete it->second;
     }
+}
 
 /**
 * @fn      updateModel( std::queue<elikos_ros::RobotsPos>& robotsMsgs )
@@ -37,51 +37,64 @@ namespace elikos_ai {
 * @note    The queue parameter HAS to be a copy (it's a multi-threaded environment)
 * @param   robotsMsgs  Copy of the queue containing the latest received robots positions messages.
 */
-    void InternalModel::updateModel( std::vector<elikos_ros::RobotsPos>& robotsMsgs )
+void InternalModel::updateRobotsPos( std::vector<elikos_ros::RobotsPos>& robotsMsgs )
+{
+    // TODO: must empty the queue and update internal model
+    // TOTEST: !! this whole function... making sure with empty the messages' queue correctly
+
+    // Update internal model
+    for ( int i = 0; i < robotsMsgs.size(); ++i )
     {
-        // TODO: must empty the queue and update internal model
-        // TOTEST: !! this whole function... making sure with empty the messages' queue correctly
+        //elikos_ros::RobotsPos msg = robotsMsgs.front();
+        std::vector<elikos_ros::RobotPos> robotsPos = robotsMsgs[i].robotsPos;
 
-        // Update internal model
-        for ( int i = 0; i < robotsMsgs.size(); ++i )
+        for ( int j = 0; j < robotsPos.size(); ++j )
         {
-            //elikos_ros::RobotsPos msg = robotsMsgs.front();
-            std::vector<elikos_ros::RobotPos> robotsPos = robotsMsgs[i].robotsPos;
+            elikos_ros::RobotPos& robotPos = robotsPos[j];
 
-            for ( int j = 0; j < robotsPos.size(); ++j )
+            // Check if the robot has already been identified and created
+            std::map<int, Robot*>::iterator it = robots.find((int)robotPos.id);
+
+            // TODO: finish this (updating the robots positions, including checking robot type)
+            if ( it == robots.end() ) // the robot does not exist yet
             {
-                elikos_ros::RobotPos& robotPos = robotsPos[j];
+                // QUESTION: on ferait pas mieux de juste donner un type aux robots et de laisser faire l'héritage "Robot", "TargetRobot, "ObstacleRobot"?
+                // TOTEST: création des robots dans le modèle interne à partir des messages RobotsPos
 
-                // Check if the robot has already been identified and created
-                std::map<int, Robot*>::iterator it = robots.find((int)robotPos.id);
+                robots[(int)robotPos.id] = RobotsFactory::Instance().newRobot( (RobotType)robotPos.type, (int)robotPos.id, tf::Vector3( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
 
-                // TODO: finish this (updating the robots positions, including checking robot type)
-                if ( it == robots.end() ) // the robot does not exist yet
-                {
-                    // QUESTION: on ferait pas mieux de juste donner un type aux robots et de laisser faire l'héritage "Robot", "TargetRobot, "ObstacleRobot"?
-                    // TOTEST: création des robots dans le modèle interne à partir des messages RobotsPos
-
-                    robots[(int)robotPos.id] = RobotsFactory::Instance().newRobot( (RobotType)robotPos.type, (int)robotPos.id, tf::Vector3( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
-
-                    // DEBUG:
-                    ROS_INFO_STREAM( "Robot created successfully in the AI's InternalModel. Robot id : " << (int)robotPos.id );
-                }
-                else
-                {
-                    robots[(int)robotPos.id]->updateRelativePosition( tf::Vector3( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
-                    //ROS_INFO_STREAM( "Robot's position updated : (" << robotPos.point.x << " ," << robotPos.point.y << ", " << robotPos.point.z << ")" );
-                }
+                // DEBUG:
+                ROS_INFO_STREAM( "Robot created successfully in the AI's InternalModel. Robot id : " << (int)robotPos.id );
             }
-
-            // Clear queue
-            //robotsMsgs.pop();
+            else
+            {
+                robots[(int)robotPos.id]->updateRelativePosition( tf::Vector3( robotPos.point.x, robotPos.point.y, robotPos.point.z ), (float)robotPos.orientation );
+                //ROS_INFO_STREAM( "Robot's position updated : (" << robotPos.point.x << " ," << robotPos.point.y << ", " << robotPos.point.z << ")" );
+            }
         }
 
-        //ROS_INFO_STREAM( "Received vector size : " << robotsMsgs.size() );
-
-        // CHECKTHIS: This was made without the Internet... No way I could check std::vector in more details.
-        robotsMsgs.clear();
+        // Clear queue
+        //robotsMsgs.pop();
     }
+
+    //ROS_INFO_STREAM( "Received vector size : " << robotsMsgs.size() );
+
+    // CHECKTHIS: This was made without the Internet... No way I could check std::vector in more details.
+    robotsMsgs.clear();
+}
+
+void InternalModel::updateQuadPos( std::vector<geometry_msgs::PoseStamped::ConstPtr>& msgs )
+{
+    for ( int i = 0; i < msgs.size(); ++i )
+    {
+        // xy_sp.setY(msg->pose.position.y);
+
+        const geometry_msgs::Point &pt = msgs[i]->pose.position;
+        self->updateRelativePosition( tf::Vector3( pt.x, pt.y, pt.z ), self->getOrientation() );
+    }
+
+    msgs.clear();
+}
 
 
 } // namespace elikos_ai

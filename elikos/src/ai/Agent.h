@@ -74,7 +74,7 @@ public:
 
 	// This needs to be public otherwise ROS won't be able to use the callback
     void receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg );
-
+    void mavrosPoseCallback( const geometry_msgs::PoseStamped::ConstPtr& msg );
     
 private:
 
@@ -117,12 +117,13 @@ private:
     // Test debug callback
     // ros::Subscriber sub_;
 
-    /** @note   No pointer-reference to the message (RobotsPos instead of RobotsPos*)
+    /** @note   No pointer-reference to the messages (RobotsPos instead of RobotsPos*)
      *          because the actual ROS's topic queue can dump out messages when it reaches
      *          its limit (the ROS's topic queue is where the original messages are from).
      *          Safer to make a copy of the message.
      */
     std::vector<elikos_ros::RobotsPos> queueRobotsPos_; /**< queue for robots positions from robot detection */
+    std::vector<geometry_msgs::PoseStamped::ConstPtr> queueQuadPos_; /**< queue for the quad positions from MAVROS  */
 
 
     // Internal model
@@ -139,7 +140,7 @@ private:
 
     // Temp for tests on Sunday March the 8th, 2015
     bool hasTarget_ = false;
-    int targetRobotId_ = -1;
+    int targetRobotId_ = -100;
     Robot* targetRobot_ = 0;
 
     bool hasTarget();
