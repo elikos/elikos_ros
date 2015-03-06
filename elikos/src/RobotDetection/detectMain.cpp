@@ -18,6 +18,7 @@ using namespace cv;
 int main(int argc, char* argv[])
 {
     //init ROS
+
     ros::init( argc, argv, "elikos_robotdetect" );
     ros::NodeHandle nh;
     ros::Rate r(30);

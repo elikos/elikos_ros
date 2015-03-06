@@ -109,7 +109,7 @@ void Agent::executeAction()
 void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
 {
     queueRobotsPos_.push( msg );
-    ROS_INFO_STREAM("CALL BAC");
+    ROS_INFO_STREAM("CALL BACK");
 }
 
 

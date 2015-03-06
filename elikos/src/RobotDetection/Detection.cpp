@@ -97,6 +97,7 @@ namespace elikos_detection
         {
             std::string topicName = TOPICS_NAMES[robotsPos];
             robots_publish = nh_->advertise<elikos_ros::RobotsPos>(topicName,1);
+
         }
     }
 
@@ -156,6 +157,7 @@ namespace elikos_detection
                             robotsPos_msg.robotsPos.push_back(pos);
                         }
                         robots_publish.publish(robotsPos_msg);
+                        ROS_INFO_STREAM("I am advertising a robotInfo vector");
                     }
                 }
 
