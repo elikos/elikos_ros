@@ -57,14 +57,22 @@ void Agent::destroy()
 bool Agent::hasTarget()
 {
     // if there is a robot in sight (any one)
-    if ( internalModel_->robots.size() > 0 )
+    if ( internalModel_->robots.size() > 1 ) // robots contains at least the quad
     {
         // and if we do not have a target yet
         if ( !hasTarget_ )
         {
             // then this robot is the target
-            targetRobotId_ = internalModel_->robots.begin()->first;
-            targetRobot_ = internalModel_->robots.begin()->second;
+
+            InternalModel::RobotsMapIterator it = internalModel_->robots.begin();
+
+            if ( it->first == internalModel_->selfId ) // we do not want to aim at ourselves...
+            {
+                ++it;
+            }
+
+            targetRobotId_ = it->first;
+            targetRobot_ = it->second;
 
             hasTarget_ = true;
         }
@@ -74,7 +82,7 @@ bool Agent::hasTarget()
         if ( hasTarget_ )
         {
             // we remove the old target, which is not valid anymore
-            targetRobotId_ = -1;
+            targetRobotId_ = -100;
             targetRobot_ = 0;
 
             hasTarget_ = false;
@@ -150,6 +158,7 @@ void Agent::executePlan()
         }
     }
 }
+
 void Agent::wanderAround()
 {
     // we just wander around randomly
@@ -170,7 +179,8 @@ void Agent::percept()
 
     // This call empties the queue of latest received robots positions from the robotDetect node
     // and updates the Agent's internal model.
-    internalModel_->updateModel( queueRobotsPos_ );
+    internalModel_->updateRobotsPos( queueRobotsPos_ );
+    internalModel_->updateQuadPos( queueQuadPos_ );
 
 }
 
@@ -228,6 +238,12 @@ void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
     queueRobotsPos_.push_back( msg );
 }
 
+void Agent::mavrosPoseCallback( const geometry_msgs::PoseStamped::ConstPtr& msg )
+{
+    ROS_INFO_STREAM( "AGENT CALLBACK MAVROS position" );
+    queueQuadPos_.push_back( msg );
+}
+
 
 /* *************************************************************************************************
  * ***           ROS RELATED FUNCTIONS
@@ -261,8 +277,13 @@ void Agent::setSubscribers()
 {
     // Subscribe to all robots' positions' topics
     std::string robotsPosTopic = TOPICS_NAMES[robotsPos];
-    ros::Subscriber sub = nh_.subscribe(robotsPosTopic, 1000, &Agent::receiveRobotsPosCallback, this );
-    rosSubscribers_.insert( std::pair<std::string,ros::Subscriber>(robotsPosTopic, sub) );
+    ros::Subscriber sub1 = nh_.subscribe( robotsPosTopic, 1000, &Agent::receiveRobotsPosCallback, this );
+    rosSubscribers_[robotsPosTopic] = sub1;
+
+    // MAVROS position (la position courante du quad)
+    std::string mavrosPosition = TOPICS_NAMES[mavros_localPosition_local];
+    ros::Subscriber sub2 = nh_.subscribe( mavrosPosition, 1000, &Agent::mavrosPoseCallback, this );
+    rosSubscribers_[mavrosPosition] = sub2;
 }
 
 /**

@@ -15,6 +15,8 @@
 #include <vector>
 #include <elikos_ros/RobotsPos.h>
 #include <elikos_ros/RobotPos.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Point.h>
 
 namespace elikos_ai {
 
@@ -35,7 +37,8 @@ public:
      * *************************************************************************************************
      */
 
-    void updateModel( std::vector<elikos_ros::RobotsPos>& robotsMsgs );
+    void updateRobotsPos( std::vector<elikos_ros::RobotsPos>& robotsMsgs );
+    void updateQuadPos( std::vector<geometry_msgs::PoseStamped::ConstPtr>& robotsMsgs );
 
 
     /* *************************************************************************************************
@@ -43,8 +46,15 @@ public:
      * *************************************************************************************************
      */
 
-    std::map<int, Robot*> robots; /**< map for keeping track of robots */
+    typedef std::map<int, Robot*> RobotsMap;
+    typedef std::map<int, Robot*>::iterator RobotsMapIterator;
+
+    RobotsMap robots;             /**< map for keeping track of robots */
                                   /**< @note map<unique id, Robot*> */
+    Robot* self;                  /**< the quad itself */
+                                  /**< @note this Robot* is in the std::map robots */
+                                  /**< @note ID number reserved: -1 */
+    int selfId = -1;
 
 private:
 
