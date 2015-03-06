@@ -148,7 +148,7 @@ private:
     bool targetCenteredInCamera();
     void executePlan();
     void wanderAround();
-    //geometry_msgs::PoseStamped addRelativeDistToPoseStamped( float x, float y, float z, Robot* target );
+    geometry_msgs::PoseStamped addRelativeDistToPoseStamped( float x, float y, float z, Robot* target );
 
 
     /* *************************************************************************************************

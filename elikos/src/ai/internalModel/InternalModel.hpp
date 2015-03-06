@@ -46,7 +46,7 @@ public:
      * *************************************************************************************************
      */
 
-    typedef std::map<int, Robot*> RobotsMap;
+    typedef std::map<int, Robot*>           RobotsMap;
     typedef std::map<int, Robot*>::iterator RobotsMapIterator;
 
     RobotsMap robots;             /**< map for keeping track of robots */
@@ -54,7 +54,7 @@ public:
     Robot* self;                  /**< the quad itself */
                                   /**< @note this Robot* is in the std::map robots */
                                   /**< @note ID number reserved: -1 */
-    int selfId = -1;
+    int selfId = -1;              /**< ID reserved for the quad robot. */
 
 private:
 

@@ -12,14 +12,10 @@
 namespace elikos_ai {
 
 
-/* *************************************************************************************************
- * ***           PUBLIC FUNCTIONS
- * *************************************************************************************************
- */
-
 InternalModel::InternalModel()
 {
     robots[selfId] = RobotsFactory::Instance().newRobot( quadRobot, selfId, tf::Vector3( 0.0, 0.0, 0.0 ), 0.0 );
+    self = robots[selfId];
 }
 
 InternalModel::~InternalModel()
@@ -29,6 +25,11 @@ InternalModel::~InternalModel()
         delete it->second;
     }
 }
+
+/* *************************************************************************************************
+ * ***           PUBLIC FUNCTIONS
+ * *************************************************************************************************
+ */
 
 /**
 * @fn      updateModel( std::queue<elikos_ros::RobotsPos>& robotsMsgs )
@@ -91,6 +92,8 @@ void InternalModel::updateQuadPos( std::vector<geometry_msgs::PoseStamped::Const
 
         const geometry_msgs::Point &pt = msgs[i]->pose.position;
         self->updateRelativePosition( tf::Vector3( pt.x, pt.y, pt.z ), self->getOrientation() );
+
+        //ROS_INFO_STREAM( "Refreasing the quad's position. New pos : " << pt.x << ", " << pt.y << ", " << pt.z );
     }
 
     msgs.clear();

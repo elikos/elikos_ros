@@ -118,5 +118,11 @@ static const std::vector<std::string> TOPICS_NAMES
 );
 
 
+///
+/// Camera size
+///
+static const int CAM_HEIGHT = 480;
+static const int CAM_WIDTH = 640;
+
 
 #endif // _DEFINES_CPP_
