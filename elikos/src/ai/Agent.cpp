@@ -6,6 +6,7 @@
  */
 
 
+#include <cmath>
 #include <boost/bind.hpp>
 #include "Agent.h"
 #include "./../defines.cpp"
@@ -65,6 +66,7 @@ bool Agent::hasTarget()
         {
             // then this robot is the target
 
+            // TOTEST: target assignation gets done properly
             InternalModel::RobotsMapIterator it = internalModel_->robots.begin();
 
             if ( it->first == internalModel_->selfId ) // we do not want to aim at ourselves...
@@ -105,8 +107,8 @@ bool Agent::targetCenteredInCamera()
 {
     // TODO: les dimensions de la caméra sont pour le moment hardcodées et fausses.
     // J'ai besoin de la largeur et de la hauteur de la caméra...
-    double widthCam = 2000.0;
-    double heightCam = 1000.0;
+    double widthCam = CAM_WIDTH;
+    double heightCam = CAM_HEIGHT;
 
     // Et j'ai besoin de ça aussi
     double acceptableCenterWidth = widthCam / 4.0;
@@ -141,7 +143,44 @@ void Agent::executePlan()
             {
                 // TODO
                 // move towards the center of the robot
-                // MAL NON NON PAS FAIRE ÇA  action_->posStamped = addRelativeDistToPoseStamped( x, y, z, targetRobot_ );
+
+                // NOTE IMPORTANTE : la position du quad et du robot dans le internalModel_ ne sont pas
+                // dans le même système de coordonnées. La position du quad provient de MAVROS tandis
+                // que la position des robots est simplement la position du centre du blob DANS L'IMAGE.
+
+                // TODO: update camera width and height
+                double widthCam = CAM_WIDTH;
+                double heightCam = CAM_HEIGHT;
+
+                tf::Vector3 posRobot = targetRobot_->Transform().getOrigin();
+                tf::Vector3 centreImage( widthCam/2.0, heightCam/2.0, 0.0 );
+                tf::Vector3 direction = posRobot - centreImage;
+
+                //ROS_INFO_STREAM( "now moving horizontally. direction: " << direction[0] << ", " << direction[2] << ", " << direction[3] );
+
+                // normalize direction
+                direction = direction / ( sqrt( pow( (double)direction[0], 2) + pow( (double)direction[1], 2) ) ); // ignore z coor
+
+                double unitMvmt = 0.3; // the length we want to move; we want to move slowly
+
+                //ROS_INFO_STREAM( "now moving horizontally. direction normalized: " << direction[0] << ", " << direction[2] << ", " << direction[3] );
+
+                tf::Vector3 mvmtToDo = direction * unitMvmt;
+
+                //ROS_INFO_STREAM( "now moving horizontally. mvmtToDo: " << mvmtToDo[0] << ", " << mvmtToDo[2] << ", " << mvmtToDo[3] );
+
+                // but we know the camera is fixed on the quad, which has its own coordinate system.
+                // we have to change from one coordinate system to the other
+                // mainly, we rotate the point around since theorically only the z-axis rotation should change
+/*
+                double zRotation = 0; // 1 ->> 180 degres
+                tf::Quaternion rotation(0, 0, zRotation, 0);
+                mvmtToDo = tf::quatRotate(rotation, mvmtToDo);
+*/
+                action_->posStamped = addRelativeDistToPoseStamped( mvmtToDo[0], mvmtToDo[1], 0.0, internalModel_->self );
+
+                ROS_INFO_STREAM( "now moving horizontally. Movement to do: " << mvmtToDo[0] << ", " << mvmtToDo[1] << ", " << mvmtToDo[2] );
+                //ROS_INFO_STREAM( "now moving horizontally. Pos stamped action: " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.x );
             }
             // (1.2) when the quad is right above the robot, then it can slowly move down
             else
@@ -149,12 +188,15 @@ void Agent::executePlan()
                 // TODO: movement down value
                 // move down
                 float movmtDown = -1.0;
-                // MAL NON NON PAS FAIRE ÇA  action_->posStamped = addRelativeDistToPoseStamped( 0.0, 0.0, movmtDown, targetRobot_ );
+                action_->posStamped = addRelativeDistToPoseStamped( 0.0, 0.0, movmtDown, internalModel_->self );
+
+                ROS_INFO_STREAM( "now moving down" );
             }
         }
         //  (2) second part of the plan: move back up, and wait there
         else
         {
+            ROS_INFO_STREAM( "final step -nothing happens" );
             // TODO
         }
     }
@@ -181,6 +223,7 @@ void Agent::percept()
     // This call empties the queue of latest received robots positions from the robotDetect node
     // and updates the Agent's internal model.
     internalModel_->updateRobotsPos( queueRobotsPos_ );
+    // TOTEST: the whole quad position update thread, from reception in the callback to the update in the internal model
     internalModel_->updateQuadPos( queueQuadPos_ );
 
 }
@@ -194,6 +237,7 @@ void Agent::chooseAction()
     }
     else
     {
+        //ROS_INFO_STREAM( "wander around" );
         wanderAround();
     }
 
@@ -216,6 +260,8 @@ void Agent::executeAction()
     // Publish on MAVROS
     std::string topic = TOPICS_NAMES[mavros_setpoint_local_position];
     rosPublishers_[topic].publish(action_->posStamped);
+
+    //ROS_INFO_STREAM( "Sending new pos for the quad. New pos : " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.y << ", " << action_->posStamped.pose.position.z );
 }
 
 
@@ -242,7 +288,7 @@ void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
 
 void Agent::mavrosPoseCallback( const geometry_msgs::PoseStamped::ConstPtr& msg )
 {
-    ROS_INFO_STREAM( "AGENT CALLBACK MAVROS position" );
+    // ROS_INFO_STREAM( "AGENT CALLBACK MAVROS position" );
     queueQuadPos_.push_back( msg );
 }
 
@@ -283,7 +329,7 @@ void Agent::setSubscribers()
     rosSubscribers_[robotsPosTopic] = sub1;
 
     // MAVROS position (la position courante du quad)
-    std::string mavrosPosition = TOPICS_NAMES[mavros_localPosition_local];
+    std::string mavrosPosition = TOPICS_NAMES[mavros_setpoint_local_position]; // mavros_setpoint_local_position
     ros::Subscriber sub2 = nh_.subscribe( mavrosPosition, 1000, &Agent::mavrosPoseCallback, this );
     rosSubscribers_[mavrosPosition] = sub2;
 }
@@ -343,7 +389,7 @@ geometry_msgs::PoseStamped Agent::getPoseStamped(float angle)
 }
 
 // NON ce truc est MAL
-/*
+
 // adds a relative distance to the quad towards the target robot
 geometry_msgs::PoseStamped Agent::addRelativeDistToPoseStamped( float x, float y, float z, Robot* target )
 {
@@ -363,7 +409,7 @@ geometry_msgs::PoseStamped Agent::addRelativeDistToPoseStamped( float x, float y
 
     return pose;
 }
-*/
+
 
 
 

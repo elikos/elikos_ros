@@ -8,7 +8,7 @@ MAV::MAV(double simulationSpeed, ros::Duration cycleTime):
 simSpeed(simulationSpeed), Name("MAV"), cycleTime(cycleTime) {
     x = 0;
     y = 0;
-    z = 0;
+    z = 5;
     yaw = 0;
     vel_x_pid = new Pid<double>(0.0, 0.0, 0.0, // PID
                                 Pid<double>::PID_DIRECT, // Controller direction
