@@ -38,11 +38,20 @@ int main(int argc, char* argv[])
     {
 
         if(DEBUG_DETECT)
+        {
             detect_instance.captureFrame();
+            detect_instance.showThreshold();
+        }
+
         else
             detect_instance.setCurrentImage(detect_instance.getNextImage()->image);
 
+
+
         detect_instance.trackRobots();
+        //detect_instance.cannyEdge();
+        detect_instance.sendMsg();
+
 
         if(DEBUG_DETECT)
             detect_instance.showCurrentImage();
