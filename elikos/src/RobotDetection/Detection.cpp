@@ -39,7 +39,7 @@ namespace elikos_detection
         //TODO : Change the hardcoding on the camera number
         try
         {
-            capture.open(0);
+            capture.open(1);
         }
         catch (int e)
         {
@@ -105,8 +105,6 @@ namespace elikos_detection
     {
 
         //int x,y;
-
-        vector<RobotDesc> vecRobot;
         RobotDesc myRobot;
 
         Mat temp;
@@ -156,8 +154,6 @@ namespace elikos_detection
                             elikos_ros::RobotPos pos = vecRobot.at(i).toMsg();
                             robotsPos_msg.robotsPos.push_back(pos);
                         }
-                        robots_publish.publish(robotsPos_msg);
-                        ROS_INFO_STREAM("I am advertising a robotInfo vector");
                     }
                 }
 
@@ -171,8 +167,12 @@ namespace elikos_detection
         cvtColor(currentImage,hsv,COLOR_BGR2HSV);
         inRange(hsv,Scalar(H_MIN,S_MIN,V_MIN),Scalar(H_MAX,S_MAX,V_MAX),threshold);
         morphOps(threshold);
-        imshow(windowName2,threshold);
         trackFilteredObjects(threshold,hsv,currentImage);
+    }
+
+    void Detection::showThreshold()
+    {
+        imshow(windowName2,threshold);
     }
 
     void Detection::setSubscribers()
@@ -213,6 +213,33 @@ namespace elikos_detection
     void Detection::showCurrentImage()
     {
         imshow(windowName, currentImage);
+    }
+
+    void Detection::cannyEdge()
+    {
+        int edgeThresh = 1;
+        int lowThreshold;
+        int const max_lowThreshold = 100;
+        int ratio = 3;
+        int kernel_size = 3;
+        Mat cannyEdges, blur;
+        //char* window_name = "Edge Map";
+
+        cannyEdges.create( threshold.size(), threshold.type() );
+        blur.create(threshold.size(), threshold.type() );
+
+        //GaussianBlur( threshold, blur, Size(3,3),2,2);
+
+        Canny( blur, cannyEdges, lowThreshold, lowThreshold*ratio, kernel_size );
+
+        imshow("Edge Map", cannyEdges);
+
+    }
+    void Detection::sendMsg()
+    {
+        robots_publish.publish(robotsPos_msg);
+        ROS_INFO_STREAM("I am advertising a robotInfo vector");
+        vecRobot.clear();
     }
 
 }

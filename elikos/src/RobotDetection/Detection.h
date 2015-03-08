@@ -46,6 +46,8 @@ namespace elikos_detection {
         void trackFilteredObjects(Mat threshold,Mat HSV, Mat &cameraFeed);
         void drawObject(vector<RobotDesc> vecRobot,Mat &frame);
         void morphOps(Mat &thresh);
+        void cannyEdge();
+        void sendMsg();
 
         string intToString(int number);
 
@@ -59,6 +61,7 @@ namespace elikos_detection {
         void captureFrame();
         void trackRobots();
         void showCurrentImage();
+        void showThreshold();
 
 
     private:
@@ -73,6 +76,8 @@ namespace elikos_detection {
         void removePublishers();
         void removeSubscribers();
 
+
+
     /* *************************************************************************************************
      * ***           ATTRIBUTES
      * *************************************************************************************************
@@ -86,7 +91,7 @@ namespace elikos_detection {
         int lasPos;
 
         elikos_ros::RobotsPos robotsPos_msg;
-
+        vector<RobotDesc> vecRobot;
         ros::NodeHandle* nh_;
         image_transport::ImageTransport it_;
         image_transport::Subscriber image_sub_;
