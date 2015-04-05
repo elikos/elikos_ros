@@ -39,7 +39,7 @@ namespace elikos_detection
         //TODO : Change the hardcoding on the camera number
         try
         {
-            capture.open(1);
+            capture.open(0);
         }
         catch (int e)
         {
@@ -87,7 +87,7 @@ namespace elikos_detection
 
     void Detection::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     {
-        nextImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        currentImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
     }
 
     void Detection::setPublishers()
@@ -181,7 +181,6 @@ namespace elikos_detection
         //TODO : subscribe to camera feed
         std::string robotsPosTopic = TOPICS_NAMES[camera_image_raw];
         image_sub_ = it_.subscribe(robotsPosTopic, 1, &Detection::cameraCallback, this);
-
     }
 
     void Detection::drawObject(vector<RobotDesc> vecRobot,Mat &frame){
@@ -238,7 +237,7 @@ namespace elikos_detection
     void Detection::sendMsg()
     {
         robots_publish.publish(robotsPos_msg);
-        ROS_INFO_STREAM("I am advertising a robotInfo vector");
+        //ROS_INFO_STREAM("I am advertising a robotInfo vector");
         vecRobot.clear();
     }
 
