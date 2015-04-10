@@ -19,10 +19,12 @@ int main( int argc, char **argv )
     // Create the quad AI Agent
     elikos_ai::Agent agent(&nh);
     agent.init();
+    int lol = 0;
 
     while (ros::ok())
     {
-        int lol;
+        ros::spinOnce();
+
         std::cout << "percept " << lol++ << "\n";
     	agent.percept(); // get the environnement's state
         std::cout << "choose " << lol++ << "\n";
@@ -31,7 +33,7 @@ int main( int argc, char **argv )
     	agent.executeAction(); // action!
         std::cout << "done " << lol++ << "\n";
 
-    	ros::spinOnce();
+
 	r.sleep();
 	}
 
