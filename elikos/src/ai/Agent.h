@@ -125,7 +125,6 @@ private:
     std::vector<elikos_ros::RobotsPos> queueRobotsPos_; /**< queue for robots positions from robot detection */
     std::vector<geometry_msgs::PoseStamped::ConstPtr> queueQuadPos_; /**< queue for the quad positions from MAVROS  */
 
-
     // Internal model
     InternalModel* internalModel_;
 

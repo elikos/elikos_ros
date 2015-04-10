@@ -12,7 +12,7 @@
 #include "std_msgs/String.h"
 
 #define DEBUG_DETECT 1
-#define USE_WEBCAM 1
+#define USE_WEBCAM 0
 
 using namespace cv;
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
             ros::spinOnce();
         }
 
-        if (detect_instance.getCurrentImage().dims != 0) {
+        if (1){//detect_instance.getCurrentImage().dims != 0) {
 
             detect_instance.trackRobots();
             detect_instance.sendMsg();

@@ -179,7 +179,7 @@ namespace elikos_detection
     {
         //TODO : subscribe to mavros (drone position)
         //TODO : subscribe to camera feed
-        std::string robotsPosTopic = TOPICS_NAMES[camera_image_raw];
+        std::string robotsPosTopic = "camera/image_raw";//TOPICS_NAMES[camera_image_raw];
         image_sub_ = it_.subscribe(robotsPosTopic, 1, &Detection::cameraCallback, this);
     }
 

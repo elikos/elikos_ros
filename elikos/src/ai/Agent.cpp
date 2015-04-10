@@ -148,24 +148,51 @@ void Agent::executePlan()
                 // dans le même système de coordonnées. La position du quad provient de MAVROS tandis
                 // que la position des robots est simplement la position du centre du blob DANS L'IMAGE.
 
+                int lolz = 0;
                 // TODO: update camera width and height
                 double widthCam = CAM_WIDTH;
                 double heightCam = CAM_HEIGHT;
+                double fovCam = 81.63;
 
+                std::cout << "inside exec plan" << lolz++ << "\n";
                 tf::Vector3 posRobot = targetRobot_->Transform().getOrigin();
                 tf::Vector3 centreImage( widthCam/2.0, heightCam/2.0, 0.0 );
                 tf::Vector3 direction = posRobot - centreImage;
 
+                std::cout << "inside exec plan" << lolz++ << "\n";
+                tf::Quaternion q;
+                q.setX(queueQuadPos_.back()->pose.orientation.x);
+                q.setY(queueQuadPos_.back()->pose.orientation.y);
+                q.setZ(queueQuadPos_.back()->pose.orientation.z);
+                q.setW(queueQuadPos_.back()->pose.orientation.w);
+
+                std::cout << "inside exec plan" << lolz++ << "\n";
+                double angle = atan2(direction[0], direction[1]);
+                double norm = sqrt(pow(direction[0],2) + pow(direction[1], 2));
+                double yaw = tf::getYaw(q);
+                double ratioMetrePixel = (2*tan(fovCam/2)*queueQuadPos_.back()->pose.position.z) / CAM_WIDTH;
+
+                std::cout << "yaw " << yaw << "\n";
+                std::cout << "inside exec plan" << lolz++ << "\n";
+                queueQuadPos_.pop_back();
+
+                std::cout << "inside exec plan" << lolz++ << "\n";
+                tf::Vector3 mvmtToDo;
+                mvmtToDo.setX(cos(angle+yaw)*norm*ratioMetrePixel);
+                mvmtToDo.setY(sin(angle+yaw)*norm*ratioMetrePixel);
+
+                std::cout << "RobotPos X = " << mvmtToDo[0] << "\t RobotPos Y = " << mvmtToDo[1] << std::endl;
+
                 //ROS_INFO_STREAM( "now moving horizontally. direction: " << direction[0] << ", " << direction[2] << ", " << direction[3] );
 
                 // normalize direction
-                direction = direction / ( sqrt( pow( (double)direction[0], 2) + pow( (double)direction[1], 2) ) ); // ignore z coor
+                // direction = direction / ( sqrt( pow( (double)direction[0], 2) + pow( (double)direction[1], 2) ) ); // ignore z coor
 
-                double unitMvmt = 0.3; // the length we want to move; we want to move slowly
+                // double unitMvmt = 0.3; // the length we want to move; we want to move slowly
 
                 //ROS_INFO_STREAM( "now moving horizontally. direction normalized: " << direction[0] << ", " << direction[2] << ", " << direction[3] );
 
-                tf::Vector3 mvmtToDo = direction * unitMvmt;
+                //tf::Vector3 mvmtToDo = direction;
 
                 //ROS_INFO_STREAM( "now moving horizontally. mvmtToDo: " << mvmtToDo[0] << ", " << mvmtToDo[2] << ", " << mvmtToDo[3] );
 
@@ -231,8 +258,10 @@ void Agent::percept()
 void Agent::chooseAction()
 {
     // For test on Sunday March the 8th, 2015
+    std::cout << "hastarget \n";
     if ( hasTarget() )
     {
+        std::cout << "exec plan \n";
         executePlan();
     }
     else
