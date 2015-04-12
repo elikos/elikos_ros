@@ -25,16 +25,11 @@ int main( int argc, char **argv )
     {
         ros::spinOnce();
 
-        std::cout << "percept " << lol++ << "\n";
     	agent.percept(); // get the environnement's state
-        std::cout << "choose " << lol++ << "\n";
     	agent.chooseAction(); // choose the best action considering the environnement's current state
-        std::cout << "execute " << lol++ << "\n";
     	agent.executeAction(); // action!
-        std::cout << "done " << lol++ << "\n";
 
-
-	r.sleep();
+	    r.sleep();
 	}
 
     agent.destroy();

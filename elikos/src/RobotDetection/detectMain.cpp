@@ -12,7 +12,7 @@
 #include "std_msgs/String.h"
 
 #define DEBUG_DETECT 1
-#define USE_WEBCAM 0
+#define USE_WEBCAM 1
 
 using namespace cv;
 

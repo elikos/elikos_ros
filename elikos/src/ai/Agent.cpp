@@ -150,36 +150,28 @@ void Agent::executePlan()
                 // TODO: update camera width and height
                 double widthCam = CAM_WIDTH;
                 double heightCam = CAM_HEIGHT;
-                double fovCam = 81.63;
-
-
+                double fovCam = 81.63 * PI / 180.0;
 
                 tf::Vector3 posRobot = targetRobot_->Transform().getOrigin();
                 tf::Vector3 centreImage( widthCam/2.0, heightCam/2.0, 0.0 );
                 tf::Vector3 direction = posRobot - centreImage;
-                std::cout << "posRobot = " << posRobot[0] << ", " << posRobot[1] << "\n";
 
                 tf::Quaternion q;
-                q.setX(queueQuadPos_.back()->pose.orientation.x);
-                q.setY(queueQuadPos_.back()->pose.orientation.y);
-                q.setZ(queueQuadPos_.back()->pose.orientation.z);
-                q.setW(queueQuadPos_.back()->pose.orientation.w);
+                q.setX(0);//queueQuadPos_.back()->pose.orientation.x);
+                q.setY(0);//queueQuadPos_.back()->pose.orientation.y);
+                q.setZ(0);//queueQuadPos_.back()->pose.orientation.z);
+                q.setW(0);//queueQuadPos_.back()->pose.orientation.w);
 
-
-                double angle = atan2(direction[0], direction[1]);
+                double angle = atan2(-direction[0], -direction[1]);
                 double norm = sqrt(pow(direction[0],2) + pow(direction[1], 2));
-                double yaw = tf::getYaw(q);
-                double ratioMetrePixel = (2*tan(fovCam/2)*queueQuadPos_.back()->pose.position.z) / CAM_WIDTH;
-
-                std::cout << "yaw " << yaw << "\n";
-
-                std::cout << "Taille du vecteur: " << queueQuadPos_.size()<< "\n";
+                double yaw = 0;//tf::getYaw(q);
+                double ratioMetrePixel = (2*tan(fovCam/2)*1) / CAM_WIDTH;//queueQuadPos_.back()->pose.position.z) / CAM_WIDTH;
 
                 tf::Vector3 mvmtToDo;
                 mvmtToDo.setX(cos(angle+yaw)*norm*ratioMetrePixel);
                 mvmtToDo.setY(sin(angle+yaw)*norm*ratioMetrePixel);
 
-                std::cout << "RobotPos X = " << mvmtToDo[0] << "\t RobotPos Y = " << mvmtToDo[1] << std::endl;
+                //std::cout << "RobotPos X = " << mvmtToDo[0] << "\t RobotPos Y = " << mvmtToDo[1] << std::endl;
 
                 //ROS_INFO_STREAM( "now moving horizontally. direction: " << direction[0] << ", " << direction[2] << ", " << direction[3] );
 
@@ -204,7 +196,7 @@ void Agent::executePlan()
 */
                 action_->posStamped = addRelativeDistToPoseStamped( mvmtToDo[0], mvmtToDo[1], 0.0, internalModel_->self );
 
-                ROS_INFO_STREAM( "now moving horizontally. Movement to do: " << mvmtToDo[0] << ", " << mvmtToDo[1] << ", " << mvmtToDo[2] );
+                ROS_INFO_STREAM( "now moving horizontally. Movement to do: " << mvmtToDo[0] << ", " << mvmtToDo[1] << ", " << angle * 180.0/PI << " deg");
                 //ROS_INFO_STREAM( "now moving horizontally. Pos stamped action: " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.x );
             }
             // (1.2) when the quad is right above the robot, then it can slowly move down
@@ -256,10 +248,8 @@ void Agent::percept()
 void Agent::chooseAction()
 {
     // For test on Sunday March the 8th, 2015
-    std::cout << "hastarget \n";
     if ( hasTarget() )
     {
-        std::cout << "exec plan \n";
         executePlan();
     }
     else
@@ -310,7 +300,6 @@ void Agent::receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg )
     //std::cout << "AGENT CALLBACK" << std::endl;
     //ROS_INFO_STREAM( "Agent::callback -- Push RobotsPos message" );
     queueRobotsPos_.push_back( msg );
-    std::cout << "RobotsPos Callback : msg = " << msg.robotsPos[0].point.x << ", " << msg.robotsPos[0].point.y << std::endl;
 }
 
 void Agent::mavrosPoseCallback( const geometry_msgs::PoseStamped::ConstPtr& msg )

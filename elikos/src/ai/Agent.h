@@ -128,7 +128,6 @@ private:
     // Internal model
     InternalModel* internalModel_;
 
-
     // List of actions planned by the agent
     std::vector<Action> actions_;
 

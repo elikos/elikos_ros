@@ -157,6 +157,8 @@ namespace elikos_detection
                     }
                 }
 
+                vecRobot.clear();
+
             }else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
         }
     }
