@@ -162,6 +162,8 @@ void Agent::executePlan()
                 q.setZ(0);//queueQuadPos_.back()->pose.orientation.z);
                 q.setW(0);//queueQuadPos_.back()->pose.orientation.w);
 
+                std::cout << queueQuadPos_.back()->pose.orientation.x << std::endl;
+
                 double angle = atan2(-direction[0], -direction[1]);
                 double norm = sqrt(pow(direction[0],2) + pow(direction[1], 2));
                 double yaw = 0;//tf::getYaw(q);

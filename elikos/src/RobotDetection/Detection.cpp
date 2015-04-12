@@ -4,12 +4,13 @@ namespace elikos_detection
 {
     Detection::Detection( ros::NodeHandle *nh ) : nh_(nh),it_(*nh)
     {
-        H_MIN = 0;
-        H_MAX = 256;
-        S_MIN = 0;
-        S_MAX = 256;
-        V_MIN = 0;
-        V_MAX = 256;
+        // Load parameters
+        nh->param<int>("h_min", H_MIN, 0);
+        nh->param<int>("h_max", H_MAX, 256);
+        nh->param<int>("s_min", S_MIN, 0);
+        nh->param<int>("s_max", S_MAX, 256);
+        nh->param<int>("v_min", V_MIN, 0);
+        nh->param<int>("v_max", V_MAX, 256);
     }
 
     Detection::~Detection()
@@ -181,7 +182,7 @@ namespace elikos_detection
     {
         //TODO : subscribe to mavros (drone position)
         //TODO : subscribe to camera feed
-        std::string robotsPosTopic = TOPICS_NAMES[camera_image_raw]; //"camera/image_raw";
+        std::string robotsPosTopic = TOPICS_NAMES[camera_image_raw];
         image_sub_ = it_.subscribe(robotsPosTopic, 1, &Detection::cameraCallback, this);
     }
 

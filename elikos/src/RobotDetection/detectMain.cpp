@@ -11,27 +11,32 @@
 #include "Detection.h"
 #include "std_msgs/String.h"
 
-#define DEBUG_DETECT 1
-#define USE_WEBCAM 1
+//#define DEBUG_DETECT 1
+//#define USE_WEBCAM 1
 
 using namespace cv;
 
 int main(int argc, char* argv[])
 {
     //init ROS
-
     ros::init( argc, argv, "elikos_robotdetect" );
     ros::NodeHandle nh;
     ros::Rate r(30);
+
+    // Load parameters
+    bool DEBUG_MODE, USE_WEBCAM;
+    nh.param<bool>("debug_mode", DEBUG_MODE, false);
+    nh.param<bool>("use_webcam", USE_WEBCAM, false);
 
     //init Detection class : set up subs/pubs
     elikos_detection::Detection detect_instance(&nh);
     detect_instance.init();
 
-    bool calibrationMode = true ;
-
-    if(DEBUG_DETECT) {
+    if (DEBUG_MODE) {
         detect_instance.createTrackbars();
+    }
+
+    if (USE_WEBCAM) {
         detect_instance.setupDebug();
     }
 
@@ -45,12 +50,12 @@ int main(int argc, char* argv[])
             ros::spinOnce();
         }
 
-        if (1){//detect_instance.getCurrentImage().dims != 0) {
+        if (!detect_instance.getCurrentImage().empty()) {
 
             detect_instance.trackRobots();
             detect_instance.sendMsg();
 
-            if (DEBUG_DETECT) {
+            if (DEBUG_MODE) {
                 detect_instance.showThreshold();
                 detect_instance.showCurrentImage();
             }

@@ -1,10 +1,11 @@
-# Robot parameters
+# Simulation Params
+## Robot parameters
 simulation_speed: 1.0
 target_robot_count: 10
 obstacle_robot_count: 4
 frame_rate: 30
 
-# MAV parameters
+## MAV parameters
 vel_xy_p: 1.0
 vel_xy_i: 0.0
 vel_xy_d: 0.5
@@ -13,3 +14,13 @@ vel_z_p: 2.0
 vel_z_i: 0.5
 vel_z_d: 1.0
 vel_z_max: 0.25
+
+# Robot Detection Params
+debug_mode: false
+use_webcam: false
+h_min: 0
+h_max: 256
+s_min: 0
+s_max: 256
+v_min: 0
+v_max: 256
