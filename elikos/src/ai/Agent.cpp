@@ -167,7 +167,7 @@ void Agent::executePlan()
 
                 double angle = atan2(-direction[0], -direction[1]);
                 double norm = sqrt(pow(direction[0],2) + pow(direction[1], 2));
-                double yaw = tf::getYaw(internalModel_->self->Transform().getRotation());
+                double yaw = internalModel_->self->getOrientation();
                 double ratioMetrePixel = (2*tan(fovCam/2)*internalModel_->self->Transform().getOrigin().z()) / CAM_WIDTH;
 
                 tf::Vector3 mvmtToDo;
@@ -244,7 +244,7 @@ void Agent::percept()
     // and updates the Agent's internal model.
     internalModel_->updateRobotsPos( queueRobotsPos_ );
     // TOTEST: the whole quad position update thread, from reception in the callback to the update in the internal model
-    internalModel_->updateQuadPos( queueQuadPos_ );
+    internalModel_->updateQuadPose( queueQuadPos_, queueQuadImu_ );
 
 }
 
@@ -309,7 +309,11 @@ void Agent::mavrosPoseCallback( const geometry_msgs::PoseStamped::ConstPtr& msg 
 {
     // ROS_INFO_STREAM( "AGENT CALLBACK MAVROS position" );
     queueQuadPos_.push_back( msg );
-    std::cout << "Z: " << msg->pose.position.z << std::endl;
+}
+
+void Agent::mavrosImuCallback( const sensor_msgs::Imu::ConstPtr& msg )
+{
+    queueQuadImu_.push_back( msg );
 }
 
 
@@ -352,6 +356,11 @@ void Agent::setSubscribers()
     std::string mavrosPosition = TOPICS_NAMES[mavros_position_local]; // mavros_setpoint_local_position
     ros::Subscriber sub2 = nh_.subscribe( mavrosPosition, 1000, &Agent::mavrosPoseCallback, this );
     rosSubscribers_[mavrosPosition] = sub2;
+
+    // MAVROS imu_data
+    std::string mavrosImu = TOPICS_NAMES[mavros_imu_data];
+    ros::Subscriber sub3 = nh_.subscribe( mavrosImu, 1000, &Agent::mavrosImuCallback, this );
+    rosSubscribers_[mavrosImu] = sub3;
 }
 
 /**

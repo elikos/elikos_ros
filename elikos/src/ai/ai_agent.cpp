@@ -19,7 +19,6 @@ int main( int argc, char **argv )
     // Create the quad AI Agent
     elikos_ai::Agent agent(&nh);
     agent.init();
-    int lol = 0;
 
     while (ros::ok())
     {
