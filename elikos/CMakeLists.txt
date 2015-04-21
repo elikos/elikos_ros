@@ -174,7 +174,6 @@ target_link_libraries( localization ${catkin_LIBRARIES})
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #target_link_libraries( webcamCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries( navigation ${catkin_LIBRARIES} )
 
 #############
 ## Install ##
