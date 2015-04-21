@@ -1,26 +1,24 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(elikos_ros)
-set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+project(bootstrap)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-
-find_package( catkin REQUIRED)
-find_package( catkin REQUIRED COMPONENTS 
-   roscpp 
-   tf 
-   std_msgs
-   message_generation
-   genmsg
-   sensor_msgs
-   cv_bridge
-   image_transport
+find_package(catkin
+    REQUIRED COMPONENTS
+    roscpp
+    sensor_msgs
+    geometry_msgs
+    tf
+    std_msgs
+    std_srvs
+    visualization_msgs
+    camera1394
+    message_generation
 )
-find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -30,6 +28,7 @@ find_package(OpenCV REQUIRED)
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
+
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
@@ -51,11 +50,11 @@ find_package(OpenCV REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  RobotPos.msg
-  RobotsPos.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -72,11 +71,10 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -87,12 +85,10 @@ generate_messages(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-
 catkin_package(
-INCLUDE_DIRS include
-CATKIN_DEPENDS message_runtime
-#  LIBRARIES elikos
-  CATKIN_DEPENDS std_msgs std_srvs
+#  INCLUDE_DIRS include
+#  LIBRARIES bootstrap
+#  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
 
@@ -104,77 +100,30 @@ CATKIN_DEPENDS message_runtime
 ## Your package locations should be listed before other locations
 # include_directories(include)
 
-include_directories( include ${catkin_INCLUDE_DIRS} )
-
 ## Declare a cpp library
-add_library(elikos_lib
-  src/elikos_lib/pid.cpp
-)
+# add_library(bootstrap
+#   src/${PROJECT_NAME}/bootstrap.cpp
+# )
 
 ## Declare a cpp executable
-# add_executable(elikos_node src/elikos_node.cpp)
-
-add_executable( ai_agent
- src/ai/ai_agent.cpp
- src/ai/Agent.cpp
- src/ai/Action.cpp
- src/ai/internalModel/InternalModel.cpp
- src/ai/internalModel/Robot.cpp
- src/ai/internalModel/TargetRobot.cpp
- src/ai/internalModel/ObstacleRobot.cpp
- src/ai/internalModel/QuadRobot.cpp
- src/ai/internalModel/Factory/RobotsFactory.cpp
- src/ai/internalModel/Factory/TargetRobotFactory.cpp
- src/ai/internalModel/Factory/ObstacleRobotFactory.cpp
- src/ai/internalModel/Factory/QuadRobotFactory.cpp
- src/ai/internalModel/Factory/RobotFactoryBase.cpp
- )
-add_executable( ai src/ai/ai.cpp )
-add_executable( localization src/localization.cpp )
-add_executable( robotsim
-  src/simulation/simulation.cpp
-  src/simulation/Robot.cpp
-  src/simulation/TargetRobot.cpp
-  src/simulation/ObstacleRobot.cpp
-  src/simulation/MAV.cpp
-)
-
-add_executable( tracking
-  src/RobotDetection/RobotDesc.h
-  src/RobotDetection/RobotDesc.cpp
-  src/RobotDetection/Detection.h
-  src/RobotDetection/Detection.cpp
-  src/RobotDetection/detectMain.cpp
-)
-#add_executable( webcamCapture
-#  src/RobotDetection/cameraCaptureNode.cpp
-#)
-
-add_executable( navigation
-  src/navigation/navigation_node.cpp
+# add_executable(bootstrap_node src/bootstrap_node.cpp)
+add_executable(
+    bootstrap
+    src/bootstrap.cpp
 )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-#add_dependencies(robotsim elikos_lib)
-
-
-add_dependencies(ai_agent
-elikos_ros_generate_messages_cpp
-)
+# add_dependencies(bootstrap_node bootstrap_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(elikos_node
+# target_link_libraries(bootstrap_node
 #   ${catkin_LIBRARIES}
 # )
-
-target_link_libraries( ai_agent ${catkin_LIBRARIES})
-target_link_libraries( ai ${catkin_LIBRARIES})
-target_link_libraries( localization ${catkin_LIBRARIES})
-target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
-target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
-#target_link_libraries( webcamCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries( navigation ${catkin_LIBRARIES
+ target_link_libraries(
+   bootstrap
+   ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -191,7 +140,7 @@ target_link_libraries( navigation ${catkin_LIBRARIES
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS elikos elikos_node
+# install(TARGETS bootstrap bootstrap_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -216,7 +165,7 @@ target_link_libraries( navigation ${catkin_LIBRARIES
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_elikos.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_bootstrap.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
