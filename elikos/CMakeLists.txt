@@ -7,10 +7,10 @@ set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 
 find_package( catkin REQUIRED)
 find_package( catkin REQUIRED COMPONENTS 
+   message_generation
    roscpp 
    tf 
    std_msgs
-   message_generation
    genmsg
    sensor_msgs
    cv_bridge
@@ -150,17 +150,15 @@ add_executable( tracking
 #  src/RobotDetection/cameraCaptureNode.cpp
 #)
 
-add_executable( navigation
-  src/navigation/navigation_node.cpp
-)
-
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(robotsim elikos_lib)
-
-
 add_dependencies(ai_agent
-elikos_ros_generate_messages_cpp
+	elikos_ros_generate_messages_cpp
+)
+
+add_dependencies(tracking
+	elikos_ros_generate_messages_cpp
 )
 
 ## Specify libraries to link a library or executable target against
