@@ -150,9 +150,9 @@ add_executable( tracking
 #  src/RobotDetection/cameraCaptureNode.cpp
 #)
 
-add_executable( navigation
-  src/navigation/navigation_node.cpp
-)
+#add_executable( navigation
+# src/navigation/navigation_node.cpp
+#)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -160,6 +160,9 @@ add_executable( navigation
 
 
 add_dependencies(ai_agent
+elikos_ros_generate_messages_cpp
+)
+add_dependencies(tracking
 elikos_ros_generate_messages_cpp
 )
 
@@ -174,7 +177,7 @@ target_link_libraries( localization ${catkin_LIBRARIES})
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #target_link_libraries( webcamCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries( navigation ${catkin_LIBRARIES
+#target_link_libraries( navigation ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -223,3 +226,4 @@ target_link_libraries( navigation ${catkin_LIBRARIES
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
