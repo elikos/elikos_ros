@@ -1,0 +1,63 @@
+<launch>
+	<arg name="fcu_url" default="serial:///dev/ttyACM1:115200" />
+	<arg name="gcs_url" default="udp://:14556@localhost:14550" />
+	<arg name="tgt_system" default="1" />
+	<arg name="tgt_component" default="50" />
+	<arg name="group_name" value="elikos" />
+
+	<node name="mavros" pkg="mavros" type="mavros_node" output="screen">
+		<remap from="mavros/position/vision" to="/mcptam/tracker_pose_cov" />
+
+		<param name="fcu_url" value="$(arg fcu_url)" />
+		<param name="gcs_url" value="$(arg gcs_url)" />
+		<param name="target_system_id" value="$(arg tgt_system)" />
+		<param name="target_component_id" value="$(arg tgt_component)" />
+
+		<rosparam command="load" file="$(find mavros)/launch/px4_blacklist.yaml" />
+
+		<!-- enable heartbeat send and reduce timeout -->
+		<param name="conn_heartbeat" value="5.0" />
+		<param name="conn_timeout" value="10.0" />
+		<param name="startup_px4_usb_quirk" value="true" />
+		<param name="position/vision/pose_with_covariance" value="true" />
+
+	</node>
+
+	<node pkg="camera1394" type="camera1394_node" name="camera1394_2_right">
+		<param name="guid" value="00b09d010099d8be" />
+		<param name="video_mode" value="640x480_mono8" />
+		<param name="external_trigger" value="true" />
+		<param name="frame_rate" value="60" />
+		<param name="use_ros_time" value="true" />
+		<remap from="camera" to="camera1394_2_right" />
+	</node>
+
+	<node pkg="camera1394" type="camera1394_node" name="camera1394_1_front">
+		<param name="guid" value="00b09d01008f706f" />
+		<param name="video_mode" value="640x480_mono8" />
+		<param name="external_trigger" value="true" />
+		<param name="frame_rate" value="60" />
+		<param name="use_ros_time" value="true" />
+		<remap from="camera" to="camera1394_1_front" />
+	</node>
+
+	<node name="mcptam" pkg="mcptam" type="mcptam" clear_params="true">
+		<rosparam command="load" file="$(find mcptam)/groups/$(arg group_name).yaml" />
+		<remap from="reset" to="mcptam/reset" />
+		<param name="image_transport" type="string" value="compressed"/>
+
+		<param name="get_pose_separately" type="bool" value="false" />
+
+		<param name="mkf_distance_mean_diff_fraction" type="double" value="0.5" />
+		<param name="mm_max_scaled_mkf_dist" type="double" value="0.3" />
+		<param name="mm_outlier_multiplier" type="double" value="1.1" />
+		<param name="mm_init_cov_thresh" type="double" value="1.0" />
+	</node>
+<!--
+	<node name="msf_pose_sensor" pkg="msf_updates" type="pose_sensor" clear_params="true" output="screen">
+        <remap from="msf_core/imu_state_input" to="/mavros/imu/data" />
+        <remap from="msf_updates/pose_with_covariance_input" to="/mcptam/tracker_pose_cov" />
+		<rosparam file="$(find msf_updates)/elikos.yaml"/>
+   </node>
+-->
+</launch>
