@@ -14,6 +14,3 @@
 [submodule "mavros"]
 	path = mavros
 	url = https://github.com/mavlink/mavros.git
-[submodule "deps/rpg_vikit"]
-	path = deps/rpg_vikit
-	url = https://github.com/uzh-rpg/rpg_vikit.git
