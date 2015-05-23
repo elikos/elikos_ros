@@ -158,7 +158,7 @@ add_dependencies(ai_agent
 )
 
 add_dependencies(tracking
-	elikos_ros_generate_messages_cpp
+elikos_ros_generate_messages_cpp
 )
 
 ## Specify libraries to link a library or executable target against
@@ -220,3 +220,4 @@ target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
