@@ -13,8 +13,6 @@
 		<param name="target_system_id" value="$(arg tgt_system)" />
 		<param name="target_component_id" value="$(arg tgt_component)" />
 
-		<rosparam command="load" file="$(find mavros)/launch/px4_blacklist.yaml" />
-
 		<!-- enable heartbeat send and reduce timeout -->
 		<param name="conn_heartbeat" value="5.0" />
 		<param name="conn_timeout" value="10.0" />
