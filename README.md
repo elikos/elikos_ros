@@ -5,7 +5,7 @@ Package ROS "Elikos_ROS" contenant les différents modules servant à la localis
 
 ##Dependencies
 
-Pour svo, suivre les instructions pour l'installation de **Sophus** et de **Fast** sur [le wiki de svo](https://github.com/uzh-rpg/rpg_svo/wiki/Installation:-ROS). Sur le même wiki, suivre les instructions pour installer **vikit**. Ce dernier est un package ROS, il faut donc le compiler dans un workspace ROS.
+	sudo apt-get install ros-indigo-camera1394 ros-indigo-mavros ros-indigo-mavros-extras ros-indigo-urg-node
 
 ##Wut is dis
 
