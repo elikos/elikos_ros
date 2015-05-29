@@ -197,7 +197,7 @@ void Agent::executePlan()
                 tf::Quaternion rotation(0, 0, zRotation, 0);
                 mvmtToDo = tf::quatRotate(rotation, mvmtToDo);
 */
-                action_->posStamped = addRelativeDistToPoseStamped( mvmtToDo[0], mvmtToDo[1], internalModel_->self->Transform().getOrigin().z(), internalModel_->self );
+                action_->posStamped = addRelativeDistToPoseStamped( mvmtToDo[0], mvmtToDo[1], 1.0, internalModel_->self );
 
                 ROS_INFO_STREAM( "now moving horizontally. Movement to do: " << mvmtToDo[0] << ", " << mvmtToDo[1] << ", " << internalModel_->self->Transform().getOrigin().z() << " " << angle * 180.0/PI << " deg");
                 //ROS_INFO_STREAM( "now moving horizontally. Pos stamped action: " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.x );
@@ -429,7 +429,7 @@ geometry_msgs::PoseStamped Agent::addRelativeDistToPoseStamped( float x, float y
     {
         pose.pose.position.x = target->Transform().getOrigin()[0] + x;
         pose.pose.position.y = target->Transform().getOrigin()[1] + y;
-        pose.pose.position.z = target->Transform().getOrigin()[2] + z;
+        pose.pose.position.z = z;
     }
     pose.pose.orientation.x = 0.0;
     pose.pose.orientation.y = 0.0;
