@@ -66,6 +66,7 @@ enum topics
     camera_image_raw,
     mavros_localPosition_local, // quad position
     mavros_imu_data, // quad orientation
+    mavros_rc_in,
     NB_TOPICS
 };
 
@@ -109,7 +110,8 @@ const std::string arr[] = // TOPICS_NAMES
     "camera/image_raw",
 	"mavros/setpoint/local_position", // quad : set position
 	"mavros/localPosition/local", // quad position
-	"mavros/imu/data" // quad orientation
+	"mavros/imu/data", // quad orientation
+    "mavros/rc/in"
 
 };
 static const std::vector<std::string> TOPICS_NAMES
