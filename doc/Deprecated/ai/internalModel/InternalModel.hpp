@@ -17,6 +17,8 @@
 #include <elikos_ros/RobotPos.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Point.h>
+#include <sensor_msgs/Imu.h>
+#include <tf/transform_datatypes.h>
 
 namespace elikos_ai {
 
@@ -38,7 +40,8 @@ public:
      */
 
     void updateRobotsPos( std::vector<elikos_ros::RobotsPos>& robotsMsgs );
-    void updateQuadPos( std::vector<geometry_msgs::PoseStamped::ConstPtr>& robotsMsgs );
+    void updateQuadPose( std::vector<geometry_msgs::PoseStamped::ConstPtr>& poseMsgs,
+                         std::vector<sensor_msgs::Imu::ConstPtr>& imuMsgs);
 
 
     /* *************************************************************************************************

@@ -62,9 +62,9 @@ enum topics
     robotsim_mav_marker,
     robotsim_setpoint_marker,
     robotsim_arena_marker,
-    mavros_setpoint_local_position,
     camera_image_raw,
-    mavros_localPosition_local, // quad position
+    mavros_setpoint_local_position,
+    mavros_position_local, // quad position
     mavros_imu_data, // quad orientation
     mavros_rc_in,
     NB_TOPICS

@@ -10,6 +10,7 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <sensor_msgs/Imu.h>
 #include <vector>
 #include <map>
 #include <string>
@@ -76,7 +77,8 @@ public:
 	// This needs to be public otherwise ROS won't be able to use the callback
     void receiveRobotsPosCallback( const elikos_ros::RobotsPos& msg );
     void mavrosPoseCallback( const geometry_msgs::PoseStamped::ConstPtr& msg );
-    
+    void mavrosImuCallback( const sensor_msgs::Imu::ConstPtr& msg );
+
 private:
 
 
@@ -125,11 +127,10 @@ private:
      */
     std::vector<elikos_ros::RobotsPos> queueRobotsPos_; /**< queue for robots positions from robot detection */
     std::vector<geometry_msgs::PoseStamped::ConstPtr> queueQuadPos_; /**< queue for the quad positions from MAVROS  */
-
+    std::vector<sensor_msgs::Imu::ConstPtr> queueQuadImu_;
 
     // Internal model
     InternalModel* internalModel_;
-
 
     // List of actions planned by the agent
     std::vector<Action> actions_;

@@ -139,7 +139,7 @@ void Agent::executePlan()
         {
             // (1.1) if the quad is not directly over the robot, then we move horizontally to be
             //       right above the robot
-            if ( !targetCenteredInCamera() )
+            if (1)//!targetCenteredInCamera()
             {
                 // TODO
                 // move towards the center of the robot
@@ -147,25 +147,45 @@ void Agent::executePlan()
                 // NOTE IMPORTANTE : la position du quad et du robot dans le internalModel_ ne sont pas
                 // dans le même système de coordonnées. La position du quad provient de MAVROS tandis
                 // que la position des robots est simplement la position du centre du blob DANS L'IMAGE.
-
                 // TODO: update camera width and height
                 double widthCam = CAM_WIDTH;
                 double heightCam = CAM_HEIGHT;
+                double fovCam = 81.63 * PI / 180.0;
 
                 tf::Vector3 posRobot = targetRobot_->Transform().getOrigin();
                 tf::Vector3 centreImage( widthCam/2.0, heightCam/2.0, 0.0 );
                 tf::Vector3 direction = posRobot - centreImage;
 
+                /*
+                tf::Quaternion q;
+                q.setX(internalModel_->self->Transform().getRotation());
+                q.setY(queueQuadPos_.back()->pose.orientation.y);
+                q.setZ(queueQuadPos_.back()->pose.orientation.z);
+                q.setW(queueQuadPos_.back()->pose.orientation.w);
+                //*/
+                //std::cout << queueQuadPos_.back()->pose.orientation.x << std::endl;
+
+                double angle = atan2(-direction[0], -direction[1]);
+                double norm = sqrt(pow(direction[0],2) + pow(direction[1], 2));
+                double yaw = internalModel_->self->getOrientation();
+                double ratioMetrePixel = (2*tan(fovCam/2)*internalModel_->self->Transform().getOrigin().z()) / CAM_WIDTH;
+
+                tf::Vector3 mvmtToDo;
+                mvmtToDo.setX(cos(angle+yaw)*norm*ratioMetrePixel);
+                mvmtToDo.setY(sin(angle+yaw)*norm*ratioMetrePixel);
+
+                //std::cout << "RobotPos X = " << mvmtToDo[0] << "\t RobotPos Y = " << mvmtToDo[1] << std::endl;
+
                 //ROS_INFO_STREAM( "now moving horizontally. direction: " << direction[0] << ", " << direction[2] << ", " << direction[3] );
 
                 // normalize direction
-                direction = direction / ( sqrt( pow( (double)direction[0], 2) + pow( (double)direction[1], 2) ) ); // ignore z coor
+                // direction = direction / ( sqrt( pow( (double)direction[0], 2) + pow( (double)direction[1], 2) ) ); // ignore z coor
 
-                double unitMvmt = 0.3; // the length we want to move; we want to move slowly
+                // double unitMvmt = 0.3; // the length we want to move; we want to move slowly
 
                 //ROS_INFO_STREAM( "now moving horizontally. direction normalized: " << direction[0] << ", " << direction[2] << ", " << direction[3] );
 
-                tf::Vector3 mvmtToDo = direction * unitMvmt;
+                //tf::Vector3 mvmtToDo = direction;
 
                 //ROS_INFO_STREAM( "now moving horizontally. mvmtToDo: " << mvmtToDo[0] << ", " << mvmtToDo[2] << ", " << mvmtToDo[3] );
 
@@ -177,9 +197,9 @@ void Agent::executePlan()
                 tf::Quaternion rotation(0, 0, zRotation, 0);
                 mvmtToDo = tf::quatRotate(rotation, mvmtToDo);
 */
-                action_->posStamped = addRelativeDistToPoseStamped( mvmtToDo[0], mvmtToDo[1], 0.0, internalModel_->self );
+                action_->posStamped = addRelativeDistToPoseStamped( mvmtToDo[0], mvmtToDo[1], 1.0, internalModel_->self );
 
-                ROS_INFO_STREAM( "now moving horizontally. Movement to do: " << mvmtToDo[0] << ", " << mvmtToDo[1] << ", " << mvmtToDo[2] );
+                ROS_INFO_STREAM( "now moving horizontally. Movement to do: " << mvmtToDo[0] << ", " << mvmtToDo[1] << ", " << internalModel_->self->Transform().getOrigin().z() << " " << angle * 180.0/PI << " deg");
                 //ROS_INFO_STREAM( "now moving horizontally. Pos stamped action: " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.x << ", " << action_->posStamped.pose.position.x );
             }
             // (1.2) when the quad is right above the robot, then it can slowly move down
@@ -224,7 +244,7 @@ void Agent::percept()
     // and updates the Agent's internal model.
     internalModel_->updateRobotsPos( queueRobotsPos_ );
     // TOTEST: the whole quad position update thread, from reception in the callback to the update in the internal model
-    internalModel_->updateQuadPos( queueQuadPos_ );
+    internalModel_->updateQuadPose( queueQuadPos_, queueQuadImu_ );
 
 }
 
@@ -291,6 +311,11 @@ void Agent::mavrosPoseCallback( const geometry_msgs::PoseStamped::ConstPtr& msg 
     queueQuadPos_.push_back( msg );
 }
 
+void Agent::mavrosImuCallback( const sensor_msgs::Imu::ConstPtr& msg )
+{
+    queueQuadImu_.push_back( msg );
+}
+
 
 /* *************************************************************************************************
  * ***           ROS RELATED FUNCTIONS
@@ -328,9 +353,14 @@ void Agent::setSubscribers()
     rosSubscribers_[robotsPosTopic] = sub1;
 
     // MAVROS position (la position courante du quad)
-    std::string mavrosPosition = TOPICS_NAMES[mavros_setpoint_local_position]; // mavros_setpoint_local_position
+    std::string mavrosPosition = TOPICS_NAMES[mavros_position_local]; // mavros_setpoint_local_position
     ros::Subscriber sub2 = nh_.subscribe( mavrosPosition, 1000, &Agent::mavrosPoseCallback, this );
     rosSubscribers_[mavrosPosition] = sub2;
+
+    // MAVROS imu_data
+    std::string mavrosImu = TOPICS_NAMES[mavros_imu_data];
+    ros::Subscriber sub3 = nh_.subscribe( mavrosImu, 1000, &Agent::mavrosImuCallback, this );
+    rosSubscribers_[mavrosImu] = sub3;
 }
 
 /**
@@ -399,7 +429,7 @@ geometry_msgs::PoseStamped Agent::addRelativeDistToPoseStamped( float x, float y
     {
         pose.pose.position.x = target->Transform().getOrigin()[0] + x;
         pose.pose.position.y = target->Transform().getOrigin()[1] + y;
-        pose.pose.position.z = target->Transform().getOrigin()[2] + z;
+        pose.pose.position.z = z;
     }
     pose.pose.orientation.x = 0.0;
     pose.pose.orientation.y = 0.0;

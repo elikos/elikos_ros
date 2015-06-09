@@ -109,30 +109,11 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 ## Declare a cpp library
 add_library(elikos_lib
   src/elikos_lib/pid.cpp
-  src/rc_receiver/RCReceiver.h
-  src/rc_receiver/RCReceiver.cpp
 )
 
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
-add_executable( ai_agent
- src/ai/ai_agent.cpp
- src/ai/Agent.cpp
- src/ai/Action.cpp
- src/ai/internalModel/InternalModel.cpp
- src/ai/internalModel/Robot.cpp
- src/ai/internalModel/TargetRobot.cpp
- src/ai/internalModel/ObstacleRobot.cpp
- src/ai/internalModel/QuadRobot.cpp
- src/ai/internalModel/Factory/RobotsFactory.cpp
- src/ai/internalModel/Factory/TargetRobotFactory.cpp
- src/ai/internalModel/Factory/ObstacleRobotFactory.cpp
- src/ai/internalModel/Factory/QuadRobotFactory.cpp
- src/ai/internalModel/Factory/RobotFactoryBase.cpp
- )
-add_executable( ai src/ai/ai.cpp )
-add_executable( localization src/localization.cpp )
 add_executable( robotsim
   src/simulation/simulation.cpp
   src/simulation/Robot.cpp
@@ -149,16 +130,10 @@ add_executable( tracking
   src/RobotDetection/detectMain.cpp
 )
 
-#add_executable( webcamCapture
-#  src/RobotDetection/cameraCaptureNode.cpp
-#)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(robotsim elikos_lib)
-add_dependencies(ai_agent
-	elikos_ros_generate_messages_cpp
-)
 
 add_dependencies(tracking
 elikos_ros_generate_messages_cpp
@@ -169,12 +144,8 @@ elikos_ros_generate_messages_cpp
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries( ai_agent ${catkin_LIBRARIES})
-target_link_libraries( ai ${catkin_LIBRARIES})
-target_link_libraries( localization ${catkin_LIBRARIES})
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
-#target_link_libraries( webcamCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##
