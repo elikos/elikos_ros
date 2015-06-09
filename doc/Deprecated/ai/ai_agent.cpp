@@ -22,12 +22,13 @@ int main( int argc, char **argv )
 
     while (ros::ok())
     {
+        ros::spinOnce();
+
     	agent.percept(); // get the environnement's state
     	agent.chooseAction(); // choose the best action considering the environnement's current state
     	agent.executeAction(); // action!
 
-    	ros::spinOnce();
-	r.sleep();
+	    r.sleep();
 	}
 
     agent.destroy();

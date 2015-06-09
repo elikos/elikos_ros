@@ -4,12 +4,13 @@ namespace elikos_detection
 {
     Detection::Detection( ros::NodeHandle *nh ) : nh_(nh),it_(*nh)
     {
-        H_MIN = 0;
-        H_MAX = 256;
-        S_MIN = 0;
-        S_MAX = 256;
-        V_MIN = 0;
-        V_MAX = 256;
+        // Load parameters
+        nh->param<int>("h_min", H_MIN, 0);
+        nh->param<int>("h_max", H_MAX, 256);
+        nh->param<int>("s_min", S_MIN, 0);
+        nh->param<int>("s_max", S_MAX, 256);
+        nh->param<int>("v_min", V_MIN, 0);
+        nh->param<int>("v_max", V_MAX, 256);
     }
 
     Detection::~Detection()
@@ -39,7 +40,7 @@ namespace elikos_detection
         //TODO : Change the hardcoding on the camera number
         try
         {
-            capture.open(1);
+            capture.open(0);
         }
         catch (int e)
         {
@@ -87,7 +88,7 @@ namespace elikos_detection
 
     void Detection::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     {
-        nextImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        currentImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
     }
 
     void Detection::setPublishers()
@@ -157,6 +158,8 @@ namespace elikos_detection
                     }
                 }
 
+                vecRobot.clear();
+
             }else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
         }
     }
@@ -181,7 +184,6 @@ namespace elikos_detection
         //TODO : subscribe to camera feed
         std::string robotsPosTopic = TOPICS_NAMES[camera_image_raw];
         image_sub_ = it_.subscribe(robotsPosTopic, 1, &Detection::cameraCallback, this);
-
     }
 
     void Detection::drawObject(vector<RobotDesc> vecRobot,Mat &frame){
@@ -238,7 +240,7 @@ namespace elikos_detection
     void Detection::sendMsg()
     {
         robots_publish.publish(robotsPos_msg);
-        ROS_INFO_STREAM("I am advertising a robotInfo vector");
+        //ROS_INFO_STREAM("I am advertising a robotInfo vector");
         vecRobot.clear();
     }
 

@@ -84,19 +84,25 @@ void InternalModel::updateRobotsPos( std::vector<elikos_ros::RobotsPos>& robotsM
     robotsMsgs.clear();
 }
 
-void InternalModel::updateQuadPos( std::vector<geometry_msgs::PoseStamped::ConstPtr>& msgs )
+void InternalModel::updateQuadPose( std::vector<geometry_msgs::PoseStamped::ConstPtr>& poseMsgs,
+                                    std::vector<sensor_msgs::Imu::ConstPtr>& imuMsgs)
 {
-    for ( int i = 0; i < msgs.size(); ++i )
-    {
-        // xy_sp.setY(msg->pose.position.y);
-
-        const geometry_msgs::Point &pt = msgs[i]->pose.position;
+    for (auto msg : poseMsgs) {
+        const geometry_msgs::Point &pt = msg->pose.position;
         self->updateRelativePosition( tf::Vector3( pt.x, pt.y, pt.z ), self->getOrientation() );
-
-        //ROS_INFO_STREAM( "Refreasing the quad's position. New pos : " << pt.x << ", " << pt.y << ", " << pt.z );
     }
 
-    msgs.clear();
+    for (auto msg : imuMsgs) {
+        const geometry_msgs::Quaternion &quat = msg->orientation;
+        tf::Quaternion tfQuat;
+        tf::quaternionMsgToTF(quat, tfQuat);
+        self->updateRelativePosition( self->Transform().getOrigin(), tf::getYaw(tfQuat) );
+    }
+
+    //ROS_INFO_STREAM( "Refreasing the quad's position. New pos : " << pt.x << ", " << pt.y << ", " << pt.z );
+
+    poseMsgs.clear();
+    imuMsgs.clear();
 }
 
 

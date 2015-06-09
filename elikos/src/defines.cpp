@@ -20,9 +20,8 @@
 
 
 #include <ros/ros.h>
-#include <vector>
 #include <string>
-
+#include <vector>
 
 /* *************************************************************************************************
  * ***           DEFINES
@@ -62,9 +61,9 @@ enum topics
     robotsim_mav_marker,
     robotsim_setpoint_marker,
     robotsim_arena_marker,
-    mavros_setpoint_local_position,
     camera_image_raw,
-    mavros_localPosition_local, // quad position
+    mavros_setpoint_local_position,
+    mavros_position_local, // quad position
     mavros_imu_data, // quad orientation
     NB_TOPICS
 };
@@ -99,6 +98,21 @@ enum Color
 ///
 /// Provide access to enum names
 ///
+/*
+std::map<topics, std::string> TOPICS_NAMES
+{
+        { robotsPos,                "robotDetect/robotsPos" },
+        { robotsim_robot_markers,   "robotsim/robot_markers" },
+        { robotsim_mav_marker,      "robotsim/mav_marker" },
+        { robotsim_setpoint_marker, "robotsim/setpoint_marker" },
+        { robotsim_arena_marker,    "robotsim/arena_marker" },
+        { camera_image_raw,         "camera/image_raw" },
+        { mavros_setpoint_local_position, "mavros/setpoint/local_position" },// quad : set position
+        { mavros_localPosition_local,     "mavros/localPosition/local" },// quad position
+        { mavros_imu_data,          "mavros/imu/data" }, // quad orientation
+};
+//*/
+//*
 const std::string arr[] = // TOPICS_NAMES
 {
 	"robotDetect/robotsPos", // robotDetec topic : communicate the located robots positions
@@ -108,7 +122,7 @@ const std::string arr[] = // TOPICS_NAMES
 	"robotsim/arena_marker",
     "camera/image_raw",
 	"mavros/setpoint/local_position", // quad : set position
-	"mavros/localPosition/local", // quad position
+	"mavros/position/local", // quad position
 	"mavros/imu/data" // quad orientation
 
 };
@@ -116,7 +130,7 @@ static const std::vector<std::string> TOPICS_NAMES
 (
     arr, arr + sizeof(arr) / sizeof(arr[0])
 );
-
+//*/
 
 ///
 /// Camera size
