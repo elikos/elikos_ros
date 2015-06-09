@@ -19,17 +19,17 @@ enum RCChannel { ROLL,
 
 class RCReceiver {
 public:
-    RCReceiver(ros::NodeHandle* nh);
+    RCReceiver(ros::NodeHandle nh);
     ~RCReceiver();
 
     std::vector<unsigned int> getRCChannels() const;
 
 private:
     void RCCallback(const mavros::RCInConstPtr rc);
-    ros::NodeHandle* _nh;
+    ros::NodeHandle _nh;
     ros::Subscriber _rc_sub;
     std::vector<unsigned int> _rc_channels;
 };
 
 
-#endif RCRECEIVER_H
+#endif

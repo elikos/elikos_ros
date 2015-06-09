@@ -109,6 +109,8 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 ## Declare a cpp library
 add_library(elikos_lib
   src/elikos_lib/pid.cpp
+  src/rc_receiver/RCReceiver.h
+  src/rc_receiver/RCReceiver.cpp
 )
 
 ## Declare a cpp executable
@@ -147,10 +149,6 @@ add_executable( tracking
   src/RobotDetection/detectMain.cpp
 )
 
-add_executable( rc_receiver
-  src/rc_receiver/RCReceiver.h
-  src/rc_receiver/RCReceiver.cpp
-)
 #add_executable( webcamCapture
 #  src/RobotDetection/cameraCaptureNode.cpp
 #)
@@ -176,7 +174,6 @@ target_link_libraries( ai ${catkin_LIBRARIES})
 target_link_libraries( localization ${catkin_LIBRARIES})
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries( rc_receiver ${catkin_LIBRARIES})
 #target_link_libraries( webcamCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############

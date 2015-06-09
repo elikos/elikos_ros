@@ -4,8 +4,8 @@
 
 #include "RCReceiver.h"
 
-RCReceiver::RCReceiver(ros::NodeHandle* nh) : _nh(nh) {
-    _rc_sub = _nh->subscribe(TOPICS_NAMES[mavros_rc_in], 1, this->RCCallback);
+RCReceiver::RCReceiver(ros::NodeHandle nh) : _nh(nh) {
+    _rc_sub = _nh.subscribe(TOPICS_NAMES[mavros_rc_in], 1, &RCReceiver::RCCallback, this);
 }
 
 RCReceiver::~RCReceiver() {}
