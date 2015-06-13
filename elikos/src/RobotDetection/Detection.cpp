@@ -96,7 +96,7 @@ namespace elikos_detection
         //TODO : publish robot info
         if(nh_)
         {
-            std::string topicName = TOPICS_NAMES[robotsPos];
+            std::string topicName = TOPIC_NAMES[robotsPos];
             robots_publish = nh_->advertise<elikos_ros::RobotsPos>(topicName,1);
 
         }
@@ -182,7 +182,7 @@ namespace elikos_detection
     {
         //TODO : subscribe to mavros (drone position)
         //TODO : subscribe to camera feed
-        std::string robotsPosTopic = TOPICS_NAMES[camera_image_raw];
+        std::string robotsPosTopic = TOPIC_NAMES[camera_image_raw];
         image_sub_ = it_.subscribe(robotsPosTopic, 1, &Detection::cameraCallback, this);
     }
 

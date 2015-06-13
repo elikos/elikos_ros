@@ -15,7 +15,8 @@ enum RCChannel { ROLL,
                  THRUST,
                  OFFBOARD_SWITCH,
                  MODE_SWITCH,
-                 POSCTL_SWITCH };
+                 POSCTL_SWITCH,
+                 NUMBER_OF_CHANNELS};
 
 class RCReceiver {
 public:
@@ -23,10 +24,11 @@ public:
     ~RCReceiver();
 
     std::vector<unsigned int> getRCChannels() const;
+    unsigned int operator[](std::size_t i) const;
 
 private:
     void RCCallback(const mavros::RCInConstPtr rc);
-    ros::NodeHandle _nh;
+    ros::NodeHandle* _nh;
     ros::Subscriber _rc_sub;
     std::vector<unsigned int> _rc_channels;
 };

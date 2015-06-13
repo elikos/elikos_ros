@@ -68,13 +68,13 @@ namespace elikos_sim
         ROS_INFO("Robot markers length: %lu", robotMarkers.markers.size());
 
         // Publishers
-        marker_pub = node.advertise<visualization_msgs::MarkerArray>(TOPICS_NAMES[robotsim_robot_markers], 0); // "robotsim/robot_markers"
-        mav_marker_pub = node.advertise<visualization_msgs::Marker>(TOPICS_NAMES[robotsim_mav_marker], 0); // "robotsim/mav_marker"
-        setpoint_marker_pub = node.advertise<visualization_msgs::Marker>(TOPICS_NAMES[robotsim_setpoint_marker], 0); // "robotsim/setpoint_marker"
-        arena_pub = node.advertise<visualization_msgs::MarkerArray>(TOPICS_NAMES[robotsim_arena_marker], 0); // "robotsim/arena_marker"
+        marker_pub = node.advertise<visualization_msgs::MarkerArray>(TOPIC_NAMES[robotsim_robot_markers], 0); // "robotsim/robot_markers"
+        mav_marker_pub = node.advertise<visualization_msgs::Marker>(TOPIC_NAMES[robotsim_mav_marker], 0); // "robotsim/mav_marker"
+        setpoint_marker_pub = node.advertise<visualization_msgs::Marker>(TOPIC_NAMES[robotsim_setpoint_marker], 0); // "robotsim/setpoint_marker"
+        arena_pub = node.advertise<visualization_msgs::MarkerArray>(TOPIC_NAMES[robotsim_arena_marker], 0); // "robotsim/arena_marker"
 
         // Subscribers
-        pose_sub = node.subscribe(TOPICS_NAMES[mavros_setpoint_local_position], 1000, &elikos_sim::MAV::poseCallback, mav); // "mavros/setpoint/local_position"
+        pose_sub = node.subscribe(TOPIC_NAMES[mavros_setpoint_local_position], 1000, &elikos_sim::MAV::poseCallback, mav); // "mavros/setpoint/local_position"
 
         //Arena setup
 

@@ -109,12 +109,12 @@ const std::string arr[] = // TOPICS_NAMES
 	"robotsim/arena_marker",
     "camera/image_raw",
 	"mavros/setpoint/local_position", // quad : set position
-	"mavros/localPosition/local", // quad position
+	"mavros/position/local", // quad position
 	"mavros/imu/data", // quad orientation
     "mavros/rc/in"
 
 };
-static const std::vector<std::string> TOPICS_NAMES
+static const std::vector<std::string> TOPIC_NAMES
 (
     arr, arr + sizeof(arr) / sizeof(arr[0])
 );

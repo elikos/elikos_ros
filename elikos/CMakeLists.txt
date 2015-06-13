@@ -109,6 +109,8 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 ## Declare a cpp library
 add_library(elikos_lib
   src/elikos_lib/pid.cpp
+  src/elikos_lib/RCReceiver.h
+  src/elikos_lib/RCReceiver.cpp
 )
 
 ## Declare a cpp executable
@@ -128,6 +130,11 @@ add_executable( tracking
   src/RobotDetection/Detection.h
   src/RobotDetection/Detection.cpp
   src/RobotDetection/detectMain.cpp
+)
+
+add_executable( navigator
+  src/navigator/SetpointManager.h
+  src/navigator/SetpointManager.cpp
 )
 
 
