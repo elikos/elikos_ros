@@ -80,6 +80,12 @@ namespace elikos_detection {
         void setSubscribers();
 
     /* *************************************************************************************************
+     * ***           PRIVATE METHODS
+     * *************************************************************************************************
+     */
+        void getRotationFromImage(tf::Quaternion &q);
+
+    /* *************************************************************************************************
      * ***           ATTRIBUTES
      * *************************************************************************************************
      */
@@ -98,6 +104,7 @@ namespace elikos_detection {
         tf::TransformListener tf_listener_;
         tf::Transform camera_;
         tf::Transform turret_;
+        tf::Quaternion turret_rotation_;
         tf::StampedTransform turret_world_;
         tf::Vector3 turret_world_x_;
         tf::Transform target_robot_;
@@ -131,6 +138,9 @@ namespace elikos_detection {
 
         const int MIN_OBJECT_AREA = 40 * 40;
         const int MAX_OBJECT_AREA = FRAME_HEIGHT * FRAME_WIDTH / 1.5;
+
+        const double CAMERA_FOV_H = 53 * PI/180.0;
+        const double CAMERA_FOV_V = 40 * PI/180.0;
 
         const string windowName = "Original Image";
         const string windowName1 = "HSV Image";

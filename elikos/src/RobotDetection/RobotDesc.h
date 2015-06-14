@@ -16,9 +16,9 @@ public:
 
     ~RobotDesc();
 
-    int getXPos();
+    int getHPos();
 
-    int getYPos();
+    int getVPos();
 
     void setXPos(int pos);
 

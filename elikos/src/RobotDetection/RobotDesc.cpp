@@ -8,12 +8,12 @@ RobotDesc::~RobotDesc()
 {
 }
 
-int RobotDesc::getXPos()
+int RobotDesc::getHPos()
 {
     return xPos;
 }
 
-int RobotDesc::getYPos()
+int RobotDesc::getVPos()
 {
     return yPos;
 }

@@ -42,7 +42,7 @@ namespace elikos_detection
         //TODO : Change the hardcoding on the camera number
         try
         {
-            capture.open(0);
+            capture.open(1);
         }
         catch (int e)
         {
@@ -124,6 +124,9 @@ namespace elikos_detection
             int numObjects = hierarchy.size();
             //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
             if(numObjects<MAX_NUM_OBJECTS){
+
+                vecRobot.clear();
+
                 for (int index = 0; index >= 0; index = hierarchy[index][0]) {
 
                     Moments moment = moments((cv::Mat)contours[index]);
@@ -159,9 +162,6 @@ namespace elikos_detection
                         }
                     }
                 }
-
-                vecRobot.clear();
-
             }else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
         }
     }
@@ -189,8 +189,11 @@ namespace elikos_detection
 
         for(int i = 0; i<vecRobot.size(); i++)
         {
-            cv::circle(frame, cv::Point(vecRobot.at(i).getXPos(), vecRobot.at(i).getYPos()), 10, cv::Scalar(0, 0, 255));
-            cv::putText(frame, intToString(vecRobot.at(i).getXPos()) + " , " + intToString(vecRobot.at(i).getYPos()), cv::Point(vecRobot.at(i).getXPos(), vecRobot.at(i).getYPos() + 20), 1, 1, Scalar(0, 255, 0));
+            cv::circle(frame, cv::Point(vecRobot.at(i).getHPos(), vecRobot.at(i).getVPos()), 10, cv::Scalar(0, 0, 255));
+            cv::putText(frame, intToString(vecRobot.at(i).getHPos()) + " , " + intToString(vecRobot.at(i).getVPos()), cv::Point(
+                    vecRobot.at(i).getHPos(),
+                                                                                                                                vecRobot.at(
+                                                                                                                                        i).getVPos() + 20), 1, 1, Scalar(0, 255, 0));
         }
     }
 
@@ -255,9 +258,19 @@ namespace elikos_detection
         tf_broadcaster_.sendTransform(tf::StampedTransform(camera_, ros::Time::now(), "fcu", "camera"));
 
         // Set yaw and pitch of the target wrt the camera frame
-        // TODO: Actually set the target angle values
+        try {
+            getRotationFromImage(turret_rotation_);
+        }
+        catch (std::out_of_range ex) {
+            static uint empty_robot_vector_ex_count = 0;
+            empty_robot_vector_ex_count++;
+            if (empty_robot_vector_ex_count % 30 == 0) {
+                ROS_ERROR("%s", ex.what());
+            }
+            return;
+        }
         turret_.setOrigin(tf::Vector3(0, 0, 0));
-        turret_.setRotation(tf::Quaternion(0, 0, 0, 1));
+        turret_.setRotation(turret_rotation_);
 
         // Broadcast the turret frame
         tf_broadcaster_.sendTransform(tf::StampedTransform(turret_, ros::Time::now(),"camera", "turret"));
@@ -268,15 +281,14 @@ namespace elikos_detection
         }
         catch (tf::TransformException ex) {
             ROS_ERROR("%s",ex.what());
-            ros::Duration(1.0).sleep();
             return;
         }
 
         // Get the smallest angle between the turret and the z axis
-        //      - First get the vector pointing towards x
+        //      - First get the vector pointing towards the x axis of the turret
         turret_world_x_ = tf::quatRotate(turret_world_.getRotation(), tf::Vector3(1, 0, 0));
 
-        //      - Then find it's angle with the resting position (pointing straight down)
+        //      - Then find it's angle with the camera's resting position (x pointing straight down (-z))
         tf::Vector3 zAxis(0, 0, -1);
         double zAxis_turret_angle = zAxis.angle(turret_world_x_);
 
@@ -289,6 +301,24 @@ namespace elikos_detection
         target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
 
         tf_broadcaster_.sendTransform(tf::StampedTransform(target_robot_, ros::Time::now(), "turret", "target_robot"));
+
+    }
+
+    void Detection::getRotationFromImage(tf::Quaternion &q) {
+        if (vecRobot.empty()) {
+            throw std::out_of_range("No object is currently detected.");
+        }
+
+        // Set pitch - y axis (image vertical)
+        double pitch = ((double)(vecRobot[0].getVPos() - CAM_HEIGHT / 2) / (double)CAM_HEIGHT) * CAMERA_FOV_V;
+
+        // Set yaw - z axis (image horizontal)
+        double yaw = -((double)(vecRobot[0].getHPos() - CAM_WIDTH / 2) / (double)CAM_WIDTH) * CAMERA_FOV_H;
+
+        // Set roll, pitch and yaw
+        q.setRPY(0, pitch, yaw);
+
+        std::cout << "\tPitch: " << pitch << "\tYaw: " << yaw << "\n";
 
     }
 }
