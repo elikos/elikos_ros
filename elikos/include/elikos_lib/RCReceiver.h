@@ -7,7 +7,7 @@
 
 #include <ros/ros.h>
 #include <mavros/RCIn.h>
-#include "./../defines.cpp"
+#include "./../../src/defines.cpp"
 
 enum RCChannel { ROLL,
                  PITCH,
