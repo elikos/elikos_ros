@@ -54,10 +54,19 @@ int main(int argc, char **argv) {
 
             // Broadcast the transform
             spManager.sendLocalPositionSetpointTF(setpoint);
+
+            // Display the setpoint on the console
+            std::cout << "Setpoint:                    " << "\n"
+            << "\033[1;31mx(E): \033[0m\t" << std::setw(10) << setpoint.getOrigin().getX() << "\n"
+            << "\033[1;31my(N): \033[0m\t" << std::setw(10) << setpoint.getOrigin().getY() << "\n"
+            << "\033[1;31mz(U): \033[0m\t" << std::setw(10) << setpoint.getOrigin().getZ() << "\n"
+            << "\033[1;31myaw: \033[0m\t" << std::setw(10) << tf::getYaw(setpoint.getRotation()) << "\n"
+            << "\e[A\e[A\e[A\e[A\e[A" << "\r" << std::flush;
         }
 
         ros::spinOnce();
         r.sleep();
     }
+    std::cout << "\n\n\n\n\n Navigator exited.\n";
     return 0;
 }

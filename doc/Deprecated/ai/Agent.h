@@ -17,7 +17,6 @@
 #include <cmath>
 
 #include <elikos_ros/RobotsPos.h>
-#include <elikos_lib>
 
 #include "Action.hpp"
 #include "internalModel/InternalModel.hpp"
