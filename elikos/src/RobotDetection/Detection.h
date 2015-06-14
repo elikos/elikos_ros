@@ -16,6 +16,9 @@
 #include <sensor_msgs/image_encodings.h>
 #include <elikos_ros/RobotPos.h>
 #include <elikos_ros/RobotsPos.h>
+#include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
 
 using namespace std;
 using namespace cv;
@@ -30,7 +33,6 @@ namespace elikos_detection {
 
         void init();
 
-        void mavPosCallback(const std_msgs::String::ConstPtr &msg);
         void cameraCallback(const sensor_msgs::ImageConstPtr &msg);
 
         Mat getCurrentImage(){return currentImage;}
@@ -50,6 +52,10 @@ namespace elikos_detection {
         void sendMsg();
 
         string intToString(int number);
+
+        // TF methods
+        void initCameraTF();
+        void computeTargetPosition();
 
     /* *************************************************************************************************
      * ***              DEBUG FUNCTIONS
@@ -73,11 +79,6 @@ namespace elikos_detection {
         void setPublishers();
         void setSubscribers();
 
-        void removePublishers();
-        void removeSubscribers();
-
-
-
     /* *************************************************************************************************
      * ***           ATTRIBUTES
      * *************************************************************************************************
@@ -85,17 +86,22 @@ namespace elikos_detection {
 
         Mat currentImage;
         cv_bridge::CvImagePtr nextImage;
-
-        int nextPos;
-        int currentPos;
-        int lasPos;
-
         elikos_ros::RobotsPos robotsPos_msg;
         vector<RobotDesc> vecRobot;
         ros::NodeHandle* nh_;
         image_transport::ImageTransport it_;
         image_transport::Subscriber image_sub_;
         ros::Publisher robots_publish;
+
+        // TF transforms
+        tf::TransformBroadcaster tf_broadcaster_;
+        tf::TransformListener tf_listener_;
+        tf::Transform camera_;
+        tf::Transform turret_;
+        tf::StampedTransform turret_world_;
+        tf::Vector3 turret_world_x_;
+        tf::Transform target_robot_;
+
 
     /* *************************************************************************************************
      * ***              DEBUG ATTRIBUTES

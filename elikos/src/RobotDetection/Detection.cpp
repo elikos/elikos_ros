@@ -1,3 +1,4 @@
+#include <geometry_msgs/PoseStamped.h>
 #include "Detection.h"
 
 namespace elikos_detection
@@ -21,6 +22,7 @@ namespace elikos_detection
     {
         setPublishers();
         setSubscribers();
+        initCameraTF();
     }
 
     string Detection::intToString(int number)
@@ -180,10 +182,7 @@ namespace elikos_detection
 
     void Detection::setSubscribers()
     {
-        //TODO : subscribe to mavros (drone position)
-        //TODO : subscribe to camera feed
-        std::string robotsPosTopic = TOPIC_NAMES[camera_image_raw];
-        image_sub_ = it_.subscribe(robotsPosTopic, 1, &Detection::cameraCallback, this);
+        image_sub_ = it_.subscribe(TOPIC_NAMES[camera_image_raw], 1, &Detection::cameraCallback, this);
     }
 
     void Detection::drawObject(vector<RobotDesc> vecRobot,Mat &frame){
@@ -244,4 +243,52 @@ namespace elikos_detection
         vecRobot.clear();
     }
 
+
+    void Detection::initCameraTF() {
+        // Set up the camera's position relative to the fcu
+        camera_.setOrigin(tf::Vector3(-0.10, 0, -0.05));
+        camera_.setRotation(tf::Quaternion(tf::Vector3(0, 1, 0), PI/2));
+    }
+
+    void Detection::computeTargetPosition() {
+        // Append the camera frame to the fcu
+        tf_broadcaster_.sendTransform(tf::StampedTransform(camera_, ros::Time::now(), "fcu", "camera"));
+
+        // Set yaw and pitch of the target wrt the camera frame
+        // TODO: Actually set the target angle values
+        turret_.setOrigin(tf::Vector3(0, 0, 0));
+        turret_.setRotation(tf::Quaternion(0, 0, 0, 1));
+
+        // Broadcast the turret frame
+        tf_broadcaster_.sendTransform(tf::StampedTransform(turret_, ros::Time::now(),"camera", "turret"));
+
+        // Get the world to turret transform
+        try {
+            tf_listener_.lookupTransform("local_origin", "turret", ros::Time(0), turret_world_);
+        }
+        catch (tf::TransformException ex) {
+            ROS_ERROR("%s",ex.what());
+            ros::Duration(1.0).sleep();
+            return;
+        }
+
+        // Get the smallest angle between the turret and the z axis
+        //      - First get the vector pointing towards x
+        turret_world_x_ = tf::quatRotate(turret_world_.getRotation(), tf::Vector3(1, 0, 0));
+
+        //      - Then find it's angle with the resting position (pointing straight down)
+        tf::Vector3 zAxis(0, 0, -1);
+        double zAxis_turret_angle = zAxis.angle(turret_world_x_);
+
+        // Get distance from turret to target (using angle and altitude)
+        double camera_altitude = turret_world_.getOrigin().getZ();
+        double distance_from_target = camera_altitude / cos(zAxis_turret_angle);
+
+        // Add the robot transform as child of the turret
+        target_robot_.setOrigin(tf::Vector3(distance_from_target, 0, 0));
+        target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
+
+        tf_broadcaster_.sendTransform(tf::StampedTransform(target_robot_, ros::Time::now(), "turret", "target_robot"));
+
+    }
 }

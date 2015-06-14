@@ -53,13 +53,14 @@ int main(int argc, char* argv[])
         if (!detect_instance.getCurrentImage().empty()) {
 
             detect_instance.trackRobots();
-            detect_instance.sendMsg();
 
             if (DEBUG_MODE) {
                 detect_instance.showThreshold();
                 detect_instance.showCurrentImage();
             }
         }
+
+        detect_instance.computeTargetPosition();
 
         waitKey(30);
     }

@@ -4,13 +4,13 @@
 
 #include "SetpointManager.h"
 
-SetpointManager::SetpointManager(ros::NodeHandle nh) : _nh(&nh) {
-    _setpoint_pub = _nh->advertise<geometry_msgs::PoseStamped>(TOPIC_NAMES[mavros_setpoint_local_position], 1);
+SetpointManager::SetpointManager(ros::NodeHandle &nh) : nh_(&nh) {
+    setpoint_pub_ = nh_->advertise<geometry_msgs::PoseStamped>(TOPIC_NAMES[mavros_setpoint_local_position], 1);
 }
 
 SetpointManager::~SetpointManager() {}
 
-void SetpointManager::sendSetpoint(const tf::Transform &t) {
+void SetpointManager::sendLocalPositionSetpoint(const tf::Transform &t) {
     double yaw = tf::getYaw(t.getRotation());
     if (isnan(yaw)) {
         throw "Yaw is NaN.";
@@ -20,7 +20,7 @@ void SetpointManager::sendSetpoint(const tf::Transform &t) {
     publishPoseStamped(pose);
 }
 
-void SetpointManager::sendSetpoint(const tf::Vector3 &v, const tf::Quaternion &q) {
+void SetpointManager::sendLocalPositionSetpoint(const tf::Vector3 &v, const tf::Quaternion &q) {
     tf::Transform t;
 
     // Set Position
@@ -30,10 +30,10 @@ void SetpointManager::sendSetpoint(const tf::Vector3 &v, const tf::Quaternion &q
     t.setRotation(q);
 
     // Send
-    sendSetpoint(t);
+    sendLocalPositionSetpoint(t);
 }
 
-void SetpointManager::sendSetpoint(const tf::Vector3 &v, const double yaw) {
+void SetpointManager::sendLocalPositionSetpoint(const tf::Vector3 &v, const double yaw) {
     tf::Transform t;
 
     // Set Position
@@ -45,10 +45,10 @@ void SetpointManager::sendSetpoint(const tf::Vector3 &v, const double yaw) {
     t.setRotation(q);
 
     // Send
-    sendSetpoint(t);
+    sendLocalPositionSetpoint(t);
 }
 
-void SetpointManager::sendSetpoint(const double x, const double y, const double z, tf::Quaternion &q) {
+void SetpointManager::sendLocalPositionSetpoint(const double x, const double y, const double z, tf::Quaternion &q) {
     tf::Transform t;
 
     // Set Position
@@ -58,10 +58,10 @@ void SetpointManager::sendSetpoint(const double x, const double y, const double 
     t.setRotation(q);
 
     // Send
-    sendSetpoint(t);
+    sendLocalPositionSetpoint(t);
 }
 
-void SetpointManager::sendSetpoint(const double x, const double y, const double z, const double yaw) {
+void SetpointManager::sendLocalPositionSetpoint(const double x, const double y, const double z, const double yaw) {
     tf::Transform t;
 
     // Set Position
@@ -73,12 +73,16 @@ void SetpointManager::sendSetpoint(const double x, const double y, const double 
     t.setRotation(q);
 
     // Send
-    sendSetpoint(t);
+    sendLocalPositionSetpoint(t);
 }
 
 void SetpointManager::publishPoseStamped(const geometry_msgs::Pose &pose) {
     geometry_msgs::PoseStamped setpoint;
     setpoint.pose = pose;
     setpoint.header.stamp = ros::Time::now();
-    _setpoint_pub.publish(setpoint);
+    setpoint_pub_.publish(setpoint);
+}
+
+void SetpointManager::sendLocalPositionSetpointTF(const tf::Transform &t) {
+    tf_broadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "local_origin", "PositionSpTF"));
 }
