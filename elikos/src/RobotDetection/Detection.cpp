@@ -189,8 +189,8 @@ namespace elikos_detection
 
         for(int i = 0; i<vecRobot.size(); i++)
         {
-            cv::circle(frame, cv::Point(vecRobot.at(i).getXPos(), vecRobot.at(i).getYPos()), 10, cv::Scalar(0, 0, 255));
-            cv::putText(frame, intToString(vecRobot.at(i).getXPos()) + " , " + intToString(vecRobot.at(i).getYPos()), cv::Point(vecRobot.at(i).getXPos(), vecRobot.at(i).getYPos() + 20), 1, 1, Scalar(0, 255, 0));
+            cv::circle(frame, cv::Point(vecRobot.at(i).getHPos(), vecRobot.at(i).getVPos()), 10, cv::Scalar(0, 0, 255));
+            cv::putText(frame, intToString(vecRobot.at(i).getHPos()) + " , " + intToString(vecRobot.at(i).getVPos()), cv::Point(vecRobot.at(i).getHPos(), vecRobot.at(i).getVPos() + 20), 1, 1, Scalar(0, 255, 0));
         }
     }
 
