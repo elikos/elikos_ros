@@ -13,8 +13,8 @@ enum RCChannel { ROLL,
                  PITCH,
                  YAW,
                  THRUST,
-                 OFFBOARD_SWITCH,
                  MODE_SWITCH,
+                 OFFBOARD_SWITCH,
                  POSCTL_SWITCH,
                  NUMBER_OF_CHANNELS};
 
@@ -28,9 +28,9 @@ public:
 
 private:
     void RCCallback(const mavros::RCInConstPtr rc);
-    ros::NodeHandle* _nh;
-    ros::Subscriber _rc_sub;
-    std::vector<unsigned int> _rc_channels;
+    ros::NodeHandle* nh_;
+    ros::Subscriber rc_sub_;
+    std::vector<unsigned int> rc_channels_;
 };
 
 
