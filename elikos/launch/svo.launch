@@ -1,11 +1,19 @@
 <launch>
   <node pkg="camera1394" type="camera1394_node" name="camera1394">
-    <param name="guid" value="00b09d010099d8be" />
+    <param name="guid" value="00b09d0100db6e43" />
     <param name="video_mode" value="640x480_mono8" />
     <param name="frame_rate" value="60" />
+    <!-- color stuff -->
+    <param name="bayer_pattern" value="rggb" />
+    <param name="bayer_method" value="simple" />
   </node>
  <!-- <node pkg="image_view" type="image_view" name="img_view" output="screen">
     <param name="image" value="camera/image_raw" />
+  </node> -->
+<!--   <node name="cameracalibrator" pkg="ptam" type="cameracalibrator" clear_params="true" output="screen">
+	    <remap from="image" to="camera/image_raw" />
+        <remap from="pose" to="pose"/>
+	    <rosparam file="$(find ptam)/PtamFixParams.yaml"/>
   </node> -->
 
   <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen">
@@ -14,15 +22,23 @@
     <param name="cam_topic" value="/camera/image_raw" type="str" />
     
     <!-- Camera calibration file -->
-    <rosparam file="$(find elikos_ros)/launch/camera-firefly-2.1-F2.2.yaml" />
+    <rosparam file="$(find elikos_ros)/launch/camera.yaml" />
 
     <!-- Default parameter settings: choose between vo_fast and vo_accurate -->
     <rosparam file="$(find elikos_ros)/launch/vo_fast.yaml" />
     
     <!-- Initial camera orientation, make it point downwards -->
-    <param name="init_rx" value="3.14" />
+    <param name="init_rx" value="3.14159265359" />
     <param name="init_ry" value="0.00" />
-    <param name="init_rz" value="0.00" />
+    <param name="init_rz" value="1.5707963268" />
+    <param name="accept_console_user_input" value="true" />
+	<param name="publish_world_in_cam_frame" value="false" />
 
   </node>
+
+    <!--node name="msf_pose_sensor" pkg="msf_updates" type="pose_sensor" clear_params="true" output="screen">
+        <remap from="msf_core/imu_state_input" to="/mavros/imu/data" />
+        <remap from="msf_updates/pose_with_covariance_input" to="/svo/pose" />
+	<rosparam file="$(find msf_updates)/pixhawk.yaml"/>
+    </node> -->
 </launch>
