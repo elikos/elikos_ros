@@ -137,6 +137,10 @@ add_executable( navigator
   src/navigator/SetpointManager.cpp
 )
 
+add_executable( pose_offset
+    src/pose_offset/pose_offset.cpp
+)
+
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -154,6 +158,7 @@ elikos_ros_generate_messages_cpp
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( pose_offset ${catkin_LIBRARIES})
 
 #############
 ## Install ##
