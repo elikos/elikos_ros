@@ -15,12 +15,31 @@ vel_z_i: 0.5
 vel_z_d: 1.0
 vel_z_max: 0.25
 
-# Robot Detection Params
+## Robot Detection Params
+
+# Debug Mode displays images and trackbars
 debug_mode: true
-use_webcam: true
-h_min: 0
-h_max: 256
-s_min: 0
-s_max: 256
-v_min: 0
-v_max: 256
+
+# True uses webcam directly from opencv, false subscribes to camera/image_raw
+use_webcam: false
+
+# Morphological operations iterations for white filtering
+pre_erosions: 5
+dilations: 5
+post_erosions: 5
+
+# HSV filter parameters for the white part of the robot
+h_min_w: 0
+h_max_w: 256
+s_min_w: 0
+s_max_w: 256
+v_min_w: 0
+v_max_w: 256
+
+# HSV filter parameters for the colored part of the robot
+h_min_c: 0
+h_max_c: 256
+s_min_c: 0
+s_max_c: 256
+v_min_c: 0
+v_max_C: 256
