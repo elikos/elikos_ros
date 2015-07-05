@@ -115,8 +115,10 @@ namespace elikos_detection {
      * *************************************************************************************************
      */
 
-        Mat threshold;
+        Mat threshold_w;
+        Mat threshold_c;
         Mat hsv;
+        Mat cropped_hsv;
         VideoCapture capture;
 
     /* *************************************************************************************************
@@ -124,12 +126,21 @@ namespace elikos_detection {
      * *************************************************************************************************
      */
 
-        int H_MIN;
-        int H_MAX;
-        int S_MIN;
-        int S_MAX;
-        int V_MIN;
-        int V_MAX;
+        int H_MIN_W;
+        int H_MAX_W;
+        int S_MIN_W;
+        int S_MAX_W;
+        int V_MIN_W;
+        int V_MAX_W;
+        int H_MIN_C;
+        int H_MAX_C;
+        int S_MIN_C;
+        int S_MAX_C;
+        int V_MIN_C;
+        int V_MAX_C;
+        int PRE_EROSIONS;
+        int DILATIONS;
+        int POST_EROSIONS;
 
         const int FRAME_WIDTH = 640;
         const int FRAME_HEIGHT = 480;

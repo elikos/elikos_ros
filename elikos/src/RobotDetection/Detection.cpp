@@ -6,12 +6,21 @@ namespace elikos_detection
     Detection::Detection( ros::NodeHandle *nh ) : nh_(nh),it_(*nh)
     {
         // Load parameters
-        nh->param<int>("h_min", H_MIN, 0);
-        nh->param<int>("h_max", H_MAX, 256);
-        nh->param<int>("s_min", S_MIN, 0);
-        nh->param<int>("s_max", S_MAX, 256);
-        nh->param<int>("v_min", V_MIN, 0);
-        nh->param<int>("v_max", V_MAX, 256);
+        nh->param<int>("pre_erosions", PRE_EROSIONS, 5);
+        nh->param<int>("dilations", DILATIONS, 5);
+        nh->param<int>("post_erosions", POST_EROSIONS, 5);
+        nh->param<int>("h_min_w", H_MIN_W, 0);
+        nh->param<int>("h_max_w", H_MAX_W, 256);
+        nh->param<int>("s_min_w", S_MIN_W, 0);
+        nh->param<int>("s_max_w", S_MAX_W, 256);
+        nh->param<int>("v_min_w", V_MIN_W, 0);
+        nh->param<int>("v_max_w", V_MAX_W, 256);
+        nh->param<int>("h_min_c", H_MIN_C, 0);
+        nh->param<int>("h_max_c", H_MAX_C, 256);
+        nh->param<int>("s_min_c", S_MIN_C, 0);
+        nh->param<int>("s_max_c", S_MAX_C, 256);
+        nh->param<int>("v_min_c", V_MIN_C, 0);
+        nh->param<int>("v_max_c", V_MAX_C, 256);
     }
 
     Detection::~Detection()
@@ -68,23 +77,38 @@ namespace elikos_detection
         namedWindow(trackbarWindowName,0);
         //create memory to store trackbar name on window
         char TrackbarName[50];
-        sprintf( TrackbarName, "H_MIN");
-        sprintf( TrackbarName, "H_MAX");
-        sprintf( TrackbarName, "S_MIN");
-        sprintf( TrackbarName, "S_MAX");
-        sprintf( TrackbarName, "V_MIN");
-        sprintf( TrackbarName, "V_MAX");
+        sprintf( TrackbarName, "H_MIN W");
+        sprintf( TrackbarName, "H_MAX W");
+        sprintf( TrackbarName, "S_MIN W");
+        sprintf( TrackbarName, "S_MAX W");
+        sprintf( TrackbarName, "V_MIN W");
+        sprintf( TrackbarName, "V_MAX W");
+        sprintf( TrackbarName, "H_MIN C");
+        sprintf( TrackbarName, "H_MAX C");
+        sprintf( TrackbarName, "S_MIN C");
+        sprintf( TrackbarName, "S_MAX C");
+        sprintf( TrackbarName, "V_MIN C");
+        sprintf( TrackbarName, "V_MAX C");
         //create trackbars and insert them into window
         //3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
         //the max value the trackbar can move (eg. H_HIGH),
         //and the function that is called whenever the trackbar is moved(eg. on_trackbar)
         //                                  ---->    ---->     ---->
-        createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
-        createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
-        createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
-        createTrackbar( "S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar );
-        createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
-        createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
+        createTrackbar( "PRE EROSIONS", trackbarWindowName, &PRE_EROSIONS, 50, on_trackbar );
+        createTrackbar( "DILATIONS", trackbarWindowName, &DILATIONS, 50, on_trackbar );
+        createTrackbar( "POST EROSIONS", trackbarWindowName, &POST_EROSIONS, 50, on_trackbar );
+        createTrackbar( "H_MIN W", trackbarWindowName, &H_MIN_W, 256, on_trackbar );
+        createTrackbar( "H_MAX W", trackbarWindowName, &H_MAX_W, 256, on_trackbar );
+        createTrackbar( "S_MIN W", trackbarWindowName, &S_MIN_W, 256, on_trackbar );
+        createTrackbar( "S_MAX W", trackbarWindowName, &S_MAX_W, 256, on_trackbar );
+        createTrackbar( "V_MIN W", trackbarWindowName, &V_MIN_W, 256, on_trackbar );
+        createTrackbar( "V_MAX W", trackbarWindowName, &V_MAX_W, 256, on_trackbar );
+        createTrackbar( "H_MIN C", trackbarWindowName, &H_MIN_C, 256, on_trackbar );
+        createTrackbar( "H_MAX C", trackbarWindowName, &H_MAX_C, 256, on_trackbar );
+        createTrackbar( "S_MIN C", trackbarWindowName, &S_MIN_C, 256, on_trackbar );
+        createTrackbar( "S_MAX C", trackbarWindowName, &S_MAX_C, 256, on_trackbar );
+        createTrackbar( "V_MIN C", trackbarWindowName, &V_MIN_C, 256, on_trackbar );
+        createTrackbar( "V_MAX C", trackbarWindowName, &V_MAX_C, 256, on_trackbar );
     }
 
 
@@ -170,14 +194,31 @@ namespace elikos_detection
     void Detection::trackRobots()
     {
         cvtColor(currentImage,hsv,COLOR_BGR2HSV);
-        inRange(hsv,Scalar(H_MIN,S_MIN,V_MIN),Scalar(H_MAX,S_MAX,V_MAX),threshold);
-        morphOps(threshold);
-        trackFilteredObjects(threshold,hsv,currentImage);
+
+        // Find the white in the image (the robot plastic casing)
+        inRange(hsv,Scalar(H_MIN_W,S_MIN_W,V_MIN_W),Scalar(H_MAX_W,S_MAX_W,V_MAX_W), threshold_w);
+
+        // Consolidate the white parts into one big blob to delimit the robot
+        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
+        dilate(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
+        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+
+        // Crop the rest of the image for color blob filtering
+        cvtColor(threshold_w, threshold_w, CV_GRAY2BGR);
+        bitwise_and(hsv, threshold_w, cropped_hsv);
+
+
+        // Filter the cropped image
+        inRange(cropped_hsv,Scalar(H_MIN_C,S_MIN_C,V_MIN_C),Scalar(H_MAX_C,S_MAX_C,V_MAX_C), threshold_c);
+        morphOps(threshold_c);
+        trackFilteredObjects(threshold_c,cropped_hsv,currentImage);
     }
 
     void Detection::showThreshold()
     {
-        imshow(windowName2,threshold);
+        imshow("White threshold", threshold_w);
+        imshow("Cropped image", cropped_hsv);
+        imshow("Color threshold", threshold_c);
     }
 
     void Detection::setSubscribers()
@@ -226,8 +267,8 @@ namespace elikos_detection
         Mat cannyEdges, blur;
         //char* window_name = "Edge Map";
 
-        cannyEdges.create( threshold.size(), threshold.type() );
-        blur.create(threshold.size(), threshold.type() );
+        cannyEdges.create( threshold_c.size(), threshold_c.type() );
+        blur.create(threshold_c.size(), threshold_c.type() );
 
         //GaussianBlur( threshold, blur, Size(3,3),2,2);
 
