@@ -230,6 +230,15 @@ namespace elikos_detection
         BLUR_AMOUNT = PRE_BLUR + 1;
         blur(grayscale_image, grayscale_image, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1,-1));
         Canny(grayscale_image, canny, CANNY_THRESH1, CANNY_THRESH2);
+
+        std::vector<std::vector<Point>> contours;
+        findContours(canny, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+
+        contour_drawings = Mat::zeros(canny.size(), CV_8UC3);
+        for (int i = 0; i < contours.size(); i++) {
+            drawContours(contour_drawings, contours, i, Scalar(255,255,255), 2, 8);
+        }
+
     }
 
     void Detection::showThreshold()
@@ -239,6 +248,7 @@ namespace elikos_detection
         //imshow("Color threshold", threshold_c);
         imshow("Blurred", grayscale_image);
         imshow("Canny Edges", canny);
+        imshow("Contours", contour_drawings);
     }
 
     void Detection::setSubscribers()

@@ -21,7 +21,7 @@ vel_z_max: 0.25
 debug_mode: true
 
 # True uses webcam directly from opencv, false subscribes to camera/image_raw
-use_webcam: true
+use_webcam: false
 
 # Morphological operations iterations for white filtering
 pre_erosions: 5
