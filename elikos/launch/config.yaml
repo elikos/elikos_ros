@@ -24,6 +24,7 @@ debug_mode: true
 use_webcam: false
 
 # Morphological operations iterations for white filtering
+pre_blur: 2
 pre_erosions: 5
 dilations: 5
 post_erosions: 5
@@ -37,15 +38,16 @@ v_min_w: 0
 v_max_w: 256
 
 # HSV filter parameters for the colored part of the robot
-h_min_c: 0
-h_max_c: 256
-s_min_c: 0
+h_min_c: 39
+h_max_c: 88
+s_min_c: 54
 s_max_c: 256
 v_min_c: 0
 v_max_C: 256
 
 # Shape detection parameters
-pre_blur: 2
 canny_thresh1: 1
 canny_thresh2: 1
 canny_aperture: 3
+poly_area_min: 0
+poly_area_max: 50000
