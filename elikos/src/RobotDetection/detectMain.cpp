@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
     // Load parameters
     bool DEBUG_MODE, USE_WEBCAM;
-    nh.param<bool>("debug_mode", DEBUG_MODE, false);
+    nh.param<bool>("debug_mode", DEBUG_MODE, true);
     nh.param<bool>("use_webcam", USE_WEBCAM, false);
 
     //init Detection class : set up subs/pubs
@@ -52,7 +52,8 @@ int main(int argc, char* argv[])
 
         if (!detect_instance.getCurrentImage().empty()) {
 
-            detect_instance.trackRobots();
+            //detect_instance.trackBlobs();
+            detect_instance.trackShape();
 
             if (DEBUG_MODE) {
                 detect_instance.showThreshold();

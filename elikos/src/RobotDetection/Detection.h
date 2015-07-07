@@ -65,7 +65,8 @@ namespace elikos_detection {
         void createTrackbars();
         void setupDebug();
         void captureFrame();
-        void trackRobots();
+        void trackBlobs();
+        void trackShape();
         void showCurrentImage();
         void showThreshold();
 
@@ -119,6 +120,8 @@ namespace elikos_detection {
         Mat threshold_c;
         Mat hsv;
         Mat cropped_hsv;
+        Mat grayscale_image;
+        Mat canny;
         VideoCapture capture;
 
     /* *************************************************************************************************
@@ -141,6 +144,11 @@ namespace elikos_detection {
         int PRE_EROSIONS;
         int DILATIONS;
         int POST_EROSIONS;
+        int PRE_BLUR;
+        int BLUR_AMOUNT;
+        int CANNY_THRESH1;
+        int CANNY_THRESH2;
+        int CANNY_APERTURE;
 
         const int FRAME_WIDTH = 640;
         const int FRAME_HEIGHT = 480;
@@ -158,6 +166,7 @@ namespace elikos_detection {
         const string windowName2 = "Thresholded Image";
         const string windowName3 = "After Morphological Operations";
         const string trackbarWindowName = "Trackbars";
+        const string shapeDetectTrackbars = "Shape detector";
 
 
     };

@@ -21,7 +21,7 @@ vel_z_max: 0.25
 debug_mode: true
 
 # True uses webcam directly from opencv, false subscribes to camera/image_raw
-use_webcam: false
+use_webcam: true
 
 # Morphological operations iterations for white filtering
 pre_erosions: 5
@@ -43,3 +43,9 @@ s_min_c: 0
 s_max_c: 256
 v_min_c: 0
 v_max_C: 256
+
+# Shape detection parameters
+pre_blur: 2
+canny_thresh1: 1
+canny_thresh2: 1
+canny_aperture: 3

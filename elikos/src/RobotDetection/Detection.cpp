@@ -9,7 +9,7 @@ namespace elikos_detection
         nh->param<int>("pre_erosions", PRE_EROSIONS, 5);
         nh->param<int>("dilations", DILATIONS, 5);
         nh->param<int>("post_erosions", POST_EROSIONS, 5);
-        nh->param<int>("h_min_w", H_MIN_W, 0);
+       /* nh->param<int>("h_min_w", H_MIN_W, 0);
         nh->param<int>("h_max_w", H_MAX_W, 256);
         nh->param<int>("s_min_w", S_MIN_W, 0);
         nh->param<int>("s_max_w", S_MAX_W, 256);
@@ -20,7 +20,24 @@ namespace elikos_detection
         nh->param<int>("s_min_c", S_MIN_C, 0);
         nh->param<int>("s_max_c", S_MAX_C, 256);
         nh->param<int>("v_min_c", V_MIN_C, 0);
+        nh->param<int>("v_max_c", V_MAX_C, 256);*/
+
+        nh->param<int>("h_min_w", H_MIN_W, 0);
+        nh->param<int>("h_max_w", H_MAX_W, 52);
+        nh->param<int>("s_min_w", S_MIN_W, 0);
+        nh->param<int>("s_max_w", S_MAX_W, 149);
+        nh->param<int>("v_min_w", V_MIN_W, 140);
+        nh->param<int>("v_max_w", V_MAX_W, 256);
+        nh->param<int>("h_min_c", H_MIN_C, 39);
+        nh->param<int>("h_max_c", H_MAX_C, 248);
+        nh->param<int>("s_min_c", S_MIN_C, 50);
+        nh->param<int>("s_max_c", S_MAX_C, 256);
+        nh->param<int>("v_min_c", V_MIN_C, 30);
         nh->param<int>("v_max_c", V_MAX_C, 256);
+        nh->param<int>("pre_blur", PRE_BLUR, 2);
+        nh->param<int>("canny_thresh1", CANNY_THRESH1, 1);
+        nh->param<int>("canny_thresh1", CANNY_THRESH2, 1);
+        nh->param<int>("canny_aperture", CANNY_APERTURE, 3);
     }
 
     Detection::~Detection()
@@ -75,20 +92,7 @@ namespace elikos_detection
     {
         //create window for trackbars
         namedWindow(trackbarWindowName,0);
-        //create memory to store trackbar name on window
-        char TrackbarName[50];
-        sprintf( TrackbarName, "H_MIN W");
-        sprintf( TrackbarName, "H_MAX W");
-        sprintf( TrackbarName, "S_MIN W");
-        sprintf( TrackbarName, "S_MAX W");
-        sprintf( TrackbarName, "V_MIN W");
-        sprintf( TrackbarName, "V_MAX W");
-        sprintf( TrackbarName, "H_MIN C");
-        sprintf( TrackbarName, "H_MAX C");
-        sprintf( TrackbarName, "S_MIN C");
-        sprintf( TrackbarName, "S_MAX C");
-        sprintf( TrackbarName, "V_MIN C");
-        sprintf( TrackbarName, "V_MAX C");
+        namedWindow(shapeDetectTrackbars,0);
         //create trackbars and insert them into window
         //3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
         //the max value the trackbar can move (eg. H_HIGH),
@@ -109,6 +113,12 @@ namespace elikos_detection
         createTrackbar( "S_MAX C", trackbarWindowName, &S_MAX_C, 256, on_trackbar );
         createTrackbar( "V_MIN C", trackbarWindowName, &V_MIN_C, 256, on_trackbar );
         createTrackbar( "V_MAX C", trackbarWindowName, &V_MAX_C, 256, on_trackbar );
+
+        // Create shape detector trackbars
+        createTrackbar("Pre Blur", shapeDetectTrackbars, &PRE_BLUR, 50, on_trackbar);
+        createTrackbar("Canny Thresh 1", shapeDetectTrackbars, &CANNY_THRESH1, 256, on_trackbar);
+        createTrackbar("Canny Thresh 2", shapeDetectTrackbars, &CANNY_THRESH2, 256, on_trackbar);
+        createTrackbar("Canny Aperture", shapeDetectTrackbars, &CANNY_APERTURE, 5, on_trackbar);
     }
 
 
@@ -191,7 +201,7 @@ namespace elikos_detection
     }
 
 
-    void Detection::trackRobots()
+    void Detection::trackBlobs()
     {
         cvtColor(currentImage,hsv,COLOR_BGR2HSV);
 
@@ -214,11 +224,21 @@ namespace elikos_detection
         trackFilteredObjects(threshold_c,cropped_hsv,currentImage);
     }
 
+    void Detection::trackShape()
+    {
+        cvtColor(currentImage, grayscale_image, COLOR_BGR2GRAY);
+        BLUR_AMOUNT = PRE_BLUR + 1;
+        blur(grayscale_image, grayscale_image, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1,-1));
+        Canny(grayscale_image, canny, CANNY_THRESH1, CANNY_THRESH2);
+    }
+
     void Detection::showThreshold()
     {
-        imshow("White threshold", threshold_w);
-        imshow("Cropped image", cropped_hsv);
-        imshow("Color threshold", threshold_c);
+        //imshow("White threshold", threshold_w);
+        //imshow("Cropped image", cropped_hsv);
+        //imshow("Color threshold", threshold_c);
+        imshow("Blurred", grayscale_image);
+        imshow("Canny Edges", canny);
     }
 
     void Detection::setSubscribers()
