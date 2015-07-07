@@ -122,6 +122,7 @@ namespace elikos_detection {
         Mat cropped_hsv;
         Mat grayscale_image;
         Mat canny;
+        Mat contour_drawings;
         VideoCapture capture;
 
     /* *************************************************************************************************
