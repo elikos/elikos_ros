@@ -38,6 +38,8 @@ namespace elikos_detection
         nh->param<int>("canny_thresh1", CANNY_THRESH1, 1);
         nh->param<int>("canny_thresh1", CANNY_THRESH2, 1);
         nh->param<int>("canny_aperture", CANNY_APERTURE, 3);
+        nh->param<int>("poly_area_min", POLY_AREA_MIN, 0);
+        nh->param<int>("poly_area_max", POLY_AREA_MAX, 50000);
     }
 
     Detection::~Detection()
@@ -98,8 +100,9 @@ namespace elikos_detection
         //the max value the trackbar can move (eg. H_HIGH),
         //and the function that is called whenever the trackbar is moved(eg. on_trackbar)
         //                                  ---->    ---->     ---->
-        createTrackbar( "PRE EROSIONS", trackbarWindowName, &PRE_EROSIONS, 50, on_trackbar );
-        createTrackbar( "DILATIONS", trackbarWindowName, &DILATIONS, 50, on_trackbar );
+        createTrackbar( "PRE BLUR", trackbarWindowName, &PRE_BLUR, 50, on_trackbar);
+        createTrackbar( "PRE EROSIONS", trackbarWindowName, &PRE_EROSIONS, 256, on_trackbar );
+        createTrackbar( "DILATIONS", trackbarWindowName, &DILATIONS, 256, on_trackbar );
         createTrackbar( "POST EROSIONS", trackbarWindowName, &POST_EROSIONS, 50, on_trackbar );
         createTrackbar( "H_MIN W", trackbarWindowName, &H_MIN_W, 256, on_trackbar );
         createTrackbar( "H_MAX W", trackbarWindowName, &H_MAX_W, 256, on_trackbar );
@@ -115,10 +118,11 @@ namespace elikos_detection
         createTrackbar( "V_MAX C", trackbarWindowName, &V_MAX_C, 256, on_trackbar );
 
         // Create shape detector trackbars
-        createTrackbar("Pre Blur", shapeDetectTrackbars, &PRE_BLUR, 50, on_trackbar);
         createTrackbar("Canny Thresh 1", shapeDetectTrackbars, &CANNY_THRESH1, 256, on_trackbar);
         createTrackbar("Canny Thresh 2", shapeDetectTrackbars, &CANNY_THRESH2, 256, on_trackbar);
         createTrackbar("Canny Aperture", shapeDetectTrackbars, &CANNY_APERTURE, 5, on_trackbar);
+        createTrackbar("Poly Area Min", shapeDetectTrackbars, &POLY_AREA_MIN, 50000, on_trackbar);
+        createTrackbar("Poly Area Max", shapeDetectTrackbars, &POLY_AREA_MAX, 50000, on_trackbar);
     }
 
 
@@ -205,6 +209,8 @@ namespace elikos_detection
     {
         cvtColor(currentImage,hsv,COLOR_BGR2HSV);
 
+        BLUR_AMOUNT = PRE_BLUR + 1;
+        blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1,-1));
         // Find the white in the image (the robot plastic casing)
         inRange(hsv,Scalar(H_MIN_W,S_MIN_W,V_MIN_W),Scalar(H_MAX_W,S_MAX_W,V_MAX_W), threshold_w);
 
@@ -227,16 +233,22 @@ namespace elikos_detection
     void Detection::trackShape()
     {
         cvtColor(currentImage, grayscale_image, COLOR_BGR2GRAY);
-        BLUR_AMOUNT = PRE_BLUR + 1;
-        blur(grayscale_image, grayscale_image, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1,-1));
         Canny(grayscale_image, canny, CANNY_THRESH1, CANNY_THRESH2);
 
         std::vector<std::vector<Point>> contours;
         findContours(canny, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
 
         contour_drawings = Mat::zeros(canny.size(), CV_8UC3);
+        std::vector<std::vector<Point>> polygons(contours.size());
         for (int i = 0; i < contours.size(); i++) {
-            drawContours(contour_drawings, contours, i, Scalar(255,255,255), 2, 8);
+            if (contourArea(contours[i]) < POLY_AREA_MIN || contourArea(contours[i]) > POLY_AREA_MAX) { // Should be in relation with altitude
+                continue;
+            }
+            approxPolyDP(Mat(contours[i]), polygons[i], 6.0, true);
+        }
+
+        for (int i = 0; i < polygons.size(); i++) {
+            drawContours(contour_drawings, polygons, i, Scalar(255,255,255), 2, 8);
         }
 
     }

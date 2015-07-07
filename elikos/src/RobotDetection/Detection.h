@@ -150,6 +150,8 @@ namespace elikos_detection {
         int CANNY_THRESH1;
         int CANNY_THRESH2;
         int CANNY_APERTURE;
+        int POLY_AREA_MIN;
+        int POLY_AREA_MAX;
 
         const int FRAME_WIDTH = 640;
         const int FRAME_HEIGHT = 480;
