@@ -122,6 +122,7 @@ namespace elikos_detection {
         Mat cropped_hsv;
         Mat grayscale_image;
         Mat canny;
+        Mat morph_ex;
         Mat contour_drawings;
         VideoCapture capture;
 
@@ -152,6 +153,9 @@ namespace elikos_detection {
         int CANNY_APERTURE;
         int POLY_AREA_MIN;
         int POLY_AREA_MAX;
+        int MORPH_OP;
+        int MORPH_ELEMENT;
+        int MORPH_SIZE;
 
         const int FRAME_WIDTH = 640;
         const int FRAME_HEIGHT = 480;

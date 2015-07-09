@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 
         if (!detect_instance.getCurrentImage().empty()) {
 
-            //detect_instance.trackBlobs();
+            detect_instance.trackBlobs();
             detect_instance.trackShape();
 
             if (true) {
