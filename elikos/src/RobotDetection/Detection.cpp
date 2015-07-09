@@ -40,6 +40,10 @@ namespace elikos_detection
         nh->param<int>("canny_aperture", CANNY_APERTURE, 3);
         nh->param<int>("poly_area_min", POLY_AREA_MIN, 0);
         nh->param<int>("poly_area_max", POLY_AREA_MAX, 50000);
+        nh->param<int>("morph_op", MORPH_OP, 0);
+        nh->param<int>("morph_op", MORPH_ELEMENT, 0);
+        nh->param<int>("morph_size", MORPH_SIZE, 0);
+
     }
 
     Detection::~Detection()
@@ -123,6 +127,9 @@ namespace elikos_detection
         createTrackbar("Canny Aperture", shapeDetectTrackbars, &CANNY_APERTURE, 5, on_trackbar);
         createTrackbar("Poly Area Min", shapeDetectTrackbars, &POLY_AREA_MIN, 50000, on_trackbar);
         createTrackbar("Poly Area Max", shapeDetectTrackbars, &POLY_AREA_MAX, 50000, on_trackbar);
+        createTrackbar("Operator:\n 0: Opening - 1: Closing \n 2: Gradient - 3: Top Hat \n 4: Black Hat", shapeDetectTrackbars, &MORPH_OP, 4, on_trackbar );
+        createTrackbar( "Element:\n 0: Rect - 1: Cross - 2: Ellipse", shapeDetectTrackbars, &MORPH_ELEMENT, 2, on_trackbar );
+        createTrackbar( "Kernel size:\n 2n +1", shapeDetectTrackbars, &MORPH_SIZE, 21, on_trackbar );
     }
 
 
@@ -227,13 +234,17 @@ namespace elikos_detection
         // Filter the cropped image
         inRange(cropped_hsv,Scalar(H_MIN_C,S_MIN_C,V_MIN_C),Scalar(H_MAX_C,S_MAX_C,V_MAX_C), threshold_c);
         morphOps(threshold_c);
-        trackFilteredObjects(threshold_c,cropped_hsv,currentImage);
+        //trackFilteredObjects(threshold_c,cropped_hsv,currentImage);
     }
 
     void Detection::trackShape()
     {
-        cvtColor(currentImage, grayscale_image, COLOR_BGR2GRAY);
-        Canny(grayscale_image, canny, CANNY_THRESH1, CANNY_THRESH2);
+        //cvtColor(currentImage, grayscale_image, COLOR_BGR2GRAY);
+        int operation = MORPH_OP + 2;
+        Mat element = getStructuringElement( MORPH_ELEMENT, Size( 2*MORPH_SIZE + 1, 2*MORPH_SIZE+1 ), Point( MORPH_SIZE, MORPH_SIZE ) );
+        morphologyEx(threshold_c, morph_ex, operation, element, Point(-1,-1), 30);
+
+        Canny(morph_ex, canny, CANNY_THRESH1, CANNY_THRESH2);
 
         std::vector<std::vector<Point>> contours;
         findContours(canny, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
@@ -244,7 +255,7 @@ namespace elikos_detection
             if (contourArea(contours[i]) < POLY_AREA_MIN || contourArea(contours[i]) > POLY_AREA_MAX) { // Should be in relation with altitude
                 continue;
             }
-            approxPolyDP(Mat(contours[i]), polygons[i], 6.0, true);
+            approxPolyDP(Mat(contours[i]), polygons[i], 10.0, true);
         }
 
         for (int i = 0; i < polygons.size(); i++) {
@@ -255,11 +266,12 @@ namespace elikos_detection
 
     void Detection::showThreshold()
     {
-        //imshow("White threshold", threshold_w);
+        imshow("White threshold", threshold_w);
         //imshow("Cropped image", cropped_hsv);
-        //imshow("Color threshold", threshold_c);
-        imshow("Blurred", grayscale_image);
-        imshow("Canny Edges", canny);
+        imshow("Color threshold", threshold_c);
+        imshow("Morp", morph_ex);
+        //imshow("Blurred", grayscale_image);
+        //imshow("Canny Edges", canny);
         imshow("Contours", contour_drawings);
     }
 
