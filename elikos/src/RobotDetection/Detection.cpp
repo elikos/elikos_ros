@@ -90,7 +90,7 @@ namespace elikos_detection
         //store image to matrix
         capture.read(currentImage);
         //convert frame from BGR to HSV colorspace
-        cvtColor(currentImage,hsv,COLOR_BGR2HSV);
+        cvtColor(currentImage,hsv_w,COLOR_BGR2HSV);
         //printf("I captured an image with my webcam");
     }
 
@@ -214,13 +214,34 @@ namespace elikos_detection
 
     void Detection::trackBlobs()
     {
-        cvtColor(currentImage,hsv,COLOR_BGR2HSV);
+        cvtColor(currentImage,hsv_w,COLOR_BGR2HSV);
+        cvtColor(currentImage, hsv_c,COLOR_BGR2HSV);
+
 
         BLUR_AMOUNT = PRE_BLUR + 1;
-        blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1,-1));
-        // Find the white in the image (the robot plastic casing)
-        inRange(hsv,Scalar(H_MIN_W,S_MIN_W,V_MIN_W),Scalar(H_MAX_W,S_MAX_W,V_MAX_W), threshold_w);
+        blur(hsv_w, hsv_w, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1,-1));
 
+        blur(hsv_c, hsv_c, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1,-1));
+
+        // Find the white in the image (the robot plastic casing)
+        inRange(hsv_w,Scalar(H_MIN_W,S_MIN_W,V_MIN_W),Scalar(H_MAX_W,S_MAX_W,V_MAX_W), threshold_w);
+
+        // Consolidate the white parts into one big blob to delimit the robot
+        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
+        dilate(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
+        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+
+        inRange(hsv_c,Scalar(H_MIN_C,S_MIN_C,V_MIN_C),Scalar(H_MAX_C,S_MAX_C,V_MAX_C), threshold_c);
+
+        // Consolidate the white parts into one big blob to delimit the robot
+        erode(threshold_c, threshold_c, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
+        dilate(threshold_c, threshold_c, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
+        erode(threshold_c, threshold_c, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+
+        bitwise_or(threshold_w, threshold_c, merged);
+
+        trackFilteredObjects(merged, hsv_w, currentImage);
+/*
         // Consolidate the white parts into one big blob to delimit the robot
         erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
         dilate(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
@@ -235,6 +256,7 @@ namespace elikos_detection
         inRange(cropped_hsv,Scalar(H_MIN_C,S_MIN_C,V_MIN_C),Scalar(H_MAX_C,S_MAX_C,V_MAX_C), threshold_c);
         morphOps(threshold_c);
         //trackFilteredObjects(threshold_c,cropped_hsv,currentImage);
+        */
     }
 
     void Detection::trackShape()
@@ -269,10 +291,11 @@ namespace elikos_detection
         imshow("White threshold", threshold_w);
         //imshow("Cropped image", cropped_hsv);
         imshow("Color threshold", threshold_c);
-        imshow("Morp", morph_ex);
+        imshow("Merged", merged);
+        //imshow("Morp", morph_ex);
         //imshow("Blurred", grayscale_image);
         //imshow("Canny Edges", canny);
-        imshow("Contours", contour_drawings);
+        //imshow("Contours", contour_drawings);
     }
 
     void Detection::setSubscribers()
