@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     elikos_detection::Detection detect_instance(&nh);
     detect_instance.init();
 
-    if (DEBUG_MODE) {
+    if (true) {
         detect_instance.createTrackbars();
     }
 
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 
             detect_instance.trackRobots();
 
-            if (DEBUG_MODE) {
+            if (true) {
                 detect_instance.showThreshold();
                 detect_instance.showCurrentImage();
             }

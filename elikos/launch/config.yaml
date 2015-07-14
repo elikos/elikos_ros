@@ -17,10 +17,10 @@ vel_z_max: 0.25
 
 # Robot Detection Params
 debug_mode: true
-use_webcam: true
+use_webcam: false
 h_min: 0
-h_max: 256
-s_min: 0
-s_max: 256
-v_min: 0
+h_max: 62
+s_min: 34
+s_max: 182
+v_min: 145
 v_max: 256

@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     ros::Subscriber local_pos_sub = nh.subscribe("mavros/local_position/local", 1, local_pos_callback);
     ros::Subscriber vo_sub = nh.subscribe("svo/pose", 1, vo_pose_callback);
 
-    ros::Publisher pose_pub = nh.advertise<geometry_msgs::PoseStamped>("pose_offset/pose", 1);
+    ros::Publisher pose_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/vision_pose/pose", 1);
 
     last_vo = ros::Time(0);
     last_local_pos = ros::Time(0);

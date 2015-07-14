@@ -8,7 +8,7 @@
 	<arg name="tgt_component" default="50" />
 
 	<include file="$(find mavros)/launch/node.launch">
-		<remap from="/mavros/vision_pose/pose" to="/msf_core/pose"/>
+		<!--remap from="/mavros/vision_pose/pose" to="/pose_offset/pose"/-->
 		<arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
 		<arg name="config_yaml" value="$(find elikos_ros)/launch/px4_config.yaml" />
 
