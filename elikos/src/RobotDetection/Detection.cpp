@@ -43,6 +43,7 @@ namespace elikos_detection
         nh->param<int>("morph_op", MORPH_OP, 0);
         nh->param<int>("morph_op", MORPH_ELEMENT, 0);
         nh->param<int>("morph_size", MORPH_SIZE, 0);
+        nh->param<int>("max_dist", MAX_DIST, 0);
 
     }
 
@@ -130,6 +131,8 @@ namespace elikos_detection
         createTrackbar("Operator:\n 0: Opening - 1: Closing \n 2: Gradient - 3: Top Hat \n 4: Black Hat", shapeDetectTrackbars, &MORPH_OP, 4, on_trackbar );
         createTrackbar( "Element:\n 0: Rect - 1: Cross - 2: Ellipse", shapeDetectTrackbars, &MORPH_ELEMENT, 2, on_trackbar );
         createTrackbar( "Kernel size:\n 2n +1", shapeDetectTrackbars, &MORPH_SIZE, 21, on_trackbar );
+        createTrackbar("Max distance", shapeDetectTrackbars, &MAX_DIST, 50000, on_trackbar);
+
     }
 
 
@@ -149,68 +152,51 @@ namespace elikos_detection
         }
     }
 
-    void Detection::trackFilteredObjects(Mat threshold,Mat HSV, Mat &cameraFeed)
-    {
+    vector<RobotDesc> Detection::trackFilteredObjects(Mat threshold, Mat &cameraFeed) {
 
         //int x,y;
         RobotDesc myRobot;
-
+        vector<RobotDesc> vecRobot;
         Mat temp;
         threshold.copyTo(temp);
         //these two vectors needed for output of findContours
-        vector< vector<Point> > contours;
+        vector<vector<Point> > contours;
         vector<Vec4i> hierarchy;
         //find contours of filtered image using openCV findContours function
-        findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );
+        findContours(temp, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
         //use moments method to find our filtered object
         double refArea = 0;
-        bool objectFound = false;
+
         if (hierarchy.size() > 0) {
             int numObjects = hierarchy.size();
             //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
-            if(numObjects<MAX_NUM_OBJECTS){
+            if (numObjects < MAX_NUM_OBJECTS) {
 
                 vecRobot.clear();
 
                 for (int index = 0; index >= 0; index = hierarchy[index][0]) {
 
-                    Moments moment = moments((cv::Mat)contours[index]);
+                    Moments moment = moments((cv::Mat) contours[index]);
                     double area = moment.m00;
 
                     //if the area is less than 20 px by 20px then it is probably just noise
                     //if the area is the same as the 3/2 of the image size, probably just a bad filter
                     //we only want the object with the largest area so we safe a reference area each
                     //iteration and compare it to the area in the next iteration.
-                    if(area>MIN_OBJECT_AREA){
+                    if (area > MIN_OBJECT_AREA) {
 
-                        myRobot.setXPos(moment.m10/area);
-                        myRobot.setYPos(moment.m01/area);
+                        myRobot.setXPos(moment.m10 / area);
+                        myRobot.setYPos(moment.m01 / area);
 
                         vecRobot.push_back(myRobot);
 
-                        objectFound = true;
-
-                    }else objectFound = false;
-
-
-                }
-                //let user know you found an object
-                if(objectFound ==true) {
-                    //draw object location on screen
-                    drawObject(vecRobot, cameraFeed);
-                    if (vecRobot.size() != 0)
-                    {
-                        for (int i = 0; i < vecRobot.size(); i++)
-                        {
-                            elikos_ros::RobotPos pos = vecRobot.at(i).toMsg();
-                            robotsPos_msg.robotsPos.push_back(pos);
-                        }
                     }
                 }
-            }else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
+            }
+            else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
         }
+        return vecRobot;
     }
-
 
     void Detection::trackBlobs()
     {
@@ -238,9 +224,52 @@ namespace elikos_detection
         dilate(threshold_c, threshold_c, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
         erode(threshold_c, threshold_c, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
 
-        bitwise_or(threshold_w, threshold_c, merged);
 
-        trackFilteredObjects(merged, hsv_w, currentImage);
+        vector<RobotDesc> foundObjects_w = trackFilteredObjects(threshold_w, currentImage);
+        vector<RobotDesc> foundObjects_c = trackFilteredObjects(threshold_c, currentImage);
+       /* for (int i=0; i<foundObjects_c.size(); i++){
+            printf("Found Color Object[%i]:\n", i);
+            printf("xPos: %i\n", foundObjects_c[i].getXPos());
+            printf("yPos: %i\n", foundObjects_c[i].getYPos());
+        }*/
+        //drawObject(foundObjects_w, currentImage);
+        for (int i=0; i<foundObjects_w.size(); i++){
+            printf("Found White Object[%i]:\n", i);
+            printf("xPos: %i\n", foundObjects_w[i].getXPos());
+            printf("yPos: %i\n", foundObjects_w[i].getYPos());
+        }
+        //drawObject(foundObjects_c, currentImage);
+        foundRobots.clear();
+        RobotDesc myRobot;
+
+        bool robotFound=false;
+        for (int i=0; i<foundObjects_c.size(); i++){
+            for (int j=0; j<foundObjects_w.size(); j++){
+                if (abs(foundObjects_c[i].getXPos()-foundObjects_w[j].getXPos())<MAX_DIST&&
+                        abs(foundObjects_c[i].getYPos()-foundObjects_w[j].getYPos())<MAX_DIST){
+                    myRobot.setXPos((foundObjects_c[i].getXPos()+foundObjects_w[j].getXPos())/2);
+                    myRobot.setYPos((foundObjects_c[i].getYPos()+foundObjects_w[j].getYPos())/2);
+                    foundRobots.push_back(myRobot);
+                    robotFound=true;
+                    break;
+                }
+            }
+        }
+
+        //let user know you found an object
+        if(robotFound ==true) {
+            //draw object location on screen
+            drawObject(foundRobots, currentImage);
+            if (foundRobots.size() != 0)
+            {
+                for (int i = 0; i < foundRobots.size(); i++)
+                {
+                    elikos_ros::RobotPos pos = foundRobots.at(i).toMsg();
+                    robotsPos_msg.robotsPos.push_back(pos);
+                }
+            }
+        }
+       // morphOps(merged);
 /*
         // Consolidate the white parts into one big blob to delimit the robot
         erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
@@ -262,17 +291,39 @@ namespace elikos_detection
     void Detection::trackShape()
     {
         //cvtColor(currentImage, grayscale_image, COLOR_BGR2GRAY);
-        int operation = MORPH_OP + 2;
+        /*int operation = MORPH_OP + 2;
         Mat element = getStructuringElement( MORPH_ELEMENT, Size( 2*MORPH_SIZE + 1, 2*MORPH_SIZE+1 ), Point( MORPH_SIZE, MORPH_SIZE ) );
-        morphologyEx(threshold_c, morph_ex, operation, element, Point(-1,-1), 30);
-
-        Canny(morph_ex, canny, CANNY_THRESH1, CANNY_THRESH2);
+        morphologyEx(merged, morph_ex, operation, element, Point(-1,-1), 30);
+*/
+       Canny(merged, canny, CANNY_THRESH1, CANNY_THRESH2);
 
         std::vector<std::vector<Point>> contours;
         findContours(canny, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
 
         contour_drawings = Mat::zeros(canny.size(), CV_8UC3);
         std::vector<std::vector<Point>> polygons(contours.size());
+
+        std::vector<std::vector<Point> > contours_poly( contours.size() );
+        //std::vector<Rect> boundRect( contours.size() );
+        std::vector<Point2f>center( contours.size() );
+        std::vector<float>radius( contours.size() );
+
+        for( int i = 0; i < contours.size(); i++ )
+        { approxPolyDP( Mat(contours[i]), contours_poly[i], 20, true );
+            //boundRect[i] = boundingRect( Mat(contours_poly[i]) );
+            minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
+        }
+
+
+        /// Draw polygonal contour + bonding rects + circles
+
+        for( int i = 0; i< contours.size(); i++ )
+        {
+            drawContours( contour_drawings, contours_poly, i, Scalar(255,255,255), 1, 8, vector<Vec4i>(), 0, Point() );
+            circle( contour_drawings, center[i], (int)radius[i], Scalar(255,255,255), 2, 8, 0 );
+        }
+
+/*
         for (int i = 0; i < contours.size(); i++) {
             if (contourArea(contours[i]) < POLY_AREA_MIN || contourArea(contours[i]) > POLY_AREA_MAX) { // Should be in relation with altitude
                 continue;
@@ -281,9 +332,10 @@ namespace elikos_detection
         }
 
         for (int i = 0; i < polygons.size(); i++) {
+           // drawContours(contour_drawings, polygons, i, Scalar(255,255,255), 2, 8);
             drawContours(contour_drawings, polygons, i, Scalar(255,255,255), 2, 8);
         }
-
+*/
     }
 
     void Detection::showThreshold()
@@ -291,11 +343,10 @@ namespace elikos_detection
         imshow("White threshold", threshold_w);
         //imshow("Cropped image", cropped_hsv);
         imshow("Color threshold", threshold_c);
-        imshow("Merged", merged);
+        //imshow("Merged", merged);
         //imshow("Morp", morph_ex);
         //imshow("Blurred", grayscale_image);
         //imshow("Canny Edges", canny);
-        //imshow("Contours", contour_drawings);
     }
 
     void Detection::setSubscribers()
@@ -318,15 +369,16 @@ namespace elikos_detection
         //create structuring element that will be used to "dilate" and "erode" image.
         //the element chosen here is a 3px by 3px rectangle
 
-        Mat erodeElement = getStructuringElement( MORPH_RECT,Size(3,3));
+        Mat erodeElement = getStructuringElement( MORPH_ELLIPSE,Size(3,3));
         //dilate with larger element so make sure object is nicely visible
-        Mat dilateElement = getStructuringElement( MORPH_RECT,Size(8,8));
-
+        Mat dilateElement = getStructuringElement( MORPH_ELLIPSE,Size(8,8));
+/*
         erode(thresh,thresh,erodeElement);
         dilate(thresh,thresh,dilateElement);
 
         erode(thresh,thresh,erodeElement);
         dilate(thresh,thresh,dilateElement);
+        */
     }
 
     void Detection::showCurrentImage()
@@ -358,7 +410,7 @@ namespace elikos_detection
     {
         robots_publish.publish(robotsPos_msg);
         //ROS_INFO_STREAM("I am advertising a robotInfo vector");
-        vecRobot.clear();
+        foundRobots.clear();
     }
 
 
@@ -420,15 +472,15 @@ namespace elikos_detection
     }
 
     void Detection::getRotationFromImage(tf::Quaternion &q) {
-        if (vecRobot.empty()) {
+        if (foundRobots.empty()) {
             throw std::out_of_range("No object is currently detected.");
         }
 
         // Set pitch - y axis (image vertical)
-        double pitch = ((double)(vecRobot[0].getVPos() - CAM_HEIGHT / 2) / (double)CAM_HEIGHT) * CAMERA_FOV_V;
+        double pitch = ((double)(foundRobots[0].getVPos() - CAM_HEIGHT / 2) / (double)CAM_HEIGHT) * CAMERA_FOV_V;
 
         // Set yaw - z axis (image horizontal)
-        double yaw = -((double)(vecRobot[0].getHPos() - CAM_WIDTH / 2) / (double)CAM_WIDTH) * CAMERA_FOV_H;
+        double yaw = -((double)(foundRobots[0].getHPos() - CAM_WIDTH / 2) / (double)CAM_WIDTH) * CAMERA_FOV_H;
 
         // Set roll, pitch and yaw
         q.setRPY(0, pitch, yaw);

@@ -24,6 +24,10 @@ public:
 
     void setYPos(int pos);
 
+    int getXPos();
+
+    int getYPos();
+
     cv::Scalar getHSVmin();
 
     cv::Scalar getHSVmax();

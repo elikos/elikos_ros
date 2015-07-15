@@ -45,7 +45,7 @@ namespace elikos_detection {
 
         VideoCapture getCapture(){return capture;}
 
-        void trackFilteredObjects(Mat threshold,Mat HSV, Mat &cameraFeed);
+        vector<RobotDesc> trackFilteredObjects(Mat threshold, Mat &cameraFeed);
         void drawObject(vector<RobotDesc> vecRobot,Mat &frame);
         void morphOps(Mat &thresh);
         void cannyEdge();
@@ -94,7 +94,7 @@ namespace elikos_detection {
         Mat currentImage;
         cv_bridge::CvImagePtr nextImage;
         elikos_ros::RobotsPos robotsPos_msg;
-        vector<RobotDesc> vecRobot;
+        vector<RobotDesc> foundRobots;
         ros::NodeHandle* nh_;
         image_transport::ImageTransport it_;
         image_transport::Subscriber image_sub_;
@@ -158,6 +158,7 @@ namespace elikos_detection {
         int MORPH_OP;
         int MORPH_ELEMENT;
         int MORPH_SIZE;
+        int MAX_DIST;
 
         const int FRAME_WIDTH = 640;
         const int FRAME_HEIGHT = 480;

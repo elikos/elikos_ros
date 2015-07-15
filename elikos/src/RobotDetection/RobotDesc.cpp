@@ -28,6 +28,14 @@ void RobotDesc::setYPos(int pos)
     yPos = pos;
 }
 
+int RobotDesc::getXPos(){
+    return xPos;
+}
+
+int RobotDesc::getYPos(){
+    return yPos;
+}
+
 cv::Scalar RobotDesc::getHSVmax()
 {
     return HSVmax;
