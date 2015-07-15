@@ -2,10 +2,10 @@
   <node pkg="camera1394" type="camera1394_node" name="camera1394">
     <param name="guid" value="00b09d0100db6e40" />
     <param name="video_mode" value="640x480_mono8" />
-    <param name="frame_rate" value="15" />
+    <param name="frame_rate" value="60" />
     <!-- color stuff -->
     <param name="bayer_pattern" value="rggb" />
-    <param name="bayer_method" value="" />
+    <param name="bayer_method" value="simple" />
   </node>
   <!--
    <node name="cameracalibrator" pkg="ptam" type="cameracalibrator" clear_params="true" output="screen">
@@ -21,12 +21,12 @@
     <rosparam file="$(find elikos_ros)/launch/camera.yaml" />
     <rosparam file="$(find elikos_ros)/launch/vo_fast.yaml" />
     
-    <param name="init_rx" value="0.0" />
-    <param name="init_ry" value="3.14159265359" />
+    <param name="init_rx" value="3.14159265359" />
+    <param name="init_ry" value="0.0" />
     <param name="init_rz" value="0.00" />
     <param name="accept_console_user_input" value="true" />
 	<param name="publish_world_in_cam_frame" value="true" />
-	<param name="map_scale" value="1.0" />
+	<param name="map_scale" value="0.73" />
 
   </node>
 

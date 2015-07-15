@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     ros::Subscriber local_pos_sub = nh.subscribe("mavros/local_position/local", 1, local_pos_callback);
     ros::Subscriber vo_sub = nh.subscribe("svo/pose", 1, vo_pose_callback);
 
-    ros::Publisher pose_pub = nh.advertise<geometry_msgs::PoseStamped>("mavros/vision_pose/pose", 1);
+    ros::Publisher pose_pub = nh.advertise<geometry_msgs::PoseStamped>("pose_offset/pose", 1);
 
     last_vo = ros::Time(0);
     last_local_pos = ros::Time(0);
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
             pose_with_offset.pose.position.z = local_pose_offset.position.z + vo_pose.pose.pose.position.z;
             pose_with_offset.pose.orientation = vo_pose.pose.pose.orientation;
             pose_with_offset.header.stamp = ros::Time::now();
-            pose_with_offset.header.frame_id = "local_origin";
+            pose_with_offset.header.frame_id = "vision";
 
             pose_pub.publish(pose_with_offset);
         }

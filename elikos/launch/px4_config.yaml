@@ -155,7 +155,7 @@ px4flow:
 
 # vision_pose_estimate
 vision_pose:
-  pose_with_covariance: true
+  pose_with_covariance: false
   listen_tf: false
   frame_id: "local_origin"
   child_frame_id: "vision"
