@@ -1,0 +1,5 @@
+<launch>
+	<node pkg="elikos_ros" type="pose_offset" name="pose_offset" />
+	<node pkg="tf" type="static_transform_publisher" name="mavros2svo" args="0 0 0 0 0 0 local_origin world 100"/> 
+
+</launch>
