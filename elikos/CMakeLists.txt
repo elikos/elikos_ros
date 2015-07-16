@@ -158,7 +158,7 @@ elikos_ros_generate_messages_cpp
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
-target_link_libraries( pose_offset ${catkin_LIBRARIES})
+target_link_libraries( pose_offset elikos_lib ${catkin_LIBRARIES})
 
 #############
 ## Install ##

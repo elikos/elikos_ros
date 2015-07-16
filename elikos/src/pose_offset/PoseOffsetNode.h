@@ -23,8 +23,14 @@ protected:
 
     ros::Subscriber _vo_sub;
     ros::Subscriber _local_pos_sub;
-
     ros::Publisher _pose_pub;
+
+    geometry_msgs::PoseStamped _local_pose;
+    geometry_msgs::PoseWithCovarianceStamped _vo_pose;
+
+    bool _publish_covariance;
+    bool _local_pos_valid;
+    bool _vo_valid;
 };
 
 
