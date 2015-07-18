@@ -6,6 +6,7 @@
     <!-- color stuff -->
     <param name="bayer_pattern" value="rggb" />
     <param name="bayer_method" value="simple" />
+    <param name="use_ros_time" value="true" />
   </node>
   <!--
    <node name="cameracalibrator" pkg="ptam" type="cameracalibrator" clear_params="true" output="screen">
@@ -20,14 +21,19 @@
     <param name="cam_topic" value="/camera/image_raw" type="str" />
     <rosparam file="$(find elikos_ros)/launch/camera.yaml" />
     <rosparam file="$(find elikos_ros)/launch/vo_fast.yaml" />
-    
+
     <param name="init_rx" value="3.14159265359" />
     <param name="init_ry" value="0.0" />
-    <param name="init_rz" value="0.00" />
+    <param name="init_rz" value="-1.57079632679" />
     <param name="accept_console_user_input" value="true" />
-	<param name="publish_world_in_cam_frame" value="true" />
-	<param name="map_scale" value="0.73" />
+    <param name="publish_world_in_cam_frame" value="false" />
+    <param name="map_scale" value="0.74" />
 
+  </node>
+
+  <node name="im_view" pkg="image_view" type="image_view">
+    <remap from="image" to="svo/image" />
+    <param name="autosize" value="true" />
   </node>
 
     <!--node name="msf_pose_sensor" pkg="msf_updates" type="pose_sensor" clear_params="true" output="screen">
