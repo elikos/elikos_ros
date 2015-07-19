@@ -8,7 +8,7 @@
 	<arg name="tgt_component" default="50" />
 
 	<node pkg="mavros" type="mavros_node" name="mavros" required="true" clear_params="true" output="screen">
-		<remap from="/mavros/vision_pose/pose" to="/svo/pose" />
+		<remap from="/mavros/vision_pose/pose" to="/msf_core/pose" />
 
 		<rosparam command="load" file="$(find mavros)/launch/px4_pluginlists.yaml" />
 		<rosparam command="load" file="$(find elikos_ros)/param/px4_config.yaml" />
