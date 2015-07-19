@@ -1,0 +1,9 @@
+grid_size: 30
+max_n_kfs: 10
+loba_num_iter: 0
+sub_pix_n_iter: 20
+init_min_tracked: 20
+init_min_inliers: 10
+quality_min_fts: 3
+quality_max_drop_fts: 3
+triang_min_corner_score: 10

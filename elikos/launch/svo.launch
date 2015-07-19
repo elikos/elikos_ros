@@ -19,8 +19,8 @@
   <node pkg="svo_ros" type="vo" name="svo" clear_params="true" output="screen">
 
     <param name="cam_topic" value="/camera/image_raw" type="str" />
-    <rosparam file="$(find elikos_ros)/launch/camera.yaml" />
-    <rosparam file="$(find elikos_ros)/launch/vo_fast.yaml" />
+    <rosparam file="$(find elikos_ros)/param/camera.yaml" />
+    <rosparam file="$(find elikos_ros)/param/vo_fast.yaml" />
 
     <param name="init_rx" value="3.14159265359" />
     <param name="init_ry" value="0.0" />

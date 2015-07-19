@@ -11,7 +11,7 @@
 		<remap from="/mavros/vision_pose/pose" to="/svo/pose" />
 
 		<rosparam command="load" file="$(find mavros)/launch/px4_pluginlists.yaml" />
-		<rosparam command="load" file="$(find elikos_ros)/launch/px4_config.yaml" />
+		<rosparam command="load" file="$(find elikos_ros)/param/px4_config.yaml" />
 
 		<param name="fcu_url" value="$(arg fcu_url)" />
 		<param name="gcs_url" value="$(arg gcs_url)" />
