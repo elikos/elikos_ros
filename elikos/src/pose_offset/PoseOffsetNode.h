@@ -31,6 +31,9 @@ protected:
     bool _publish_covariance;
     bool _local_pos_valid;
     bool _vo_valid;
+
+    int _rate;  //!< Rate in Hz
+    int _timeout; //!< Max time [ms] to wait before declaring vo or local_pos timed out
 };
 
 
