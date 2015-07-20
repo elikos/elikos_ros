@@ -8,6 +8,9 @@
 #include "PoseOffsetNode.h"
 #include "../../../../../../../../../../opt/ros/indigo/include/geometry_msgs/PoseStamped.h"
 #include "../../../../../../../../../../opt/ros/indigo/include/std_msgs/Header.h"
+#include "../../../../../../../../../../opt/ros/indigo/include/geometry_msgs/PoseWithCovarianceStamped.h"
+#include "../../../../../../../../../../opt/ros/indigo/include/geometry_msgs/PoseWithCovariance.h"
+#include "../../../../../../../../../../opt/ros/indigo/include/geometry_msgs/Pose.h"
 
 PoseOffsetNode::PoseOffsetNode() :
     _n("/pose_offset"),
@@ -44,25 +47,56 @@ void PoseOffsetNode::VOPoseCallback(const PoseWithCovarianceStampedPtr pose)
 {
     if(!_vo_valid){
         ROS_WARN("VO pose now valid.");
+        //save the offset position ever since VO started or came back
+        this->_offset_pose = _local_pose;
     }
-    _vo_pose = *pose;
-    _vo_valid = true;
+    this->_vo_pose = *pose;
+    this->_vo_valid = true;
 
-    //additional processing should follow this line
+    //publish pose offset at the same rate as VO
+    if(_local_pos_valid && _vo_valid){
+        if (this->_publish_covariance) {
+            geometry_msgs::PoseWithCovarianceStamped offset_pose;
+            offset_pose.header.stamp = this->_vo_pose.stamp;
+
+            //hopefully what this does is keep the VO covariance matrix
+            //and update position and orientation with offsets
+            offset_pose.pose = _vo_pose.pose;
+            offset_pose.pose.pose.position += this->_offset_pose.pose.position;
+            offset_pose.pose.pose.orientation += this->_offset_pose.pose.orientation;
+
+            this->_pose_pub.publish(offset_pose);
+        } else {
+            geometry_msgs::PoseStamped offset_pose;
+            offset_pose.header.stamp = this->_vo_pose.stamp;
+            offset_pose.pose.position = this->_vo_pose.pose.pose.position + this->_offset_pose.pose.position;
+            offset_pose.pose.orientation = this->_vo_pose.pose.pose.orientation + this->_offset_pose.pose.orientation;
+
+            this->_pose_pub.publish(offset_pose);
+        }
+    }
 }
 
 PoseOffsetNode::main()
 {
     ros::init(argc, argv, "pose_offset");
-    ros::Rate r(this->_rate);   //Not sure what rate to put but i absolutely has to be greater than
+    ros::Rate r(this->_rate);   //Not sure what rate to put but it absolutely has to be greater than
                                 //what visual odometry is outputting
     ros::Duration timeout(this->_timeout/1000);
 
     while(ros::ok()){
         if(ros::Time::now() - _local_pose.header.stamp > timeout){
             if(this->_local_pos_valid){
-                ROS_ERROR("Local Pose timed out!");
+                ROS_ERROR("Local Pose timed out.");
             }
+            this->_local_pos_valid = false;
+        }
+
+        if(ros::Time::now() - _vo_pose.header.stamp > timeout) {
+            if(this->_vo_valid){
+                ROS_ERROR("VO timed out.");
+            }
+            this->_vo_valid = false;
         }
 
         r.spinOnce();

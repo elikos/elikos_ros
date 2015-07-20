@@ -26,6 +26,7 @@ protected:
     ros::Publisher _pose_pub;
 
     geometry_msgs::PoseStamped _local_pose;
+    geometry_msgs::PoseStamped _offset_pose;
     geometry_msgs::PoseWithCovarianceStamped _vo_pose;
 
     bool _publish_covariance;
