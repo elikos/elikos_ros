@@ -1,0 +1,101 @@
+<launch>
+	<arg name="frame_rate" default="60" />
+	<arg name="use_ros_time" default="true" />
+	<arg name="video_mode" default="640x480_mono8" />
+	<arg name="ext_trigger" default="true" />
+
+	<arg name="autosize_img_view" default="true" />
+	<arg name="cam1_name" default="cam_starboard" />
+	<arg name="cam2_name" default="cam_bot" />
+	<arg name="cam3_name" default="cam_port" />
+	<arg name="group_name" default="default" />
+
+	<node pkg="camera1394" type="camera1394_node" name="$(arg cam1_name)">
+		<param name="frame_rate" value="$(arg frame_rate)" />
+		<param name="use_ros_time" value="$(arg use_ros_time)" />
+		<param name="video_mode" value="$(arg video_mode)" />
+		<param name="external_trigger" value="$(arg ext_trigger)" />
+
+		<!-- cam specific settings -->
+		<param name="guid" value="00b09d0100db6e43" />
+		<param name="bayer_method" value="HQ" />
+		<param name="bayer_pattern" value="rggb" />
+		<remap from="camera" to="$(arg cam1_name)" />
+	</node>
+	<node pkg="camera1394" type="camera1394_node" name="$(arg cam2_name)">
+		<param name="frame_rate" value="$(arg frame_rate)" />
+		<param name="use_ros_time" value="$(arg use_ros_time)" />
+		<param name="video_mode" value="$(arg video_mode)" />
+		<param name="external_trigger" value="$(arg ext_trigger)" />
+
+		<!-- cam specific settings -->
+		<param name="guid" value="00b09d0100db6e40" />
+		<param name="bayer_method" value="HQ" />
+		<param name="bayer_pattern" value="rggb" />
+		<remap from="camera" to="$(arg cam2_name)" />
+	</node>
+
+	<!-- black and white camera -->
+	<node pkg="camera1394" type="camera1394_node" name="$(arg cam3_name)">
+		<param name="frame_rate" value="$(arg frame_rate)" />
+		<param name="use_ros_time" value="$(arg use_ros_time)" />
+		<param name="video_mode" value="$(arg video_mode)" />
+		<param name="external_trigger" value="$(arg ext_trigger)" />
+
+		<!-- cam specific settings -->
+		<param name="guid" value="00b09d01008f706f" />
+		<remap from="camera" to="$(arg cam3_name)" />
+	</node>
+<!--
+	<node pkg="image_view" type="image_view" name="im_starboard">
+		<remap from="image" to="$(arg cam1_name)/image_raw" />
+		<param name="auto_scale" value="$(arg autosize_img_view)" />
+	</node>
+	<node pkg="image_view" type="image_view" name="im_bot">
+		<remap from="image" to="$(arg cam2_name)/image_raw" />
+		<param name="auto_scale" value="$(arg autosize_img_view)" />
+	</node>
+	<node pkg="image_view" type="image_view" name="im_port">
+		<remap from="image" to="$(arg cam3_name)/image_raw" />
+		<param name="auto_scale" value="$(arg autosize_img_view)" />
+	</node>
+-->
+<!--
+	<node name="camera_calibrator" pkg="mcptam" type="camera_calibrator" output="screen">
+		<param name="cam_name" type="string" value="$(arg cam3_name)"/>
+		<param name="image_transport" type="string" value="compressed"/> 
+		<param name="image_topic" type="string" value="image_raw" />
+		<param name="info_topic" type="string" value="camera_info"/> 
+	</node>
+-->
+<!--
+	<node name="pose_calibrator" pkg="mcptam" type="pose_calibrator" clear_params="true" output="screen"> 
+		<rosparam command="load" file="$(find elikos_ros)/groups/$(arg group_name).yaml" />
+
+		<remap from="reset" to="pose_calibrator/reset" />
+
+		<param name="image_transport" type="string" value="compressed"/> 
+		<param name="pattern_width" type="int" value="11"/>
+		<param name="pattern_height" type="int" value="7"/>
+		<param name="square_size" type="double" value="0.029"/>
+		<param name="finder_max_ssd_per_pixel" type="int" value="500" />
+		<param name="kf_distance_mean_diff_fraction" type="double" value="0.0" />
+		<param name="kf_adaptive_thresh" type="bool" value="false" />
+
+		<param name="pose_out_file" type="string" value="$(find elikos_ros)/poses/poses.dat" />   
+	</node>
+-->
+
+	<node name="mcptam" pkg="mcptam" type="mcptam" clear_params="true" output="screen">
+		<rosparam command="load" file="$(find elikos_ros)/groups/$(arg group_name).yaml" />
+		<remap from="reset" to="mcptam/reset" />
+		<param name="image_transport" type="string" value="compressed"/>
+
+		<param name="init_mode" value="stereo" />
+
+		<param name="mkf_distance_mean_diff_fraction" type="double" value="0.5" /> 
+		<param name="mm_max_scaled_mkf_dist" type="double" value="0.3" />
+		<param name="mm_outlier_multiplier" type="double" value="1.1" />
+		<param name="mm_init_cov_thresh" type="double" value="1.0" />
+	</node>
+</launch>
