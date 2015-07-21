@@ -17,7 +17,8 @@ public:
 
 protected:
     void LocalPosCallback(const geometry_msgs::PoseStampedConstPtr pose);
-    void VOPoseCallback(const geometry_msgs::PoseWithCovarianceStampedPtr pose);
+    void VOPoseCallback_Cov(const geometry_msgs::PoseWithCovarianceStampedPtr pose);
+    void VOPoseCallback(const geometry_msgs::PoseStampedPtr pose);
 
     ros::NodeHandle _n;
 
@@ -30,6 +31,7 @@ protected:
     geometry_msgs::PoseWithCovarianceStamped _vo_pose;
 
     bool _publish_covariance;
+    bool _recv_covariance;
     bool _local_pos_valid;
     bool _vo_valid;
 
