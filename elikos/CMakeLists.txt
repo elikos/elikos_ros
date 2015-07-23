@@ -110,7 +110,7 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 add_library(elikos_lib
   src/elikos_lib/pid.cpp
   src/elikos_lib/RCReceiver.cpp
-)
+include/elikos_lib/PositionHelper.h)
 
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
@@ -137,9 +137,16 @@ add_executable( navigator
   src/navigator/SetpointManager.cpp
 )
 
+include_directories( include ${catkin_INCLUDE_DIRS} )
+
 add_executable( pose_offset
     src/pose_offset/pose_offset.cpp
-)
+    src/pose_offset/PoseOffsetNode.cpp
+    src/pose_offset/McptamCtrl.cpp
+    include/pose_offset/SvoCtrl.h
+    include/pose_offset/McptamCtrl.h
+    include/pose_offset/VoCtrl.h
+src/pose_offset/SvoCtrl.cpp)
 
 
 ## Add cmake target dependencies of the executable/library

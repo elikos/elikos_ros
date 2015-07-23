@@ -6,6 +6,7 @@
 #define ELIKOS_ROS_POSEOFFSETNODE_H
 
 #include <ros/ros.h>
+#include <geometry_msgs/PoseStamped.h>
 
 class PoseOffsetNode {
 public:
@@ -13,7 +14,7 @@ public:
 
     ~PoseOffsetNode() {};
 
-    int main();
+    int main(int argc, char** argv);
 
 protected:
     void LocalPosCallback(const geometry_msgs::PoseStampedConstPtr pose);
