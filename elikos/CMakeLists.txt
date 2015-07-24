@@ -146,7 +146,8 @@ add_executable( pose_offset
     include/pose_offset/SvoCtrl.h
     include/pose_offset/McptamCtrl.h
     include/pose_offset/VoCtrl.h
-src/pose_offset/SvoCtrl.cpp)
+    src/pose_offset/SvoCtrl.cpp
+)
 
 
 ## Add cmake target dependencies of the executable/library
@@ -162,6 +163,7 @@ elikos_ros_generate_messages_cpp
 #   ${catkin_LIBRARIES}
 # )
 
+target_link_libraries( elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})

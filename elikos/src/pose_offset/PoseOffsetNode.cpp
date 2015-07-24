@@ -11,6 +11,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/PoseWithCovariance.h>
 #include <geometry_msgs/Pose.h>
+#include <elikos_lib/PositionHelper.h>
 
 PoseOffsetNode::PoseOffsetNode() :
     _n("/pose_offset"),
@@ -74,7 +75,8 @@ void PoseOffsetNode::VOPoseCallback_Cov(const geometry_msgs::PoseWithCovarianceS
             //hopefully what this does is keep the VO covariance matrix
             //and update position and orientation with offsets
             offset_pose.pose = _vo_pose.pose;
-            //offset_pose.pose.pose.position += this->_offset_pose.pose.position;
+            offset_pose.pose.pose.position = elikos::tools::AddPoints(offset_pose.pose.pose.position, this->_offset_pose.pose.position);
+
             //offset_pose.pose.pose.orientation += this->_offset_pose.pose.orientation;
 
             this->_pose_pub.publish(offset_pose);
