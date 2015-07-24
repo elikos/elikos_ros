@@ -46,7 +46,8 @@ namespace elikos_detection {
         VideoCapture getCapture(){return capture;}
 
         vector<RobotDesc> trackFilteredObjects(Mat threshold, Mat &cameraFeed);
-        void drawObject(vector<RobotDesc> vecRobot,Mat &frame);
+        void drawObjects(vector<RobotDesc> vecRobot, Mat &frame);
+        void drawObject(RobotDesc robot, Mat &frame);
         void morphOps(Mat &thresh);
         void cannyEdge();
         void sendMsg();
@@ -84,7 +85,8 @@ namespace elikos_detection {
      * ***           PRIVATE METHODS
      * *************************************************************************************************
      */
-        void getRotationFromImage(tf::Quaternion &q);
+    void getRotationFromImage(tf::Quaternion &q, int i);
+    void getRotationFromImage(tf::Quaternion &q, RobotDesc desc);
 
     /* *************************************************************************************************
      * ***           ATTRIBUTES
@@ -99,15 +101,22 @@ namespace elikos_detection {
         image_transport::ImageTransport it_;
         image_transport::Subscriber image_sub_;
         ros::Publisher robots_publish;
+        double min_distance = 0;
 
         // TF transforms
         tf::TransformBroadcaster tf_broadcaster_;
         tf::TransformListener tf_listener_;
         tf::Transform camera_;
-        tf::Transform turret_;
-        tf::Quaternion turret_rotation_;
-        tf::StampedTransform turret_world_;
-        tf::Vector3 turret_world_x_;
+        std::vector<std::string> turret_frame_id_/*{"turret0",
+                                                  "turret1",
+                                                  "turret2",
+                                                  "turret3",
+                                                  "turret4",
+                                                  "turret5" }*/;
+        std::vector<tf::Transform> turret_;
+        std::vector<tf::Quaternion> turret_rotation_;
+        std::vector<tf::StampedTransform> turret_world_;
+        std::vector<tf::Vector3> turret_world_x_;
         tf::Transform target_robot_;
 
 
@@ -117,7 +126,8 @@ namespace elikos_detection {
      */
 
         Mat threshold_w;
-        Mat threshold_c;
+        Mat threshold_g;
+        Mat threshold_r;
         Mat hsv_w;
         Mat hsv_c;
         Mat merged;
@@ -139,12 +149,18 @@ namespace elikos_detection {
         int S_MAX_W;
         int V_MIN_W;
         int V_MAX_W;
-        int H_MIN_C;
-        int H_MAX_C;
-        int S_MIN_C;
-        int S_MAX_C;
-        int V_MIN_C;
-        int V_MAX_C;
+        int H_MIN_G;
+        int H_MAX_G;
+        int S_MIN_G;
+        int S_MAX_G;
+        int V_MIN_G;
+        int V_MAX_G;
+        int H_MIN_R;
+        int H_MAX_R;
+        int S_MIN_R;
+        int S_MAX_R;
+        int V_MIN_R;
+        int V_MAX_R;
         int PRE_EROSIONS;
         int DILATIONS;
         int POST_EROSIONS;
