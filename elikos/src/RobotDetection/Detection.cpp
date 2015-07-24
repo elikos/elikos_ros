@@ -15,12 +15,12 @@ namespace elikos_detection
         nh->param<int>("s_max_w", S_MAX_W, 256);
         nh->param<int>("v_min_w", V_MIN_W, 0);
         nh->param<int>("v_max_w", V_MAX_W, 256);
-        nh->param<int>("h_min_c", H_MIN_C, 0);
-        nh->param<int>("h_max_c", H_MAX_C, 256);
-        nh->param<int>("s_min_c", S_MIN_C, 0);
-        nh->param<int>("s_max_c", S_MAX_C, 256);
-        nh->param<int>("v_min_c", V_MIN_C, 0);
-        nh->param<int>("v_max_c", V_MAX_C, 256);*/
+        nh->param<int>("h_min_c", H_MIN_G, 0);
+        nh->param<int>("h_max_c", H_MAX_G, 256);
+        nh->param<int>("s_min_c", S_MIN_G, 0);
+        nh->param<int>("s_max_c", S_MAX_G, 256);
+        nh->param<int>("v_min_c", V_MIN_G, 0);
+        nh->param<int>("v_max_c", V_MAX_G, 256);*/
 
         nh->param<int>("h_min_w", H_MIN_W, 0);
         nh->param<int>("h_max_w", H_MAX_W, 52);
@@ -28,12 +28,18 @@ namespace elikos_detection
         nh->param<int>("s_max_w", S_MAX_W, 149);
         nh->param<int>("v_min_w", V_MIN_W, 140);
         nh->param<int>("v_max_w", V_MAX_W, 256);
-        nh->param<int>("h_min_c", H_MIN_C, 39);
-        nh->param<int>("h_max_c", H_MAX_C, 248);
-        nh->param<int>("s_min_c", S_MIN_C, 50);
-        nh->param<int>("s_max_c", S_MAX_C, 256);
-        nh->param<int>("v_min_c", V_MIN_C, 30);
-        nh->param<int>("v_max_c", V_MAX_C, 256);
+        nh->param<int>("h_min_g", H_MIN_G, 39);
+        nh->param<int>("h_max_g", H_MAX_G, 88);
+        nh->param<int>("s_min_g", S_MIN_G, 54);
+        nh->param<int>("s_max_g", S_MAX_G, 256);
+        nh->param<int>("v_min_g", V_MIN_G, 30);
+        nh->param<int>("v_max_g", V_MAX_G, 256);
+        nh->param<int>("h_min_r", H_MIN_R, 0);
+        nh->param<int>("h_max_r", H_MAX_R, 256);
+        nh->param<int>("s_min_r", S_MIN_R, 0);
+        nh->param<int>("s_max_r", S_MAX_R, 256);
+        nh->param<int>("v_min_r", V_MIN_R, 0);
+        nh->param<int>("v_max_r", V_MAX_R, 256);
         nh->param<int>("pre_blur", PRE_BLUR, 2);
         nh->param<int>("canny_thresh1", CANNY_THRESH1, 1);
         nh->param<int>("canny_thresh1", CANNY_THRESH2, 1);
@@ -44,6 +50,11 @@ namespace elikos_detection
         nh->param<int>("morph_op", MORPH_ELEMENT, 0);
         nh->param<int>("morph_size", MORPH_SIZE, 0);
         nh->param<int>("max_dist", MAX_DIST, 0);
+
+//        turret_.reserve(100);
+//        turret_rotation_.reserve(100);
+//        turret_world_.reserve(100);
+//        turret_world_x_.reserve(100);
 
     }
 
@@ -115,12 +126,18 @@ namespace elikos_detection
         createTrackbar( "S_MAX W", trackbarWindowName, &S_MAX_W, 256, on_trackbar );
         createTrackbar( "V_MIN W", trackbarWindowName, &V_MIN_W, 256, on_trackbar );
         createTrackbar( "V_MAX W", trackbarWindowName, &V_MAX_W, 256, on_trackbar );
-        createTrackbar( "H_MIN C", trackbarWindowName, &H_MIN_C, 256, on_trackbar );
-        createTrackbar( "H_MAX C", trackbarWindowName, &H_MAX_C, 256, on_trackbar );
-        createTrackbar( "S_MIN C", trackbarWindowName, &S_MIN_C, 256, on_trackbar );
-        createTrackbar( "S_MAX C", trackbarWindowName, &S_MAX_C, 256, on_trackbar );
-        createTrackbar( "V_MIN C", trackbarWindowName, &V_MIN_C, 256, on_trackbar );
-        createTrackbar( "V_MAX C", trackbarWindowName, &V_MAX_C, 256, on_trackbar );
+        createTrackbar( "H_MIN G", trackbarWindowName, &H_MIN_G, 256, on_trackbar );
+        createTrackbar( "H_MAX G", trackbarWindowName, &H_MAX_G, 256, on_trackbar );
+        createTrackbar( "S_MIN G", trackbarWindowName, &S_MIN_G, 256, on_trackbar );
+        createTrackbar( "S_MAX G", trackbarWindowName, &S_MAX_G, 256, on_trackbar );
+        createTrackbar( "V_MIN G", trackbarWindowName, &V_MIN_G, 256, on_trackbar );
+        createTrackbar( "V_MAX G", trackbarWindowName, &V_MAX_G, 256, on_trackbar );
+        createTrackbar( "H_MIN R", trackbarWindowName, &H_MIN_R, 256, on_trackbar );
+        createTrackbar( "H_MAX R", trackbarWindowName, &H_MAX_R, 256, on_trackbar );
+        createTrackbar( "S_MIN R", trackbarWindowName, &S_MIN_R, 256, on_trackbar );
+        createTrackbar( "S_MAX R", trackbarWindowName, &S_MAX_R, 256, on_trackbar );
+        createTrackbar( "V_MIN R", trackbarWindowName, &V_MIN_R, 256, on_trackbar );
+        createTrackbar( "V_MAX R", trackbarWindowName, &V_MAX_R, 256, on_trackbar );
 
         // Create shape detector trackbars
         createTrackbar("Canny Thresh 1", shapeDetectTrackbars, &CANNY_THRESH1, 256, on_trackbar);
@@ -217,41 +234,53 @@ namespace elikos_detection
         dilate(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
         erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
 
-        inRange(hsv_c,Scalar(H_MIN_C,S_MIN_C,V_MIN_C),Scalar(H_MAX_C,S_MAX_C,V_MAX_C), threshold_c);
+        //trackShape();
+
+        inRange(hsv_c,Scalar(H_MIN_G, S_MIN_G, V_MIN_G),Scalar(H_MAX_G, S_MAX_G, V_MAX_G), threshold_g);
 
         // Consolidate the white parts into one big blob to delimit the robot
-        erode(threshold_c, threshold_c, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
-        dilate(threshold_c, threshold_c, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
-        erode(threshold_c, threshold_c, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+        erode(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
+        dilate(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
+        erode(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+
+        inRange(hsv_c,Scalar(H_MIN_R, S_MIN_R, V_MIN_R),Scalar(H_MAX_R, S_MAX_R, V_MAX_R), threshold_r);
+
+        // Consolidate the white parts into one big blob to delimit the robot
+        erode(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
+        dilate(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
+        erode(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
 
 
         vector<RobotDesc> foundObjects_w = trackFilteredObjects(threshold_w, currentImage);
-        vector<RobotDesc> foundObjects_c = trackFilteredObjects(threshold_c, currentImage);
-       /* for (int i=0; i<foundObjects_c.size(); i++){
+        vector<RobotDesc> foundObjects_g = trackFilteredObjects(threshold_g, currentImage);
+       /* for (int i=0; i<foundObjects_g.size(); i++){
             printf("Found Color Object[%i]:\n", i);
-            printf("xPos: %i\n", foundObjects_c[i].getXPos());
-            printf("yPos: %i\n", foundObjects_c[i].getYPos());
+            printf("xPos: %i\n", foundObjects_g[i].getXPos());
+            printf("yPos: %i\n", foundObjects_g[i].getYPos());
         }*/
-        //drawObject(foundObjects_w, currentImage);
+        drawObjects(foundObjects_w, currentImage);
+/*
         for (int i=0; i<foundObjects_w.size(); i++){
             printf("Found White Object[%i]:\n", i);
             printf("xPos: %i\n", foundObjects_w[i].getXPos());
             printf("yPos: %i\n", foundObjects_w[i].getYPos());
-        }
-        //drawObject(foundObjects_c, currentImage);
+        }*/
+        //drawObjects(foundObjects_g, currentImage);
         foundRobots.clear();
         RobotDesc myRobot;
 
+
+        //TODO: "MAX_DIST" related to altitude
         bool robotFound=false;
-        for (int i=0; i<foundObjects_c.size(); i++){
+        for (int i=0; i< foundObjects_g.size(); i++){
             for (int j=0; j<foundObjects_w.size(); j++){
-                if (abs(foundObjects_c[i].getXPos()-foundObjects_w[j].getXPos())<MAX_DIST&&
-                        abs(foundObjects_c[i].getYPos()-foundObjects_w[j].getYPos())<MAX_DIST){
-                    myRobot.setXPos((foundObjects_c[i].getXPos()+foundObjects_w[j].getXPos())/2);
-                    myRobot.setYPos((foundObjects_c[i].getYPos()+foundObjects_w[j].getYPos())/2);
+                if (abs(foundObjects_g[i].getXPos()-foundObjects_w[j].getXPos())<MAX_DIST&&
+                        abs(foundObjects_g[i].getYPos()-foundObjects_w[j].getYPos())<MAX_DIST){
+                    myRobot.setXPos((foundObjects_g[i].getXPos()+foundObjects_w[j].getXPos())/2);
+                    myRobot.setYPos((foundObjects_g[i].getYPos()+foundObjects_w[j].getYPos())/2);
                     foundRobots.push_back(myRobot);
                     robotFound=true;
-                    break;
+                    //break;
                 }
             }
         }
@@ -259,7 +288,7 @@ namespace elikos_detection
         //let user know you found an object
         if(robotFound ==true) {
             //draw object location on screen
-            drawObject(foundRobots, currentImage);
+            drawObjects(foundRobots, currentImage);
             if (foundRobots.size() != 0)
             {
                 for (int i = 0; i < foundRobots.size(); i++)
@@ -269,6 +298,7 @@ namespace elikos_detection
                 }
             }
         }
+
        // morphOps(merged);
 /*
         // Consolidate the white parts into one big blob to delimit the robot
@@ -282,7 +312,7 @@ namespace elikos_detection
 
 
         // Filter the cropped image
-        inRange(cropped_hsv,Scalar(H_MIN_C,S_MIN_C,V_MIN_C),Scalar(H_MAX_C,S_MAX_C,V_MAX_C), threshold_c);
+        inRange(cropped_hsv,Scalar(H_MIN_G,S_MIN_G,V_MIN_G),Scalar(H_MAX_G,S_MAX_G,V_MAX_G), threshold_c);
         morphOps(threshold_c);
         //trackFilteredObjects(threshold_c,cropped_hsv,currentImage);
         */
@@ -290,12 +320,31 @@ namespace elikos_detection
 
     void Detection::trackShape()
     {
-        //cvtColor(currentImage, grayscale_image, COLOR_BGR2GRAY);
+        cvtColor(currentImage, grayscale_image, COLOR_BGR2GRAY);
+
+       GaussianBlur( grayscale_image, grayscale_image, Size(9, 9), 2, 2 );
+
+        vector<Vec3f> circles;
+
+        HoughCircles( grayscale_image, circles, CV_HOUGH_GRADIENT, 1, grayscale_image.rows/8, 200, 100, 0, 0 );
+
+        //printf(circles.size());
+        for( size_t i = 0; i < circles.size(); i++ )
+        {
+            printf("HERE");
+            Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+            int radius = cvRound(circles[i][2]);
+            // circle center
+            circle( currentImage, center, 3, Scalar(0,255,0), -1, 8, 0 );
+            // circle outline
+            circle( currentImage, center, radius, Scalar(0,0,255), 3, 8, 0 );
+        }
+
         /*int operation = MORPH_OP + 2;
         Mat element = getStructuringElement( MORPH_ELEMENT, Size( 2*MORPH_SIZE + 1, 2*MORPH_SIZE+1 ), Point( MORPH_SIZE, MORPH_SIZE ) );
         morphologyEx(merged, morph_ex, operation, element, Point(-1,-1), 30);
 */
-       Canny(merged, canny, CANNY_THRESH1, CANNY_THRESH2);
+       /*Canny(merged, canny, CANNY_THRESH1, CANNY_THRESH2);
 
         std::vector<std::vector<Point>> contours;
         findContours(canny, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
@@ -314,7 +363,7 @@ namespace elikos_detection
             minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
         }
 
-
+*//*
         /// Draw polygonal contour + bonding rects + circles
 
         for( int i = 0; i< contours.size(); i++ )
@@ -322,7 +371,7 @@ namespace elikos_detection
             drawContours( contour_drawings, contours_poly, i, Scalar(255,255,255), 1, 8, vector<Vec4i>(), 0, Point() );
             circle( contour_drawings, center[i], (int)radius[i], Scalar(255,255,255), 2, 8, 0 );
         }
-
+*/
 /*
         for (int i = 0; i < contours.size(); i++) {
             if (contourArea(contours[i]) < POLY_AREA_MIN || contourArea(contours[i]) > POLY_AREA_MAX) { // Should be in relation with altitude
@@ -342,11 +391,13 @@ namespace elikos_detection
     {
         imshow("White threshold", threshold_w);
         //imshow("Cropped image", cropped_hsv);
-        imshow("Color threshold", threshold_c);
+        imshow("Green threshold", threshold_g);
+        imshow("Red threshold", threshold_r);
         //imshow("Merged", merged);
         //imshow("Morp", morph_ex);
         //imshow("Blurred", grayscale_image);
         //imshow("Canny Edges", canny);
+
     }
 
     void Detection::setSubscribers()
@@ -354,7 +405,7 @@ namespace elikos_detection
         image_sub_ = it_.subscribe(TOPIC_NAMES[camera_image_raw], 1, &Detection::cameraCallback, this);
     }
 
-    void Detection::drawObject(vector<RobotDesc> vecRobot,Mat &frame){
+    void Detection::drawObjects(vector<RobotDesc> vecRobot, Mat &frame){
 
         for(int i = 0; i<vecRobot.size(); i++)
         {
@@ -363,6 +414,10 @@ namespace elikos_detection
         }
     }
 
+    void Detection::drawObject(RobotDesc robot, Mat &frame){
+        cv::circle(frame, cv::Point(robot.getHPos(), robot.getVPos()), 10, cv::Scalar(0, 0, 255));
+        cv::putText(frame, intToString(robot.getHPos()) + " , " + intToString(robot.getVPos()), cv::Point(robot.getHPos(), robot.getVPos() + 20), 1, 1, Scalar(0, 255, 0));
+    }
     void Detection::morphOps(Mat &thresh)
     {
 
@@ -396,8 +451,8 @@ namespace elikos_detection
         Mat cannyEdges, blur;
         //char* window_name = "Edge Map";
 
-        cannyEdges.create( threshold_c.size(), threshold_c.type() );
-        blur.create(threshold_c.size(), threshold_c.type() );
+        cannyEdges.create( threshold_g.size(), threshold_g.type() );
+        blur.create(threshold_g.size(), threshold_g.type() );
 
         //GaussianBlur( threshold, blur, Size(3,3),2,2);
 
@@ -421,68 +476,176 @@ namespace elikos_detection
     }
 
     void Detection::computeTargetPosition() {
+        char buf[50];
+        int n = 0;
+        memset(buf, 0, 50);
+
         // Append the camera frame to the fcu
         tf_broadcaster_.sendTransform(tf::StampedTransform(camera_, ros::Time::now(), "fcu", "camera"));
 
-        // Set yaw and pitch of the target wrt the camera frame
-        try {
-            getRotationFromImage(turret_rotation_);
-        }
-        catch (std::out_of_range ex) {
-            static uint empty_robot_vector_ex_count = 0;
-            empty_robot_vector_ex_count++;
-            if (empty_robot_vector_ex_count % 30 == 0) {
-                ROS_ERROR("%s", ex.what());
+        // Clear minimum distance
+        min_distance = 0;
+        int robotIterator = -1;
+
+        int i = 0;
+        for(vector<RobotDesc>::iterator iter = foundRobots.begin(); iter != foundRobots.end(); ++iter){
+            //initialize shit
+            tf::Quaternion q = tf::createIdentityQuaternion();
+            tf::Transform t = tf::Transform::getIdentity();
+
+            // Set yaw and pitch of the target wrt the camera frame
+            getRotationFromImage(q, *iter);
+
+            t.setOrigin(tf::Vector3(0,0,0));
+            t.setRotation(q);
+            n = sprintf(buf, "turret%d", i);
+            string frameid (buf);
+            tf::StampedTransform stampedTF(t, ros::Time::now(), "camera", frameid);
+            tf_broadcaster_.sendTransform(stampedTF);
+
+            // Get the world to turret transform
+            tf::StampedTransform world2turret;
+            tf_listener_.lookupTransform("local_origin", frameid, ros::Time(0), world2turret);
+
+            // Get the smallest angle between the turret and the z axis
+            //      - First get the vector pointing towards the x axis of the turret
+            tf::Vector3 vect_x = tf::quatRotate(world2turret.getRotation(), tf::Vector3(1, 0, 0));
+
+            //      - Then find it's angle with the camera's resting position (x pointing straight down (-z))
+            tf::Vector3 zAxis(0, 0, -1);
+            double zAxis_turret_angle = zAxis.angle(vect_x);
+
+            // Get distance from turret to target (using angle and altitude)
+            double camera_altitude = world2turret.getOrigin().getZ();
+            double distance_from_target = camera_altitude / cos(zAxis_turret_angle);
+
+            if (min_distance == 0 || distance_from_target < min_distance){
+                robotIterator = i;
+                // Add the robot transform as child of the turret
+                target_robot_.setOrigin(tf::Vector3(distance_from_target, 0, 0));
+                target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
             }
-            return;
-        }
-        turret_.setOrigin(tf::Vector3(0, 0, 0));
-        turret_.setRotation(turret_rotation_);
 
-        // Broadcast the turret frame
-        tf_broadcaster_.sendTransform(tf::StampedTransform(turret_, ros::Time::now(),"camera", "turret"));
-
-        // Get the world to turret transform
-        try {
-            tf_listener_.lookupTransform("local_origin", "turret", ros::Time(0), turret_world_);
-        }
-        catch (tf::TransformException ex) {
-            ROS_ERROR("%s",ex.what());
-            return;
+            turret_rotation_.push_back(q);
+            turret_.push_back(t);
+            turret_frame_id_.push_back(frameid);
+            turret_world_.push_back(world2turret);
+            turret_world_x_.push_back(vect_x);
+            ++i;
         }
 
-        // Get the smallest angle between the turret and the z axis
-        //      - First get the vector pointing towards the x axis of the turret
-        turret_world_x_ = tf::quatRotate(turret_world_.getRotation(), tf::Vector3(1, 0, 0));
+        std::stringstream ss;
+        ss << "turret" << robotIterator;
 
-        //      - Then find it's angle with the camera's resting position (x pointing straight down (-z))
-        tf::Vector3 zAxis(0, 0, -1);
-        double zAxis_turret_angle = zAxis.angle(turret_world_x_);
+        if (robotIterator >= 0) {
+            tf_broadcaster_.sendTransform(tf::StampedTransform(target_robot_, ros::Time::now(), ss.str(), "target_robot"));
 
-        // Get distance from turret to target (using angle and altitude)
-        double camera_altitude = turret_world_.getOrigin().getZ();
-        double distance_from_target = camera_altitude / cos(zAxis_turret_angle);
+            //draw object location on screen
+            std::cout << "Robot iterator: " << robotIterator << "\n";
+            drawObject(foundRobots[robotIterator], currentImage);
+        }
+/*
+        for (int i = 0; i < foundRobots.size(); ++i) {
+            // Set yaw and pitch of the target wrt the camera frame
+            try {
+                tf::Quaternion q = tf::createIdentityQuaternion();
+                turret_rotation_.push_back(q);
+                cout<< "ok i = " << i << " turret_rotation.size() is " << turret_rotation_.size() << endl;
+                getRotationFromImage(turret_rotation_[i], i);
+                cout<< "After getRotationFromImage"<< endl;
+            }
+            catch (std::out_of_range ex) {
+                static uint empty_robot_vector_ex_count = 0;
+                empty_robot_vector_ex_count++;
+                if (empty_robot_vector_ex_count % 30 == 0) {
+                    ROS_ERROR("%s", ex.what());
+                }
+                return;
+            }
 
-        // Add the robot transform as child of the turret
-        target_robot_.setOrigin(tf::Vector3(distance_from_target, 0, 0));
-        target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
+            cout<< "CRISS ESTI1 " << turret_.size() << endl;
+            tf::Transform t = tf::Transform::getIdentity();
+            t.setOrigin(tf::Vector3(0, 0, 0));
+            t.setRotation(turret_rotation_[i]);
+            turret_.push_back(t);
+            cout<< "CRISS ESTI3 "<< turret_rotation_[i].getW() << endl;
+            std::stringstream ss;
+            ss << "turret" << i;
+            cout<< "CRISS ESTI4"<< endl;
+            // Broadcast the turret frame
+            turret_frame_id_.push_back(ss.str());
+            tf::StampedTransform stampedTF(t, ros::Time::now(), "camera", turret_frame_id_[i]);
+            cout<< "CRISS ESTI5 "<< turret_.size() << " " << turret_frame_id_.size() << endl;
+            tf_broadcaster_.sendTransform(stampedTF);
 
-        tf_broadcaster_.sendTransform(tf::StampedTransform(target_robot_, ros::Time::now(), "turret", "target_robot"));
+            // Get the world to turret transform
+            try {
+                //tf_listener_.lookupTransform("local_origin", turret_frame_id_[i], ros::Time(0), dummy);
+                //turret_world_.push_back(dummy);
+                cout << "niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiice";
+            }
+            catch (std::exception& ex) {
+                cout << "Exception: " << ex.what() << "\n";
+                return;
+            }
+
+            // Get the smallest angle between the turret and the z axis
+            //      - First get the vector pointing towards the x axis of the turret
+            turret_world_x_[i] = tf::quatRotate(turret_world_[i].getRotation(), tf::Vector3(1, 0, 0));
+
+            //      - Then find it's angle with the camera's resting position (x pointing straight down (-z))
+            tf::Vector3 zAxis(0, 0, -1);
+            double zAxis_turret_angle = zAxis.angle(turret_world_x_[i]);
+
+            // Get distance from turret to target (using angle and altitude)
+            double camera_altitude = turret_world_[i].getOrigin().getZ();
+            double distance_from_target = camera_altitude / cos(zAxis_turret_angle);
+
+            if (min_distance == 0 || distance_from_target < min_distance){
+                robotIterator = i;
+                // Add the robot transform as child of the turret
+                target_robot_.setOrigin(tf::Vector3(distance_from_target, 0, 0));
+                target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
+            }
+        }
+
+        std::stringstream ss;
+        ss << "turret" << robotIterator;
+
+        if (robotIterator >= 0) {
+            tf_broadcaster_.sendTransform(tf::StampedTransform(target_robot_, ros::Time::now(), ss.str(), "target_robot"));
+
+            //draw object location on screen
+            std::cout << "Robot iterator: " << robotIterator << "\n";
+            drawObject(foundRobots[robotIterator], currentImage);
+        }*/
 
     }
 
-    void Detection::getRotationFromImage(tf::Quaternion &q) {
+    void Detection::getRotationFromImage(tf::Quaternion &q, int i) {
         if (foundRobots.empty()) {
             throw std::out_of_range("No object is currently detected.");
         }
-
+       // cout<< "HERE 1"<< endl;
         // Set pitch - y axis (image vertical)
-        double pitch = ((double)(foundRobots[0].getVPos() - CAM_HEIGHT / 2) / (double)CAM_HEIGHT) * CAMERA_FOV_V;
+        double pitch = ((double)(foundRobots[i].getVPos() - CAM_HEIGHT / 2) / (double)CAM_HEIGHT) * CAMERA_FOV_V;
+       // cout<< "HERE 2"<< endl;
 
         // Set yaw - z axis (image horizontal)
-        double yaw = -((double)(foundRobots[0].getHPos() - CAM_WIDTH / 2) / (double)CAM_WIDTH) * CAMERA_FOV_H;
+        double yaw = -((double)(foundRobots[i].getHPos() - CAM_WIDTH / 2) / (double)CAM_WIDTH) * CAMERA_FOV_H;
+        //cout<< "HERE 3"<< endl;
+
+        cout<< "pitch: " << pitch << endl;
+        cout << "yaw: "<< yaw << endl;
 
         // Set roll, pitch and yaw
-        q.setRPY(0, pitch, yaw);
+        q.setRPY(0.0, 0.0, 0.0);
+        cout<< "After setRPY"<< endl;
+    }
+
+    void Detection::getRotationFromImage(tf::Quaternion &q, RobotDesc desc){
+        double pitch = ((double)(desc.getVPos() - CAM_HEIGHT / 2) / (double)CAM_HEIGHT) * CAMERA_FOV_V;
+        double yaw = -((double)(desc.getHPos() - CAM_WIDTH / 2) / (double)CAM_WIDTH) * CAMERA_FOV_H;
+        q.setRPY((double)0.0, pitch, yaw);
     }
 }
