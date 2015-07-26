@@ -10,9 +10,8 @@
 
     <node name="robotDetect" pkg="elikos_ros" type="tracking" output="screen">
         <remap from="elikos_robotdetect/altitude" to="mavros/px4flow/ground_distance"/>
-    </node>
-    <rosparam command="load" file="$(find elikos_ros)/launch/config.yaml"/>
-
+    	<rosparam command="load" file="$(find elikos_ros)/param/config.yaml"/>
+	</node>
 
 
 	<!-- node name="navigator" pkg="elikos_ros" type="navigator" output="screen"/ -->
