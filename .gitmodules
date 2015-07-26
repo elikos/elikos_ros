@@ -1,0 +1,3 @@
+[submodule "mcptam_msgs"]
+	path = mcptam_msgs
+	url = https://github.com/ProjectArtemis/mcptam_msgs.git
