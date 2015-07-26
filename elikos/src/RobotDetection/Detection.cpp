@@ -52,7 +52,7 @@ namespace elikos_detection
         nh->param<int>("morph_op", MORPH_OP, 0);
         nh->param<int>("morph_op", MORPH_ELEMENT, 0);
         nh->param<int>("morph_size", MORPH_SIZE, 0);
-        nh->param<int>("max_dist", MAX_DIST, 0);
+        nh->param<int>("max_dist", MAX_DIST, 100);
 
 //        turret_.reserve(100);
 //        turret_rotation_.reserve(100);
@@ -167,7 +167,9 @@ namespace elikos_detection
 
     void Detection::altitudeCallback(const sensor_msgs::RangeConstPtr& msg)
     {
-        altRange = msg->range;
+        if(msg->range != 0) {
+            altRange = msg->range;
+        }
     }
 
     void Detection::setPublishers()
@@ -445,7 +447,7 @@ namespace elikos_detection
     }
 
     void Detection::drawObject(RobotDesc robot, Mat &frame){
-        cv::circle(frame, cv::Point(robot.getHPos(), robot.getVPos()), 10, cv::Scalar(255, 0, 0));
+        cv::circle(frame, cv::Point(robot.getHPos(), robot.getVPos()), 20, cv::Scalar(255, 0, 0));
         cv::putText(frame, intToString(robot.getHPos()) + " , " + intToString(robot.getVPos()), cv::Point(robot.getHPos(), robot.getVPos() + 20), 1, 1, Scalar(0, 255, 0));
     }
     void Detection::morphOps(Mat &thresh)
@@ -517,6 +519,7 @@ namespace elikos_detection
         min_distance = 0;
         int robotIterator = -1;
 
+        cout<<"Altitude range: "<<altRange<<endl;
         int i = 0;
         for(vector<RobotDesc>::iterator iter = foundRobots.begin(); iter != foundRobots.end(); ++iter){
             //initialize shit
@@ -555,10 +558,10 @@ namespace elikos_detection
 
             // Get distance from turret to target (using angle and altitude)
             double camera_altitude = world2turret.getOrigin().getZ();
-            cout << "Altitude local origin: "<<camera_altitude<<endl;
+            //cout << "Altitude local origin: "<<camera_altitude<<endl;
 
             double cam_alt = altRange;
-            cout<<"Altitude range: "<<cam_alt<<endl;
+            //cout<<"Altitude range: "<<cam_alt<<endl;
             double distance_from_target = cam_alt / cos(zAxis_turret_angle);
 
             if (min_distance == 0 || distance_from_target < min_distance){
@@ -566,6 +569,8 @@ namespace elikos_detection
                 // Add the robot transform as child of the turret
                 target_robot_.setOrigin(tf::Vector3(distance_from_target, 0, 0));
                 target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
+                min_distance = distance_from_target;
+                cout << "robot " << i << " at distance " << distance_from_target << endl;
             }
 
             turret_rotation_.push_back(q);
