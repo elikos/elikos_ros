@@ -11,8 +11,11 @@
     <node name="robotDetect" pkg="elikos_ros" type="tracking" output="screen">
         <remap from="elikos_robotdetect/altitude" to="mavros/px4flow/ground_distance"/>
     	<rosparam command="load" file="$(find elikos_ros)/param/config.yaml"/>
+	<remap from="camera/image_raw" to="camera1394/image_raw_uncompressed"/>
 	</node>
 
+    <node name="republisher" pkg="image_transport" type="republish" 
+      args="compressed in:=/camera/image_raw raw out:=/camera1394/image_raw_uncompressed"/>
 
 	<!-- node name="navigator" pkg="elikos_ros" type="navigator" output="screen"/ -->
     <!-- launch-prefix="xterm -e gdb -tui args"/ -->
