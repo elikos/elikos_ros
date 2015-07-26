@@ -7,10 +7,14 @@
 #define ELIKOS_ROS_VO_CTRL_H
 
 namespace elikos {
+    enum SupportedVO { SVO, MCPTAM };
+
     class VoCtrl{
     public:
         virtual void init() = 0;
         virtual void reset() = 0;
+
+
     private:
 
     };

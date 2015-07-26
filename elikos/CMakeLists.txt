@@ -15,8 +15,10 @@ find_package( catkin REQUIRED COMPONENTS
    sensor_msgs
    cv_bridge
    image_transport
+   mcptam_msgs
 )
 find_package(OpenCV REQUIRED)
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -76,6 +78,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   geometry_msgs
+  mcptam_msgs
 )
 
 ###################################
@@ -92,7 +95,7 @@ catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
 #  LIBRARIES elikos
-  CATKIN_DEPENDS std_msgs std_srvs
+  CATKIN_DEPENDS std_msgs std_srvs mcptam_msgs
 #  DEPENDS system_lib
 )
 
@@ -146,7 +149,8 @@ add_executable( pose_offset
     include/pose_offset/SvoCtrl.h
     include/pose_offset/McptamCtrl.h
     include/pose_offset/VoCtrl.h
-src/pose_offset/SvoCtrl.cpp)
+    src/pose_offset/SvoCtrl.cpp
+)
 
 
 ## Add cmake target dependencies of the executable/library
@@ -155,6 +159,11 @@ src/pose_offset/SvoCtrl.cpp)
 
 add_dependencies(tracking
 elikos_ros_generate_messages_cpp
+)
+
+add_dependencies(
+    pose_offset
+    mcptam_msgs_gencpp
 )
 
 ## Specify libraries to link a library or executable target against

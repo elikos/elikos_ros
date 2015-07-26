@@ -7,6 +7,7 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <pose_offset/VoCtrl.h>
 
 class PoseOffsetNode {
 public:
@@ -35,9 +36,15 @@ protected:
     bool _recv_covariance;
     bool _local_pos_valid;
     bool _vo_valid;
+    std::string _vo_method_s;
+    elikos::SupportedVO _vo_method;
+    elikos::VoCtrl* _vo_controller;
 
     int _rate;  //!< Rate in Hz
     int _timeout; //!< Max time [ms] to wait before declaring vo or local_pos timed out
+
+private:
+    void setupVoCtrl(std::string method);
 };
 
 

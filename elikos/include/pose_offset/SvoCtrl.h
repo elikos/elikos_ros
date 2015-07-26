@@ -8,7 +8,7 @@
 #include "VoCtrl.h"
 
 namespace elikos{
-    class SvoCtrl : VoCtrl{
+    class SvoCtrl : public VoCtrl{
         void init();
         void reset();
     };
