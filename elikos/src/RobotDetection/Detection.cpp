@@ -6,9 +6,12 @@ namespace elikos_detection
     Detection::Detection( ros::NodeHandle *nh ) : nh_(nh),it_(*nh)
     {
         // Load parameters
-        nh->param<int>("pre_erosions", PRE_EROSIONS, 5);
-        nh->param<int>("dilations", DILATIONS, 5);
-        nh->param<int>("post_erosions", POST_EROSIONS, 5);
+        nh->param<int>("pre_erosions_w", PRE_EROSIONS_W, 12);
+        nh->param<int>("dilations_w", DILATIONS_W, 25);
+        nh->param<int>("post_erosions_w", POST_EROSIONS_W, 5);
+        nh->param<int>("pre_erosions_g", PRE_EROSIONS_G, 3);
+        nh->param<int>("dilations_g", DILATIONS_G, 20);
+        nh->param<int>("post_erosions_g", POST_EROSIONS_G, 0);
        /* nh->param<int>("h_min_w", H_MIN_W, 0);
         nh->param<int>("h_max_w", H_MAX_W, 256);
         nh->param<int>("s_min_w", S_MIN_W, 0);
@@ -110,6 +113,7 @@ namespace elikos_detection
     {
         //create window for trackbars
         namedWindow(trackbarWindowName,0);
+        namedWindow(HSVTrackbars, 0);
         namedWindow(shapeDetectTrackbars,0);
         //create trackbars and insert them into window
         //3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
@@ -117,27 +121,30 @@ namespace elikos_detection
         //and the function that is called whenever the trackbar is moved(eg. on_trackbar)
         //                                  ---->    ---->     ---->
         createTrackbar( "PRE BLUR", trackbarWindowName, &PRE_BLUR, 50, on_trackbar);
-        createTrackbar( "PRE EROSIONS", trackbarWindowName, &PRE_EROSIONS, 256, on_trackbar );
-        createTrackbar( "DILATIONS", trackbarWindowName, &DILATIONS, 256, on_trackbar );
-        createTrackbar( "POST EROSIONS", trackbarWindowName, &POST_EROSIONS, 50, on_trackbar );
-        createTrackbar( "H_MIN W", trackbarWindowName, &H_MIN_W, 256, on_trackbar );
-        createTrackbar( "H_MAX W", trackbarWindowName, &H_MAX_W, 256, on_trackbar );
-        createTrackbar( "S_MIN W", trackbarWindowName, &S_MIN_W, 256, on_trackbar );
-        createTrackbar( "S_MAX W", trackbarWindowName, &S_MAX_W, 256, on_trackbar );
-        createTrackbar( "V_MIN W", trackbarWindowName, &V_MIN_W, 256, on_trackbar );
-        createTrackbar( "V_MAX W", trackbarWindowName, &V_MAX_W, 256, on_trackbar );
-        createTrackbar( "H_MIN G", trackbarWindowName, &H_MIN_G, 256, on_trackbar );
-        createTrackbar( "H_MAX G", trackbarWindowName, &H_MAX_G, 256, on_trackbar );
-        createTrackbar( "S_MIN G", trackbarWindowName, &S_MIN_G, 256, on_trackbar );
-        createTrackbar( "S_MAX G", trackbarWindowName, &S_MAX_G, 256, on_trackbar );
-        createTrackbar( "V_MIN G", trackbarWindowName, &V_MIN_G, 256, on_trackbar );
-        createTrackbar( "V_MAX G", trackbarWindowName, &V_MAX_G, 256, on_trackbar );
-        createTrackbar( "H_MIN R", trackbarWindowName, &H_MIN_R, 256, on_trackbar );
-        createTrackbar( "H_MAX R", trackbarWindowName, &H_MAX_R, 256, on_trackbar );
-        createTrackbar( "S_MIN R", trackbarWindowName, &S_MIN_R, 256, on_trackbar );
-        createTrackbar( "S_MAX R", trackbarWindowName, &S_MAX_R, 256, on_trackbar );
-        createTrackbar( "V_MIN R", trackbarWindowName, &V_MIN_R, 256, on_trackbar );
-        createTrackbar( "V_MAX R", trackbarWindowName, &V_MAX_R, 256, on_trackbar );
+        createTrackbar( "PRE EROSIONS W", trackbarWindowName, &PRE_EROSIONS_W, 256, on_trackbar );
+        createTrackbar( "DILATIONS_W W", trackbarWindowName, &DILATIONS_W, 256, on_trackbar );
+        createTrackbar( "POST EROSIONS W", trackbarWindowName, &POST_EROSIONS_W, 50, on_trackbar );
+        createTrackbar( "PRE EROSIONS G", trackbarWindowName, &PRE_EROSIONS_G, 256, on_trackbar );
+        createTrackbar( "DILATIONS_W G", trackbarWindowName, &DILATIONS_G, 256, on_trackbar );
+        createTrackbar( "POST EROSIONS G", trackbarWindowName, &POST_EROSIONS_G, 50, on_trackbar );
+        createTrackbar( "H_MIN W", HSVTrackbars, &H_MIN_W, 256, on_trackbar );
+        createTrackbar( "H_MAX W", HSVTrackbars, &H_MAX_W, 256, on_trackbar );
+        createTrackbar( "S_MIN W", HSVTrackbars, &S_MIN_W, 256, on_trackbar );
+        createTrackbar( "S_MAX W", HSVTrackbars, &S_MAX_W, 256, on_trackbar );
+        createTrackbar( "V_MIN W", HSVTrackbars, &V_MIN_W, 256, on_trackbar );
+        createTrackbar( "V_MAX W", HSVTrackbars, &V_MAX_W, 256, on_trackbar );
+        createTrackbar( "H_MIN G", HSVTrackbars, &H_MIN_G, 256, on_trackbar );
+        createTrackbar( "H_MAX G", HSVTrackbars, &H_MAX_G, 256, on_trackbar );
+        createTrackbar( "S_MIN G", HSVTrackbars, &S_MIN_G, 256, on_trackbar );
+        createTrackbar( "S_MAX G", HSVTrackbars, &S_MAX_G, 256, on_trackbar );
+        createTrackbar( "V_MIN G", HSVTrackbars, &V_MIN_G, 256, on_trackbar );
+        createTrackbar( "V_MAX G", HSVTrackbars, &V_MAX_G, 256, on_trackbar );
+        createTrackbar( "H_MIN R", HSVTrackbars, &H_MIN_R, 256, on_trackbar );
+        createTrackbar( "H_MAX R", HSVTrackbars, &H_MAX_R, 256, on_trackbar );
+        createTrackbar( "S_MIN R", HSVTrackbars, &S_MIN_R, 256, on_trackbar );
+        createTrackbar( "S_MAX R", HSVTrackbars, &S_MAX_R, 256, on_trackbar );
+        createTrackbar( "V_MIN R", HSVTrackbars, &V_MIN_R, 256, on_trackbar );
+        createTrackbar( "V_MAX R", HSVTrackbars, &V_MAX_R, 256, on_trackbar );
 
         // Create shape detector trackbars
         createTrackbar("Canny Thresh 1", shapeDetectTrackbars, &CANNY_THRESH1, 256, on_trackbar);
@@ -156,6 +163,11 @@ namespace elikos_detection
     void Detection::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     {
         currentImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
+    }
+
+    void Detection::altitudeCallback(const sensor_msgs::RangeConstPtr& msg)
+    {
+        altRange = msg->range;
     }
 
     void Detection::setPublishers()
@@ -230,35 +242,37 @@ namespace elikos_detection
         inRange(hsv_w,Scalar(H_MIN_W,S_MIN_W,V_MIN_W),Scalar(H_MAX_W,S_MAX_W,V_MAX_W), threshold_w);
 
         // Consolidate the white parts into one big blob to delimit the robot
-        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
-        dilate(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
-        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS_W);
+        dilate(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS_W);
+        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS_W);
 
         //trackShape();
 
         inRange(hsv_c,Scalar(H_MIN_G, S_MIN_G, V_MIN_G),Scalar(H_MAX_G, S_MAX_G, V_MAX_G), threshold_g);
 
         // Consolidate the white parts into one big blob to delimit the robot
-        erode(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
-        dilate(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
-        erode(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+        erode(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS_G);
+        dilate(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS_G);
+        erode(threshold_g, threshold_g, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS_G);
 
         inRange(hsv_c,Scalar(H_MIN_R, S_MIN_R, V_MIN_R),Scalar(H_MAX_R, S_MAX_R, V_MAX_R), threshold_r);
 
         // Consolidate the white parts into one big blob to delimit the robot
-        erode(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
-        dilate(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
-        erode(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+        erode(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS_W);
+        dilate(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS_W);
+        erode(threshold_r, threshold_r, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS_W);
 
 
         vector<RobotDesc> foundObjects_w = trackFilteredObjects(threshold_w, currentImage);
         vector<RobotDesc> foundObjects_g = trackFilteredObjects(threshold_g, currentImage);
+        vector<RobotDesc> foundObjects_r = trackFilteredObjects(threshold_r, currentImage);
+
        /* for (int i=0; i<foundObjects_g.size(); i++){
             printf("Found Color Object[%i]:\n", i);
             printf("xPos: %i\n", foundObjects_g[i].getXPos());
             printf("yPos: %i\n", foundObjects_g[i].getYPos());
         }*/
-        drawObjects(foundObjects_w, currentImage);
+        //drawObjects(foundObjects_g, currentImage);
 /*
         for (int i=0; i<foundObjects_w.size(); i++){
             printf("Found White Object[%i]:\n", i);
@@ -266,12 +280,14 @@ namespace elikos_detection
             printf("yPos: %i\n", foundObjects_w[i].getYPos());
         }*/
         //drawObjects(foundObjects_g, currentImage);
-        foundRobots.clear();
+        cout << "Found color " << foundObjects_g.size() << " and white " << foundObjects_w.size() << endl;
+       // foundRobots.clear();
         RobotDesc myRobot;
-
+        foundRobots.clear();
 
         //TODO: "MAX_DIST" related to altitude
-        bool robotFound=false;
+        //Finding green robots
+        bool greenRobotFound =false;
         for (int i=0; i< foundObjects_g.size(); i++){
             for (int j=0; j<foundObjects_w.size(); j++){
                 if (abs(foundObjects_g[i].getXPos()-foundObjects_w[j].getXPos())<MAX_DIST&&
@@ -279,36 +295,49 @@ namespace elikos_detection
                     myRobot.setXPos((foundObjects_g[i].getXPos()+foundObjects_w[j].getXPos())/2);
                     myRobot.setYPos((foundObjects_g[i].getYPos()+foundObjects_w[j].getYPos())/2);
                     foundRobots.push_back(myRobot);
-                    robotFound=true;
+                    greenRobotFound =true;
                     //break;
                 }
             }
         }
-
+      /*  bool redRobotFound = false;
+        for (int i=0; i< foundObjects_r.size(); i++){
+            for (int j=0; j<foundObjects_w.size(); j++){
+                if (abs(foundObjects_r[i].getXPos()-foundObjects_w[j].getXPos())<MAX_DIST&&
+                    abs(foundObjects_r[i].getYPos()-foundObjects_w[j].getYPos())<MAX_DIST){
+                    myRobot.setXPos((foundObjects_g[i].getXPos()+foundObjects_w[j].getXPos())/2);
+                    myRobot.setYPos((foundObjects_g[i].getYPos()+foundObjects_w[j].getYPos())/2);
+                    foundRobots.push_back(myRobot);
+                    redRobotFound = true;
+                    //break;
+                }
+            }
+        }
+*/
         //let user know you found an object
-        if(robotFound ==true) {
+        if(greenRobotFound ) {
             //draw object location on screen
-            drawObjects(foundRobots, currentImage);
-            if (foundRobots.size() != 0)
+             drawObjects(foundRobots, currentImage);
+          /*  if (foundRobots.size() != 0)
             {
                 for (int i = 0; i < foundRobots.size(); i++)
                 {
                     elikos_ros::RobotPos pos = foundRobots.at(i).toMsg();
                     robotsPos_msg.robotsPos.push_back(pos);
                 }
-            }
+            }*/
         }
 
        // morphOps(merged);
 /*
         // Consolidate the white parts into one big blob to delimit the robot
-        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS);
-        dilate(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS);
-        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS);
+        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), PRE_EROSIONS_W);
+        dilate(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), DILATIONS_W);
+        erode(threshold_w, threshold_w, getStructuringElement(MORPH_ELLIPSE,Size(3,3)), Point(-1,-1), POST_EROSIONS_W);
 
         // Crop the rest of the image for color blob filtering
         cvtColor(threshold_w, threshold_w, CV_GRAY2BGR);
-        bitwise_and(hsv, threshold_w, cropped_hsv);
+        bitwise_and(hsv, threshold_w, cropped_hsv);d
 
 
         // Filter the cropped image
@@ -403,6 +432,7 @@ namespace elikos_detection
     void Detection::setSubscribers()
     {
         image_sub_ = it_.subscribe(TOPIC_NAMES[camera_image_raw], 1, &Detection::cameraCallback, this);
+        sub = nh_->subscribe(TOPIC_NAMES[elikos_robotdetect_altitude], 1, &Detection::altitudeCallback, this);
     }
 
     void Detection::drawObjects(vector<RobotDesc> vecRobot, Mat &frame){
@@ -415,7 +445,7 @@ namespace elikos_detection
     }
 
     void Detection::drawObject(RobotDesc robot, Mat &frame){
-        cv::circle(frame, cv::Point(robot.getHPos(), robot.getVPos()), 10, cv::Scalar(0, 0, 255));
+        cv::circle(frame, cv::Point(robot.getHPos(), robot.getVPos()), 10, cv::Scalar(255, 0, 0));
         cv::putText(frame, intToString(robot.getHPos()) + " , " + intToString(robot.getVPos()), cv::Point(robot.getHPos(), robot.getVPos() + 20), 1, 1, Scalar(0, 255, 0));
     }
     void Detection::morphOps(Mat &thresh)
@@ -505,7 +535,15 @@ namespace elikos_detection
 
             // Get the world to turret transform
             tf::StampedTransform world2turret;
-            tf_listener_.lookupTransform("local_origin", frameid, ros::Time(0), world2turret);
+            try{
+                tf_listener_.lookupTransform("local_origin", frameid, ros::Time(0), world2turret);
+            } catch(tf::LookupException& e){
+                ROS_ERROR(e.what());
+            } catch (tf::ConnectivityException& e) {
+                ROS_ERROR(e.what());
+            }  catch (tf::ExtrapolationException e) {
+                ROS_ERROR(e.what());
+            }
 
             // Get the smallest angle between the turret and the z axis
             //      - First get the vector pointing towards the x axis of the turret
@@ -517,7 +555,11 @@ namespace elikos_detection
 
             // Get distance from turret to target (using angle and altitude)
             double camera_altitude = world2turret.getOrigin().getZ();
-            double distance_from_target = camera_altitude / cos(zAxis_turret_angle);
+            cout << "Altitude local origin: "<<camera_altitude<<endl;
+
+            double cam_alt = altRange;
+            cout<<"Altitude range: "<<cam_alt<<endl;
+            double distance_from_target = cam_alt / cos(zAxis_turret_angle);
 
             if (min_distance == 0 || distance_from_target < min_distance){
                 robotIterator = i;

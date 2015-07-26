@@ -8,9 +8,13 @@
          <param name="bayer_mode" value="AHD" />
     </node-->
 
-    <node name="robotDetect" pkg="elikos_ros" type="tracking" output="screen"/>
-    	<rosparam command="load" file="$(find elikos_ros)/launch/config.yaml"/>
+    <node name="robotDetect" pkg="elikos_ros" type="tracking" output="screen">
+        <remap from="elikos_robotdetect/altitude" to="mavros/px4flow/ground_distance"/>
+    </node>
+    <rosparam command="load" file="$(find elikos_ros)/launch/config.yaml"/>
 
-	<!--node name="navigator" pkg="elikos_ros" type="navigator" output="screen"/-->
 
+
+	<!-- node name="navigator" pkg="elikos_ros" type="navigator" output="screen"/ -->
+    <!-- launch-prefix="xterm -e gdb -tui args"/ -->
 </launch>
