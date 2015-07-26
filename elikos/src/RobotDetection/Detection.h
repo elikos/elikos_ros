@@ -14,6 +14,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include "./../defines.cpp"
 #include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/Range.h>
 #include <elikos_ros/RobotPos.h>
 #include <elikos_ros/RobotsPos.h>
 #include <tf/transform_listener.h>
@@ -34,6 +35,7 @@ namespace elikos_detection {
         void init();
 
         void cameraCallback(const sensor_msgs::ImageConstPtr &msg);
+        void altitudeCallback(const sensor_msgs::RangeConstPtr& msg);
 
         Mat getCurrentImage(){return currentImage;}
         cv_bridge::CvImagePtr getNextImage(){return nextImage;}
@@ -100,8 +102,12 @@ namespace elikos_detection {
         ros::NodeHandle* nh_;
         image_transport::ImageTransport it_;
         image_transport::Subscriber image_sub_;
+
+        ros::Subscriber sub;
+        float altRange;
+
         ros::Publisher robots_publish;
-        double min_distance = 0;
+        double min_distance = -1;
 
         // TF transforms
         tf::TransformBroadcaster tf_broadcaster_;
@@ -161,9 +167,12 @@ namespace elikos_detection {
         int S_MAX_R;
         int V_MIN_R;
         int V_MAX_R;
-        int PRE_EROSIONS;
-        int DILATIONS;
-        int POST_EROSIONS;
+        int PRE_EROSIONS_W;
+        int DILATIONS_W;
+        int POST_EROSIONS_W;
+        int PRE_EROSIONS_G;
+        int DILATIONS_G;
+        int POST_EROSIONS_G;
         int PRE_BLUR;
         int BLUR_AMOUNT;
         int CANNY_THRESH1;
@@ -192,6 +201,7 @@ namespace elikos_detection {
         const string windowName2 = "Thresholded Image";
         const string windowName3 = "After Morphological Operations";
         const string trackbarWindowName = "Trackbars";
+        const string HSVTrackbars= "HSV Trackbars";
         const string shapeDetectTrackbars = "Shape detector";
 
 
