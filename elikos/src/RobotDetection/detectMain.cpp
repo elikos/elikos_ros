@@ -55,13 +55,15 @@ int main(int argc, char* argv[])
             detect_instance.trackBlobs();
             //detect_instance.trackShape();
 
+            detect_instance.computeTargetPosition();
+
             if (true) {
                 detect_instance.showThreshold();
                 detect_instance.showCurrentImage();
             }
         }
 
-        detect_instance.computeTargetPosition();
+
 
         waitKey(30);
     }
