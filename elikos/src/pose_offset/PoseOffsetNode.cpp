@@ -41,7 +41,7 @@ void PoseOffsetNode::setupVoCtrl(std::string method){
     std::transform(method.begin(), method.end(), method.begin(), ::tolower);
     if(method.compare("svo")){
         this->_vo_method = elikos::SupportedVO::SVO;
-        this->_vo_controller = new elikos::SvoCtrl();
+        this->_vo_controller = new elikos::SvoCtrl(this->_n);
     } else if (method.compare("mcptam")) {
         this->_vo_method = elikos::SupportedVO::MCPTAM;
         this->_vo_controller = new elikos::McptamCtrl(this->_n);
