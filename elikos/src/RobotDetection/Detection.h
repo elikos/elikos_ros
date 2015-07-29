@@ -136,7 +136,8 @@ namespace elikos_detection {
         Mat threshold_r;
         Mat hsv_w;
         Mat hsv_c;
-        Mat merged;
+        Mat mask;
+        Mat closeWhite;
         Mat cropped_hsv;
         Mat grayscale_image;
         Mat canny;
