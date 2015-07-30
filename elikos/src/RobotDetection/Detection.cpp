@@ -6,53 +6,54 @@ namespace elikos_detection
     Detection::Detection( ros::NodeHandle *nh ) : nh_(nh),it_(*nh)
     {
         // Load parameters
-        nh->param<int>("pre_erosions_w", PRE_EROSIONS_W, 12);
-        nh->param<int>("dilations_w", DILATIONS_W, 25);
-        nh->param<int>("post_erosions_w", POST_EROSIONS_W, 5);
-        nh->param<int>("pre_erosions_g", PRE_EROSIONS_G, 3);
-        nh->param<int>("dilations_g", DILATIONS_G, 20);
-        nh->param<int>("post_erosions_g", POST_EROSIONS_G, 0);
-       /* nh->param<int>("h_min_w", H_MIN_W, 0);
-        nh->param<int>("h_max_w", H_MAX_W, 256);
-        nh->param<int>("s_min_w", S_MIN_W, 0);
-        nh->param<int>("s_max_w", S_MAX_W, 256);
-        nh->param<int>("v_min_w", V_MIN_W, 0);
-        nh->param<int>("v_max_w", V_MAX_W, 256);
-        nh->param<int>("h_min_c", H_MIN_G, 0);
-        nh->param<int>("h_max_c", H_MAX_G, 256);
-        nh->param<int>("s_min_c", S_MIN_G, 0);
-        nh->param<int>("s_max_c", S_MAX_G, 256);
-        nh->param<int>("v_min_c", V_MIN_G, 0);
-        nh->param<int>("v_max_c", V_MAX_G, 256);*/
+        nh->param<int>("robotDetect/pre_erosions_w", PRE_EROSIONS_W, 12);
+        nh->param<int>("robotDetect/dilations_w", DILATIONS_W, 25);
+        nh->param<int>("robotDetect/post_erosions_w", POST_EROSIONS_W, 5);
+        nh->param<int>("robotDetect/pre_erosions_g", PRE_EROSIONS_G, 3);
+        nh->param<int>("robotDetect/dilations_g", DILATIONS_G, 20);
+        nh->param<int>("robotDetect/post_erosions_g", POST_EROSIONS_G, 0);
+       /*
+        nh->param<int>("robotDetect/h_min_w", H_MIN_W, 0);
+        nh->param<int>("robotDetect/h_max_w", H_MAX_W, 256);
+        nh->param<int>("robotDetect/s_min_w", S_MIN_W, 0);
+        nh->param<int>("robotDetect/s_max_w", S_MAX_W, 256);
+        nh->param<int>("robotDetect/v_min_w", V_MIN_W, 0);
+        nh->param<int>("robotDetect/v_max_w", V_MAX_W, 256);
+        nh->param<int>("robotDetect/h_min_c", H_MIN_G, 0);
+        nh->param<int>("robotDetect/h_max_c", H_MAX_G, 256);
+        nh->param<int>("robotDetect/s_min_c", S_MIN_G, 0);
+        nh->param<int>("robotDetect/s_max_c", S_MAX_G, 256);
+        nh->param<int>("robotDetect/v_min_c", V_MIN_G, 0);
+        nh->param<int>("robotDetect/v_max_c", V_MAX_G, 256);*/
 
-        nh->param<int>("h_min_w", H_MIN_W, 0);
-        nh->param<int>("h_max_w", H_MAX_W, 52);
-        nh->param<int>("s_min_w", S_MIN_W, 0);
-        nh->param<int>("s_max_w", S_MAX_W, 149);
-        nh->param<int>("v_min_w", V_MIN_W, 140);
-        nh->param<int>("v_max_w", V_MAX_W, 256);
-        nh->param<int>("h_min_g", H_MIN_G, 39);
-        nh->param<int>("h_max_g", H_MAX_G, 88);
-        nh->param<int>("s_min_g", S_MIN_G, 54);
-        nh->param<int>("s_max_g", S_MAX_G, 256);
-        nh->param<int>("v_min_g", V_MIN_G, 30);
-        nh->param<int>("v_max_g", V_MAX_G, 256);
-        nh->param<int>("h_min_r", H_MIN_R, 0);
-        nh->param<int>("h_max_r", H_MAX_R, 256);
-        nh->param<int>("s_min_r", S_MIN_R, 0);
-        nh->param<int>("s_max_r", S_MAX_R, 256);
-        nh->param<int>("v_min_r", V_MIN_R, 0);
-        nh->param<int>("v_max_r", V_MAX_R, 256);
-        nh->param<int>("pre_blur", PRE_BLUR, 2);
-        nh->param<int>("canny_thresh1", CANNY_THRESH1, 1);
-        nh->param<int>("canny_thresh1", CANNY_THRESH2, 1);
-        nh->param<int>("canny_aperture", CANNY_APERTURE, 3);
-        nh->param<int>("poly_area_min", POLY_AREA_MIN, 0);
-        nh->param<int>("poly_area_max", POLY_AREA_MAX, 50000);
-        nh->param<int>("morph_op", MORPH_OP, 0);
-        nh->param<int>("morph_op", MORPH_ELEMENT, 0);
-        nh->param<int>("morph_size", MORPH_SIZE, 0);
-        nh->param<int>("max_dist", MAX_DIST, 100);
+        nh->param<int>("robotDetect/h_min_w", H_MIN_W, 0);
+        nh->param<int>("robotDetect/h_max_w", H_MAX_W, 52);
+        nh->param<int>("robotDetect/s_min_w", S_MIN_W, 0);
+        nh->param<int>("robotDetect/s_max_w", S_MAX_W, 149);
+        nh->param<int>("robotDetect/v_min_w", V_MIN_W, 140);
+        nh->param<int>("robotDetect/v_max_w", V_MAX_W, 256);
+        nh->param<int>("robotDetect/h_min_g", H_MIN_G, 39);
+        nh->param<int>("robotDetect/h_max_g", H_MAX_G, 88);
+        nh->param<int>("robotDetect/s_min_g", S_MIN_G, 54);
+        nh->param<int>("robotDetect/s_max_g", S_MAX_G, 256);
+        nh->param<int>("robotDetect/v_min_g", V_MIN_G, 30);
+        nh->param<int>("robotDetect/v_max_g", V_MAX_G, 256);
+        nh->param<int>("robotDetect/h_min_r", H_MIN_R, 0);
+        nh->param<int>("robotDetect/h_max_r", H_MAX_R, 256);
+        nh->param<int>("robotDetect/s_min_r", S_MIN_R, 0);
+        nh->param<int>("robotDetect/s_max_r", S_MAX_R, 256);
+        nh->param<int>("robotDetect/v_min_r", V_MIN_R, 0);
+        nh->param<int>("robotDetect/v_max_r", V_MAX_R, 256);
+        nh->param<int>("robotDetect/pre_blur", PRE_BLUR, 2);
+        nh->param<int>("robotDetect/canny_thresh1", CANNY_THRESH1, 1);
+        nh->param<int>("robotDetect/canny_thresh1", CANNY_THRESH2, 1);
+        nh->param<int>("robotDetect/canny_aperture", CANNY_APERTURE, 3);
+        nh->param<int>("robotDetect/poly_area_min", POLY_AREA_MIN, 0);
+        nh->param<int>("robotDetect/poly_area_max", POLY_AREA_MAX, 50000);
+        nh->param<int>("robotDetect/morph_op", MORPH_OP, 0);
+        nh->param<int>("robotDetect/morph_op", MORPH_ELEMENT, 0);
+        nh->param<int>("robotDetect/morph_size", MORPH_SIZE, 0);
+        nh->param<int>("robotDetect/max_dist", MAX_DIST, 100);
 
     }
 
@@ -283,15 +284,15 @@ namespace elikos_detection
 
         mask =cv::Mat::zeros(FRAME_HEIGHT, FRAME_WIDTH, CV_8U);
         for (int i=0; i< foundObjects_g.size(); i++){
-            if (altRange > 0)
+            if (altRange != 0)
                 cv::circle(mask, cv::Point(foundObjects_g[i].getXPos(),foundObjects_g[i].getYPos()), MAX_DIST * 1/altRange, cv::Scalar(255, 0, 0), -1);
         }
-
+/*
         for (int i=0; i< foundObjects_r.size(); i++){
-            if (altRange > 0)
-                cv::circle(mask, cv::Point(foundObjects_g[i].getXPos(),foundObjects_g[i].getYPos()), MAX_DIST * 1/altRange, cv::Scalar(255, 0, 0), -1);
+            if (altRange != 0)
+                cv::circle(mask, cv::Point(foundObjects_r[i].getXPos(),foundObjects_r[i].getYPos()), MAX_DIST * 1/altRange, cv::Scalar(255, 0, 0), -1);
         }
-
+*/
         bitwise_and(mask, threshold_w, closeWhite);
 
         vector<RobotDesc> foundObjects_w = trackFilteredObjects(closeWhite, currentImage);
@@ -300,13 +301,15 @@ namespace elikos_detection
         //Finding green robots
         for (int i=0; i< foundObjects_g.size(); i++){
             for (int j=0; j<foundObjects_w.size(); j++){
-                if (abs(foundObjects_g[i].getXPos()-foundObjects_w[j].getXPos())<MAX_DIST * 1/altRange &&
-                        abs(foundObjects_g[i].getYPos()-foundObjects_w[j].getYPos())<MAX_DIST * 1/altRange){
-                    myRobot.setXPos(foundObjects_g[i].getXPos());
-                    myRobot.setYPos(foundObjects_g[i].getYPos());
-                    foundRobots.push_back(myRobot);
-                    break;
-                }
+                 if (altRange != 0) {
+                     if (abs(foundObjects_g[i].getXPos() - foundObjects_w[j].getXPos()) < MAX_DIST * 1 / altRange &&
+                         abs(foundObjects_g[i].getYPos() - foundObjects_w[j].getYPos()) < MAX_DIST * 1 / altRange) {
+                         myRobot.setXPos(foundObjects_g[i].getXPos());
+                         myRobot.setYPos(foundObjects_g[i].getYPos());
+                         foundRobots.push_back(myRobot);
+                         break;
+                     }
+                 }
             }
         }
 /*
@@ -381,7 +384,7 @@ namespace elikos_detection
         imshow("White threshold", threshold_w);
         //imshow("Cropped image", cropped_hsv);
         imshow("Green threshold", threshold_g);
-        imshow("Red threshold", threshold_r);
+        //imshow("Red threshold", threshold_r);
         imshow("Merged", closeWhite);
         //imshow("Morp", morph_ex);
         //imshow("Blurred", grayscale_image);
@@ -491,16 +494,19 @@ namespace elikos_detection
 
             double cam_alt = altRange;
             //cout<<"Altitude range: " << cam_alt << endl;
-            double distance_from_target = cam_alt / cos(zAxis_turret_angle);
+            if (cam_alt != 0) {
+                double distance_from_target = cam_alt / cos(zAxis_turret_angle);
 
-            if (min_distance == 0 || distance_from_target < min_distance){
-                robotIterator = i;
-                // Add the robot transform as child of the turret
-                target_robot_.setOrigin(tf::Vector3(distance_from_target, 0, 0));
-                target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
-                min_distance = distance_from_target;
-                cout << "robot " << i << " at distance " << distance_from_target << endl;
+                if (min_distance == 0 || distance_from_target < min_distance){
+                    robotIterator = i;
+                    // Add the robot transform as child of the turret
+                    target_robot_.setOrigin(tf::Vector3(distance_from_target, 0, 0));
+                    target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
+                    min_distance = distance_from_target;
+                    cout << "robot " << i << " at distance " << distance_from_target << endl;
+                }
             }
+
 
             turret_rotation_.push_back(q);
             turret_.push_back(t);

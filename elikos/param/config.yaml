@@ -21,8 +21,8 @@ use_webcam: false
 
 # Morphological operations iterations for white filtering
 pre_blur: 2
-pre_erosions_w: 13
-dilations_w: 25
+pre_erosions_w: 0
+dilations_w: 2
 post_erosions_w: 0
 
 
@@ -33,10 +33,10 @@ post_erosions_g: 0
 
 # HSV filter parameters for the white part of the robot
 h_min_w: 0
-h_max_w: 190
+h_max_w: 52
 s_min_w: 0
-s_max_w: 118
-v_min_w: 67
+s_max_w: 149
+v_min_w: 140
 v_max_w: 256
 
 # HSV filter parameters for the green part of the robot
