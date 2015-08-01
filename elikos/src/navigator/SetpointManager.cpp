@@ -10,11 +10,19 @@ SetpointManager::SetpointManager(ros::NodeHandle &nh) : nh_(&nh) {
 
 SetpointManager::~SetpointManager() {}
 
-void SetpointManager::sendLocalPositionSetpoint(const tf::Transform &t) {
+//not const because yolo
+void SetpointManager::sendLocalPositionSetpoint(tf::Transform &t) {
     double yaw = tf::getYaw(t.getRotation());
     if (isnan(yaw)) {
         throw "Yaw is NaN.";
     }
+
+    //XXX HACK BECAUSE MAVROS FLIPS SHIT
+    // FLIP YAW AROUND
+    tf::Quaternion q = t.getRotation();
+    q.setY(-yaw);
+    t.setRotation(q);
+
     geometry_msgs::Pose pose;
     tf::poseTFToMsg(t, pose);
     publishPoseStamped(pose);

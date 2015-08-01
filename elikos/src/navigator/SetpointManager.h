@@ -17,7 +17,8 @@ public:
     SetpointManager(ros::NodeHandle &nh);
     ~SetpointManager();
 
-    void sendLocalPositionSetpoint(const tf::Transform &t);
+    //not const because yolo
+    void sendLocalPositionSetpoint(tf::Transform &t);
     void sendLocalPositionSetpoint(const tf::Vector3 &p, const tf::Quaternion &q);
     void sendLocalPositionSetpoint(const tf::Vector3 &p, const double yaw);
     void sendLocalPositionSetpoint(const double x, const double y, const double z, tf::Quaternion &q);
