@@ -28,6 +28,8 @@
     <!-- ROBOT DETECTION -->
     <node name="robotDetect" pkg="elikos_ros" type="tracking" output="screen">
     	<rosparam command="load" file="$(find elikos_ros)/param/config.yaml"/>
+
+        <param name="debug_mode" value="true" />
 	</node>
 
     <!-- NAVIGATOR -->
