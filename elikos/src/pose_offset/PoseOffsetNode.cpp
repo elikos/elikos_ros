@@ -127,17 +127,17 @@ int PoseOffsetNode::main(int argc, char** argv)
 
     //setup publications
     if (this->_publish_covariance) {
-        _pose_pub = _n.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose", 1);
+        _pose_pub = _n.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose_out", 1);
     } else {
-        _pose_pub = _n.advertise<geometry_msgs::PoseStamped>("pose", 1);
+        _pose_pub = _n.advertise<geometry_msgs::PoseStamped>("pose_out", 1);
     }
 
     //setup subscriptions and callbacks
     _local_pos_sub = _n.subscribe("local_position", 1, &PoseOffsetNode::LocalPosCallback, this);
     if(this->_recv_covariance) {
-        _vo_sub = _n.subscribe("pose", 1, &PoseOffsetNode::VOPoseCallback_Cov, this);
+        _vo_sub = _n.subscribe("pose_in", 1, &PoseOffsetNode::VOPoseCallback_Cov, this);
     } else {
-        _vo_sub = _n.subscribe("pose", 1, &PoseOffsetNode::VOPoseCallback, this);
+        _vo_sub = _n.subscribe("pose_in", 1, &PoseOffsetNode::VOPoseCallback, this);
     }
 
     setupVoCtrl(this->_vo_method_s);
