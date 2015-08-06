@@ -25,14 +25,14 @@ int main(int argc, char* argv[])
 
     // Load parameters
     bool DEBUG_MODE, USE_WEBCAM;
-    nh.param<bool>("debug_mode", DEBUG_MODE, true);
+    nh.param<bool>("debug_mode", DEBUG_MODE, false);
     nh.param<bool>("use_webcam", USE_WEBCAM, false);
 
     //init Detection class : set up subs/pubs
     elikos_detection::Detection detect_instance(&nh);
     detect_instance.init();
 
-    if (true) {
+    if (DEBUG_MODE) {
         detect_instance.createTrackbars();
     }
 
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 
             detect_instance.computeTargetPosition();
 
-            if (true) {
+            if (DEBUG_MODE) {
                 detect_instance.showThreshold();
                 detect_instance.showCurrentImage();
             }

@@ -2,7 +2,7 @@
 
     <!-- CAMERA -->
     <node pkg="camera1394" type="camera1394_node" name="camera1394">
-         <param name="guid" value="00b09d0100db6e43" />
+         <param name="guid" value="00b09d0100db6e40" />
          <param name="video_mode" value="640x480_mono8" />
          <param name="frame_rate" value="60" />
          <param name="bayer_pattern" value="rggb" />
@@ -30,7 +30,7 @@
     <node name="robotDetect" pkg="elikos_ros" type="tracking" output="screen">
     	<rosparam command="load" file="$(find elikos_ros)/param/config.yaml"/>
 
-        <param name="debug_mode" value="true" />
+        <param name="debug_mode" value="false" />
 	</node>
 
     <!-- NAVIGATOR -->
