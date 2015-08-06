@@ -10,11 +10,18 @@ SetpointManager::SetpointManager(ros::NodeHandle &nh) : nh_(&nh) {
 
 SetpointManager::~SetpointManager() {}
 
-void SetpointManager::sendLocalPositionSetpoint(const tf::Transform &t) {
+void SetpointManager::sendLocalPositionSetpoint(tf::Transform &t) {
     double yaw = tf::getYaw(t.getRotation());
     if (isnan(yaw)) {
         throw "Yaw is NaN.";
     }
+
+    //XXX HACK BECAUSE MAVROS FLIPS SHIT
+    // FLIP YAW AROUND
+    tf::Quaternion q = t.getRotation();
+    q.setY(-yaw);
+    t.setRotation(q);
+
     geometry_msgs::Pose pose;
     tf::poseTFToMsg(t, pose);
     publishPoseStamped(pose);
@@ -84,5 +91,12 @@ void SetpointManager::publishPoseStamped(const geometry_msgs::Pose &pose) {
 }
 
 void SetpointManager::sendLocalPositionSetpointTF(const tf::Transform &t) {
-    tf_broadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "local_origin", "PositionSpTF"));
+    // Get the inverted yaw from the transform and save it in a quaternion
+    tf::Quaternion q(-tf::getYaw(t.getRotation()), 0, 0);
+
+    // Copy the transform and set the new yaw
+    tf::Transform sp(t);
+    sp.setRotation(q);
+
+    tf_broadcaster_.sendTransform(tf::StampedTransform(sp, ros::Time::now(), "local_origin", "PositionSpTF"));
 }
