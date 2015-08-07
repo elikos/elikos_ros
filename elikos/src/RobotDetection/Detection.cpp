@@ -285,12 +285,12 @@ namespace elikos_detection
         mask =cv::Mat::zeros(FRAME_HEIGHT, FRAME_WIDTH, CV_8U);
         for (int i=0; i< foundObjects_g.size(); i++){
             if (altRange != 0)
-                cv::circle(mask, cv::Point(foundObjects_g[i].getXPos(),foundObjects_g[i].getYPos()), MAX_DIST * 1/altRange, cv::Scalar(255, 0, 0), -1);
+                cv::circle(mask, cv::Point(foundObjects_g[i].getXPos(),foundObjects_g[i].getYPos()), MAX_DIST, cv::Scalar(255, 0, 0), -1);
         }
 /*
         for (int i=0; i< foundObjects_r.size(); i++){
             if (altRange != 0)
-                cv::circle(mask, cv::Point(foundObjects_r[i].getXPos(),foundObjects_r[i].getYPos()), MAX_DIST * 1/altRange, cv::Scalar(255, 0, 0), -1);
+                cv::circle(mask, cv::Point(foundObjects_r[i].getXPos(),foundObjects_r[i].getYPos()), MAX_DIST, cv::Scalar(255, 0, 0), -1);
         }
 */
         bitwise_and(mask, threshold_w, closeWhite);
