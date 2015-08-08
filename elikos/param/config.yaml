@@ -26,9 +26,9 @@ dilations_w: 2
 post_erosions_w: 0
 
 
-pre_erosions_g: 3
-dilations_g: 20
-post_erosions_g: 0
+pre_erosions_g: 5
+dilations_g: 23
+post_erosions_g: 8
 
 
 # HSV filter parameters for the white part of the robot
@@ -40,12 +40,12 @@ v_min_w: 140
 v_max_w: 256
 
 # HSV filter parameters for the green part of the robot
-h_min_g: 39
-h_max_g: 88
-s_min_g: 54
-s_max_g: 256
-v_min_g: 30
-v_max_g: 256
+h_min_g: 17
+h_max_g: 63
+s_min_g: 0
+s_max_g: 156
+v_min_g: 0
+v_max_g: 193
 
 # HSV filter parameters for the red part of the robot
 h_min_r: 0

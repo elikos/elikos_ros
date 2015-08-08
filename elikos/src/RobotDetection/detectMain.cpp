@@ -62,11 +62,8 @@ int main(int argc, char* argv[])
                 detect_instance.showCurrentImage();
             }
         }
-
-
-
         waitKey(30);
     }
-
+    detect_instance.printROSparams();
     return 0;
 }

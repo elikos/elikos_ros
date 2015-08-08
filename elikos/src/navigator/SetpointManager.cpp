@@ -92,7 +92,7 @@ void SetpointManager::publishPoseStamped(const geometry_msgs::Pose &pose) {
 
 void SetpointManager::sendLocalPositionSetpointTF(const tf::Transform &t) {
     // Get the inverted yaw from the transform and save it in a quaternion
-    tf::Quaternion q(-tf::getYaw(t.getRotation()), 0, 0);
+    tf::Quaternion q(tf::getYaw(t.getRotation()), 0, 0);
 
     // Copy the transform and set the new yaw
     tf::Transform sp(t);
