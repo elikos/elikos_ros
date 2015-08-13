@@ -196,8 +196,8 @@ namespace elikos_detection {
         const int MIN_OBJECT_AREA = 40 * 40;
         const int MAX_OBJECT_AREA = FRAME_HEIGHT * FRAME_WIDTH / 1.5;
 
-        const double CAMERA_FOV_H = 53 * PI/180.0;
-        const double CAMERA_FOV_V = 40 * PI/180.0;
+        const double CAMERA_FOV_H = 120 * PI/180.0;
+        const double CAMERA_FOV_V = 66 * PI/180.0;
 
         const string windowName = "Original Image";
         const string windowName1 = "HSV Image";

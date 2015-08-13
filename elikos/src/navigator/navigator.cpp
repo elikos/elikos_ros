@@ -30,8 +30,6 @@ int main(int argc, char **argv) {
         // Get the MAV and target robot transforms
         try {
             tf_listener.lookupTransform("local_origin", "fcu", ros::Time(0), mav_world);
-            tf_listener.lookupTransform("local_origin", "target_robot", ros::Time(0), target_robot);
-
             if (rcReceiver[OFFBOARD_SWITCH] < 1200) {
                 // Save the starting transform
                 mav_world_start = mav_world;
@@ -43,6 +41,7 @@ int main(int argc, char **argv) {
                 << "\033[1;31myaw: \033[0m\t" << std::setw(10) << tf::getYaw(mav_world_start.getRotation()) << "\n"
                 << "\e[A\e[A\e[A\e[A\e[A" << "\r" << std::flush;
             }
+	    tf_listener.lookupTransform("local_origin", "target_robot", ros::Time(0), target_robot);
         }
         catch (tf::TransformException ex) {
             ROS_ERROR_THROTTLE(2, "%s",ex.what());
