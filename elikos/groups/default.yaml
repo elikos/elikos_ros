@@ -1,2 +1,2 @@
 ---
-cam_group_list: [[cam_bot,cam_starboard,cam_port]]
+cam_group_list: [[cam_front,cam_starboard,cam_port]]

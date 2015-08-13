@@ -31,18 +31,27 @@ int main(int argc, char **argv) {
         try {
             tf_listener.lookupTransform("local_origin", "fcu", ros::Time(0), mav_world);
             tf_listener.lookupTransform("local_origin", "target_robot", ros::Time(0), target_robot);
+
+            if (rcReceiver[OFFBOARD_SWITCH] < 1200) {
+                // Save the starting transform
+                mav_world_start = mav_world;
+                // Display the setpoint on the console
+                std::cout << "Setting starting position:                    " << "\n"
+                << "\033[1;31mx(E): \033[0m\t" << std::setw(10) << mav_world_start.getOrigin().getX() << "\n"
+                << "\033[1;31my(N): \033[0m\t" << std::setw(10) << mav_world_start.getOrigin().getY() << "\n"
+                << "\033[1;31mz(U): \033[0m\t" << std::setw(10) << mav_world_start.getOrigin().getZ() << "\n"
+                << "\033[1;31myaw: \033[0m\t" << std::setw(10) << tf::getYaw(mav_world_start.getRotation()) << "\n"
+                << "\e[A\e[A\e[A\e[A\e[A" << "\r" << std::flush;
+            }
         }
         catch (tf::TransformException ex) {
-            ROS_ERROR("%s",ex.what());
+            ROS_ERROR_THROTTLE(2, "%s",ex.what());
             r.sleep();
             continue;
         }
 
-        if (rcReceiver[OFFBOARD_SWITCH] < 1200) {
-            // Save the starting transform
-            mav_world_start = mav_world;
-        }
-        else {
+        
+        if (rcReceiver[OFFBOARD_SWITCH] >= 1200) {
             // Set origin of setpoint, keep starting altitude
             tf::Vector3 spOrigin(target_robot.getOrigin().getX(),
                                  target_robot.getOrigin().getY(),
@@ -56,7 +65,7 @@ int main(int argc, char **argv) {
             spManager.sendLocalPositionSetpointTF(setpoint);
 
             // Display the setpoint on the console
-            std::cout << "Setpoint:                    " << "\n"
+            std::cout << "Sending setpoint:                    " << "\n"
             << "\033[1;31mx(E): \033[0m\t" << std::setw(10) << setpoint.getOrigin().getX() << "\n"
             << "\033[1;31my(N): \033[0m\t" << std::setw(10) << setpoint.getOrigin().getY() << "\n"
             << "\033[1;31mz(U): \033[0m\t" << std::setw(10) << setpoint.getOrigin().getZ() << "\n"

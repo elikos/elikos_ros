@@ -435,7 +435,6 @@ namespace elikos_detection {
         min_distance = 0;
         int robotIterator = -1;
 
-        cout << "Altitude range: " << altRange << endl;
         int i = 0;
         for (vector<RobotDesc>::iterator iter = foundRobots.begin(); iter != foundRobots.end(); ++iter) {
             //initialize shit
@@ -475,7 +474,6 @@ namespace elikos_detection {
             // Get distance from turret to target (using angle and altitude)
 
             double cam_alt = world2turret.getOrigin().getZ();
-            //cout<<"Altitude range: " << cam_alt << endl;
             if (cam_alt != 0) {
                 double distance_from_target = cam_alt / cos(zAxis_turret_angle);
 
@@ -485,7 +483,7 @@ namespace elikos_detection {
                     target_robot_.setOrigin(tf::Vector3(distance_from_target, 0, 0));
                     target_robot_.setRotation(tf::Quaternion(0, 0, 0, 1));
                     min_distance = distance_from_target;
-                    cout << "robot " << i << " at distance " << distance_from_target << endl;
+                    //cout << "robot " << i << " at distance " << distance_from_target << endl;
                 }
             }
 
@@ -506,7 +504,7 @@ namespace elikos_detection {
                     tf::StampedTransform(target_robot_, ros::Time::now(), ss.str(), "target_robot"));
 
             //draw object location on screen
-            std::cout << "Robot iterator: " << robotIterator << "\n";
+            //std::cout << "Robot iterator: " << robotIterator << "\n";
             drawObject(foundRobots[robotIterator], currentImage);
         }
     }

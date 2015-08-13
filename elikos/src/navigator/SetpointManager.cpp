@@ -18,9 +18,9 @@ void SetpointManager::sendLocalPositionSetpoint(tf::Transform &t) {
 
     //XXX HACK BECAUSE MAVROS FLIPS SHIT
     // FLIP YAW AROUND
-    tf::Quaternion q = t.getRotation();
-    q.setY(-yaw);
-    t.setRotation(q);
+    //tf::Quaternion q = t.getRotation();
+    //q.setY(-yaw);
+    //t.setRotation(q);
 
     geometry_msgs::Pose pose;
     tf::poseTFToMsg(t, pose);
