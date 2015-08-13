@@ -94,7 +94,7 @@ setpoint_attitude:
 
 # setpoint_position
 setpoint_position:
-  listen_tf: false
+  listen_tf: true
   frame_id: "local_origin"
   child_frame_id: "PositionSpTF"
   tf_rate_limit: 50.0

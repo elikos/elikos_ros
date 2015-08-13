@@ -18,9 +18,44 @@ vel_z_max: 0.25
 # Robot Detection Params
 debug_mode: true
 use_webcam: false
-h_min: 0
-h_max: 62
-s_min: 34
-s_max: 182
-v_min: 145
-v_max: 256
+
+# Morphological operations iterations for white filtering
+pre_blur: 2
+
+pre_erosions_w: 0
+dilations_w: 2
+pre_erosions_g: 2
+dilations_g: 8
+post_erosions_g: 2
+
+# HSV filter parameters for the white part of the robot
+h_min_w: 0
+h_max_w: 77
+s_min_w: 0
+s_max_w: 149
+v_min_w: 140
+v_max_w: 256
+
+# HSV filter parameters for the green part of the robot
+h_min_g: 41
+h_max_g: 95
+s_min_g: 55
+s_max_g: 256
+v_min_g: 30
+v_max_g: 256
+
+# HSV filter parameters for the red part of the robot
+h_min_r: 0
+h_max_r: 256
+s_min_r: 0
+s_max_r: 256
+v_min_r: 0
+v_max_r: 256
+
+# Shape detection parameters
+canny_thresh1: 1
+canny_thresh2: 1
+canny_aperture: 3
+poly_area_min: 0
+poly_area_max: 50000
+max_dist: 75

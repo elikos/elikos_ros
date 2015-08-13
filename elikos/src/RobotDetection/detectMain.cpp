@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     elikos_detection::Detection detect_instance(&nh);
     detect_instance.init();
 
-    if (true) {
+    if (DEBUG_MODE) {
         detect_instance.createTrackbars();
     }
 
@@ -52,18 +52,18 @@ int main(int argc, char* argv[])
 
         if (!detect_instance.getCurrentImage().empty()) {
 
-            detect_instance.trackRobots();
+            detect_instance.trackBlobs();
+            //detect_instance.trackShape();
 
-            if (true) {
+            detect_instance.computeTargetPosition();
+
+            if (DEBUG_MODE) {
                 detect_instance.showThreshold();
                 detect_instance.showCurrentImage();
             }
         }
-
-        detect_instance.computeTargetPosition();
-
         waitKey(30);
     }
-
+    detect_instance.printROSparams();
     return 0;
 }

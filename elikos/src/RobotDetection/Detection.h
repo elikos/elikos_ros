@@ -14,6 +14,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include "./../defines.cpp"
 #include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/Range.h>
 #include <elikos_ros/RobotPos.h>
 #include <elikos_ros/RobotsPos.h>
 #include <tf/transform_listener.h>
@@ -34,6 +35,7 @@ namespace elikos_detection {
         void init();
 
         void cameraCallback(const sensor_msgs::ImageConstPtr &msg);
+        void altitudeCallback(const sensor_msgs::RangeConstPtr& msg);
 
         Mat getCurrentImage(){return currentImage;}
         cv_bridge::CvImagePtr getNextImage(){return nextImage;}
@@ -45,8 +47,9 @@ namespace elikos_detection {
 
         VideoCapture getCapture(){return capture;}
 
-        void trackFilteredObjects(Mat threshold,Mat HSV, Mat &cameraFeed);
-        void drawObject(vector<RobotDesc> vecRobot,Mat &frame);
+        vector<RobotDesc> trackFilteredObjects(Mat threshold, Mat &cameraFeed);
+        void drawObjects(vector<RobotDesc> vecRobot, Mat &frame);
+        void drawObject(RobotDesc robot, Mat &frame);
         void morphOps(Mat &thresh);
         void cannyEdge();
         void sendMsg();
@@ -57,6 +60,8 @@ namespace elikos_detection {
         void initCameraTF();
         void computeTargetPosition();
 
+        void printROSparams();
+
     /* *************************************************************************************************
      * ***              DEBUG FUNCTIONS
      * *************************************************************************************************
@@ -65,7 +70,8 @@ namespace elikos_detection {
         void createTrackbars();
         void setupDebug();
         void captureFrame();
-        void trackRobots();
+        void trackBlobs();
+        void trackShape();
         void showCurrentImage();
         void showThreshold();
 
@@ -83,7 +89,8 @@ namespace elikos_detection {
      * ***           PRIVATE METHODS
      * *************************************************************************************************
      */
-        void getRotationFromImage(tf::Quaternion &q);
+    void getRotationFromImage(tf::Quaternion &q, int i);
+    void getRotationFromImage(tf::Quaternion &q, RobotDesc desc);
 
     /* *************************************************************************************************
      * ***           ATTRIBUTES
@@ -93,20 +100,31 @@ namespace elikos_detection {
         Mat currentImage;
         cv_bridge::CvImagePtr nextImage;
         elikos_ros::RobotsPos robotsPos_msg;
-        vector<RobotDesc> vecRobot;
+        vector<RobotDesc> foundRobots;
         ros::NodeHandle* nh_;
         image_transport::ImageTransport it_;
         image_transport::Subscriber image_sub_;
+
+        ros::Subscriber sub;
+        float altRange;
+
         ros::Publisher robots_publish;
+        double min_distance = -1;
 
         // TF transforms
         tf::TransformBroadcaster tf_broadcaster_;
         tf::TransformListener tf_listener_;
         tf::Transform camera_;
-        tf::Transform turret_;
-        tf::Quaternion turret_rotation_;
-        tf::StampedTransform turret_world_;
-        tf::Vector3 turret_world_x_;
+        std::vector<std::string> turret_frame_id_/*{"turret0",
+                                                  "turret1",
+                                                  "turret2",
+                                                  "turret3",
+                                                  "turret4",
+                                                  "turret5" }*/;
+        std::vector<tf::Transform> turret_;
+        std::vector<tf::Quaternion> turret_rotation_;
+        std::vector<tf::StampedTransform> turret_world_;
+        std::vector<tf::Vector3> turret_world_x_;
         tf::Transform target_robot_;
 
 
@@ -115,8 +133,18 @@ namespace elikos_detection {
      * *************************************************************************************************
      */
 
-        Mat threshold;
-        Mat hsv;
+        Mat threshold_w;
+        Mat threshold_g;
+        Mat threshold_r;
+        Mat hsv_w;
+        Mat hsv_c;
+        Mat mask;
+        Mat closeWhite;
+        Mat cropped_hsv;
+        Mat grayscale_image;
+        Mat canny;
+        Mat morph_ex;
+        Mat contour_drawings;
         VideoCapture capture;
 
     /* *************************************************************************************************
@@ -124,12 +152,41 @@ namespace elikos_detection {
      * *************************************************************************************************
      */
 
-        int H_MIN;
-        int H_MAX;
-        int S_MIN;
-        int S_MAX;
-        int V_MIN;
-        int V_MAX;
+        int H_MIN_W;
+        int H_MAX_W;
+        int S_MIN_W;
+        int S_MAX_W;
+        int V_MIN_W;
+        int V_MAX_W;
+        int H_MIN_G;
+        int H_MAX_G;
+        int S_MIN_G;
+        int S_MAX_G;
+        int V_MIN_G;
+        int V_MAX_G;
+        int H_MIN_R;
+        int H_MAX_R;
+        int S_MIN_R;
+        int S_MAX_R;
+        int V_MIN_R;
+        int V_MAX_R;
+        int PRE_EROSIONS_W;
+        int DILATIONS_W;
+        int POST_EROSIONS_W;
+        int PRE_EROSIONS_G;
+        int DILATIONS_G;
+        int POST_EROSIONS_G;
+        int PRE_BLUR;
+        int BLUR_AMOUNT;
+        int CANNY_THRESH1;
+        int CANNY_THRESH2;
+        int CANNY_APERTURE;
+        int POLY_AREA_MIN;
+        int POLY_AREA_MAX;
+        int MORPH_OP;
+        int MORPH_ELEMENT;
+        int MORPH_SIZE;
+        int MAX_DIST;
 
         const int FRAME_WIDTH = 640;
         const int FRAME_HEIGHT = 480;
@@ -139,14 +196,16 @@ namespace elikos_detection {
         const int MIN_OBJECT_AREA = 40 * 40;
         const int MAX_OBJECT_AREA = FRAME_HEIGHT * FRAME_WIDTH / 1.5;
 
-        const double CAMERA_FOV_H = 53 * PI/180.0;
-        const double CAMERA_FOV_V = 40 * PI/180.0;
+        const double CAMERA_FOV_H = 120 * PI/180.0;
+        const double CAMERA_FOV_V = 66 * PI/180.0;
 
         const string windowName = "Original Image";
         const string windowName1 = "HSV Image";
         const string windowName2 = "Thresholded Image";
         const string windowName3 = "After Morphological Operations";
         const string trackbarWindowName = "Trackbars";
+        const string HSVTrackbars= "HSV Trackbars";
+        const string shapeDetectTrackbars = "Shape detector";
 
 
     };
