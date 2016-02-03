@@ -152,6 +152,9 @@ add_executable( pose_offset
     src/pose_offset/SvoCtrl.cpp
 )
 
+add_executable( dnt
+    src/dnt/dnt.cpp
+)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -176,6 +179,7 @@ target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( pose_offset elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##
