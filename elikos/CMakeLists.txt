@@ -15,7 +15,6 @@ find_package( catkin REQUIRED COMPONENTS
    sensor_msgs
    cv_bridge
    image_transport
-   mcptam_msgs
 )
 find_package(OpenCV REQUIRED)
 
@@ -78,7 +77,6 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   geometry_msgs
-  mcptam_msgs
 )
 
 ###################################
@@ -95,7 +93,7 @@ catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
 #  LIBRARIES elikos
-  CATKIN_DEPENDS std_msgs std_srvs mcptam_msgs
+  CATKIN_DEPENDS std_msgs std_srvs
 #  DEPENDS system_lib
 )
 
@@ -110,21 +108,21 @@ CATKIN_DEPENDS message_runtime
 include_directories( include ${catkin_INCLUDE_DIRS} )
 
 ## Declare a cpp library
-add_library(elikos_lib
-  src/elikos_lib/pid.cpp
-  src/elikos_lib/RCReceiver.cpp
-include/elikos_lib/PositionHelper.h)
+#add_library(elikos_lib
+#  src/elikos_lib/pid.cpp
+#  src/elikos_lib/RCReceiver.cpp
+#include/elikos_lib/PositionHelper.h)
 
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
-add_executable( robotsim
-  src/simulation/simulation.cpp
-  src/simulation/Robot.cpp
-  src/simulation/TargetRobot.cpp
-  src/simulation/ObstacleRobot.cpp
-  src/simulation/MAV.cpp
-)
+#add_executable( robotsim
+#  src/simulation/simulation.cpp
+#  src/simulation/Robot.cpp
+#  src/simulation/TargetRobot.cpp
+#  src/simulation/ObstacleRobot.cpp
+#  src/simulation/MAV.cpp
+#)
 
 add_executable( tracking
   src/RobotDetection/RobotDesc.h
@@ -134,23 +132,23 @@ add_executable( tracking
   src/RobotDetection/detectMain.cpp
 )
 
-add_executable( navigator
-  src/navigator/navigator.cpp
-  src/navigator/SetpointManager.h
-  src/navigator/SetpointManager.cpp
-)
+#add_executable( navigator
+#  src/navigator/navigator.cpp
+#  src/navigator/SetpointManager.h
+#  src/navigator/SetpointManager.cpp
+#)
 
 include_directories( include ${catkin_INCLUDE_DIRS} )
 
-add_executable( pose_offset
-    src/pose_offset/pose_offset.cpp
-    src/pose_offset/PoseOffsetNode.cpp
-    src/pose_offset/McptamCtrl.cpp
-    include/pose_offset/SvoCtrl.h
-    include/pose_offset/McptamCtrl.h
-    include/pose_offset/VoCtrl.h
-    src/pose_offset/SvoCtrl.cpp
-)
+#add_executable( pose_offset
+#    src/pose_offset/pose_offset.cpp
+#    src/pose_offset/PoseOffsetNode.cpp
+#    src/pose_offset/McptamCtrl.cpp
+#    include/pose_offset/SvoCtrl.h
+#    include/pose_offset/McptamCtrl.h
+#    include/pose_offset/VoCtrl.h
+#    src/pose_offset/SvoCtrl.cpp
+#)
 
 add_executable( dnt
     src/dnt/dnt.cpp
@@ -164,21 +162,16 @@ add_dependencies(tracking
 elikos_ros_generate_messages_cpp
 )
 
-add_dependencies(
-    pose_offset
-    mcptam_msgs_gencpp
-)
-
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(elikos_node
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries( elikos_lib ${catkin_LIBRARIES})
-target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
+#target_link_libraries( elikos_lib ${catkin_LIBRARIES})
+#target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
-target_link_libraries( pose_offset elikos_lib ${catkin_LIBRARIES})
+#target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
+#target_link_libraries( pose_offset elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
