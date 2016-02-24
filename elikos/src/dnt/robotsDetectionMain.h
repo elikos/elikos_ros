@@ -1,0 +1,12 @@
+//
+// Created by ta11e4rand on 19/11/15.
+//
+
+#ifndef DETECTION_AND_TRACKING_ROBOTSDETECTIONMAIN_H
+#define DETECTION_AND_TRACKING_ROBOTSDETECTIONMAIN_H
+
+
+int trackRobotsTestMain();
+int blobTrackingMain();
+
+#endif //DETECTION_AND_TRACKING_ROBOTSDETECTIONMAIN_H
