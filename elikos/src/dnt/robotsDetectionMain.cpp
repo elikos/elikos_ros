@@ -16,11 +16,11 @@
 using namespace cv;
 using namespace std;
 
-#define VIDEO_FILE "videos/cam_bas.mp4"
+//#define VIDEO_FILE "videos/cam_bas.mp4"
 //#define VIDEO_FILE "videos/cam_bas_raccourci.mp4"
 //#define VIDEO_FILE "videos/unRobot.mp4"
 //#define VIDEO_FILE "videos/IARC.mp4"
-//#define VIDEO_FILE "videos/elikos_youtube.mp4"
+#define VIDEO_FILE "videos/elikos_youtube.mp4"
 //#define VIDEO_FILE "videos/Calibration_Proche_Vert.mp4"
 //#define VIDEO_FILE "videos/Calibration_Proche_Rouge.mp4"
 
@@ -61,7 +61,7 @@ int trackRobotsTestMain()
     trackingCircles.detectColor(frame, threshold_w, threshold_r, threshold_g, robotsMat);
     //Robot detection
     trackingCircles.detectRobots(frame,robotsMat);
-    if(waitKey(30) >= 0) return -1;//normalement 30
+    if(waitKey(15) >= 0) return -1;//normalement 30
 
     while(1) {
         // Obtenir une nouvelle image de la camera
@@ -84,7 +84,7 @@ int trackRobotsTestMain()
         imshow("Robot detection", robotsMat);
 
         // Attendre une touche pendant 30ms avant de continuer de la boucle
-        if(waitKey(30) >= 0) break;//normalement 30
+        if(waitKey(15) >= 0) break;//normalement 30
     }
     // Destroy the windows we have created
     cvDestroyWindow("Input");

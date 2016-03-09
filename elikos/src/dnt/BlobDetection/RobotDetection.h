@@ -108,6 +108,8 @@ private:
     const string trackbarWindowName = "Trackbars";
     const string HSVTrackbars = "HSV Trackbars";
     const string shapeDetectTrackbars = "Shape detector";
+
+    int maxID = 0;
 };
 
 

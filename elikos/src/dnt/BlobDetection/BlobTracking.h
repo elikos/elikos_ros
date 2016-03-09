@@ -11,6 +11,7 @@ class BlobTracking {
 public:
     //Robot tracking algorithm. Includes color and robot detection
     void track(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
+    //Method to detect blobs of color on frames
     void detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
     //Getters for the output vector of the algorithm
     vector<RobotDesc> getBlobObjects();

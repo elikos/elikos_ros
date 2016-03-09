@@ -63,6 +63,12 @@ public:
 
     void setArea(double area);
 
+    double getDistance(){return distancePrevious;}
+    void setDistance(double d){distancePrevious=d;}
+
+    bool getAlreadyFound(){return alreadyFound;}
+    void setAlreadyFound(bool a){alreadyFound=a;}
+
 private:
     /////Attributes/////
     // center
@@ -71,6 +77,10 @@ private:
     double area;
     //direction is an angle in radians
     double direction;
+    //distance from the previous position on frame. TODO: Could be interesting to choose which robot to keep when there are many with the same ID.
+    double distancePrevious;
+    //to insure that there is only one robot by id
+    bool alreadyFound;
     int id;//Still unused
     //window is the area on the frame where the robot was found
     cv::RotatedRect window;

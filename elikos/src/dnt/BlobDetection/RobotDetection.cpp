@@ -35,26 +35,62 @@ void RobotDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Ma
     whiteObjects = colors.at(0)->getObjects();
     greenObjects = colors.at(1)->getObjects();
     redObjects = colors.at(2)->getObjects();
-
-
+    int maxID = 0;
+    for (auto object: blobObjects){
+        maxID = max(maxID, object.getID());
+    }
+    auto oldObjects = blobObjects;
     blobObjects.erase(blobObjects.begin(),blobObjects.end());
-    int id = 0;
-    //increment counter
-    int i = 0;
+
     for(auto object : greenObjects){
         object.setColor(GREEN);
-        object.setWindow(RotatedRect(Point2f(object.getXPos(),object.getYPos()),Size2f(sqrt(object.getArea()),sqrt(object.getArea())),0));
-        object.setID(id + i++);
+        object.setWindow(RotatedRect(Point2f(object.getXPos(),object.getYPos()),Size2d(sqrt(object.getArea()),sqrt(object.getArea())),0));
         displayBlobMarker(object, output);
+        //set ID
+        bool found = false;
+        for(auto old : oldObjects) {
+            double old_ray = sqrt(old.getArea() / PI);
+            double distance = sqrt(abs(object.getXPos() - old.getXPos()) + abs(object.getYPos() - old.getYPos()));
+            object.setDistance(distance);
+            //if(distance < old_ray && !old.getAlreadyFound()){
+            if(object.getXPos() < old.getXPos() + old_ray && object.getXPos() > old.getXPos() - old_ray
+               && object.getYPos() < old.getYPos() + old_ray && object.getYPos() > old.getYPos() - old_ray
+               && !old.getAlreadyFound() && old.getColor() == object.getColor()){
+                found = true;
+                object.setID(old.getID());
+                old.setAlreadyFound(true);
+            }
+        }
+        if(!found) {
+            object.setID(++maxID);
+        }
         blobObjects.emplace_back(RobotDesc(object));
     }
     for(auto object : redObjects){
         object.setColor(RED);
-        object.setWindow(RotatedRect(Point2f(object.getXPos(),object.getYPos()),Size2f(sqrt(object.getArea()),sqrt(object.getArea())),0));
-        object.setID(id + i++);
+        object.setWindow(RotatedRect(Point2f(object.getXPos(),object.getYPos()),Size2d(sqrt(object.getArea()),sqrt(object.getArea())),0));
         displayBlobMarker(object, output);
+        //set ID
+        bool found = false;
+        for(auto old : oldObjects) {
+            double old_ray = sqrt(old.getArea() / PI);
+            double distance = sqrt(abs(object.getXPos() - old.getXPos()) + abs(object.getYPos() - old.getYPos()));
+            object.setDistance(distance);
+            //if(distance < old_ray && !old.getAlreadyFound()){
+            if(object.getXPos() < old.getXPos() + old_ray && object.getXPos() > old.getXPos() - old_ray
+             && object.getYPos() < old.getYPos() + old_ray && object.getYPos() > old.getYPos() - old_ray
+                    && !old.getAlreadyFound() && old.getColor() == object.getColor()){
+                found = true;
+                object.setID(old.getID());
+                old.setAlreadyFound(true);
+            }
+        }
+        if(!found) {
+            object.setID(++maxID);
+        }
         blobObjects.emplace_back(RobotDesc(object));
     }
+
 
     for (Color* color : colors)
         delete color;

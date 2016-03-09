@@ -72,12 +72,20 @@ void BlobTracking::trackRobots(const cv::Mat &input, cv::Mat &output){
 
 
         //Update IDs with blobs detected on the previous TrackListLength'th frame.
+        /*int maxID = 0;
+        for (auto object: getBlobObjects()){
+            maxID = max(maxID, object.getID());
+            cout<<"object ID: "<<object.getID()<<endl;
+        }
+        bool found = false;
         for(auto object: getBlobObjects()){
             if(object.getXPos()<trackWindow.center.x+trackWindow.size.width/2 && object.getXPos()>trackWindow.center.x-trackWindow.size.width/2
                     && object.getYPos()<trackWindow.center.y+trackWindow.size.height/2 &&object.getYPos()>trackWindow.center.y-trackWindow.size.height/2) {
                 object.setID(it->getID());
+                found = true;
             }
         }
+        if(!found) it->setID(maxID++);*/
 
         //Compute and display the direction of the trackWindow
         double direction = fastAtan2(trackWindow.center.y-it->getYPos(),trackWindow.center.x-it->getXPos())/360*2*PI;

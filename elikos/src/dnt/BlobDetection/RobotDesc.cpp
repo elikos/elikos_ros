@@ -2,11 +2,11 @@
 /*
  * Constructors and destructors
  */
-RobotDesc::RobotDesc():direction(0), id(0)
+RobotDesc::RobotDesc():direction(0), id(0), alreadyFound(false)
 {
 }
 
-RobotDesc::RobotDesc(int id, int x, int y): radius(id), xPos(x), yPos(y), direction(0), id(0)
+RobotDesc::RobotDesc(int id, int x, int y): radius(id), xPos(x), yPos(y), direction(0), id(0), alreadyFound(false)
 {
 }
 
