@@ -11,7 +11,7 @@ RCReceiver::RCReceiver(ros::NodeHandle nh) : nh_(&nh) {
 
 RCReceiver::~RCReceiver() {}
 
-void RCReceiver::RCCallback(const mavros::RCInConstPtr rc) {
+void RCReceiver::RCCallback(const mavros_msgs::RCInConstPtr rc) {
     for (size_t i = 0; i < NUMBER_OF_CHANNELS; i++) {
         rc_channels_[i] = rc->channels[i];
     }

@@ -15,6 +15,7 @@ find_package( catkin REQUIRED COMPONENTS
    sensor_msgs
    cv_bridge
    image_transport
+   mavros_msgs
 )
 find_package(OpenCV REQUIRED)
 
@@ -77,6 +78,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   geometry_msgs
+  mavros_msgs
 )
 
 ###################################
@@ -93,7 +95,7 @@ catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
 #  LIBRARIES elikos
-  CATKIN_DEPENDS std_msgs std_srvs
+CATKIN_DEPENDS std_msgs std_srvs mavros_msgs
 #  DEPENDS system_lib
 )
 
@@ -108,10 +110,10 @@ CATKIN_DEPENDS message_runtime
 include_directories( include ${catkin_INCLUDE_DIRS} )
 
 ## Declare a cpp library
-#add_library(elikos_lib
-#  src/elikos_lib/pid.cpp
-#  src/elikos_lib/RCReceiver.cpp
-#include/elikos_lib/PositionHelper.h)
+add_library( elikos_lib
+  src/elikos_lib/pid.cpp
+  src/elikos_lib/RCReceiver.cpp
+include/elikos_lib/PositionHelper.h)
 
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
@@ -190,15 +192,18 @@ add_executable( dnt
 #add_dependencies(robotsim elikos_lib)
 
 add_dependencies(tracking
-elikos_ros_generate_messages_cpp
+    elikos_ros_generate_messages_cpp
 )
 
+add_dependencies(elikos_lib
+    mavros_msgs
+)
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(elikos_node
-#   ${catkin_LIBRARIES}
-# )
+#target_link_libraries(elikos_node
+#  ${catkin_LIBRARIES}
+#)
 
-#target_link_libraries( elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( elikos_lib ${catkin_LIBRARIES})
 #target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
