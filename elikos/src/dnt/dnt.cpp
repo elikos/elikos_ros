@@ -12,11 +12,10 @@ int main(int argc, char* argv[])
 {
     // ROS Init
     ros::init( argc, argv, "elikos_dnt" );
-    ros::Rate r(30);
    
-//    std::unique_ptr<MessageHandler> messageHandler = std::make_unique<MessageHandler>();
-    MessageHandler* messageHandler = new MessageHandler();
+    MessageHandler messageHandler;
 
+    ros::Rate r(30);
     // Endless loop
     while(ros::ok()) 
     {
