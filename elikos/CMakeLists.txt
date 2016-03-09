@@ -118,13 +118,13 @@ include/elikos_lib/PositionHelper.h)
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
-#add_executable( robotsim
-#  src/simulation/simulation.cpp
-#  src/simulation/Robot.cpp
-#  src/simulation/TargetRobot.cpp
-#  src/simulation/ObstacleRobot.cpp
-#  src/simulation/MAV.cpp
-#)
+add_executable( robotsim
+  src/simulation/simulation.cpp
+  src/simulation/Robot.cpp
+  src/simulation/TargetRobot.cpp
+  src/simulation/ObstacleRobot.cpp
+  src/simulation/MAV.cpp
+)
 
 add_executable( tracking
   src/RobotDetection/RobotDesc.h
@@ -134,11 +134,11 @@ add_executable( tracking
   src/RobotDetection/detectMain.cpp
 )
 
-#add_executable( navigator
-#  src/navigator/navigator.cpp
-#  src/navigator/SetpointManager.h
-#  src/navigator/SetpointManager.cpp
-#)
+add_executable( navigator
+  src/navigator/navigator.cpp
+  src/navigator/SetpointManager.h
+  src/navigator/SetpointManager.cpp
+)
 
 include_directories( include ${catkin_INCLUDE_DIRS} )
 
@@ -204,9 +204,9 @@ add_dependencies(elikos_lib
 #)
 
 target_link_libraries( elikos_lib ${catkin_LIBRARIES})
-#target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
-#target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
 #target_link_libraries( pose_offset elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
