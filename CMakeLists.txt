@@ -155,20 +155,11 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 add_executable( dnt
     src/dnt/dnt.cpp
     src/dnt/MessageHandler.h
-    src/dnt/MessageHandler.cpp 
-    src/dnt/EdgeDetection/EdgeDetection.cpp
-    src/dnt/EdgeDetection/EdgeDetection.h
+    src/dnt/MessageHandler.cpp
 	src/dnt/BlobDetection/BlobDetection.cpp
-    src/dnt/BlobDetection/BlobDetection.h
-	src/dnt/BlobDetection/OpticalFlowTracking.h
-	src/dnt/BlobDetection/OpticalFlowTracking.cpp
     src/dnt/BlobDetection/BlobDetection.h
 	src/dnt/BlobDetection/RobotDesc.h
 	src/dnt/BlobDetection/RobotDesc.cpp
-    src/dnt/trackBlobsTestMain.cpp
-	src/dnt/circleDetectionTestMain.cpp
-	src/dnt/circleDetectionTestMain.h
-	src/dnt/trackBlobsTestMain.h
 	src/dnt/BlobDetection/Color.cpp
 	src/dnt/BlobDetection/Color.h
 	src/dnt/BlobDetection/GreenColor.cpp
@@ -180,10 +171,7 @@ add_executable( dnt
     src/dnt/BlobDetection/RobotDetection.cpp
     src/dnt/BlobDetection/RobotDetection.h 
     src/dnt/robotsDetectionMain.cpp 
-    src/dnt/robotsDetectionMain.h 
-    src/dnt/BlobDetection/TrackingCircles.cpp 
-    src/dnt/BlobDetection/TrackingCircles.h 
-    src/dnt/OpticalFlowMain.cpp 
+    src/dnt/robotsDetectionMain.h
     src/dnt/BlobDetection/BlobTracking.h 
     src/dnt/BlobDetection/BlobTracking.cpp)
 
