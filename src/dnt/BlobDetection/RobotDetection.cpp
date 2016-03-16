@@ -3,6 +3,7 @@
 //
 
 #include "RobotDetection.h"
+#include <opencv2/core/core.hpp>
 
 RobotDetection::RobotDetection(){
     //foundCircles initialisation
@@ -44,7 +45,7 @@ void RobotDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Ma
 
     for(auto object : greenObjects){
         object.setColor(GREEN);
-        object.setWindow(RotatedRect(Point2f(object.getXPos(),object.getYPos()),Size2d(sqrt(object.getArea()),sqrt(object.getArea())),0));
+        object.setWindow(RotatedRect(Point2f(object.getXPos(),object.getYPos()), Size2f(sqrt(object.getArea()),sqrt(object.getArea())),0));
         displayBlobMarker(object, output);
         //set ID
         bool found = false;
@@ -68,7 +69,7 @@ void RobotDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Ma
     }
     for(auto object : redObjects){
         object.setColor(RED);
-        object.setWindow(RotatedRect(Point2f(object.getXPos(),object.getYPos()),Size2d(sqrt(object.getArea()),sqrt(object.getArea())),0));
+        object.setWindow(RotatedRect(Point2f(object.getXPos(),object.getYPos()), cv::Size2f(sqrt(object.getArea()),sqrt(object.getArea())),0));
         displayBlobMarker(object, output);
         //set ID
         bool found = false;
