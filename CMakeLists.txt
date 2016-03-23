@@ -16,6 +16,8 @@ find_package( catkin REQUIRED COMPONENTS
    cv_bridge
    image_transport
    mavros_msgs
+   sensor_msgs
+   cv_bridge
 )
 find_package(OpenCV REQUIRED)
 
@@ -79,6 +81,7 @@ generate_messages(
   std_msgs
   geometry_msgs
   mavros_msgs
+  sensor_msgs
 )
 
 ###################################
@@ -95,7 +98,7 @@ catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
 #  LIBRARIES elikos
-CATKIN_DEPENDS std_msgs std_srvs mavros_msgs
+CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -185,6 +188,7 @@ add_dependencies(tracking
 
 add_dependencies(elikos_lib
     mavros_msgs
+    sensor_msgs
 )
 ## Specify libraries to link a library or executable target against
 #target_link_libraries(elikos_node
