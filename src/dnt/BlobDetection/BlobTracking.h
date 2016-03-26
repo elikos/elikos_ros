@@ -13,17 +13,19 @@ public:
     void track(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
     //Method to detect blobs of color on frames
     void detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
-    //Getters for the output vector of the algorithm
-    vector<RobotDesc> getBlobObjects();
+
     int getTrackCounter(){return trackCounter;}
     void setPrevPoints(vector<cv::Point2f> p){
         prevPoints=p;
     }
+    void displayDirection(RobotDesc robot, cv::Mat &output);
+
+    //Getters for the output vector of the algorithm
+    vector<RobotDesc> getRobots();
 private:
     //Computation methods
-    void displayDirection(RobotDesc robot, cv::Mat &output);
     void trackRobots(const cv::Mat &input, cv::Mat &output);
-
+    vector<RobotDesc> robots;
     //Attributes
     //Detection class
     RobotDetection detection;

@@ -25,7 +25,7 @@ MessageHandler::~MessageHandler()
 void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &msg)
 {
     std::cout << "Message recu" << std::endl;
-    /*cv::Mat currentImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
+    cv::Mat currentImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
 
     Mat threshold_w;
     Mat threshold_r;
@@ -34,7 +34,9 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &msg)
 
     BlobTracking tracking;
 
-    tracking.track(currentImage, threshold_w, threshold_r, threshold_g, robotsMat);*/
+    tracking.track(currentImage, threshold_w, threshold_r, threshold_g, robotsMat);
+
+
 }
 
 

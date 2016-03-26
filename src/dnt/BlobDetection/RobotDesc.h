@@ -69,8 +69,12 @@ public:
     bool getAlreadyFound(){return alreadyFound;}
     void setAlreadyFound(bool a){alreadyFound=a;}
 
+    bool getInsideFOV(){return insideFOV;}
+    void setInsideFOV(bool in){insideFOV=in;}
 private:
     /////Attributes/////
+    //Inside fov(field of view)
+    bool insideFOV;
     // center
     int xPos, yPos;
     int radius;
