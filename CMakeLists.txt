@@ -159,8 +159,6 @@ add_executable( dnt
     src/dnt/dnt.cpp
     src/dnt/MessageHandler.h
     src/dnt/MessageHandler.cpp
-	src/dnt/BlobDetection/BlobDetection.cpp
-    src/dnt/BlobDetection/BlobDetection.h
 	src/dnt/BlobDetection/RobotDesc.h
 	src/dnt/BlobDetection/RobotDesc.cpp
 	src/dnt/BlobDetection/Color.cpp
@@ -172,9 +170,7 @@ add_executable( dnt
 	src/dnt/BlobDetection/WhiteColor.cpp
 	src/dnt/BlobDetection/WhiteColor.h
     src/dnt/BlobDetection/RobotDetection.cpp
-    src/dnt/BlobDetection/RobotDetection.h 
-    src/dnt/robotsDetectionMain.cpp 
-    src/dnt/robotsDetectionMain.h
+    src/dnt/BlobDetection/RobotDetection.h
     src/dnt/BlobDetection/BlobTracking.h 
     src/dnt/BlobDetection/BlobTracking.cpp)
 
