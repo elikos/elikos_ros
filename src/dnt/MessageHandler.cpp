@@ -13,7 +13,7 @@ MessageHandler::MessageHandler() :
     it_(nh_)
 {
 	is_ = it_.subscribe("camera/image_raw", 1, &MessageHandler::dispatchMessage, this);
-        pub_ = nh_.advertise<elikos_ros::RobotRawArray>("robot_raw_array",1);
+    pub_ = nh_.advertise<elikos_ros::RobotRawArray>("robot_raw_array",1);
 }
 
 
@@ -33,6 +33,9 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
 
     tracking_.track(currentImage, threshold_w, threshold_r, threshold_g, robotsMat);
 
+	//Affichage à la console pour tester
+	std::cout<<"output dnt size: "<<tracking_.getRobots().size()<<std::endl;
+	
     //publishing data
     elikos_ros::RobotRawArray output;
     elikos_ros::RobotRaw data;
