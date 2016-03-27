@@ -22,9 +22,9 @@ MessageHandler::~MessageHandler()
 }
 
 
-void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
+void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &msg)
 {
-    cv::Mat currentImage = cv_bridge::toCvCopy(input, sensor_msgs::image_encodings::BGR8)->image;
+    cv::Mat currentImage = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
 
     Mat threshold_w;
     Mat threshold_r;
@@ -34,7 +34,7 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
     tracking_.track(currentImage, threshold_w, threshold_r, threshold_g, robotsMat);
 
     //publishing data
-    elikos_ros::RobotRawArray output;
+    elikos_ros::RobotRawArray msg;
     elikos_ros::RobotRaw data;
 
     for(auto robot : tracking_.getRobots()){
@@ -43,8 +43,8 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
 	data.pose.x = robot.getXPos();
 	data.pose.y = robot.getYPos();
 	data.pose.theta = robot.getDirection();
-	output.robots.push_back(data);
-	pub_.publish(output);
+	msg.robots.push_back(data);
+	pub_.publish(msg);
     }
 
 }
