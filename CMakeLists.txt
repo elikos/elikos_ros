@@ -176,10 +176,10 @@ add_executable( dnt
     src/dnt/BlobDetection/BlobTracking.h 
     src/dnt/BlobDetection/BlobTracking.cpp)
 
-add_executable( tracking_tf
-    src/tracking_tf/tracking_tf.cpp
-    src/tracking_tf/MessageHandler_ttf.h
-    src/tracking_tf/MessageHandler_ttf.cpp)
+add_executable( tracking_abs
+    src/tracking_abs/tracking_abs.cpp
+    src/tracking_abs/MessageHandler_abs.h
+    src/tracking_abs/MessageHandler_abs.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -204,7 +204,7 @@ target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
 #target_link_libraries( pose_offset elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries( tracking_tf ${catkin_LIBRARIES})
+target_link_libraries( tracking_abs ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############
