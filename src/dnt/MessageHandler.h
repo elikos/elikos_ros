@@ -10,6 +10,9 @@
 
 #include "BlobDetection/BlobTracking.h"
 
+namespace dnt 
+{
+
 class MessageHandler
 {
 public:
@@ -25,5 +28,5 @@ private:
     BlobTracking tracking_;
 };
 
+}
 #endif /// MESSAGE_HANDLER
-

@@ -9,6 +9,9 @@
 
 #include "BlobDetection/BlobTracking.h"
 
+namespace dnt
+{
+
 MessageHandler::MessageHandler() : 
     it_(nh_)
 {
@@ -49,5 +52,6 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
 	output.robots.push_back(data);
 	pub_.publish(output);
     }
+}
 
 }

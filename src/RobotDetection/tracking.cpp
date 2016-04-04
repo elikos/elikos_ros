@@ -1,4 +1,3 @@
-
 //Current file modified by : Olivier Comtois
 
 //Original file :

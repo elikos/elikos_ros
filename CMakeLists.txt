@@ -18,6 +18,7 @@ find_package( catkin REQUIRED COMPONENTS
    mavros_msgs
    sensor_msgs
    cv_bridge
+   geometry_msgs
 )
 find_package(OpenCV REQUIRED)
 
@@ -100,7 +101,7 @@ catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
 #  LIBRARIES elikos
-CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs
+CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
@@ -128,24 +129,19 @@ add_executable( robotsim
   src/simulation/Robot.cpp
   src/simulation/TargetRobot.cpp
   src/simulation/ObstacleRobot.cpp
-  src/simulation/MAV.cpp
-)
+  src/simulation/MAV.cpp)
 
 add_executable( tracking
   src/RobotDetection/RobotDesc.h
   src/RobotDetection/RobotDesc.cpp
   src/RobotDetection/Detection.h
   src/RobotDetection/Detection.cpp
-  src/RobotDetection/detectMain.cpp
-)
+  src/RobotDetection/detectMain.cpp)
 
 add_executable( navigator
   src/navigator/navigator.cpp
   src/navigator/SetpointManager.h
-  src/navigator/SetpointManager.cpp
-)
-
-include_directories( include ${catkin_INCLUDE_DIRS} )
+  src/navigator/SetpointManager.cpp)
 
 #add_executable( pose_offset
 #    src/pose_offset/pose_offset.cpp
@@ -156,6 +152,7 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 #    include/pose_offset/VoCtrl.h
 #    src/pose_offset/SvoCtrl.cpp
 #)
+
 
 add_executable( dnt
     src/dnt/dnt.cpp
@@ -181,6 +178,20 @@ add_executable( tracking_abs
     src/tracking_abs/MessageHandler_abs.h
     src/tracking_abs/MessageHandler_abs.cpp)
 
+include_directories(src/ai/StateMachine)
+
+add_executable( ai
+    src/ai/ai.cpp
+    src/ai/AIFacade.cpp
+    src/ai/AIFacade.h
+    src/ai/MessageHandler.h
+    src/ai/MessageHandler.cpp
+    src/ai/StateMachine/StateMachine.h
+    src/ai/StateMachine/StateMachine.cpp
+    src/ai/StateMachine/AbstractState.h
+    src/ai/StateMachine/AbstractState.cpp)
+
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(robotsim elikos_lib)
@@ -193,6 +204,12 @@ add_dependencies(elikos_lib
     mavros_msgs
     sensor_msgs
 )
+
+add_dependencies( tracking_abs
+    elikos_ros_generate_messages_cpp
+)
+
+
 ## Specify libraries to link a library or executable target against
 #target_link_libraries(elikos_node
 #  ${catkin_LIBRARIES}
@@ -205,6 +222,9 @@ target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
 #target_link_libraries( pose_offset elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( tracking_abs ${catkin_LIBRARIES})
+target_link_libraries( ai ${catkin_LIBRARIES})
+
+set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 #############
 ## Install ##
 #############
@@ -252,4 +272,3 @@ target_link_libraries( tracking_abs ${catkin_LIBRARIES})
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-
