@@ -1,28 +1,24 @@
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
 
-#include "AIFacade.h"
+#include "Agent.h"
 #include "MessageHandler.h"
 
 namespace ai 
 {
 
-MessageHandler::MessageHandler()
+MessageHandler::MessageHandler(Agent* agent)
+    : agent_(agent)
 {
-
 }
-
-
-MessageHandler::~MessageHandler()
-{
-
-}
-
 
 void MessageHandler::lookupTransform()
 {
     tf::StampedTransform stf; 
-    listener_.lookupTransform("", "", ros::Time(0), stf);
+    listener_.lookupTransform("world", "MAV", ros::Time(0), stf);
+
+    stf.getOrigin();
+    stf.getRotation();
 }
 
 }

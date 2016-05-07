@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(elikos_ros)
-set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -178,18 +178,8 @@ add_executable( tracking_abs
     src/tracking_abs/MessageHandler_abs.h
     src/tracking_abs/MessageHandler_abs.cpp)
 
-include_directories(src/ai/StateMachine)
 
-add_executable( ai
-    src/ai/ai.cpp
-    src/ai/AIFacade.cpp
-    src/ai/AIFacade.h
-    src/ai/MessageHandler.h
-    src/ai/MessageHandler.cpp
-    src/ai/StateMachine/StateMachine.h
-    src/ai/StateMachine/StateMachine.cpp
-    src/ai/StateMachine/AbstractState.h
-    src/ai/StateMachine/AbstractState.cpp)
+add_subdirectory(src/ai)
 
 
 ## Add cmake target dependencies of the executable/library
@@ -219,12 +209,9 @@ target_link_libraries( elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
-#target_link_libraries( pose_offset elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( tracking_abs ${catkin_LIBRARIES})
-target_link_libraries( ai ${catkin_LIBRARIES})
 
-set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 #############
 ## Install ##
 #############
