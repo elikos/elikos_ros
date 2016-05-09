@@ -15,10 +15,19 @@ MessageHandler::MessageHandler(Agent* agent)
 void MessageHandler::lookupTransform()
 {
     tf::StampedTransform stf; 
-    listener_.lookupTransform("world", "MAV", ros::Time(0), stf);
+    try
+    {
+        listener_.lookupTransform("world", "MAV", ros::Time(0), stf);
+    }
+    catch(tf::TransformException e)
+    {
+        ROS_ERROR("%s", e.what());
+        ros::Duration(1.0).sleep();
+        return;
+    }
 
-    stf.getOrigin();
-    stf.getRotation();
+    std::cout << stf.getOrigin() << std::endl;
+    std::cout << stf.getRotation() << std::endl;
 }
 
 }
