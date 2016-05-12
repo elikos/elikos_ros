@@ -13,6 +13,7 @@ class Agent;
 class MessageHandler
 {
 public:
+
     MessageHandler() = default;
     MessageHandler(Agent* agent);
     ~MessageHandler() = default;

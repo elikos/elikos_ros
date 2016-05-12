@@ -3,16 +3,19 @@
 #include <ros/package.h>
 #include "MessageHandler.h"
 #include "Agent.h"
+#include "CmdLineParser.h"
 
 int main(int argc, char* argv[])
 {
+    ai::CmdLineParser parser(argc, argv);
+    parser.parse();
+
     // ROS Init
     ros::init( argc, argv, "elikos_ai" );
     std::unique_ptr<ai::Agent> agent;
     agent = std::unique_ptr<ai::Agent>(new ai::Agent());
     ai::MessageHandler mh(agent.get());
     ros::Rate rate(30);
-
 
     // Endless loop
     while(ros::ok()) 
