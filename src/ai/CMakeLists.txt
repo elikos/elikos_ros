@@ -3,6 +3,8 @@ include_directories(Robot)
 
 add_executable( ai
     ai.cpp
+    CmdLineParser.h
+    CmdLineParser.cpp
     Agent.cpp
     Agent.h
     MessageHandler.h

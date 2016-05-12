@@ -7,6 +7,7 @@
 namespace ai 
 {
 
+const static std::string OBS_FRAMES[4];
 MessageHandler::MessageHandler(Agent* agent)
     : agent_(agent)
 {
