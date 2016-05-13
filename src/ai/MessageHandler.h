@@ -13,6 +13,13 @@ class Agent;
 class MessageHandler
 {
 public:
+    static const std::string TRGT_FRAME;
+    static const std::string OBS_FRAME;
+    static const std::string MAV_FRAME;
+    static const std::string WORLD_FRAME;
+
+    static const int N_TRGT = 10;
+    static const int N_OBS = 4;
 
     MessageHandler() = default;
     MessageHandler(Agent* agent);
@@ -25,6 +32,10 @@ private:
     ros::NodeHandle nh_;
     tf::TransformListener listener_;
     Agent* agent_{ nullptr };
+
+    void lookForTargets();
+    void lookForObs();
+    void lookForMAV();
 };
 
 

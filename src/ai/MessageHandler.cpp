@@ -7,7 +7,12 @@
 namespace ai 
 {
 
-const static std::string OBS_FRAMES[4];
+const std::string MessageHandler::TRGT_FRAME     = "trgtRobot";
+const std::string MessageHandler::OBS_FRAME      = "obsRobot";
+const std::string MessageHandler::MAV_FRAME      = "MAV";
+const std::string MessageHandler::WORLD_FRAME    = "world";
+
+
 MessageHandler::MessageHandler(Agent* agent)
     : agent_(agent)
 {
@@ -15,20 +20,61 @@ MessageHandler::MessageHandler(Agent* agent)
 
 void MessageHandler::lookupTransform()
 {
-    tf::StampedTransform stf; 
+}
+
+void MessageHandler::lookForTargets()
+{
+    for (int i = 0; i < N_TRGT; i++)
+    {
+        tf::StampedTransform stf;
+        try
+        {
+            std::stringstream frame(TRGT_FRAME);
+            frame << std::to_string(i);
+            listener_.lookupTransform(WORLD_FRAME, frame.str(), ros::Time(0), stf);
+            // TODO: Send to agent.
+        }
+        catch(tf::TransformException e)
+        {
+            //TODO: Maybe log exception.
+            ROS_ERROR("%s", e.what());
+        }
+    }
+}
+void MessageHandler::lookForObs()
+{
+    for (int i = 0; i < N_OBS; i++)
+    {
+        tf::StampedTransform stf;
+        try
+        {
+            std::stringstream frame(OBS_FRAME);
+            frame << std::to_string(i);
+            listener_.lookupTransform(WORLD_FRAME, frame.str(), ros::Time(0), stf);
+            // TODO: Send to agent.
+        }
+        catch(tf::TransformException e)
+        {
+            //TODO: Maybe log exception.
+            ROS_ERROR("%s", e.what());
+        }
+    }
+
+}
+void MessageHandler::lookForMAV()
+{
+    tf::StampedTransform stf;
     try
     {
-        listener_.lookupTransform("world", "MAV", ros::Time(0), stf);
+        listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), stf);
+        // TODO: Send to agent.
     }
     catch(tf::TransformException e)
     {
+        //TODO: Maybe log exception.
         ROS_ERROR("%s", e.what());
-        ros::Duration(1.0).sleep();
         return;
     }
-
-    std::cout << stf.getOrigin() << std::endl;
-    std::cout << stf.getRotation() << std::endl;
 }
 
 }
