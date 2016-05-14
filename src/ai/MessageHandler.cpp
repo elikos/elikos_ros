@@ -20,6 +20,9 @@ MessageHandler::MessageHandler(Agent* agent)
 
 void MessageHandler::lookupTransform()
 {
+    lookForMAV();
+    lookForObstacles();
+    lookForTargets();
 }
 
 void MessageHandler::lookForTargets()
@@ -41,7 +44,8 @@ void MessageHandler::lookForTargets()
         }
     }
 }
-void MessageHandler::lookForObs()
+
+void MessageHandler::lookForObstacles()
 {
     for (int i = 0; i < N_OBS; i++)
     {
@@ -52,6 +56,7 @@ void MessageHandler::lookForObs()
             frame << std::to_string(i);
             listener_.lookupTransform(WORLD_FRAME, frame.str(), ros::Time(0), stf);
             // TODO: Send to agent.
+
         }
         catch(tf::TransformException e)
         {
@@ -61,6 +66,7 @@ void MessageHandler::lookForObs()
     }
 
 }
+
 void MessageHandler::lookForMAV()
 {
     tf::StampedTransform stf;
@@ -73,7 +79,6 @@ void MessageHandler::lookForMAV()
     {
         //TODO: Maybe log exception.
         ROS_ERROR("%s", e.what());
-        return;
     }
 }
 
