@@ -7,9 +7,6 @@
 
 int main(int argc, char* argv[])
 {
-    ai::CmdLineParser parser(argc, argv);
-    parser.parse();
-
     // ROS Init
     ros::init( argc, argv, "elikos_ai" );
     std::unique_ptr<ai::Agent> agent;
