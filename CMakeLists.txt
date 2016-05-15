@@ -176,7 +176,9 @@ add_executable( dnt
 add_executable( tracking_abs
     src/tracking_abs/tracking_abs.cpp
     src/tracking_abs/MessageHandler_abs.h
-    src/tracking_abs/MessageHandler_abs.cpp)
+    src/tracking_abs/MessageHandler_abs.cpp
+    src/tracking_abs/TransformationUnit.h
+    src/tracking_abs/TransformationUnit.cpp)
 
 
 add_subdirectory(src/ai)
