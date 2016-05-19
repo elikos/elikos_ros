@@ -9,27 +9,27 @@ namespace ai
 class Robot
 {
 public:
+    static const double SPEED;
+
     Robot() = default;
-    Robot(const int& id);
     virtual ~Robot() = 0;
 
-    inline int getId() const;
     inline const tf::Vector3& getPosition() const;
     inline const tf::Quaternion& getOrientation() const;
 
     inline void setPosition(const tf::Vector3 position);
     inline void setOrientation(const tf::Quaternion orientation);
+    inline void setIsUpdated(const bool& isUpdated);
+
+    void updatePositionRadius(const double& dt);
+
 
 private:
-    int id_;
+    bool isUpdated_{ false };
+    double positionRadius_{ 30.0 };
     tf::Vector3 position_;
     tf::Quaternion orientation_;
 };
-
-inline int Robot::getId() const
-{
-   return id_;
-}
 
 inline const tf::Vector3& Robot::getPosition() const
 {
@@ -49,6 +49,11 @@ inline void Robot::setPosition(const tf::Vector3 position)
 inline void Robot::setOrientation(const tf::Quaternion orientation)
 {
    orientation_ = orientation;
+}
+
+inline void Robot::setIsUpdated(const bool& isUpdated)
+{
+    isUpdated_ = isUpdated;
 }
 
 };

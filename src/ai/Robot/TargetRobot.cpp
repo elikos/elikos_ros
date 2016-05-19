@@ -3,7 +3,7 @@
 namespace ai {
 
 TargetRobot::TargetRobot(const int& id)
-    : Robot(id)
+    : id_(id)
 {
 }
 
