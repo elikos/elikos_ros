@@ -1,5 +1,6 @@
-include_directories(StateMachine)
-include_directories(Robot)
+include(Robot/CMakeLists.txt)
+include(StateMachine/CMakeLists.txt)
+include(TargetSelectionStrategy/CMakeLists.txt)
 
 add_executable( ai
     ai.cpp
@@ -9,18 +10,8 @@ add_executable( ai
     Agent.h
     MessageHandler.h
     MessageHandler.cpp
-    StateMachine/StateMachine.h
-    StateMachine/StateMachine.cpp
-    StateMachine/AbstractState.h
-    StateMachine/AbstractState.cpp
-    Robot/Robot.h
-    Robot/Robot.cpp
-    Robot/ObstacleRobot.h
-    Robot/ObstacleRobot.cpp
-    Robot/QuadRobot.h
-    Robot/QuadRobot.cpp
-    Robot/TargetRobot.h
-    Robot/TargetRobot.cpp
-    Robot/RobotTypes.h)
+    ${STATE_MACHINE_SRC}
+    ${STRATEGY_SRC}
+    ${ROBOT_SRC})
 
 target_link_libraries( ai ${catkin_LIBRARIES})

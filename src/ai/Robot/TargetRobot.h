@@ -6,11 +6,14 @@
 namespace ai
 {
 
-class RobotTarget : public Robot
+class TargetRobot : public Robot
 {
 public:
-    RobotTarget()=default;
-    ~RobotTarget()=default;
+    TargetRobot() = default;
+    TargetRobot(const int& id);
+    virtual ~TargetRobot() ;
 };
 
 }
+
+#endif /// AI_ROBOTTARGET_H
