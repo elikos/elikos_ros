@@ -11,9 +11,19 @@ class TargetRobot : public Robot
 public:
     TargetRobot() = default;
     TargetRobot(const int& id);
-    virtual ~TargetRobot() ;
+    virtual ~TargetRobot();
+
+    inline int getId() const;
+
+private:
+    int id_;
 };
 
+inline int TargetRobot::getId() const
+{
+   return id_;
 }
+
+};
 
 #endif /// AI_ROBOTTARGET_H

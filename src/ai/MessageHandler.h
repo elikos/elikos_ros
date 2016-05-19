@@ -16,10 +16,10 @@ public:
     static const int N_TRGT = 10;
     static const int N_OBS = 4;
 
-    static const std::string TRGT_FRAME;
-    static const std::string OBS_FRAME;
     static const std::string MAV_FRAME;
     static const std::string WORLD_FRAME;
+    static const std::string TRGT_FRAME;
+    static const std::string OBS_FRAME;
 
     MessageHandler(Agent* agent);
     ~MessageHandler() = default;

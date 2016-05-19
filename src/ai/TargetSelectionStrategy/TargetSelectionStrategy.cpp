@@ -4,7 +4,8 @@
 namespace ai
 {
 
-TargetSelectionStrategy::TargetSelectionStrategy()
+TargetSelectionStrategy::TargetSelectionStrategy(QuadRobot& quad)
+    : quad_(quad)
 {
     for (int i = 0; i < N_TARGETS; i++)
     {

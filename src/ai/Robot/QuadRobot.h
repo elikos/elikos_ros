@@ -9,8 +9,10 @@ namespace ai
 class QuadRobot : public Robot
 {
 public:
-    QuadRobot()=default;
-    ~QuadRobot()=default;
+    QuadRobot() = default;
+    ~QuadRobot() = default;
 };
 
 }
+
+#endif /// AI_QUADROBOT_H

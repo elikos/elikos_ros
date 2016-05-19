@@ -6,24 +6,17 @@ namespace ai
 
 Agent::Agent()
 {
-   strategy_ = std::unique_ptr<FollowClosestTarget>(new FollowClosestTarget());
+   strategy_ = std::unique_ptr<FollowClosestTarget>(new FollowClosestTarget(quad_));
 }
 
-void Agent::updateTarget(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation)
+void Agent::behave()
 {
+    Robot* target = strategy_->findTargetSelection();
+
+    //TODO: update the current target,
+
 
 }
 
-void Agent::updateObstacle(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation)
-{
 
-}
-
-void Agent::updateMAV(const tf::Vector3& position, const tf::Quaternion& orientation)
-{
-
-}
-
-}
-
-void takeADecision();
+};

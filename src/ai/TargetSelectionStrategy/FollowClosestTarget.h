@@ -2,16 +2,19 @@
 #define AI_FOLLOWTARGET_H
 
 #include "TargetSelectionStrategy.h"
+
+class Robot;
+
 namespace ai
 {
 
 class FollowClosestTarget : public TargetSelectionStrategy
 {
 public:
-    FollowClosestTarget() = default;
+    FollowClosestTarget(QuadRobot& quad);
     virtual ~FollowClosestTarget();
 
-    virtual void updateTargetSelection();
+    virtual Robot* findTargetSelection();
 };
 
 };

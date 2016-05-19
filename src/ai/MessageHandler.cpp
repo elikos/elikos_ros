@@ -7,10 +7,10 @@
 namespace ai 
 {
 
-const std::string MessageHandler::TRGT_FRAME     = "trgtRobot";
-const std::string MessageHandler::OBS_FRAME      = "obsRobot";
-const std::string MessageHandler::MAV_FRAME      = "MAV";
-const std::string MessageHandler::WORLD_FRAME    = "world";
+const std::string MessageHandler::MAV_FRAME   = "MAV";
+const std::string MessageHandler::WORLD_FRAME = "world";
+const std::string MessageHandler::TRGT_FRAME  = "trgtRobot";
+const std::string MessageHandler::OBS_FRAME   = "obsRobot";
 
 
 MessageHandler::MessageHandler(Agent* agent)
@@ -23,6 +23,7 @@ void MessageHandler::lookupTransform()
     lookForMAV();
     lookForObstacles();
     lookForTargets();
+    agent_->behave();
 }
 
 void MessageHandler::lookForTargets()
@@ -32,15 +33,14 @@ void MessageHandler::lookForTargets()
         tf::StampedTransform stf;
         try
         {
-            std::stringstream frame(TRGT_FRAME);
-            frame << std::to_string(i);
-            listener_.lookupTransform(WORLD_FRAME, frame.str(), ros::Time(0), stf);
-            // TODO: Send to agent.
+            listener_.lookupTransform(WORLD_FRAME, TRGT_FRAME + std::to_string(i), ros::Time(0), stf);
+            agent_->updateTarget(i, stf.getOrigin(), stf.getRotation());
         }
         catch(tf::TransformException e)
         {
             //TODO: Maybe log exception.
             ROS_ERROR("%s", e.what());
+            continue;
         }
     }
 }
@@ -52,16 +52,14 @@ void MessageHandler::lookForObstacles()
         tf::StampedTransform stf;
         try
         {
-            std::stringstream frame(OBS_FRAME);
-            frame << std::to_string(i);
-            listener_.lookupTransform(WORLD_FRAME, frame.str(), ros::Time(0), stf);
-            // TODO: Send to agent.
-
+            listener_.lookupTransform(WORLD_FRAME, OBS_FRAME + std::to_string(i), ros::Time(0), stf);
+            agent_->updateTarget(i, stf.getOrigin(), stf.getRotation());
         }
         catch(tf::TransformException e)
         {
             //TODO: Maybe log exception.
             ROS_ERROR("%s", e.what());
+            continue;
         }
     }
 
@@ -73,12 +71,11 @@ void MessageHandler::lookForMAV()
     try
     {
         listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), stf);
-        // TODO: Send to agent.
+        agent_->updateQuadRobot(stf.getOrigin(), stf.getRotation());
     }
     catch(tf::TransformException e)
     {
         //TODO: Maybe log exception.
-        ROS_ERROR("%s", e.what());
     }
 }
 

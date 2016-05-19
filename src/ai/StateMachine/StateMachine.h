@@ -9,6 +9,12 @@
 class StateMachine
 {
 public:
+    enum STATE_ENUM
+    {
+        GOING_FOR_TARGET,
+        DODGING_OBSTACLE,
+
+    };
 
     StateMachine();
     ~StateMachine();
