@@ -6,7 +6,7 @@
 #define RCRECEIVER_H
 
 #include <ros/ros.h>
-#include <mavros/RCIn.h>
+#include <mavros_msgs/RCIn.h>
 #include "./../../src/defines.cpp"
 
 enum RCChannel { ROLL,
@@ -27,11 +27,10 @@ public:
     unsigned int operator[](std::size_t i) const;
 
 private:
-    void RCCallback(const mavros::RCInConstPtr rc);
+    void RCCallback(const mavros_msgs::RCInConstPtr rc);
     ros::NodeHandle* nh_;
     ros::Subscriber rc_sub_;
     std::vector<unsigned int> rc_channels_;
 };
-
 
 #endif
