@@ -18,24 +18,26 @@ public:
     virtual void printFoundObjects();
     virtual void drawFoundObjects(Mat& image);
     vector<RobotDesc> getObjects();
+	virtual void createTrackbars(string windowName){};
 
     Mat& getThreshold();
 
+	//Calibration values
+    int* H_MIN;
+    int* H_MAX;
+    int* S_MIN;
+    int* S_MAX;
+    int* V_MIN;
+    int* V_MAX;
+    int* PRE_EROSIONS;
+    int* DILATIONS;
+    int* POST_EROSIONS;
+    
 protected:
     Mat threshold;
     Mat hsv;
     vector<RobotDesc> foundObjects;
 
-    int H_MIN;
-    int H_MAX;
-    int S_MIN;
-    int S_MAX;
-    int V_MIN;
-    int V_MAX;
-
-    int PRE_EROSIONS;
-    int DILATIONS;
-    int POST_EROSIONS;
 
     int PRE_BLUR = 2;
     int BLUR_AMOUNT;

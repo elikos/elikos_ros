@@ -7,7 +7,6 @@
 #include <sensor_msgs/image_encodings.h>
 #include <elikos_ros/RobotRaw.h>
 #include <elikos_ros/RobotRawArray.h>
-
 #include "BlobDetection/BlobTracking.h"
 
 namespace dnt 
@@ -16,16 +15,17 @@ namespace dnt
 class MessageHandler
 {
 public:
-    MessageHandler();
+    MessageHandler(string calibrationFilename);
     ~MessageHandler();
     void dispatchMessage(const sensor_msgs::ImageConstPtr &input);
-
+	void saveCalibration(string filename);
 private:
     ros::NodeHandle nh_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber is_;
     ros::Publisher pub_;
     BlobTracking tracking_;
+    image_transport::Publisher pubImages_;
 };
 
 }

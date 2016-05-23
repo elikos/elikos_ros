@@ -21,7 +21,7 @@ private:
     ros::NodeHandle nh_;
     ros::Subscriber sub1_;
     ros::Subscriber sub2_;
-    ros::Publisher pub_;
+    ros::Publisher pubTest_;
     elikos_ros::RobotRawArray inputArray_;
     geometry_msgs::PoseStamped inputPose_;
 	TransformationUnit transformationUnit_;

@@ -4,7 +4,7 @@ MessageHandler_abs::MessageHandler_abs()
 {
 	sub1_ = nh_.subscribe("robot_raw_array", 1, &MessageHandler_abs::dispatchMessageRobotRaw, this);
 	sub2_ = nh_.subscribe("/mavros/local_position/local", 1, &MessageHandler_abs::dispatchMessagePose, this);
-	pub_ = nh_.advertise<geometry_msgs::PoseArray>("robot_pose_array",1);
+	pubTest_ = nh_.advertise<geometry_msgs::PoseArray>("robot_pose_array",1);
 }
 
 
@@ -23,7 +23,7 @@ void MessageHandler_abs::dispatchMessageRobotRaw(const elikos_ros::RobotRawArray
 	geometry_msgs::PoseArray results = transformationUnit_.computeTransformForRobots(inputArray_);
 	
 	//publish results
-	pub_.publish(results);
+	pubTest_.publish(results);
 }
 
 
