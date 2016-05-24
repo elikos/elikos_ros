@@ -7,7 +7,7 @@ namespace ai
 {
 
 FollowClosestTarget::FollowClosestTarget(QuadRobot &quad)
-    : TargetSelectionStrategy(quad)
+    : Strategy(quad)
 {
 }
 
@@ -34,6 +34,5 @@ Robot* FollowClosestTarget::findTargetSelection()
     }
     return &targets_[minId];
 }
-
 
 };

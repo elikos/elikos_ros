@@ -8,38 +8,34 @@
 namespace ai
 {
 
-class Agent;
-
-class MessageHandler
+class Translator
 {
 public:
     static const int N_TRGT = 10;
-    static const int N_OBS = 4;
 
-    static const std::string MAV_FRAME;
     static const std::string WORLD_FRAME;
     static const std::string TRGT_FRAME;
-    static const std::string OBS_FRAME;
 
-    static MessageHandler* getInstance();
+    static const std::string TOPIC;
+
+    static Translator* getInstance();
     static void freeInstance();
 
     void lookForTf();
-    void lookForMessages();
 
 private:
-    ~MessageHandler() = default;
-    MessageHandler();
+    ~Translator() = default;
+    Translator();
 
-    static MessageHandler* instance_;
+    static Translator* instance_;
 
     ros::NodeHandle nh_;
     tf::TransformListener listener_;
-    Agent* agent_{ nullptr };
+    ros::Publisher pubisher_;
 
-    void lookForMAV();
+    void lookForTargets();
 };
 
 }
 
-#endif /// MESSAGE_HANDLER
+#endif /// AI_TRANSLATER

@@ -1,7 +1,7 @@
 #ifndef AI_FOLLOWTARGET_H
 #define AI_FOLLOWTARGET_H
 
-#include "TargetSelectionStrategy.h"
+#include "Strategy.h"
 
 class Robot;
 

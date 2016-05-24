@@ -1,6 +1,8 @@
 #include "CmdLineParser.h"
 #include <cstring>
 #include <ros/ros.h>
+#include <thread>
+#include <unistd.h>
 
 namespace ai
 {
@@ -43,7 +45,8 @@ bool CmdLineParser::checkParam(const std::string& param)
 
 void CmdLineParser::launchSimulation()
 {
-    int result = std::system("roscore");
+    //TODO: launch sim here.
+    execve("tf_translater", nullptr, nullptr);
 }
 
 }
