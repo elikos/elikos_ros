@@ -12,8 +12,9 @@ namespace ai {
 class Agent
 {
 public:
-    Agent();
-    ~Agent() = default;
+
+    static Agent* getInstance();
+    static void freeInstance();
 
     inline void updateTarget(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation);
     inline void updateObstacle(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation);
@@ -22,9 +23,15 @@ public:
     void behave();
 
 private:
+    static Agent* instance_;
+
     QuadRobot quad_;
     StateMachine stateMachine_;
-    std::unique_ptr<TargetSelectionStrategy> strategy_;
+    std::unique_ptr<Strategy> strategy_;
+
+    Agent();
+    ~Agent() = default;
+
 };
 
 inline void Agent::updateTarget(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation)

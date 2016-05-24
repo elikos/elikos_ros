@@ -5,13 +5,13 @@
 
 namespace ai {
 
-class TargetSelectionStrategy
+class Strategy
 {
 public:
     static const int N_TARGETS = 10;
 
-    TargetSelectionStrategy(QuadRobot& quad);
-    virtual ~TargetSelectionStrategy() = 0;
+    Strategy(QuadRobot& quad);
+    virtual ~Strategy() = 0;
 
     // This is the core of the strategy class, it has to be implemented by any concrete strategy.
     virtual Robot* findTargetSelection() = 0;
@@ -25,13 +25,13 @@ protected:
     inline void resetTarget(const int& id);
 };
 
-inline void TargetSelectionStrategy::resetTarget(const int& id)
+inline void Strategy::resetTarget(const int& id)
 {
     targets_[id].updatePositionRadius(30);
     targets_[id].setIsUpdated(false);
 }
 
-inline void TargetSelectionStrategy::updateTarget(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation)
+inline void Strategy::updateTarget(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation)
 {
     targets_[id].setPosition(position);
     targets_[id].setOrientation(orientation);
@@ -39,4 +39,5 @@ inline void TargetSelectionStrategy::updateTarget(const int& id, const tf::Vecto
 }
 
 };
+
 #endif /// AI_STRATEGY

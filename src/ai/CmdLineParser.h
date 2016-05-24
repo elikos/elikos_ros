@@ -15,25 +15,15 @@ public:
     CmdLineParser(int argc, char* argv[]);
     ~CmdLineParser() = default;
 
-    inline bool getIsSimulation();
-
     void parse();
 
 private:
     int argc_;
     char** argv_;
-    bool isSimulation_{ false };
 
     bool checkParam(const std::string& param);
     void launchSimulation();
-
-
 };
-
-inline bool CmdLineParser::getIsSimulation()
-{
-    return isSimulation_;
-}
 
 }
 

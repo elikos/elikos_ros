@@ -1,9 +1,10 @@
 include(Robot/CMakeLists.txt)
 include(StateMachine/CMakeLists.txt)
-include(TargetSelectionStrategy/CMakeLists.txt)
+include(Strategy/CMakeLists.txt)
+include(Translator/CMakeLists.txt)
 
 add_executable( ai
-    ai.cpp
+    main.cpp
     CmdLineParser.h
     CmdLineParser.cpp
     Agent.cpp
