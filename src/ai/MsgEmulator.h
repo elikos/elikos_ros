@@ -8,31 +8,34 @@
 namespace ai
 {
 
-class Translator
+class MsgEmulator
 {
 public:
     static const int N_TRGT = 10;
+    static const double virtualRadius;
 
     static const std::string WORLD_FRAME;
     static const std::string TRGT_FRAME;
     static const std::string TOPIC;
 
-    static Translator* getInstance();
+    static MsgEmulator* getInstance();
     static void freeInstance();
 
     void lookForTf();
+    bool start();
 
 private:
-    ~Translator() = default;
-    Translator();
+    static MsgEmulator* instance_;
+    static bool started_;
 
-    static Translator* instance_;
-
+    MsgEmulator();
+    ~MsgEmulator() = default;
     ros::NodeHandle nh_;
     tf::TransformListener listener_;
     ros::Publisher pubisher_;
 
     void lookForTargets();
+    void publishMessage(const tf::StampedTransform& stf);
 };
 
 }

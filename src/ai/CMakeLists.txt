@@ -1,7 +1,6 @@
 include(Robot/CMakeLists.txt)
 include(StateMachine/CMakeLists.txt)
 include(Strategy/CMakeLists.txt)
-include(Translator/CMakeLists.txt)
 
 add_executable( ai
     main.cpp
@@ -11,8 +10,13 @@ add_executable( ai
     Agent.h
     MessageHandler.h
     MessageHandler.cpp
+    MsgEmulator.h
+    MsgEmulator.cpp
     ${STATE_MACHINE_SRC}
     ${STRATEGY_SRC}
     ${ROBOT_SRC})
 
 target_link_libraries( ai ${catkin_LIBRARIES})
+
+add_dependencies(ai
+    elikos_ros_generate_messages_cpp)
