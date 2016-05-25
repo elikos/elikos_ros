@@ -3,6 +3,7 @@
 int main(int argc, char* argv[])
 {
     ros::init(argc, argv, "tf_translator");
-    Translator::getInstance()->lookForTf();
+    ai::Translator::getInstance()->lookForTf();
+    ai::Translator::freeInstance(); 
     return 0;
 }

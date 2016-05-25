@@ -8,7 +8,7 @@ class Robot;
 namespace ai
 {
 
-class FollowClosestTarget : public TargetSelectionStrategy
+class FollowClosestTarget : public Strategy
 {
 public:
     FollowClosestTarget(QuadRobot& quad);

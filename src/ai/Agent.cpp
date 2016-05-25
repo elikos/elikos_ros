@@ -31,7 +31,6 @@ void Agent::behave()
 
     //TODO: update the current target,
 
-
 }
 
 
