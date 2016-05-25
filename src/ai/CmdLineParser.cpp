@@ -1,8 +1,10 @@
-#include "CmdLineParser.h"
 #include <cstring>
 #include <ros/ros.h>
 #include <thread>
-#include <unistd.h>
+
+#include "MsgEmulator.h"
+
+#include "CmdLineParser.h"
 
 namespace ai
 {
@@ -46,7 +48,11 @@ bool CmdLineParser::checkParam(const std::string& param)
 void CmdLineParser::launchSimulation()
 {
     //TODO: launch sim here.
-    execve("tf_translater", nullptr, nullptr);
+    bool success = MsgEmulator::getInstance()->start();
+    if(!success)
+    {
+        std::cout << "Error: Failed to start msg emulator." << std::endl;
+    }
 }
 
 }
