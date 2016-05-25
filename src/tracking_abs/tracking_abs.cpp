@@ -1,5 +1,4 @@
 #include <memory>
-
 #include "MessageHandler_abs.h"
 
 int main(int argc, char* argv[])

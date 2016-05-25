@@ -1,0 +1,14 @@
+<!-- Launch file to simulate robot tracking -->
+<!-- Nodes: dnt, tracking_abs -->
+<!-- Important: The path of the bag needs to be hardcoded -->
+<!-- Rviz is launched by default. You can launch rqt_image_view with "image:=true" in the command line-->
+<launch>
+	<arg name="rviz" default="true" />
+	<arg name="image" default="false" />
+	<param name="use_sim_time" value="false" />
+	<node name="tracking_abs" pkg="elikos_ros" type="tracking_abs" />
+	<node name="dnt" pkg="elikos_ros" type="dnt" />
+	<node pkg="rosbag" type="play" name="player" output="screen" args="--clock /home/ta11e4rand/catkin_ws/src/2015-08-13-10-31-55.bag"/>
+	<node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz"/>
+	<node if="$(arg image)" pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view"/>
+</launch>

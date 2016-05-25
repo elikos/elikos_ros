@@ -424,9 +424,9 @@ namespace elikos_detection {
     }
 
     void Detection::computeTargetPosition() {
-        char buf[50];
+		char buf[50];
         int n = 0;
-        memset(buf, 0, 50);
+        memset(buf, 0, 50);//turret
 
         // Append the camera frame to the fcu
         tf_broadcaster_.sendTransform(tf::StampedTransform(camera_, ros::Time::now(), "fcu", "camera"));

@@ -7,6 +7,8 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <cv_bridge/cv_bridge.h>
 
+#include "TransformationUnit.h"
+
 class MessageHandler_abs
 {
 public:
@@ -19,8 +21,10 @@ private:
     ros::NodeHandle nh_;
     ros::Subscriber sub1_;
     ros::Subscriber sub2_;
+    ros::Publisher pubTest_;
     elikos_ros::RobotRawArray inputArray_;
     geometry_msgs::PoseStamped inputPose_;
+	TransformationUnit transformationUnit_;
 };
 
 #endif /// MESSAGE_HANDLER_TTF

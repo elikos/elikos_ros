@@ -9,6 +9,7 @@ public:
     GreenColor();
     ~GreenColor();
 
+	void createTrackbars(string windowName);
 };
 
 #endif //DETECTION_AND_TRACKING_GREENCOLOR_H
