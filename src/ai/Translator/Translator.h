@@ -15,7 +15,6 @@ public:
 
     static const std::string WORLD_FRAME;
     static const std::string TRGT_FRAME;
-
     static const std::string TOPIC;
 
     static Translator* getInstance();

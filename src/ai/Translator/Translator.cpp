@@ -3,8 +3,12 @@
 namespace ai 
 {
  
+
+const std::string Translator::WORLD_FRAME = "world";
+const std::string Translator::TRGT_FRAME = "trgt_frame";
 const std::string Translator::TOPIC = "target_robot_array";
 
+Translator* Translator::instance_ = nullptr;
 
 Translator::Translator()
 {
@@ -19,6 +23,11 @@ Translator* Translator::getInstance()
    return instance_;
 }
 
+void Translator::freeInstance()
+{
+    delete instance_;
+    instance_ = nullptr;
+}
 
 void Translator::lookForTf()
 {

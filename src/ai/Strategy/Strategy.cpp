@@ -4,7 +4,7 @@
 namespace ai
 {
 
-TargetSelectionStrategy::Strategy(QuadRobot& quad)
+Strategy::Strategy(QuadRobot& quad)
     : quad_(quad)
 {
     for (int i = 0; i < N_TARGETS; i++)
@@ -12,7 +12,8 @@ TargetSelectionStrategy::Strategy(QuadRobot& quad)
         targets_.push_back(TargetRobot(i));
     }
 }
-TargetSelectionStrategy::~Strategy()
+
+Strategy::~Strategy()
 {
 }
 
