@@ -24,7 +24,7 @@ private:
     image_transport::ImageTransport it_;
     image_transport::Subscriber is_;
     ros::Publisher pub_;
-    BlobTracking tracking_;
+    BlobTracking detection_;
     image_transport::Publisher pubImages_;//debug only
     image_transport::Publisher pubRed_;//debug only
     image_transport::Publisher pubGreen_;//debug only

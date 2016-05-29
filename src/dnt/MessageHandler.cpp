@@ -21,13 +21,13 @@ MessageHandler::MessageHandler(string calibrationFilename) :
     pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
     pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
     
-	tracking_.loadCalibration(calibrationFilename);
+	detection_.loadCalibration(calibrationFilename);
 	
     //Calibration trackbars
 	bool calibrationOn;
     if (nh_.getParam("/dnt/calibration", calibrationOn))
 	{
-		if(calibrationOn) tracking_.createTrackbars();
+		if(calibrationOn) detection_.createTrackbars();
 	}
 }
 
@@ -46,7 +46,7 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
     Mat threshold_g;
     Mat robotsMat;
 
-    tracking_.track(currentImage, threshold_w, threshold_r, threshold_g, robotsMat);
+    detection_.detect(currentImage, threshold_w, threshold_r, threshold_g, robotsMat);
 	//debug images
 	sensor_msgs::ImagePtr msgDebug = cv_bridge::CvImage(std_msgs::Header(), "bgr8", robotsMat).toImageMsg();
 	pubImages_.publish(msgDebug);
@@ -59,7 +59,7 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
     elikos_ros::RobotRawArray output;
     elikos_ros::RobotRaw data;
 
-    for(auto robot : tracking_.getRobots()){
+    for(auto robot : detection_.getRobots()){
 		data.id = robot.getID();
 		data.color = robot.getColor();
 		data.point.x = robot.getXPos();
@@ -71,6 +71,6 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
 }
 
 void MessageHandler::saveCalibration(string filename){
-	tracking_.saveCalibration(filename);
+	detection_.saveCalibration(filename);
 }
 }
