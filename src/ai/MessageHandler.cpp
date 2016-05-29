@@ -42,9 +42,7 @@ void MessageHandler::lookForMessages()
 
 void MessageHandler::handleMessage(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
-    std::cout << "message" << std::endl;
-    unsigned long size = input->targets.size();
-    std::cout << size << std::endl;
+    size_t n = input->targets.size();
 }
 
 }

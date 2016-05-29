@@ -1,4 +1,5 @@
 #include <thread>
+#include <iostream>
 
 
 #include "MsgEmulator.h"
@@ -25,7 +26,7 @@ bool MsgEmulator::start()
 {
     if (!started_)
     {
-        std::thread th(&MsgEmulator::lookForTargets, this);
+        std::thread th(&MsgEmulator::lookForTf, this);
         th.detach();
         started_ = true;
         return true;
@@ -51,7 +52,7 @@ void MsgEmulator::freeInstance()
 void MsgEmulator::lookForTf()
 {
     ros::Rate rate(30);
-    while(ros::ok()) 
+    while(ros::ok())
     {
         lookForTargets();
         ros::spinOnce();
