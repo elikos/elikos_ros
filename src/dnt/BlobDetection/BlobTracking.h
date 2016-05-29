@@ -5,6 +5,7 @@
 #ifndef DETECTION_AND_TRACKING_BLOBTRACKING_H
 #define DETECTION_AND_TRACKING_BLOBTRACKING_H
 #include "RobotDetection.h"
+
 #include <list>
 class BlobTracking {
 

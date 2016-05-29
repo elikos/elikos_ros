@@ -23,8 +23,9 @@ MessageHandler* MessageHandler::getInstance()
 
 MessageHandler::MessageHandler()
 {
+    std::cout << "message" << std::endl;
     agent_ = Agent::getInstance();
-    sub = nh_.subscribe(TOPIC, 1, &MessageHandler::handleMessage, this);
+    sub = nh_.subscribe<elikos_ros::TargetRobotArray>(TOPIC, 1, &MessageHandler::handleMessage, this);
 }
 
 void MessageHandler::freeInstance()
@@ -35,12 +36,15 @@ void MessageHandler::freeInstance()
 
 void MessageHandler::lookForMessages()
 {
+    std::cout << "message" << std::endl;
     ros::spin();
 }
 
 void MessageHandler::handleMessage(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
-
+    std::cout << "message" << std::endl;
+    unsigned long size = input->targets.size();
+    std::cout << size << std::endl;
 }
 
 }

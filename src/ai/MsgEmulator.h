@@ -1,7 +1,10 @@
 #ifndef AI_TRANSLATOR
 #define AI_TRANSLATOR
 
+#include <elikos_ros/TargetRobot.h>
+#include <elikos_ros/TargetRobotArray.h>
 #include <string>
+
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 
@@ -26,16 +29,19 @@ public:
 
 private:
     static MsgEmulator* instance_;
+
     static bool started_;
+
+    elikos_ros::TargetRobotArray targets_;
+
+    ros::NodeHandle nh_;
+    tf::TransformListener listener_;
+    ros::Publisher pub_;
 
     MsgEmulator();
     ~MsgEmulator() = default;
-    ros::NodeHandle nh_;
-    tf::TransformListener listener_;
-    ros::Publisher pubisher_;
-
     void lookForTargets();
-    void publishMessage(const tf::StampedTransform& stf);
+    void addTarget(const tf::StampedTransform& stf, unsigned char i);
 };
 
 }
