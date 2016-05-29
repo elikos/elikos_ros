@@ -62,8 +62,6 @@ add_message_files(
   RobotsPos.msg
   RobotRaw.msg
   RobotRawArray.msg
-  TargetRobot.msg
-  TargetRobotArray.msg
 )
 
 ## Generate services in the 'srv' folder

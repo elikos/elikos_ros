@@ -8,6 +8,8 @@ class RedColor : public Color
 public:
     RedColor();
     ~RedColor();
+    
+	void createTrackbars(string windowName);
 };
 
 

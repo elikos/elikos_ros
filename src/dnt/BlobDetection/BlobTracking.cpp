@@ -3,6 +3,8 @@
 //
 #include "BlobTracking.h"
 
+BlobTracking::BlobTracking(){
+}
 /*
  * This method is the first step of the tracking algorithm
  * params: input: frame from the camera, output_*: output matrix with color, output: general output matrix
@@ -43,8 +45,8 @@ void BlobTracking::trackRobots(const cv::Mat &input, cv::Mat &output){
         Mat hsv, hue, mask, hist, histimg = Mat::zeros(input.rows, input.cols, CV_8UC3), backproj;
         //Conversion to HSV
         cvtColor(input, hsv, COLOR_BGR2HSV); //TODO: Is it already available through output?
-        inRange(hsv, Scalar(0, MIN(MIN(detection.S_MIN_G, detection.S_MIN_R),detection.S_MIN_W), MIN(MIN(detection.V_MIN_G, detection.V_MIN_R),detection.V_MIN_W)),
-              Scalar(180, 256, MAX(MAX(detection.V_MAX_G, detection.V_MAX_R),detection.V_MAX_W)), mask);
+        inRange(hsv, Scalar(0, MIN(MIN(*detection.getGreen()->S_MIN, *detection.getRed()->S_MIN),*detection.getWhite()->S_MIN), MIN(MIN(*detection.getGreen()->V_MIN, *detection.getRed()->V_MIN),*detection.getWhite()->V_MIN)),
+              Scalar(180, 256, MAX(MAX(*detection.getGreen()->V_MAX, *detection.getRed()->V_MAX),*detection.getWhite()->V_MAX)), mask);
         //temporary data for CamShift
         float hranges[] = {0,180};
         int hsize = 16;
@@ -82,6 +84,7 @@ void BlobTracking::trackRobots(const cv::Mat &input, cv::Mat &output){
                     fastAtan2(trackWindow.center.y - it->getYPos(), trackWindow.center.x - it->getXPos()) / 360 * 2 *
                     PI;
             it->setDirection(direction);
+            displayDirection(*it, output);
             for(auto object : detection.getBlobObjects()){
                 if(object.getXPos()<trackWindow.center.x+trackWindow.size.width/2 && object.getXPos()>trackWindow.center.x-trackWindow.size.width/2
                    && object.getYPos()<trackWindow.center.y+trackWindow.size.height/2 &&object.getYPos()>trackWindow.center.y-trackWindow.size.height/2) {
@@ -108,12 +111,16 @@ void BlobTracking::displayDirection(RobotDesc robot, cv::Mat &output){
     //second point
     Point second(cvRound(robot.getXPos()+30*cos(robot.getDirection())), cvRound(robot.getYPos())+30*sin(robot.getDirection()));
     //arrow
-    line(output,center, second, Scalar(0,255,0),3,8,0);
+    if(robot.getColor() == ColorsIndex::RED){
+		arrowedLine(output,center, second, Scalar(0,0,255),3,8,0,0.5);
+	}
+	else if(robot.getColor() == ColorsIndex::GREEN){
+		arrowedLine(output,center, second, Scalar(0,255,0),3,8,0,0.5);
+	}
     string text = to_string(robot.getID());
-    text += "_"+to_string(robot.getColor());
     int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
     double fontScale = 2;
     int thickness = 3;
     cv::Point pos(robot.getXPos(), robot.getYPos());
-    cv::putText(output, text, pos, fontFace, fontScale, Scalar::all(0), thickness,8);
+    cv::putText(output, text, pos, fontFace, fontScale, Scalar(70,70,70), thickness,8);
 }

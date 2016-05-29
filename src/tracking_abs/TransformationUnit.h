@@ -14,6 +14,8 @@
 #include "message_filters/subscriber.h"
 #include <elikos_ros/RobotRawArray.h>
 #include <elikos_ros/RobotRaw.h>
+#include <elikos_ros/TargetRobotArray.h>
+#include <elikos_ros/TargetRobot.h>
 #include <string> 
 #include <sstream>
 #include <geometry_msgs/Pose.h>
@@ -32,6 +34,8 @@ class TransformationUnit
         tf::TransformBroadcaster tf_broadcaster_;
         tf::TransformListener tf_listener_;
         tf::Transform camera_;
+		ros::NodeHandle nh_;
+		ros::Publisher pub_;
         
         //TODO: Check the validity of those values
         const double CAMERA_FOV_H = 120 * PI/180.0;

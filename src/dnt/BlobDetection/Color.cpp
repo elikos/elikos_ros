@@ -22,15 +22,14 @@ Mat Color::generateThreshold(const Mat& image)
     BLUR_AMOUNT = PRE_BLUR + 1;
     blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
 
-    H_MIN = 0;
-    inRange(hsv, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+    inRange(hsv, Scalar(*H_MIN, *S_MIN, *V_MIN), Scalar(*H_MAX, *S_MAX, *V_MAX), threshold);
 
     // Consolidate the colored parts into one big blob to delimit the robot
     erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
-          PRE_EROSIONS);
-    dilate(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), DILATIONS);
+          *PRE_EROSIONS);
+    dilate(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), *DILATIONS);
     erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
-          POST_EROSIONS);
+          *POST_EROSIONS);
 
     return threshold;
 }

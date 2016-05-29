@@ -9,9 +9,7 @@ public:
     WhiteColor();
     ~WhiteColor();
 
-    virtual void printFoundObjects();
-    virtual void drawFoundObjects(Mat& image);
-
+	void createTrackbars(string windowName);
 };
 
 
