@@ -18,6 +18,8 @@ MessageHandler::MessageHandler(string calibrationFilename) :
 	is_ = it_.subscribe("camera/image_raw", 1, &MessageHandler::dispatchMessage, this);
     pub_ = nh_.advertise<elikos_ros::RobotRawArray>("robot_raw_array", 1);
     pubImages_ = it_.advertise("camera/image_opencv", 1);//debug only
+    pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
+    pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
     
 	tracking_.loadCalibration(calibrationFilename);
 	
@@ -45,9 +47,13 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
     Mat robotsMat;
 
     tracking_.track(currentImage, threshold_w, threshold_r, threshold_g, robotsMat);
-	//debug image
+	//debug images
 	sensor_msgs::ImagePtr msgDebug = cv_bridge::CvImage(std_msgs::Header(), "bgr8", robotsMat).toImageMsg();
 	pubImages_.publish(msgDebug);
+	sensor_msgs::ImagePtr msgDebug2 = cv_bridge::CvImage(std_msgs::Header(), "bgr8", threshold_r).toImageMsg();
+	pubRed_.publish(msgDebug2);
+	sensor_msgs::ImagePtr msgDebug3 = cv_bridge::CvImage(std_msgs::Header(), "bgr8", threshold_g).toImageMsg();
+	pubGreen_.publish(msgDebug3);
 	
     //publishing data
     elikos_ros::RobotRawArray output;
@@ -56,9 +62,9 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
     for(auto robot : tracking_.getRobots()){
 		data.id = robot.getID();
 		data.color = robot.getColor();
-		data.pose.x = robot.getXPos();
-		data.pose.y = robot.getYPos();
-		data.pose.theta = robot.getDirection();
+		data.point.x = robot.getXPos();
+		data.point.y = robot.getYPos();
+		data.point.z = 0;
 		output.robots.push_back(data);
 		pub_.publish(output);
     }

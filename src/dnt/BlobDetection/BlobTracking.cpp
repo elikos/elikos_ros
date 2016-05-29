@@ -36,7 +36,8 @@ void BlobTracking::track(const cv::Mat &input, cv::Mat &output_w, cv::Mat &outpu
 }
 
 void BlobTracking::trackRobots(const cv::Mat &input, cv::Mat &output){
-    robots.erase(robots.begin(),robots.end());//TODO: enlever
+	//Reset robot container
+    robots.erase(robots.begin(),robots.end());
 
     //Research of each robot in the last vector of trackList on the current frame
     for(auto it =trackList.back().begin(); it!=trackList.back().end(); it++) {
@@ -81,14 +82,12 @@ void BlobTracking::trackRobots(const cv::Mat &input, cv::Mat &output){
 
             //Compute and display the direction of the trackWindow
             double direction =
-                    fastAtan2(trackWindow.center.y - it->getYPos(), trackWindow.center.x - it->getXPos()) / 360 * 2 *
-                    PI;
+                    fastAtan2(trackWindow.center.y - it->getYPos(), trackWindow.center.x - it->getXPos()) / 360 * 2 *PI;
             it->setDirection(direction);
             displayDirection(*it, output);
             for(auto object : detection.getBlobObjects()){
                 if(object.getXPos()<trackWindow.center.x+trackWindow.size.width/2 && object.getXPos()>trackWindow.center.x-trackWindow.size.width/2
                    && object.getYPos()<trackWindow.center.y+trackWindow.size.height/2 &&object.getYPos()>trackWindow.center.y-trackWindow.size.height/2) {
-                    //object.setInsideFOV(it->getInsideFOV());
                     object.setDirection(it->getDirection());
                     robots.emplace_back(object);
                 }

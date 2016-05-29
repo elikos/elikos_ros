@@ -31,16 +31,12 @@ void RobotDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Ma
     currentImage = input;
 
     //Blob detection with color thresholds
-    thresholds.emplace_back(whiteColor_.generateThreshold(currentImage));
+    output_w = whiteColor_.generateThreshold(currentImage);
     whiteColor_.trackFilteredObjects(currentImage);
-    thresholds.emplace_back(redColor_.generateThreshold(currentImage));
+    output_r = redColor_.generateThreshold(currentImage);
     redColor_.trackFilteredObjects(currentImage);
-    thresholds.emplace_back(greenColor_.generateThreshold(currentImage));
+    output_g = greenColor_.generateThreshold(currentImage);
     greenColor_.trackFilteredObjects(currentImage);
-    
-    output_w = thresholds[WHITE];
-    output_g = thresholds[GREEN];
-    output_r = thresholds[RED];
 
     //extraction of white, red and green objects (robots)
     whiteObjects = whiteColor_.getObjects();

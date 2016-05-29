@@ -48,13 +48,14 @@ void Color::trackFilteredObjects(Mat &cameraFeed) {
     findContours(temp, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
     //use moments method to find our filtered object
     double refArea = 0;
+    //Reset objects container
+    foundObjects.clear();
 
     if (hierarchy.size() > 0) {
         int numObjects = hierarchy.size();
         //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
         if (numObjects < MAX_NUM_OBJECTS) {
 
-            foundObjects.clear();
 
             for (int index = 0; index >= 0; index = hierarchy[index][0]) {
 

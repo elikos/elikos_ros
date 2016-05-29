@@ -18,6 +18,7 @@
       <param name="dir" value="$(arg calib_dir)" />
 	</node>
 	<!-- Camera node -->
+	<node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="0.1 0 0 -0.5 0.5 -0.5 0.5 fcu camera 100" />
 	<node pkg="camera1394" type="camera1394_node" name="ffmv">
       <param name="guid" value="00b09d0100db6e40" />
       <param name="video_mode" value="640x480_mono8" />
