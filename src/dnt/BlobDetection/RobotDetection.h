@@ -49,7 +49,7 @@ private:
     WhiteColor whiteColor_;
     RedColor redColor_;
     GreenColor greenColor_;
-
+	int maxID;
     //Final data (can be fetched by other classes through the getters)
     vector<RobotDesc> foundRobots;
     vector<RobotDesc> foundObstacles;

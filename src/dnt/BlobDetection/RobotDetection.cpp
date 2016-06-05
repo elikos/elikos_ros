@@ -12,6 +12,7 @@ RobotDetection::RobotDetection(){
     trackbarsWhiteMat_ = Mat3b(1, 300, Vec3b(0,0,0));
     trackbarsRedMat_ = Mat3b(1, 300, Vec3b(0,0,0));
     trackbarsGreenMat_ = Mat3b(1, 300, Vec3b(0,0,0));
+    maxID = 0;
 }
 
 //Color detection algorithm
@@ -21,10 +22,6 @@ void RobotDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Ma
         cerr << "Input of detecRobots is empty";//TODO:throw an exception
 
     //Initialisation
-    int maxID = 0;
-    for (auto object: blobObjects){
-        maxID = max(maxID, object.getID());
-    }
     auto oldObjects = blobObjects;
     blobObjects.erase(blobObjects.begin(),blobObjects.end());
 

@@ -11,7 +11,7 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
     geometry_msgs::PoseArray results;
     //Stamp the array
     results.header.stamp = ros::Time();
-    results.header.frame_id = "local_origin";
+    results.header.frame_id = "absolute_origin";
 	for(auto robot: robotArray.robots){
 		//Define the camera2turret turret transform
 		tf::Transform camera2turret = tf::Transform::getIdentity();
@@ -25,7 +25,7 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
 		//Get the origin to camera transform
 		tf::StampedTransform origin2camera;
 		try {
-			tf_listener_.lookupTransform("local_origin", "camera", ros::Time(0), origin2camera);
+			tf_listener_.lookupTransform("absolute_origin", "camera", ros::Time(0), origin2camera);
 		}
 		catch (tf::TransformException &ex) {
 			ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
@@ -57,21 +57,21 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
 		double direction = 0; // if the direction is 0. the robot has no known direction.
 		for(auto old : oldArray_.targets){
 			//if the id is the same and the difference of the position is high enough (arbitrary criterion : tolerance).
-			double tolerance = 0.015; //in meters
+			double tolerance = 0.02; //in meters
 			if(old.id == robot.id && (sqrt(pow(origin2robot.getOrigin().getY() - old.poseOrigin.pose.position.y,2) + pow(origin2robot.getOrigin().getX() - old.poseOrigin.pose.position.x,2))>tolerance)){
 				direction = cv::fastAtan2(origin2robot.getOrigin().getY() - old.poseOrigin.pose.position.y, origin2robot.getOrigin().getX() - old.poseOrigin.pose.position.x) / 360 * 2 *PI;
 			}
 		}
 		robot_theta.setRPY(0,0,direction);
 		direction_transform.setRotation(robot_theta);
-		//Apply direction transform;
+		//Apply absolute_origin and direction transform.
 		origin2robot = origin2robot * direction_transform;
 		fcu2robot = fcu2robot * direction_transform;
 		
 		//Define the pose and emplace it in the collection
 		geometry_msgs::PoseStamped robotPoseOrigin;
 		robotPoseOrigin.header.stamp = ros::Time();
-		robotPoseOrigin.header.frame_id = "local_origin";
+		robotPoseOrigin.header.frame_id = "absolute_origin";
 		robotPoseOrigin.pose.position.x = origin2robot.getOrigin().getX();
 		robotPoseOrigin.pose.position.y = origin2robot.getOrigin().getY();
 		robotPoseOrigin.pose.position.z = origin2robot.getOrigin().getZ();
