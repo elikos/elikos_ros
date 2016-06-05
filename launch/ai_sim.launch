@@ -1,4 +1,8 @@
 <launch>
+    <node name="simulator" pkg="elikos_ros" type="robotsim" output="screen"/>
+    	<rosparam command="load" file="$(find elikos_ros)/param/config.yaml" />
+
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_ros)/launch/tf_markerarray.rviz" />
+
 </launch>
 

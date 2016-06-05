@@ -2,6 +2,7 @@
 #define AI_TRANSLATOR
 
 #include <elikos_ros/TargetRobot.h>
+
 #include <elikos_ros/TargetRobotArray.h>
 #include <string>
 

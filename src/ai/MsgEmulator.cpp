@@ -1,6 +1,6 @@
 #include <thread>
-#include <iostream>
 
+#include <iostream>
 
 #include "MsgEmulator.h"
 #include <tf/transform_datatypes.h>
@@ -62,6 +62,8 @@ void MsgEmulator::lookForTf()
 
 void MsgEmulator::lookForTargets()
 {
+    targets_.targets.clear();
+    assert(targets_.targets.size() == 0);
     for (int i = 0; i < N_TRGT; i++)
     {
         tf::StampedTransform stf;

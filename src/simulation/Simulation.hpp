@@ -59,7 +59,6 @@ namespace elikos_sim {
         Simulation();
         Simulation& operator= (const Simulation&);
         Simulation (const Simulation&);
-
     };
 }
 

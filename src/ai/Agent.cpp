@@ -1,4 +1,6 @@
 #include "Agent.h"
+#include "MessageHandler.h"
+
 #include "StrategyTypes.h"
 
 namespace ai
@@ -28,7 +30,8 @@ void Agent::freeInstance()
 void Agent::behave()
 {
     Robot* target = strategy_->findTargetSelection();
-
+    tf::Vector3 destination(4.0 ,4.0, 4.0);
+    MessageHandler::getInstance()->sendDestination(target->getPose().getOrigin());
 }
 
 
