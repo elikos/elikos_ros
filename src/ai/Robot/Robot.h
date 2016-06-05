@@ -14,42 +14,32 @@ public:
     Robot() = default;
     virtual ~Robot() = 0;
 
-    inline const tf::Vector3& getPosition() const;
-    inline const tf::Quaternion& getOrientation() const;
+    inline const tf::Pose& getPose() const;
 
-    inline void setPosition(const tf::Vector3 position);
-    inline void setOrientation(const tf::Quaternion orientation);
+    inline void setPose(const tf::Pose pose);
     inline void setIsUpdated(const bool& isUpdated);
 
     void updatePositionRadius(const double& dt);
+    tfScalar getDistance(Robot* robot);
 
 
 private:
     bool isUpdated_{ false };
     double positionRadius_{ 30.0 };
-    tf::Vector3 position_;
-    tf::Quaternion orientation_;
+    tf::Pose pose_;
 };
 
-inline const tf::Vector3& Robot::getPosition() const
+inline const tf::Pose& Robot::getPose() const
 {
-   return position_;
+   return pose_;
 }
 
-inline const tf::Quaternion& Robot::getOrientation() const
+
+inline void Robot::setPose(const tf::Pose pose)
 {
-   return orientation_;
+   pose_ = pose;
 }
 
-inline void Robot::setPosition(const tf::Vector3 position)
-{
-   position_ = position;
-}
-
-inline void Robot::setOrientation(const tf::Quaternion orientation)
-{
-   orientation_ = orientation;
-}
 
 inline void Robot::setIsUpdated(const bool& isUpdated)
 {

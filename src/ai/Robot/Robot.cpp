@@ -14,4 +14,9 @@ void Robot::updatePositionRadius(const double& dt)
     positionRadius_ += SPEED * dt;
 }
 
+tfScalar Robot::getDistance(Robot* robot)
+{
+    return tf::tfDistance(pose_.getOrigin(), robot->getPose().getOrigin());
+}
+
 };

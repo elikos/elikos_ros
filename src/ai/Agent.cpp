@@ -29,8 +29,6 @@ void Agent::behave()
 {
     Robot* target = strategy_->findTargetSelection();
 
-    //TODO: update the current target,
-
 }
 
 

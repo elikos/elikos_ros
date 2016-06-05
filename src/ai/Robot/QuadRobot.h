@@ -11,6 +11,7 @@ class QuadRobot : public Robot
 public:
     QuadRobot() = default;
     ~QuadRobot() = default;
+
 };
 
 }

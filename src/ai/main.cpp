@@ -7,9 +7,8 @@ int main(int argc, char* argv[])
     // ROS Init
     ros::init(argc, argv, "elikos_ai");
 
-    ai::CmdLineParser* parser = new ai::CmdLineParser(argc, argv);
-    parser->parse();
-    delete parser;
+    ai::CmdLineParser parser(argc, argv);
+    parser.parse();
 
     ai::MessageHandler::getInstance()->lookForMessages();
 }

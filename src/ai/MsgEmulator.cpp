@@ -81,19 +81,14 @@ void MsgEmulator::lookForTargets()
 
 void MsgEmulator::addTarget(const tf::StampedTransform& stf, unsigned char id)
 {
+    tf::Pose poseTf(stf);
+    geometry_msgs::Pose poseMsg;
+    tf::poseTFToMsg(poseTf, poseMsg);
+
     elikos_ros::TargetRobot target;
     target.color = 0;
     target.id = id;
-
-    // tf orientation to msg.
-    geometry_msgs::Quaternion orientation;
-    tf::quaternionTFToMsg(stf.getRotation(), orientation);
-    target.poseOrigin.pose.orientation = orientation;
-
-    // tf Vector3 to msg.
-    target.poseOrigin.pose.position.x = stf.getOrigin().getX();
-    target.poseOrigin.pose.position.y = stf.getOrigin().getY();
-    target.poseOrigin.pose.position.z = stf.getOrigin().getZ();
+    target.poseOrigin.pose = poseMsg;
     targets_.targets.push_back(target);
 }
     

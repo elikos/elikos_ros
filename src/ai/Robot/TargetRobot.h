@@ -10,18 +10,38 @@ class TargetRobot : public Robot
 {
 public:
     TargetRobot() = default;
-    TargetRobot(const int& id);
+    TargetRobot(uint8_t id, uint8_t color);
     virtual ~TargetRobot();
 
-    inline int getId() const;
+    inline uint8_t getId() const;
+    inline uint8_t getColor() const;
+
+    inline void setId(uint8_t id);
+    inline void setColor(uint8_t color);
 
 private:
-    int id_;
+    uint8_t id_;
+    uint8_t color_;
 };
 
-inline int TargetRobot::getId() const
+inline void TargetRobot::setId(uint8_t id)
+{
+    id_ = id;
+}
+
+inline uint8_t TargetRobot::getId() const
 {
    return id_;
+}
+
+inline void TargetRobot::setColor(uint8_t color)
+{
+    color_ =  color;
+}
+
+inline uint8_t TargetRobot::getColor() const
+{
+    return color_;
 }
 
 };

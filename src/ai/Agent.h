@@ -16,9 +16,8 @@ public:
     static Agent* getInstance();
     static void freeInstance();
 
-    inline void updateTarget(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation);
-    inline void updateObstacle(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation);
-    inline void updateQuadRobot(const tf::Vector3& position, const tf::Quaternion& orientation);
+    inline void updateTarget(const uint8_t& id, const uint8_t& color, const tf::Pose pose);
+    inline void updateQuadRobot(const tf::Pose& pose);
 
     void behave();
 
@@ -34,20 +33,14 @@ private:
 
 };
 
-inline void Agent::updateTarget(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation)
+inline void Agent::updateTarget(const uint8_t& id, const uint8_t& color, const tf::Pose pose)
 {
-    strategy_->updateTarget(id, position, orientation);
+    strategy_->updateTarget(id, color, pose);
 }
 
-inline void Agent::updateObstacle(const int& id, const tf::Vector3& position, const tf::Quaternion& orientation)
+inline void Agent::updateQuadRobot(const tf::Pose& pose)
 {
-    //TODO: Ask the safety evaluation if the situation is safe.
-}
-
-inline void Agent::updateQuadRobot(const tf::Vector3& position, const tf::Quaternion& orientation)
-{
-    quad_.setPosition(position);
-    quad_.setOrientation(orientation);
+    quad_.setPose(pose);
 }
 
 }; /// namespace ai

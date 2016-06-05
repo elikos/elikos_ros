@@ -2,8 +2,8 @@
 
 namespace ai {
 
-TargetRobot::TargetRobot(const int& id)
-    : id_(id)
+TargetRobot::TargetRobot(uint8_t id, uint8_t color)
+    : id_(id), color_(color)
 {
 }
 
