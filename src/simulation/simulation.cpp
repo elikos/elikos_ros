@@ -104,14 +104,14 @@ namespace elikos_sim
             robotMarkers.markers.clear();
 
             //Move the robot
-            for(auto robot : robots) {
+            for(auto robot : robots)
+            {
                 robot->move(r.expectedCycleTime());
                 robotMarkers.markers.push_back(robot->getVizMarker());
                 br.sendTransform(tf::StampedTransform(robot->getTransform(), ros::Time::now(), "world", robot->getName()));
             }
             //Remove the robot that are out of bound
             std::remove_if(robots.begin(), robots.end(),Simulation::isOutOfBounds);
-
 
             br.sendTransform(tf::StampedTransform(mav->getTransform(), ros::Time::now(), "world", mav->getName()));
             mav_marker_pub.publish(mavMarker);
