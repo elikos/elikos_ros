@@ -2,6 +2,7 @@
 // Created by tonio on 09/06/15.
 //
 
+#include <math.h>
 #include "SetpointManager.h"
 
 SetpointManager::SetpointManager(ros::NodeHandle &nh) : nh_(&nh) {
@@ -12,7 +13,7 @@ SetpointManager::~SetpointManager() {}
 
 void SetpointManager::sendLocalPositionSetpoint(tf::Transform &t) {
     double yaw = tf::getYaw(t.getRotation());
-    if (isnan(yaw)) {
+    if (std::isnan(yaw)) {
         throw "Yaw is NaN.";
     }
 

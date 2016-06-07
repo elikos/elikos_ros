@@ -3,14 +3,14 @@
 
 #include <memory>
 
-class AbstractState
+class State
 {
 public:
-    AbstractState();
-    ~AbstractState();
+    State();
+    ~State();
 
 private:
-    std::unique_ptr<AbstractState> nextState_;  
+    std::unique_ptr<State> nextState_;
 };
 
 #endif /// ABSTRACT_STATE_H
