@@ -133,18 +133,6 @@ add_executable( robotsim
   src/simulation/ObstacleRobot.cpp
   src/simulation/MAV.cpp)
 
-add_executable( tracking
-  src/RobotDetection/RobotDesc.h
-  src/RobotDetection/RobotDesc.cpp
-  src/RobotDetection/Detection.h
-  src/RobotDetection/Detection.cpp
-  src/RobotDetection/detectMain.cpp)
-
-add_executable( navigator
-  src/navigator/navigator.cpp
-  src/navigator/SetpointManager.h
-  src/navigator/SetpointManager.cpp)
-
 #add_executable( pose_offset
 #    src/pose_offset/pose_offset.cpp
 #    src/pose_offset/PoseOffsetNode.cpp
@@ -190,10 +178,6 @@ add_subdirectory(src/ai)
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(robotsim elikos_lib)
 
-add_dependencies(tracking
-    elikos_ros_generate_messages_cpp
-)
-
 add_dependencies(elikos_lib
     mavros_msgs
     sensor_msgs
@@ -211,8 +195,6 @@ add_dependencies( tracking_abs
 
 target_link_libraries( elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
-target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( tracking_abs ${catkin_LIBRARIES})
 
