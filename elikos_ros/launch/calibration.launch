@@ -1,0 +1,35 @@
+<!-- Launch file to test robot tracking -->
+<!-- Nodes: dnt, tracking_abs -->
+<!-- Rviz is launched by default. You can launch rqt_image_view with "image:=true" in the command line-->
+<launch>
+	<arg name="rviz" default="true" />
+	<arg name="image" default="false" />
+	<arg name="calib" default="false" />
+	<arg name="calib_in" default="calibration_initial" />
+	<arg name="calib_out" default="new_calibration" />
+	<arg name="calib_dir" default="$(find elikos_detection)/cfg/" />
+	<node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(find elikos_detection)/cfg/dnt.rviz"/>
+	<node if="$(arg image)" pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view"/>
+	<include file="$(find elikos_detection)/launch/detection.launch" pass_all_args="true"/>
+	<include file="$(find elikos_tracking)/launch/tracking.launch"/>
+
+	<node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="0.1 0 0 -0.5 0.5 -0.5 0.5 fcu camera 100" />
+	<node pkg="tf" type="static_transform_publisher" name="absolute_origin_broadcaster" args="10 10 0 0 0 0 1 absolute_origin local_origin 100" />
+	<!-- Camera node -->
+	<node pkg="camera1394" type="camera1394_node" name="ffmv">
+      <param name="guid" value="00b09d0100db6e40" />
+      <param name="video_mode" value="640x480_mono8" />
+      <param name="frame_rate" value="30" />
+      <param name="bayer_pattern" value="rggb" />
+      <param name="bayer_mode" value="AHD" />
+  </node>
+  <include file="$(find mavros)/launch/px4.launch" />
+  <rosparam command="load">
+  local_position:
+    tf:
+      send: true
+  global_position:
+    tf:
+      send: false
+  </rosparam>
+</launch>
