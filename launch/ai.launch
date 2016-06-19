@@ -1,3 +1,0 @@
-<launch>
-    <node name="ai_agent" pkg="elikos_ros" type="ai_agent" output="screen"/>
-</launch>
