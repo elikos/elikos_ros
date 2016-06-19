@@ -7,8 +7,8 @@
 	<arg name="calib" default="false" />
 	<arg name="calib_in" default="calibration_initial" />
 	<arg name="calib_out" default="new_calibration" />
-	<arg name="calib_dir" default="$(find elikos_detection)/src/detection/BlobDetection/Calibration/" />
-	<node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz"/>
+	<arg name="calib_dir" default="$(find elikos_detection)/cfg/" />
+	<node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(find elikos_detection)/cfg/dnt.rviz"/>
 	<node if="$(arg image)" pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view"/>
 	<include file="$(find elikos_detection)/launch/detection.launch" pass_all_args="true"/>
 	<include file="$(find elikos_tracking)/launch/tracking.launch"/>
@@ -23,6 +23,7 @@
       <param name="bayer_pattern" value="rggb" />
       <param name="bayer_mode" value="AHD" />
   </node>
+  <include file="$(find mavros)/launch/px4.launch" />
   <rosparam command="load">
   local_position:
     tf:
@@ -31,5 +32,4 @@
     tf:
       send: false
   </rosparam>
-  <include file="$(find mavros)/launch/px4.launch" />
 </launch>
