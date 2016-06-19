@@ -60,8 +60,8 @@ add_message_files(
   FILES
   RobotPos.msg
   RobotsPos.msg
-  #RobotRaw.msg
-  #RobotRawArray.msg
+  RobotRaw.msg
+  RobotRawArray.msg
   TargetRobot.msg
   TargetRobotArray.msg
 )
@@ -182,7 +182,8 @@ add_executable( tracking_abs
     src/tracking_abs/TransformationUnit.h
     src/tracking_abs/TransformationUnit.cpp)
 
-
+add_executable( moveit_test
+    src/moveittest/move_group_interface_tutorial.cpp)
 add_subdirectory(src/ai)
 
 

@@ -6,10 +6,10 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ## is used, also find other catkin packages
 
 find_package( catkin REQUIRED)
-find_package( catkin REQUIRED COMPONENTS 
+find_package( catkin REQUIRED COMPONENTS
    message_generation
-   roscpp 
-   tf 
+   roscpp
+   tf
    std_msgs
    genmsg
    sensor_msgs
@@ -19,6 +19,11 @@ find_package( catkin REQUIRED COMPONENTS
    sensor_msgs
    cv_bridge
    geometry_msgs
+   moveit_core
+   moveit_ros_planning
+   moveit_ros_planning_interface
+   pluginlib
+   cmake_modules
 )
 find_package(OpenCV REQUIRED)
 
@@ -105,6 +110,10 @@ CATKIN_DEPENDS message_runtime
 #  LIBRARIES elikos
 CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs geometry_msgs
 #  DEPENDS system_lib
+CATKIN_DEPENDS
+    moveit_core
+    moveit_ros_planning_interface
+    interactive_markers
 )
 
 ###########
@@ -172,7 +181,7 @@ add_executable( dnt
 	src/dnt/BlobDetection/WhiteColor.h
     src/dnt/BlobDetection/RobotDetection.cpp
     src/dnt/BlobDetection/RobotDetection.h
-    src/dnt/BlobDetection/BlobTracking.h 
+    src/dnt/BlobDetection/BlobTracking.h
     src/dnt/BlobDetection/BlobTracking.cpp)
 
 add_executable( tracking_abs
@@ -182,6 +191,10 @@ add_executable( tracking_abs
     src/tracking_abs/TransformationUnit.h
     src/tracking_abs/TransformationUnit.cpp)
 
+add_executable( moveit_navigation
+    src/moveit_navigation/moveit_move_group.cpp
+    src/moveit_navigation/MessageHandler_moveit.h
+    src/moveit_navigation/MessageHandler_moveit.cpp)
 
 add_subdirectory(src/ai)
 
@@ -203,6 +216,11 @@ add_dependencies( tracking_abs
     elikos_ros_generate_messages_cpp
 )
 
+add_dependencies( moveit_navigation
+    moveit_core
+    moveit_ros_planning_interface
+    interactive_markers
+)
 
 ## Specify libraries to link a library or executable target against
 #target_link_libraries(elikos_node
@@ -215,6 +233,7 @@ target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
 target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries( tracking_abs ${catkin_LIBRARIES})
+target_link_libraries( moveit_navigation ${catkin_LIBRARIES})
 
 #############
 ## Install ##
