@@ -1,0 +1,3 @@
+<launch>
+  <node name="elikos_moveit_move_group" pkg="elikos_nav" type="elikos_moveit_move_group"/>
+</launch>

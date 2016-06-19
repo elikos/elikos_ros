@@ -50,6 +50,6 @@ add_dependencies( elikos_moveit_move_group
     interactive_markers
 )
 
-target_link_libraries(elikos_moveit_move_group
+target_link_libraries( elikos_moveit_move_group
   ${catkin_LIBRARIES}
 )
