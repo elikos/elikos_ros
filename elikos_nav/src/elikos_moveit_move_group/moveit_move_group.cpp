@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
     //Initialization
     display_publisher_ = nh_.advertise<moveit_msgs::DisplayTrajectory>("/move_group/display_planned_path", 1, true);
-  	group_ = new moveit::planning_interface::MoveGroup("drone_planning_group");
+  	group_ = new moveit::planning_interface::MoveGroup("elikos_moveit_quadrotor_group");
     moveit_msgs::DisplayTrajectory display_trajectory;
 
     //move_group settings

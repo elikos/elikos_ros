@@ -1,0 +1,7 @@
+controller_list:
+  - name: quadrotor_controller
+    action_ns: follow_trajectory
+    type: MultiDofFollowJointTrajectory
+    default: true
+    joints:
+      - virtual_joint
