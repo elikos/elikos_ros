@@ -10,6 +10,7 @@ class CmdLineParser
 {
 public:
     static const std::string PARAM_SIM;
+    static const std::string SIM_LAUNCH_CMD;
 
     CmdLineParser() = delete;
     CmdLineParser(int argc, char* argv[]);

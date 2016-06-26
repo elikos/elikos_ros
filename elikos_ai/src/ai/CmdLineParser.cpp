@@ -10,6 +10,7 @@ namespace ai
 {
 
 const std::string CmdLineParser::PARAM_SIM = "--sim";
+const std::string CmdLineParser::SIM_LAUNCH_CMD = "roslaunch elikos_sim simulation.launch";
 
 CmdLineParser::CmdLineParser(int argc, char* argv[])
     : argc_(argc), argv_(argv)
@@ -36,18 +37,25 @@ void CmdLineParser::parse()
  */
 bool CmdLineParser::checkParam(const std::string& param)
 {
-    for (int i = 0; i < argc_; i++)
+    bool foundParam = false;
+    for (int i = 0; i < argc_ && !foundParam; i++)
     {
         if(strcmp(argv_[i], param.c_str()) == 0)
         {
-            return true;
+            foundParam = true;
         }
     }
+    return foundParam;
 }
 
+/*
+ *  void CmdLineParser::launchSimulation()
+ *
+ *  Launch sim and msg emulator
+ */
 void CmdLineParser::launchSimulation()
 {
-    //TODO: launch sim here.
+    std::system(SIM_LAUNCH_CMD.c_str());
     bool success = MsgEmulator::getInstance()->start();
     if(!success)
     {
