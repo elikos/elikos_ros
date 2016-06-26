@@ -15,7 +15,7 @@
 
 #include "Simulation.hpp"
 
-#include "./../defines.cpp"
+#include "defines.cpp"
 
 namespace elikos_sim
 {

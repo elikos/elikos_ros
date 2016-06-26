@@ -3,7 +3,7 @@
 
 #include <elikos_lib/pid.hpp>
 #include <visualization_msgs/Marker.h>
-#include "./../defines.cpp"
+#include "defines.cpp"
 
 namespace elikos_sim {
 

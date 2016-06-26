@@ -39,7 +39,12 @@ void MessageHandler::freeInstance()
 
 void MessageHandler::lookForMessages()
 {
-    ros::spin();
+    ros::Rate rate(30);
+    while(ros::ok())
+    {
+        ros::spinOnce();
+        rate.sleep();
+    }
 }
 
 void MessageHandler::handleMessage(const elikos_ros::TargetRobotArray::ConstPtr& input)

@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include "TargetRobot.hpp"
-#include "./../defines.cpp"
+#include "defines.cpp"
 
 
 namespace elikos_sim {
