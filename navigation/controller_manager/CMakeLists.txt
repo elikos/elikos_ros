@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(moveit_simple_controller_manager)
+project(controller_manager)
 
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
@@ -34,11 +34,11 @@ catkin_package(
 
 include_directories(include)
 
-add_library(moveit_simple_controller_manager src/moveit_simple_controller_manager.cpp)
-target_link_libraries(moveit_simple_controller_manager ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_library(controller_manager src/moveit_simple_controller_manager.cpp)
+target_link_libraries(controller_manager ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-install(TARGETS moveit_simple_controller_manager LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+install(TARGETS controller_manager LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
-install(FILES moveit_simple_controller_manager_plugin_description.xml
+install(FILES controller_manager_plugin_description.xml
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
        )
