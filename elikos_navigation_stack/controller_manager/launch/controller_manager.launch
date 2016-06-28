@@ -1,0 +1,3 @@
+<launch>
+  <node name="moveit_simple_controller_manager" pkg="controller_manager" type="moveit_simple_controller_manager"/>
+</launch>

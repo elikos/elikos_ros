@@ -1,0 +1,3 @@
+<launch>
+  <node name="action_controller" pkg="action_controller" type="action_controller"/>
+</launch>

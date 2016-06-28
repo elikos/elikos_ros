@@ -28,7 +28,7 @@
   <run_depend>actionlib</run_depend>
 
   <export>
-    <moveit_core plugin="${prefix}/moveit_simple_controller_manager_plugin_description.xml"/>
+    <moveit_core plugin="${prefix}/controller_manager_plugin_description.xml"/>
   </export>
 
 </package>
