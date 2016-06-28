@@ -1,5 +1,5 @@
-#ifndef AI_TRANSLATOR
-#define AI_TRANSLATOR
+#ifndef AI_MESSAGE_EMULATOR_H
+#define AI_MESSAGE_EMULATOR_H
 
 #include <elikos_ros/TargetRobot.h>
 
@@ -9,27 +9,29 @@
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 
+
 namespace ai
 {
 
-class MsgEmulator
+class MessageEmulator
 {
 public:
     static const int N_TRGT = 10;
     static const double virtualRadius;
 
-    static const std::string WORLD_FRAME;
     static const std::string TRGT_FRAME;
+    static const std::string MAV_FRAME;
     static const std::string TOPIC;
+    static const std::string WORLD_FRAME;
 
-    static MsgEmulator* getInstance();
+    static MessageEmulator* getInstance();
     static void freeInstance();
 
     void lookForTf();
     bool start();
 
 private:
-    static MsgEmulator* instance_;
+    static MessageEmulator* instance_;
 
     static bool started_;
 
@@ -37,14 +39,16 @@ private:
 
     ros::NodeHandle nh_;
     tf::TransformListener listener_;
-    ros::Publisher pub_;
+    ros::Publisher mavPub_;
+    ros::Publisher trgtPub_;
 
-    MsgEmulator();
-    ~MsgEmulator() = default;
+    MessageEmulator();
+    ~MessageEmulator() = default;
     void lookForTargets();
+    void lookForMav();
     void addTarget(const tf::StampedTransform& stf, unsigned char i);
 };
 
 }
 
-#endif /// AI_TRANSLATER
+#endif /// AI_MESSAGE_EMULATOR_H

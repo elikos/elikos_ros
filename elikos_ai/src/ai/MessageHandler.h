@@ -1,5 +1,5 @@
-#ifndef AI_TRANSLATOR
-#define AI_TRANSLATOR
+#ifndef AI_MESSAGE_HANDLER_H
+#define AI_MESSAGE_HANDLER_H
 
 #include <string>
 #include <ros/ros.h>
@@ -22,9 +22,9 @@ class Agent;
 class MessageHandler
 {
 public:
-    static const std::string DNT_TOPIC;
+    static const std::string TRGT_TOPIC;
+    static const std::string SETPOINT_TOPIC;
     static const std::string MAV_TOPIC;
-    static const std::string MAV_FRAME;
     static const std::string WORLD_FRAME;
 
     static MessageHandler* getInstance();
@@ -37,13 +37,15 @@ private:
     static MessageHandler* instance_;
 
     ros::NodeHandle nh_;
-    ros::Subscriber sub_;
-    ros::Publisher mavPublisher_;
+    ros::Subscriber trgtSub_;
+    ros::Subscriber mavSub_;
+    ros::Publisher mavPub_;
     tf::TransformBroadcaster br_;
 
     Agent* agent_{ nullptr };
 
-    void handleMessage(const elikos_ros::TargetRobotArray::ConstPtr& input);
+    void handleTrgtMsg(const elikos_ros::TargetRobotArray::ConstPtr& input);
+    void handleMavMsg(const geometry_msgs::PoseStamped::ConstPtr& input);
 
     MessageHandler();
     ~MessageHandler() = default;

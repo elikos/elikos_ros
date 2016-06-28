@@ -2,7 +2,7 @@
 #include <ros/ros.h>
 #include <thread>
 
-#include "MsgEmulator.h"
+#include "MessageEmulator.h"
 
 #include "CmdLineParser.h"
 
@@ -55,8 +55,8 @@ bool CmdLineParser::checkParam(const std::string& param)
  */
 void CmdLineParser::launchSimulation()
 {
-    std::system(SIM_LAUNCH_CMD.c_str());
-    bool success = MsgEmulator::getInstance()->start();
+    //std::system(SIM_LAUNCH_CMD.c_str());
+    bool success = MessageEmulator::getInstance()->start();
     if(!success)
     {
         std::cout << "Error: Failed to start msg emulator." << std::endl;

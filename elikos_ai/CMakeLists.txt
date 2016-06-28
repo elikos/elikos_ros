@@ -18,10 +18,11 @@ catkin_package(
 )
 
 include_directories(
-  ${catkin_INCLUDE_DIRS}
-  src/ai/StateMachine
-  src/ai/Strategy
-  src/ai/Robot
+  	${catkin_INCLUDE_DIRS}
+  	src/ai/StateMachine
+    src/ai/Strategy
+	src/ai/Robot
+	src/ai
 )
 
 set(STATE_MACHINE_SRC
@@ -55,8 +56,8 @@ add_executable(elikos_ai
     src/ai/Agent.h
     src/ai/MessageHandler.h
     src/ai/MessageHandler.cpp
-    src/ai/MsgEmulator.h
-    src/ai/MsgEmulator.cpp
+        src/ai/MessageEmulator.h
+        src/ai/MessageEmulator.cpp
     ${STATE_MACHINE_SRC}
     ${STRATEGY_SRC}
     ${ROBOT_SRC})
