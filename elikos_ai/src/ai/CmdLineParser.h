@@ -2,15 +2,29 @@
 #define CMD_LINE_PARSER_H
 
 #include <string>
+#include <unordered_map>
+#include <memory>
 
 namespace ai
 {
 
+class AbstractConsideration;
+
 class CmdLineParser
 {
 public:
-    static const std::string PARAM_SIM;
-    static const std::string SIM_LAUNCH_CMD;
+    static const char* SIM_LAUNCH_CMD;
+    static const char* ARG_SIM;
+    static const char* ARG_MODE;
+
+    // 0001
+    static const int RED_LINE_MASK { 1 };
+    // 0010
+    static const int GREEN_LINE_MASK { 2 };
+    // 0100
+    static const int QUAD_DISTANCE_MASK { 4 };
+    // 1000
+    static const int ORIENTATION_MASK = { 8 };
 
     CmdLineParser() = delete;
     CmdLineParser(int argc, char* argv[]);
@@ -19,10 +33,13 @@ public:
     void parse();
 
 private:
+    std::unordered_map<char, bool> args;
     int argc_;
     char** argv_;
 
-    bool checkParam(const std::string& param);
+    bool checkSimArg();
+    int checkModeArg();
+    void parseMode(int mode);
     void launchSimulation();
 };
 

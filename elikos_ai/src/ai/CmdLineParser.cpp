@@ -2,15 +2,18 @@
 #include <ros/ros.h>
 #include <thread>
 
-#include "MessageEmulator.h"
-
 #include "CmdLineParser.h"
+
+#include "MessageEmulator.h"
+#include "Agent.h"
+#include "ConsiderationTypes.h"
 
 namespace ai
 {
 
-const std::string CmdLineParser::PARAM_SIM = "--sim";
-const std::string CmdLineParser::SIM_LAUNCH_CMD = "roslaunch elikos_sim simulation.launch";
+const char* CmdLineParser::SIM_LAUNCH_CMD{ "roslaunch elikos_sim simulation.launch" };
+const char* CmdLineParser::ARG_SIM  { "--sim" };
+const char* CmdLineParser::ARG_MODE { "--mode" };
 
 CmdLineParser::CmdLineParser(int argc, char* argv[])
     : argc_(argc), argv_(argv)
@@ -20,27 +23,25 @@ CmdLineParser::CmdLineParser(int argc, char* argv[])
 
 void CmdLineParser::parse()
 {
-    bool isSimulation = checkParam(PARAM_SIM);
+    bool isSimulation = checkSimArg();
     if(isSimulation)
     {
         launchSimulation();
     }
+
+    int mode = checkModeArg();
+    if (mode > 0)
+    {
+        parseMode(mode);
+    }
 }
 
-/*
- *  bool CmdLineParser::checkParam(const std::string& param)
- *
- *  Check if one of the input arguments is valid with a given parameter.
- *
- *  param[in] : parameter to check for in the arguments
- *  return : if the parameter has been found
- */
-bool CmdLineParser::checkParam(const std::string& param)
+bool CmdLineParser::checkSimArg()
 {
     bool foundParam = false;
-    for (int i = 0; i < argc_ && !foundParam; i++)
+    for (int i = 0; i < argc_ && !foundParam; ++i)
     {
-        if(strcmp(argv_[i], param.c_str()) == 0)
+        if (strcmp(argv_[i], ARG_SIM) == 0)
         {
             foundParam = true;
         }
@@ -48,11 +49,39 @@ bool CmdLineParser::checkParam(const std::string& param)
     return foundParam;
 }
 
-/*
- *  void CmdLineParser::launchSimulation()
- *
- *  Launch sim and msg emulator
- */
+int CmdLineParser::checkModeArg()
+{
+    bool foundParam = false;
+    int mode = 0;
+    for (int i = 0; i < argc_ && !foundParam; ++i)
+    {
+        if (strcmp(argv_[i], ARG_MODE) == 0)
+        {
+            if (i + 1 < argc_)
+            {
+                mode = std::stoi(argv_[i + 1]);
+                foundParam = true;
+            }
+        }
+    }
+    return mode;
+}
+
+void CmdLineParser::parseMode(int mode)
+{
+    ConsiderationPipeline *pipeline = Agent::getInstance()->getConsiderationPipeline();
+
+    if ((mode & RED_LINE_MASK) == RED_LINE_MASK)
+    {
+        pipeline->addConsideration(std::unique_ptr<RedLineDistance>(new RedLineDistance()));
+    }
+
+    if ((mode & QUAD_DISTANCE_MASK) == QUAD_DISTANCE_MASK)
+    {
+        pipeline->addConsideration(std::unique_ptr<QuadDistance>(new QuadDistance()));
+    }
+}
+
 void CmdLineParser::launchSimulation()
 {
     //std::system(SIM_LAUNCH_CMD.c_str());
@@ -60,6 +89,7 @@ void CmdLineParser::launchSimulation()
     if(!success)
     {
         std::cout << "Error: Failed to start msg emulator." << std::endl;
+        exit(0);
     }
 }
 

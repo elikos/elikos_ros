@@ -36,7 +36,6 @@ inline void Strategy::updateTarget(const uint8_t& id, const uint8_t& color, cons
 {
     targets_[id].setPose(pose);
     targets_[id].setColor(color);
-    targets_[id].setPose(pose);
     targets_[id].setIsUpdated(true);
 }
 

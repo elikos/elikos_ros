@@ -19,11 +19,11 @@ catkin_package(
 
 include_directories(
   	${catkin_INCLUDE_DIRS}
+    src/ai
   	src/ai/StateMachine
     src/ai/Strategy
 	src/ai/Robot
-	src/ai
-)
+    src/ai/Consideration)
 
 set(STATE_MACHINE_SRC
     src/ai/StateMachine/StateMachine.h
@@ -48,6 +48,10 @@ set(ROBOT_SRC
     src/ai/Robot/TargetRobot.cpp
     src/ai/Robot/RobotTypes.h)
 
+set(CONSIDERATION_SRC
+
+        src/ai/Consideration/ConsiderationPipeline.cpp src/ai/Consideration/ConsiderationPipeline.h src/ai/Consideration/AbstractConsideration.cpp src/ai/Consideration/AbstractConsideration.h src/ai/Consideration/QuadDistance.cpp src/ai/Consideration/QuadDistance.h src/ai/Consideration/RedLineDistance.cpp src/ai/Consideration/RedLineDistance.h src/ai/Consideration/ConsiderationTypes.h)
+
 add_executable(elikos_ai
     src/ai/main.cpp
     src/ai/CmdLineParser.h
@@ -56,11 +60,13 @@ add_executable(elikos_ai
     src/ai/Agent.h
     src/ai/MessageHandler.h
     src/ai/MessageHandler.cpp
-        src/ai/MessageEmulator.h
-        src/ai/MessageEmulator.cpp
+    src/ai/MessageEmulator.h
+    src/ai/MessageEmulator.cpp
+    ${CONSIDERATION_SRC}
     ${STATE_MACHINE_SRC}
     ${STRATEGY_SRC}
     ${ROBOT_SRC})
+
 
 target_link_libraries(elikos_ai
   ${catkin_LIBRARIES}

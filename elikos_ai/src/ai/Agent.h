@@ -6,18 +6,20 @@
 #include "StateMachine.h"
 #include "StrategyTypes.h"
 #include "QuadRobot.h"
+#include "ConsiderationPipeline.h"
 
 namespace ai {
 
 class Agent
 {
 public:
-
     static Agent* getInstance();
     static void freeInstance();
 
     inline void updateTarget(const uint8_t& id, const uint8_t& color, const tf::Pose pose);
     inline void updateQuadRobot(const tf::Pose& pose);
+
+    inline ConsiderationPipeline* getConsiderationPipeline();
 
     void behave();
 
@@ -26,21 +28,25 @@ private:
 
     QuadRobot quad_;
     StateMachine stateMachine_;
-    std::unique_ptr<Strategy> strategy_;
+    ConsiderationPipeline pipeline_;
 
     Agent();
     ~Agent() = default;
-
 };
 
 inline void Agent::updateTarget(const uint8_t& id, const uint8_t& color, const tf::Pose pose)
 {
-    strategy_->updateTarget(id, color, pose);
+    pipeline_.updateTarget(id, color, pose);
 }
 
 inline void Agent::updateQuadRobot(const tf::Pose& pose)
 {
     quad_.setPose(pose);
+}
+
+inline ConsiderationPipeline* Agent::getConsiderationPipeline()
+{
+    return &pipeline_;
 }
 
 }; /// namespace ai

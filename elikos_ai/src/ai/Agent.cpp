@@ -19,7 +19,6 @@ Agent* Agent::getInstance()
 
 Agent::Agent()
 {
-   strategy_ = std::unique_ptr<FollowClosestTarget>(new FollowClosestTarget(quad_));
 }
 
 void Agent::freeInstance()
@@ -29,8 +28,8 @@ void Agent::freeInstance()
 
 void Agent::behave()
 {
-    Robot* target = strategy_->findTargetSelection();
-    tf::Vector3 destination(4.0 ,4.0, 4.0);
+    Robot* target = pipeline_.evaluateTargetSelection();
+    //TODO: The state machine should be sending the destinations.
     MessageHandler::getInstance()->sendDestination(target->getPose().getOrigin());
 }
 
