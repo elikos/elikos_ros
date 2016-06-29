@@ -2,15 +2,16 @@
 #define ABSTRACT_STATE_H
 
 #include <memory>
+namespace ai
+{
 
-class State
+class AbstractState
 {
 public:
-    State();
-    ~State();
-
-private:
-    std::unique_ptr<State> nextState_;
+    AbstractState() = default;
+    virtual ~AbstractState() = 0;
 };
+
+}
 
 #endif /// ABSTRACT_STATE_H

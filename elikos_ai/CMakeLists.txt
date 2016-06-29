@@ -21,27 +21,20 @@ include_directories(
   	${catkin_INCLUDE_DIRS}
     src/ai
   	src/ai/StateMachine
-    src/ai/Strategy
 	src/ai/Robot
     src/ai/Consideration)
 
 set(STATE_MACHINE_SRC
     src/ai/StateMachine/StateMachine.h
     src/ai/StateMachine/StateMachine.cpp
-    src/ai/StateMachine/State.h
-    src/ai/StateMachine/State.cpp)
-
-set(STRATEGY_SRC
-    src/ai/Strategy/Strategy.h
-    src/ai/Strategy/Strategy.cpp
-    src/ai/Strategy/FollowClosestTarget.cpp
-    src/ai/Strategy/FollowClosestTarget.h)
+    src/ai/StateMachine/AbstractState.h
+    src/ai/StateMachine/AbstractState.cpp
+    src/ai/StateMachine/MovementState.cpp
+    src/ai/StateMachine/MovementState.h)
 
 set(ROBOT_SRC
     src/ai/Robot/Robot.h
     src/ai/Robot/Robot.cpp
-    src/ai/Robot/ObstacleRobot.h
-    src/ai/Robot/ObstacleRobot.cpp
     src/ai/Robot/QuadRobot.h
     src/ai/Robot/QuadRobot.cpp
     src/ai/Robot/TargetRobot.h
@@ -49,8 +42,19 @@ set(ROBOT_SRC
     src/ai/Robot/RobotTypes.h)
 
 set(CONSIDERATION_SRC
-
-        src/ai/Consideration/ConsiderationPipeline.cpp src/ai/Consideration/ConsiderationPipeline.h src/ai/Consideration/AbstractConsideration.cpp src/ai/Consideration/AbstractConsideration.h src/ai/Consideration/QuadDistance.cpp src/ai/Consideration/QuadDistance.h src/ai/Consideration/RedLineDistance.cpp src/ai/Consideration/RedLineDistance.h src/ai/Consideration/ConsiderationTypes.h)
+    src/ai/Consideration/ConsiderationPipeline.cpp
+    src/ai/Consideration/ConsiderationPipeline.h
+    src/ai/Consideration/AbstractConsideration.cpp
+    src/ai/Consideration/AbstractConsideration.h
+    src/ai/Consideration/QuadDistance.cpp
+    src/ai/Consideration/QuadDistance.h
+    src/ai/Consideration/RedLineDistance.cpp
+    src/ai/Consideration/RedLineDistance.h
+    src/ai/Consideration/ConsiderationTypes.h
+    src/ai/StateMachine/ObservationState.cpp
+    src/ai/StateMachine/ObservationState.h
+    src/ai/StateMachine/InteractionState.cpp
+    src/ai/StateMachine/InteractionState.h)
 
 add_executable(elikos_ai
     src/ai/main.cpp
@@ -64,10 +68,7 @@ add_executable(elikos_ai
     src/ai/MessageEmulator.cpp
     ${CONSIDERATION_SRC}
     ${STATE_MACHINE_SRC}
-    ${STRATEGY_SRC}
     ${ROBOT_SRC})
 
-
 target_link_libraries(elikos_ai
-  ${catkin_LIBRARIES}
-)
+  ${catkin_LIBRARIES})

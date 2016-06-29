@@ -4,7 +4,6 @@
 #include <memory>
 #include <tf/tf.h>
 #include "StateMachine.h"
-#include "StrategyTypes.h"
 #include "QuadRobot.h"
 #include "ConsiderationPipeline.h"
 

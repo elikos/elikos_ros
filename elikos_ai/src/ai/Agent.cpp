@@ -1,8 +1,6 @@
 #include "Agent.h"
 #include "MessageHandler.h"
 
-#include "StrategyTypes.h"
-
 namespace ai
 {
 

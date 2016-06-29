@@ -2,26 +2,21 @@
 #define STATE_MACHINE_H
 
 #include <memory>
-#include "State.h"
+#include "AbstractState.h"
 
-
+namespace ai
+{
 
 class StateMachine
 {
 public:
-    enum STATE_ENUM
-    {
-        GOING_FOR_TARGET,
-        DODGING_OBSTACLE,
-
-    };
-
-    StateMachine();
-    ~StateMachine();
+    StateMachine() = default;
+    ~StateMachine() = default;
 
 private:
-    std::unique_ptr<State> currentState_;
+    std::unique_ptr<AbstractState> currentState_;
+};
 
-}; 
+}
 
 #endif /// STATE_MACHINE_H
