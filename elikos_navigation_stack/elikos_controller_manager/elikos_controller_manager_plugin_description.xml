@@ -1,0 +1,10 @@
+<library path="libelikos_controller_manager">
+
+  <class name="elikos_controller_manager/ElikosControllerManager"
+         type="elikos_controller_manager::ElikosControllerManager"
+         base_class_type="moveit_controller_manager::MoveItControllerManager">
+    <description>
+    </description>
+  </class>
+
+</library>

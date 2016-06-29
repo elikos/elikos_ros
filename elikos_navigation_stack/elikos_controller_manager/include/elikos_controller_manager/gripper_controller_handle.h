@@ -38,11 +38,11 @@
 #ifndef MOVEIT_PLUGINS_GRIPPER_CONTROLLER_HANDLE
 #define MOVEIT_PLUGINS_GRIPPER_CONTROLLER_HANDLE
 
-#include <moveit_simple_controller_manager/action_based_controller_handle.h>
+#include <elikos_controller_manager/action_based_controller_handle.h>
 #include <control_msgs/GripperCommandAction.h>
 #include <set>
 
-namespace moveit_simple_controller_manager
+namespace elikos_controller_manager
 {
 
 

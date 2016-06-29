@@ -34,29 +34,30 @@
  *********************************************************************/
 
 /* Author: Michael Ferguson, Ioan Sucan, E. Gil Jones */
+/* Modifyed by Team Elikos*/
 
 #include <ros/ros.h>
-#include <moveit_simple_controller_manager/action_based_controller_handle.h>
-#include <moveit_simple_controller_manager/gripper_controller_handle.h>
-#include <moveit_simple_controller_manager/follow_joint_trajectory_controller_handle.h>
-#include <moveit_simple_controller_manager/multi_dof_follow_joint_trajectory_handle.h>
+#include <elikos_controller_manager/action_based_controller_handle.h>
+#include <elikos_controller_manager/gripper_controller_handle.h>
+#include <elikos_controller_manager/follow_joint_trajectory_controller_handle.h>
+#include <elikos_controller_manager/multi_dof_follow_joint_trajectory_handle.h>
 #include <pluginlib/class_list_macros.h>
 #include <algorithm>
 #include <map>
 
-namespace moveit_simple_controller_manager
+namespace elikos_controller_manager
 {
 
 
-class MoveItSimpleControllerManager : public moveit_controller_manager::MoveItControllerManager
+class ElikosControllerManager : public moveit_controller_manager::MoveItControllerManager
 {
 public:
 
-	MoveItSimpleControllerManager() : node_handle_("~")
+	ElikosControllerManager() : node_handle_("~")
 {
 		if (!node_handle_.hasParam("controller_list"))
 		{
-			ROS_ERROR_STREAM("MoveitSimpleControllerManager: No controller_list specified.");
+			ROS_ERROR_STREAM("ElikosControllerManager: No controller_list specified.");
 			return;
 		}
 
@@ -64,7 +65,7 @@ public:
 		node_handle_.getParam("controller_list", controller_list);
 		if (controller_list.getType() != XmlRpc::XmlRpcValue::TypeArray)
 		{
-			ROS_ERROR("MoveitSimpleControllerManager: controller_list should be specified as an array");
+			ROS_ERROR("ElikosControllerManager: controller_list should be specified as an array");
 			return;
 		}
 
@@ -73,7 +74,7 @@ public:
 		{
 			if (!controller_list[i].hasMember("name") || !controller_list[i].hasMember("joints"))
 			{
-				ROS_ERROR("MoveitSimpleControllerManager: Name and joints must be specifed for each controller");
+				ROS_ERROR("ElikosControllerManager: Name and joints must be specifed for each controller");
 				continue;
 			}
 
@@ -86,22 +87,22 @@ public:
 				{
 					/* TODO: this used to be called "ns", renaming to "action_ns" and will remove in the future */
 					action_ns = std::string(controller_list[i]["ns"]);
-					ROS_WARN("MoveitSimpleControllerManager: use of 'ns' is deprecated, use 'action_ns' instead.");
+					ROS_WARN("ElikosControllerManager: use of 'ns' is deprecated, use 'action_ns' instead.");
 				}
 				else if (controller_list[i].hasMember("action_ns"))
 					action_ns = std::string(controller_list[i]["action_ns"]);
 				else
-					ROS_WARN("MoveitSimpleControllerManager: please note that 'action_ns' no longer has a default value.");
+					ROS_WARN("ElikosControllerManager: please note that 'action_ns' no longer has a default value.");
 
 				if (controller_list[i]["joints"].getType() != XmlRpc::XmlRpcValue::TypeArray)
 				{
-					ROS_ERROR_STREAM("MoveitSimpleControllerManager: The list of joints for controller " << name << " is not specified as an array");
+					ROS_ERROR_STREAM("ElikosControllerManager: The list of joints for controller " << name << " is not specified as an array");
 					continue;
 				}
 
 				if (!controller_list[i].hasMember("type"))
 				{
-					ROS_ERROR_STREAM("MoveitSimpleControllerManager: No type specified for controller " << name);
+					ROS_ERROR_STREAM("ElikosControllerManager: No type specified for controller " << name);
 					continue;
 				}
 
@@ -121,7 +122,7 @@ public:
 						if (controller_list[i].hasMember("allow_failure"))
 							static_cast<GripperControllerHandle*>(new_handle.get())->allowFailure(true);
 
-						ROS_INFO_STREAM("MoveitSimpleControllerManager: Added GripperCommand controller for " << name );
+						ROS_INFO_STREAM("ElikosControllerManager: Added GripperCommand controller for " << name );
 						controllers_[name] = new_handle;
 					}
 				}
@@ -130,7 +131,7 @@ public:
 					new_handle.reset(new FollowJointTrajectoryControllerHandle(name, action_ns));
 					if (static_cast<FollowJointTrajectoryControllerHandle*>(new_handle.get())->isConnected())
 					{
-						ROS_INFO_STREAM("MoveitSimpleControllerManager: Added FollowJointTrajectory controller for " << name );
+						ROS_INFO_STREAM("ElikosControllerManager: Added FollowJointTrajectory controller for " << name );
 						controllers_[name] = new_handle;
 					}
 				}
@@ -139,7 +140,7 @@ public:
 					new_handle.reset(new MultiDofFollowJointTrajectoryControllerHandle(name, action_ns));
 					if (static_cast<MultiDofFollowJointTrajectoryControllerHandle*>(new_handle.get())->isConnected())
 					{
-						ROS_INFO_STREAM("MoveitSimpleControllerManager: Added MultiDofFollowJointTrajectory controller for " << name );
+						ROS_INFO_STREAM("ElikosControllerManager: Added MultiDofFollowJointTrajectory controller for " << name );
 						controllers_[name] = new_handle;
 					}
 				}
@@ -150,12 +151,12 @@ public:
 			}
 			catch (...)
 			{
-				ROS_ERROR("MoveitSimpleControllerManager: Unable to parse controller information");
+				ROS_ERROR("ElikosControllerManager: Unable to parse controller information");
 			}
 		}
 }
 
-	virtual ~MoveItSimpleControllerManager()
+	virtual ~ElikosControllerManager()
 	{
 	}
 
@@ -234,7 +235,7 @@ protected:
 	std::map<std::string, ActionBasedControllerHandleBasePtr> controllers_;
 };
 
-} // end namespace moveit_simple_controller_manager
+} // end namespace elikos_controller_manager
 
-PLUGINLIB_EXPORT_CLASS(moveit_simple_controller_manager::MoveItSimpleControllerManager,
+PLUGINLIB_EXPORT_CLASS(elikos_controller_manager::ElikosControllerManager,
 		moveit_controller_manager::MoveItControllerManager);

@@ -42,7 +42,7 @@
 #include <actionlib/client/simple_action_client.h>
 #include <moveit/macros/class_forward.h>
 
-namespace moveit_simple_controller_manager
+namespace elikos_controller_manager
 {
 
 /*

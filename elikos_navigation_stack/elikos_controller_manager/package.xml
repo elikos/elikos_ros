@@ -1,17 +1,11 @@
 <package>
-  <name>controller_manager</name>
-  <version>0.5.2</version>
+  <name>elikos_controller_manager</name>
+  <version>1.5.2</version>
   <description>A generic, simple controller manager plugin for MoveIt.</description>
-  <author email="fergs@unboundedrobotics.com">Michael Ferguson</author>
-  <maintainer email="fergs@unboundedrobotics.com">Michael Ferguson</maintainer>
 
-  <license>BSD</license>
-
-  <url type="website">http://moveit.ros.org</url>
-  <url type="bugtracker">https://github.com/ros-planning/moveit_plugins/issues</url>
-  <url type="repository">https://github.com/ros-planning/moveit_plugins</url>
-
+  <maintainer email="lajoie.py@gmail.com">PY</maintainer>
   <buildtool_depend>catkin</buildtool_depend>
+  <license>TODO</license>
 
   <build_depend>action_controller</build_depend>
   <build_depend>moveit_core</build_depend>
@@ -28,7 +22,7 @@
   <run_depend>actionlib</run_depend>
 
   <export>
-    <moveit_core plugin="${prefix}/controller_manager_plugin_description.xml"/>
+    <moveit_core plugin="${prefix}/elikos_controller_manager_plugin_description.xml"/>
   </export>
 
 </package>
