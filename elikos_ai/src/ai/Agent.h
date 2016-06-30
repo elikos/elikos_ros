@@ -15,11 +15,8 @@ public:
     static Agent* getInstance();
     static void freeInstance();
 
-    inline void updateTarget(const uint8_t& id, const uint8_t& color, const tf::Pose pose);
-    inline void updateQuadRobot(const tf::Pose& pose);
-
     inline ConsiderationPipeline* getConsiderationPipeline();
-
+    inline void updateQuadRobot(const tf::Pose& pose);
     void behave();
 
 private:
@@ -33,9 +30,9 @@ private:
     ~Agent() = default;
 };
 
-inline void Agent::updateTarget(const uint8_t& id, const uint8_t& color, const tf::Pose pose)
+inline ConsiderationPipeline* Agent::getConsiderationPipeline()
 {
-    pipeline_.updateTarget(id, color, pose);
+    return &pipeline_;
 }
 
 inline void Agent::updateQuadRobot(const tf::Pose& pose)
@@ -43,11 +40,6 @@ inline void Agent::updateQuadRobot(const tf::Pose& pose)
     quad_.setPose(pose);
 }
 
-inline ConsiderationPipeline* Agent::getConsiderationPipeline()
-{
-    return &pipeline_;
 }
-
-}; /// namespace ai
 
 #endif /// AI_FACADE_H

@@ -21,14 +21,16 @@ Agent::Agent()
 
 void Agent::freeInstance()
 {
-
+    delete instance_;
+    instance_ = nullptr;
 }
 
 void Agent::behave()
 {
-    Robot* target = pipeline_.evaluateTargetSelection();
+    TargetRobot* target = pipeline_.evaluateTargetSelection(quad_);
     //TODO: The state machine should be sending the destinations.
-    MessageHandler::getInstance()->sendDestination(target->getPose().getOrigin());
+    stateMachine_.handleTargetSelection(target, quad_);
+
 }
 
 

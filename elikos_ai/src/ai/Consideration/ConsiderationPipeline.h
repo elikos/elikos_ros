@@ -18,18 +18,18 @@ public:
     ~ConsiderationPipeline() = default;
 
     void addConsideration(std::unique_ptr<AbstractConsideration>);
-    inline void updateTarget(const uint8_t& id, const uint8_t& color, const tf::Pose& pose);
-    TargetRobot* evaluateTargetSelection();
+    inline void updateTarget(uint8_t id, uint8_t color, const tf::Pose& pose);
+
+    TargetRobot* evaluateTargetSelection(const QuadRobot& quad);
 
 private:
     std::vector<std::unique_ptr<AbstractConsideration>> considerations_;
     std::vector<TargetRobot> targets_;
-    QuadRobot quad_;
 
     TargetRobot* findHighestPriorityTarget();
 };
 
-inline void ConsiderationPipeline::updateTarget(const uint8_t& id, const uint8_t& color, const tf::Pose& pose)
+inline void ConsiderationPipeline::updateTarget(uint8_t id, uint8_t color, const tf::Pose& pose)
 {
     targets_[id].setPose(pose);
     targets_[id].setColor(color);

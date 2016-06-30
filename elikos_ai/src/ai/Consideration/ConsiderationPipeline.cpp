@@ -21,12 +21,12 @@ namespace ai
         considerations_.push_back(std::move(consideration));
     }
 
-    TargetRobot* ConsiderationPipeline::evaluateTargetSelection()
+    TargetRobot* ConsiderationPipeline::evaluateTargetSelection(const QuadRobot& quad)
     {
+        //TODO: evaluate after every update on a single robot so multithreading can be used.
         for (int i = 0; i < considerations_.size(); ++i)
         {
-            //TODO: Threads could be used here.
-            considerations_[i]->evaluatePriority(targets_, quad_);
+            considerations_[i]->evaluatePriority(targets_, quad);
         }
         return findHighestPriorityTarget();
     }

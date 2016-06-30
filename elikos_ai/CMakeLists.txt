@@ -30,7 +30,7 @@ set(STATE_MACHINE_SRC
     src/ai/StateMachine/AbstractState.h
     src/ai/StateMachine/AbstractState.cpp
     src/ai/StateMachine/MovementState.cpp
-    src/ai/StateMachine/MovementState.h)
+    src/ai/StateMachine/MovementState.h src/ai/StateMachine/Command.cpp src/ai/StateMachine/Command.h)
 
 set(ROBOT_SRC
     src/ai/Robot/Robot.h

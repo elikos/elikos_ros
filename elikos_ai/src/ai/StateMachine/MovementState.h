@@ -1,22 +1,29 @@
-//
-// Created by olivier on 28/06/16.
-//
+#ifndef AI_MOVEMENT_STATE_H
+#define AI_MOVEMENT_STATE_H
 
-#ifndef ELIKOS_AI_MOVING_H
-#define ELIKOS_AI_MOVING_H
+#include "RobotTypes.h"
 
 #include "AbstractState.h"
 
 namespace ai
 {
 
-class MovementState : AbstractState
+class StateMachine;
+
+class MovementState : public AbstractState
 {
 public:
-    MovementState() = default;
+
+    static constexpr double FLIGHT_HEIGHT{ 2.0 };
+
+    MovementState(StateMachine* reference);
     virtual ~MovementState();
+    virtual void handleTargetSelection(TargetRobot* target, const QuadRobot& quad);
+
+private:
+    MovementState() = delete;
 };
 
 }
 
-#endif //ELIKOS_AI_MOVING_H
+#endif // AI_MOVEMENT_STATE_H
