@@ -23,13 +23,17 @@ bool Line::getIntersectionPoint(const Segment& segment, tf::Point& intersection)
 
 bool Line::isIntersecting(const Segment& segment) const
 {
-    tf::Vector3 dA = segment.getA() - origin_;
-    tf::Vector3 dB = segment.getB() - origin_;
-
+    tf::Vector3 originDistanceA = segment.getA() - origin_;
+    tf::Vector3 originDistanceB = segment.getB() - origin_;
     tf::Vector3 perpendicular = get2DPerpendicularOrientation();
+    return projectionIsIntersecting(perpendicular, originDistanceA, originDistanceB);
+}
 
-    return projectionIsIntersecting(orientation_, dA, dB) &&
-           projectionIsIntersecting(perpendicular, dA, dB);
+bool Line::projectionIsIntersecting(const tf::Vector3& orientation, const tf::Point& originDistanceA, const tf::Point& originDistanceB) const
+{
+    double projA = orientation.dot(originDistanceA);
+    double projB = orientation.dot(originDistanceB);
+    return std::signbit(projA) != std::signbit(projB);
 }
 
 tf::Vector3 Line::get2DPerpendicularOrientation() const
@@ -38,13 +42,6 @@ tf::Vector3 Line::get2DPerpendicularOrientation() const
                               -orientation_.getX(),
                                orientation_.getZ());
     return perpendicular.normalized();
-}
-
-bool Line::projectionIsIntersecting(const tf::Vector3& orientation, const tf::Point& dA, const tf::Point& dB) const
-{
-    double projA = orientation.dot(dA);
-    double projB = orientation.dot(dB);
-    return std::signbit(projA) != std::signbit(projB);
 }
 
 }
