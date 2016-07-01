@@ -30,7 +30,9 @@ set(STATE_MACHINE_SRC
     src/ai/StateMachine/AbstractState.h
     src/ai/StateMachine/AbstractState.cpp
     src/ai/StateMachine/MovementState.cpp
-    src/ai/StateMachine/MovementState.h src/ai/StateMachine/Command.cpp src/ai/StateMachine/Command.h)
+    src/ai/StateMachine/MovementState.h
+    src/ai/StateMachine/Command.cpp
+    src/ai/StateMachine/Command.h)
 
 set(ROBOT_SRC
     src/ai/Robot/Robot.h
@@ -56,6 +58,12 @@ set(CONSIDERATION_SRC
     src/ai/StateMachine/InteractionState.cpp
     src/ai/StateMachine/InteractionState.h)
 
+set(UTIL_SRC
+    src/ai/Util/Line.cpp
+    src/ai/Util/Line.h
+    src/ai/Util/Segment.cpp
+    src/ai/Util/Segment.h)
+
 add_executable(elikos_ai
     src/ai/main.cpp
     src/ai/CmdLineParser.h
@@ -68,7 +76,8 @@ add_executable(elikos_ai
     src/ai/MessageEmulator.cpp
     ${CONSIDERATION_SRC}
     ${STATE_MACHINE_SRC}
-    ${ROBOT_SRC})
+    ${ROBOT_SRC}
+	${UTIL_SRC})
 
 target_link_libraries(elikos_ai
   ${catkin_LIBRARIES})

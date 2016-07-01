@@ -17,7 +17,6 @@ class AbstractConsideration
 public:
 
     static constexpr double MAX_DISTANCE { 20.0 };
-
     static constexpr double LEFT_SIDE  { -10.0 };
     static constexpr double RIGHT_SIDE {  10.0 };
     static constexpr double UP_SIDE    {  10.0 };
@@ -29,8 +28,6 @@ public:
     AbstractConsideration() = default;
     virtual ~AbstractConsideration() = 0;
     virtual void evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad) = 0;
-
-private:
 };
 
 }

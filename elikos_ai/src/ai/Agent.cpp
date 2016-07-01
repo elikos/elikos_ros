@@ -28,7 +28,6 @@ void Agent::freeInstance()
 void Agent::behave()
 {
     TargetRobot* target = pipeline_.evaluateTargetSelection(quad_);
-    //TODO: The state machine should be sending the destinations.
     stateMachine_.handleTargetSelection(target, quad_);
 
 }
