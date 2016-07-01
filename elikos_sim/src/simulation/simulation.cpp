@@ -4,6 +4,7 @@
 
 #include <ros/ros.h>
 
+
 #include <vector>
 #include <elikos_lib/pid.hpp>
 #include <algorithm>
@@ -14,6 +15,8 @@
 #include "GameManager.hpp"
 
 #include "Simulation.hpp"
+#include <iostream>
+#include <fstream>
 
 #include "defines.cpp"
 
@@ -21,6 +24,7 @@ namespace elikos_sim
 {
     Simulation::Simulation(int& argc, char** argv, ros::NodeHandle& node): node(node), r(30)
     {
+
         // ROS initialization
         //ros::init(argc, argv, "robotsim_tf_broadcaster");
 
@@ -88,6 +92,7 @@ namespace elikos_sim
 
     void Simulation::Exec()
     {
+
         while(ros::ok()){
             // Receive and set mav setpoints
             ros::spinOnce();
@@ -97,9 +102,15 @@ namespace elikos_sim
 
             //Collision checking
             for(auto& robot1 : robots)
-                for(auto& robot2 : robots)
-                    if( robot1 != robot2 && checkCollision(robot1, robot2))
-                        robot1->collide();
+            {
+                if (!handleCollision(robot1, mav))
+                {
+                    for(auto& robot2 : robots)
+                        if( robot1 != robot2 && checkCollision(robot1, robot2))
+                            robot1->collide();
+                }
+
+            }
 
             robotMarkers.markers.clear();
 
@@ -120,6 +131,27 @@ namespace elikos_sim
             arena_pub.publish(arenaMarkers);
             r.sleep();
         };
+    }
+
+    bool Simulation::handleCollision(elikos_sim::Robot* robot, elikos_sim::MAV* mav)
+    {
+
+        tf::Vector3 mavPosition = mav->getTransform().getOrigin();
+        tf::Vector3 robotPosition = mav->getTransform().getOrigin();
+
+        double height = mavPosition.getZ();
+
+        mavPosition.setZ(0.0);
+        robotPosition.setZ(0.0);
+
+        double distance = mavPosition.distance(robotPosition);
+
+        if (distance < 0.35 && height < 0.1)
+        {
+            robot->interact(true);
+            return true;
+        }
+
     }
 
     bool Simulation::checkCollision(const elikos_sim::Robot* ra, const elikos_sim::Robot* rb){

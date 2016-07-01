@@ -92,6 +92,7 @@ void MAV::move(){
     x += vel_xy.getX() * cycleTime.toSec() * simSpeed;
     y += vel_xy.getY() * cycleTime.toSec() * simSpeed;
     z += vel_z * cycleTime.toSec() * simSpeed;
+    std::cout << vel_z << std::cout;
     // TODO: Yaw
     refreshTransform();
 }

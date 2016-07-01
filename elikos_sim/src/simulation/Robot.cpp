@@ -19,4 +19,9 @@ void Robot::refreshTransform(){
     transform.setRotation(q);
 }
 
+void Robot::interact(bool topInteraction)
+{
+
+}
+
 } // namespace elikos_sim
