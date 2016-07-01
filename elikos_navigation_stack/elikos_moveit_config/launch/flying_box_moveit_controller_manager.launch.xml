@@ -3,7 +3,5 @@
    <arg name="moveit_controller_manager" default="elikos_controller_manager/ElikosControllerManager" />
    <param name="moveit_controller_manager" value="$(arg moveit_controller_manager)"/>
    <!-- load controller_list -->
-   <arg name="controller_manager_name" default="flying_box_controller_manager" />
-   <param name="controller_manager_name" value="$(arg controller_manager_name)" />
    <rosparam file="$(find elikos_moveit_config)/config/controllers.yaml"/>
 </launch>
