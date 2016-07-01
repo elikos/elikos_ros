@@ -56,8 +56,7 @@ int main(int argc, char* argv[])
         display_trajectory.trajectory.push_back(my_plan.trajectory_);
         display_publisher_.publish(display_trajectory);
 
-        ros::spinOnce();
-        r.sleep();
+        group_->asyncMove();
     }
 
     delete group_;

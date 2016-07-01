@@ -26,7 +26,7 @@ public:
 		empty.angular.z=0;
 		empty.angular.y=0;
 		empty.angular.x=0;
-		pub_topic = node_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+		pub_topic = node_.advertise<geometry_msgs::Twist>("/mavros/setpoint_velocity/cmd_vel", 1);
 		action_server_.start();
 		ROS_INFO_STREAM("Node ready!");
 }
@@ -98,7 +98,7 @@ private:
 	}
 
 	void executeTrajectory(){
-		if(toExecute.joint_names[0]=="Base" && toExecute.points.size()>0){
+		if(toExecute.joint_names[0]=="virtual_joint" && toExecute.points.size()>0){
 			for(int k=0; k<toExecute.points.size(); k++){
 				//ricavo cmd da effettuare
 				geometry_msgs::Transform_<std::allocator<void> > punto=toExecute.points[k].transforms[0];
