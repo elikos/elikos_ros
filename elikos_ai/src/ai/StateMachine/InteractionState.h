@@ -20,10 +20,10 @@ public:
 
     static constexpr double HEIGHT_OFFSET{ 0.0 };
 
-    InteractionState(StateMachine* reference);
+    InteractionState(StateMachine* stateMachine, QuadRobot* quad);
 
+    virtual void behave();
     virtual ~InteractionState();
-    virtual void handleTargetSelection(TargetRobot* target, const QuadRobot& quad);
 
 private:
     InteractionState() = delete;

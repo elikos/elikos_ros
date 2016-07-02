@@ -7,6 +7,6 @@
 
 #include "AbstractConsideration.h"
 #include "QuadDistance.h"
-#include "RedLineDistance.h"
+#include "TargetDestination.h"
 
 #endif // AI_CONSIDERATION_TYPES_H

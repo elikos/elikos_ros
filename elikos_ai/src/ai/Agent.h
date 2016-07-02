@@ -5,7 +5,7 @@
 #include <tf/tf.h>
 #include "StateMachine.h"
 #include "Robot/QuadRobot.h"
-#include "ConsiderationPipeline.h"
+#include "PriorityEvaluationPipeline.h"
 
 namespace ai {
 
@@ -15,7 +15,7 @@ public:
     static Agent* getInstance();
     static void freeInstance();
 
-    inline ConsiderationPipeline* getConsiderationPipeline();
+    inline PriorityEvaluationPipeline* getConsiderationPipeline();
     inline void updateQuadRobot(const tf::Pose& pose);
     void behave();
 
@@ -24,13 +24,13 @@ private:
 
     QuadRobot quad_;
     StateMachine stateMachine_;
-    ConsiderationPipeline pipeline_;
+    PriorityEvaluationPipeline pipeline_;
 
     Agent();
     ~Agent() = default;
 };
 
-inline ConsiderationPipeline* Agent::getConsiderationPipeline()
+inline PriorityEvaluationPipeline* Agent::getConsiderationPipeline()
 {
     return &pipeline_;
 }

@@ -11,9 +11,9 @@ vel_xy_i: 0.0
 vel_xy_d: 0.5
 vel_xy_max: 2.0
 vel_z_p: 2.0
-vel_z_i: 0.5
-vel_z_d: 1.0
-vel_z_max: 2.00
+vel_z_i: 0.0
+vel_z_d: 0.5
+vel_z_max: 2.0
 
 # Robot Detection Params
 debug_mode: true

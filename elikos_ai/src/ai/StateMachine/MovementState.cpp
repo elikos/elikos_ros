@@ -10,8 +10,8 @@
 namespace ai
 {
 
-MovementState::MovementState(StateMachine* reference)
-    : AbstractState(reference)
+MovementState::MovementState(StateMachine* stateMachine, QuadRobot* quad)
+    : AbstractState(stateMachine, quad)
 {
 }
 
@@ -19,14 +19,14 @@ MovementState::~MovementState()
 {
 }
 
-void MovementState::handleTargetSelection(TargetRobot* target, const QuadRobot& quad)
+void MovementState::behave()
 {
-    tf::Vector3 destination = destination_;
+    tf::Vector3 destination = target_->getPose().getOrigin();
     destination.setZ(FLIGHT_HEIGHT);
     MessageHandler::getInstance()->sendDestination(destination);
-    if (hasReachedDestination(quad.getPose().getOrigin(), destination))
+    if (hasReachedDestination(quad_->getPose().getOrigin(), destination))
     {
-        stateMachine_->setState(StateMachine::INTERACTION);
+        stateMachine_->setState(StateMachine::INTERACTION, target_);
     }
 }
 

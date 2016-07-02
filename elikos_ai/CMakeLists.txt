@@ -50,11 +50,12 @@ set(CONTEXT_SRC
     src/ai/Context/WhiteLine.cpp
     src/ai/Context/WhiteLine.h
     src/ai/Context/GreenLine.cpp
-    src/ai/Context/GreenLine.h src/ai/Context/ContextTypes.h)
+    src/ai/Context/GreenLine.h
+    src/ai/Context/ContextTypes.h)
 
 set(ROBOT_SRC
-		src/ai/Robot/AbstractRobot.h
-		src/ai/Robot/AbstractRobot.cpp
+    src/ai/Robot/AbstractRobot.h
+    src/ai/Robot/AbstractRobot.cpp
     src/ai/Robot/QuadRobot.h
     src/ai/Robot/QuadRobot.cpp
     src/ai/Robot/TargetRobot.h
@@ -62,14 +63,14 @@ set(ROBOT_SRC
     src/ai/Robot/RobotTypes.h)
 
 set(CONSIDERATION_SRC
-    src/ai/Consideration/ConsiderationPipeline.cpp
-    src/ai/Consideration/ConsiderationPipeline.h
+        src/ai/Consideration/PriorityEvaluationPipeline.cpp
+        src/ai/Consideration/PriorityEvaluationPipeline.h
     src/ai/Consideration/AbstractConsideration.cpp
     src/ai/Consideration/AbstractConsideration.h
     src/ai/Consideration/QuadDistance.cpp
     src/ai/Consideration/QuadDistance.h
-    src/ai/Consideration/RedLineDistance.cpp
-    src/ai/Consideration/RedLineDistance.h
+        src/ai/Consideration/TargetDestination.cpp
+        src/ai/Consideration/TargetDestination.h
     src/ai/Consideration/ConsiderationTypes.h
     src/ai/StateMachine/ObservationState.cpp
     src/ai/StateMachine/ObservationState.h
@@ -80,7 +81,9 @@ set(UTIL_SRC
     src/ai/Util/Line.cpp
     src/ai/Util/Line.h
     src/ai/Util/Segment.cpp
-    src/ai/Util/Segment.h src/ai/Context/TargetOrientationEvaluation.cpp src/ai/Context/TargetOrientationEvaluation.h)
+    src/ai/Util/Segment.h
+    src/ai/Context/TargetOrientationEvaluation.cpp
+    src/ai/Context/TargetOrientationEvaluation.h)
 
 add_executable(elikos_ai
     src/ai/main.cpp

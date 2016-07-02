@@ -42,15 +42,15 @@ void MessageHandler::lookForMessages()
     ros::Rate rate(30);
     while(ros::ok())
     {
-        agent_->behave();
         ros::spinOnce();
+        agent_->behave();
         rate.sleep();
     }
 }
 
 void MessageHandler::handleTrgtMsg(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
-    ConsiderationPipeline* pipeline = agent_->getConsiderationPipeline();
+    PriorityEvaluationPipeline* pipeline = agent_->getConsiderationPipeline();
     const elikos_ros::TargetRobot_<std::allocator<void>>* targets = input->targets.data();
 
     size_t n = input->targets.size();

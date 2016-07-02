@@ -15,8 +15,6 @@
 #include "GameManager.hpp"
 
 #include "Simulation.hpp"
-#include <iostream>
-#include <fstream>
 
 #include "defines.cpp"
 

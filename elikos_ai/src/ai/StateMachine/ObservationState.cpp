@@ -11,10 +11,10 @@
 namespace ai
 {
 
-const tf::Point ObservationState::OBSERVATION_POSITION{ 0.0, 0.0, 6.0 };
+const tf::Point ObservationState::OBSERVATION_POSITION{ 0.0, 0.0, 3.0 };
 
-ObservationState::ObservationState(StateMachine* reference)
-    : AbstractState(reference)
+ObservationState::ObservationState(StateMachine* stateMachine, QuadRobot* quad)
+    : AbstractState(stateMachine, quad)
 {
 }
 
@@ -22,14 +22,18 @@ ObservationState::~ObservationState()
 {
 }
 
-void ObservationState::handleTargetSelection(TargetRobot* target, const QuadRobot& quad)
+void ObservationState::handlePriorityUpdate(TargetRobot* highestPriority)
+{
+    target_ = highestPriority;
+}
+
+void ObservationState::behave()
 {
     MessageHandler::getInstance()->sendDestination(OBSERVATION_POSITION);
-    bool destionationReached = hasReachedDestination(quad.getPose().getOrigin(), OBSERVATION_POSITION);
+    bool destionationReached = hasReachedDestination(quad_->getPose().getOrigin(), OBSERVATION_POSITION);
     if (destionationReached)
     {
-        stateMachine_->getState(StateMachine::MOVEMENT)->setDestination(target->getPose().getOrigin());
-        stateMachine_->setState(StateMachine::MOVEMENT);
+        stateMachine_->setState(StateMachine::MOVEMENT, target_);
     }
 }
 

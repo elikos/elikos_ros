@@ -16,13 +16,13 @@ public:
 
     static constexpr double FLIGHT_HEIGHT{ 2.0 };
 
-    MovementState(StateMachine* reference);
+    MovementState(StateMachine* stateMachine, QuadRobot* quad);
     virtual ~MovementState();
-    virtual void handleTargetSelection(TargetRobot* target, const QuadRobot& quad);
+
+    virtual void behave();
 
 private:
     MovementState() = delete;
-    TargetRobot* target_;
 };
 
 }

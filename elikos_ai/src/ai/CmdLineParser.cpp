@@ -69,7 +69,7 @@ int CmdLineParser::checkModeArg()
 
 void CmdLineParser::parseMode(int mode)
 {
-    ConsiderationPipeline* pipeline = Agent::getInstance()->getConsiderationPipeline();
+    PriorityEvaluationPipeline* pipeline = Agent::getInstance()->getConsiderationPipeline();
 
     if ((mode & RED_LINE_MASK) == RED_LINE_MASK)
     {

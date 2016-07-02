@@ -7,36 +7,35 @@ namespace ai
 {
 
 class StateMachine;
+class TargetRobot;
+class QuadRobot;
 
 class AbstractState
 {
 public:
-
-    AbstractState(StateMachine* reference);
+    AbstractState(StateMachine* stateMachine, QuadRobot* quad);
     virtual ~AbstractState() = 0;
-    virtual void handleTargetSelection(TargetRobot* target, const QuadRobot& quad) = 0;
 
-    inline const tf::Point& getDestination() const;
-    inline void setDestination(const tf::Point& destination);
+    inline void setTarget(TargetRobot* target);
+
+    virtual void handlePriorityUpdate(TargetRobot* highestPriority);
+    virtual void behave() = 0;
 
 protected:
     bool hasReachedDestination(const tf::Vector3& currentPosition, const tf::Vector3& destination);
-    StateMachine* stateMachine_{ nullptr };
-    tf::Point destination_;
+    StateMachine* stateMachine_;
+    QuadRobot* quad_;
+    TargetRobot* target_;
+    //TODO: use command pattern with a q for handling more complexe trajectories.
 
 private:
     // Deleted because a state needs a reference to the state machine
     AbstractState() = delete;
 };
 
-inline const tf::Point& AbstractState::getDestination() const
+inline void AbstractState::setTarget(TargetRobot* target)
 {
-    return destination_;
-}
-
-inline void AbstractState::setDestination(const tf::Point& destination)
-{
-    destination_ = destination;
+    target_ = target;
 }
 
 }

@@ -20,9 +20,12 @@ public:
 
     static const tf::Point OBSERVATION_POSITION;
 
-    ObservationState(StateMachine* reference);
+
+    ObservationState(StateMachine* stateMachine, QuadRobot* quad);
     virtual ~ObservationState();
-    virtual void handleTargetSelection(TargetRobot* target, const QuadRobot& quad);
+
+    virtual void handlePriorityUpdate(TargetRobot* highestPriorityTarget);
+    virtual void behave();
 
 private:
     ObservationState() = delete;

@@ -23,23 +23,28 @@ public:
         INTERACTION
     };
 
-    StateMachine();
+    StateMachine(QuadRobot& quad);
     ~StateMachine() = default;
 
-    inline void setState(EnumState state);
+    inline void setState(EnumState state, TargetRobot* target);
     inline AbstractState* getState(EnumState state);
-    void handleTargetSelection(TargetRobot* target, const QuadRobot& quad);
+
+    void updatePriorityTarget(TargetRobot* robot);
+    void behave();
 
 private:
     using StatePtr = std::unique_ptr<AbstractState>;
     std::unordered_map<int, StatePtr> states_;
+    QuadRobot& quad_;
+
     AbstractState* currentState_;
-    //TODO: use command pattern with a q for handling more complexe trajectories.
 };
 
-inline void StateMachine::setState(EnumState state)
+inline void StateMachine::setState(EnumState state, TargetRobot* target)
 {
+    states_[state]->setTarget(target);
     currentState_ = states_[state].get();
+
 }
 
 inline AbstractState* StateMachine::getState(EnumState state)

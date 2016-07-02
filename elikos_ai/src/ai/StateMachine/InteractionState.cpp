@@ -10,8 +10,8 @@
 namespace ai
 {
 
-InteractionState::InteractionState(StateMachine* reference)
-    : AbstractState(reference)
+InteractionState::InteractionState(StateMachine* stateMachine, QuadRobot* quad)
+    : AbstractState(stateMachine, quad)
 {
 }
 
@@ -19,13 +19,13 @@ InteractionState::~InteractionState()
 {
 }
 
-void InteractionState::handleTargetSelection(TargetRobot* target, const QuadRobot& quad)
+void InteractionState::behave()
 {
-    tf::Vector3 destination = target->getPose().getOrigin();
+    tf::Vector3 destination = target_->getPose().getOrigin();
     MessageHandler::getInstance()->sendDestination(destination);
-    if (hasReachedDestination(quad.getPose().getOrigin(), destination))
+    if (hasReachedDestination(quad_->getPose().getOrigin(), destination))
     {
-        stateMachine_->setState(StateMachine::OBSERVATION);
+        stateMachine_->setState(StateMachine::OBSERVATION, target_);
     }
 }
 

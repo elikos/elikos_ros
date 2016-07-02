@@ -16,6 +16,7 @@ Agent* Agent::getInstance()
 }
 
 Agent::Agent()
+    : pipeline_(quad_), stateMachine_(quad_)
 {
 }
 
@@ -28,8 +29,8 @@ void Agent::freeInstance()
 void Agent::behave()
 {
     TargetRobot* target = pipeline_.evaluateTargetSelection(quad_);
-    stateMachine_.handleTargetSelection(target, quad_);
-
+    stateMachine_.updatePriorityTarget(target);
+    stateMachine_.behave();
 }
 
 

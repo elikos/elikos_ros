@@ -4,7 +4,7 @@
 #include <cmath>
 
 #include <queue>
-#include "RedLineDistance.h"
+#include "TargetDestination.h"
 #include "TargetOrientationEvaluation.h"
 #include "AbstractArena.h"
 
