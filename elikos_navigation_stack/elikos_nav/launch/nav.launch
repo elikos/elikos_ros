@@ -2,5 +2,5 @@
   <node name="elikos_moveit_move_group" pkg="elikos_nav" type="elikos_moveit_move_group"/>
   <include file="$(find elikos_moveit_config)/launch/demo.launch"/>
   <include file="$(find realsense)/realsense_r200_launch.launch"/>
-  <node name="action_controller" pkg="action_controller" type="action_controller"/>
+  <!--<node name="action_controller" pkg="action_controller" type="action_controller"/>-->
 </launch>

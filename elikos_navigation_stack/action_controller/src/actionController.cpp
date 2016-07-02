@@ -6,6 +6,7 @@
 #include <action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
 
+
 class Controller{
 private:
 	typedef actionlib::ActionServer<action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
@@ -42,7 +43,7 @@ private:
 
 	bool has_active_goal_;
 	GoalHandle active_goal_;
-	trajectory_msgs::MultiDOFJointTrajectory_<std::allocator<void> > toExecute;
+	trajectory_msgs::MultiDOFJointTrajectory_<std::allocator<void> > trajectoryToExecute;
 
 	void cancelCB(GoalHandle gh){
 		if (active_goal_ == gh)
@@ -79,7 +80,7 @@ private:
 		gh.setAccepted();
 		active_goal_ = gh;
 		has_active_goal_ = true;
-		toExecute = gh.getGoal()->trajectory;
+		trajectoryToExecute = gh.getGoal()->trajectory;
 
 		//controllore solo per il giunto virtuale Base
 		if(pthread_create(&trajectoryExecutor, NULL, threadWrapper, this)==0){
@@ -98,25 +99,28 @@ private:
 	}
 
 	void executeTrajectory(){
-		if(toExecute.joint_names[0]=="virtual_joint" && toExecute.points.size()>0){
-			for(int k=0; k<toExecute.points.size(); k++){
-				//ricavo cmd da effettuare
-				geometry_msgs::Transform_<std::allocator<void> > punto=toExecute.points[k].transforms[0];
-				bool eseguito=true;
+		if(trajectoryToExecute.joint_names[0]=="virtual_joint" && trajectoryToExecute.points.size()>0){
+			//For now we only exec the first transform of the trajectory.
+			for(int k=0; k < 1 && k < trajectoryToExecute.points.size(); k++){
+				std::cout << "test avant "<<std::endl;
+				std::cout << "Velocities size: "<< trajectoryToExecute.points[k].velocities.size() <<std::endl;
+				std::cout << "Transforms size: "<< trajectoryToExecute.points[k].transforms.size() <<std::endl;
+				geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[k].transforms[0];
+				bool isExecuted=true;
 				if(k!=0){
-					eseguito=publishTranslationComand(punto,false);
-					if(k==(toExecute.points.size()-1)){
-						if(!eseguito) publishTranslationComand(punto,true);
-						publishRotationComand(punto,false);
+					isExecuted=publishTranslationComand(trajectoryPoint,false);
+					if(k==(trajectoryToExecute.points.size()-1)){
+						if(!isExecuted) publishTranslationComand(trajectoryPoint,true);
+						publishRotationComand(trajectoryPoint,false);
 					}
 				} else {
-					publishRotationComand(punto,true);
+					publishRotationComand(trajectoryPoint,true);
 				}
 				pub_topic.publish(empty);
 				//aggiorno start position
-				if(eseguito){
-					lastPosition.translation=punto.translation;
-					lastPosition.rotation=punto.rotation;
+				if(isExecuted){
+					lastPosition.translation=trajectoryPoint.translation;
+					lastPosition.rotation=trajectoryPoint.rotation;
 				}
 			}
 		}
@@ -125,11 +129,17 @@ private:
 		creato=0;
 
 	}
-	bool publishTranslationComand(geometry_msgs::Transform_<std::allocator<void> > punto, bool anyway){
+	bool publishCommand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint)
+	{
+		cmd.linear.x=trajectoryPoint.translation.x-lastPosition.translation.x;
+		cmd.linear.y=trajectoryPoint.translation.y-lastPosition.translation.y;
+		cmd.linear.z=trajectoryPoint.translation.z-lastPosition.translation.z;
+	}
+	bool publishTranslationComand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint, bool anyway){
 		//creazione comando di traslazione
-		cmd.linear.x=punto.translation.x-lastPosition.translation.x;
-		cmd.linear.y=punto.translation.y-lastPosition.translation.y;
-		cmd.linear.z=punto.translation.z-lastPosition.translation.z;
+		cmd.linear.x=trajectoryPoint.translation.x-lastPosition.translation.x;
+		cmd.linear.y=trajectoryPoint.translation.y-lastPosition.translation.y;
+		cmd.linear.z=trajectoryPoint.translation.z-lastPosition.translation.z;
 		cmd.angular.x=cmd.angular.y=cmd.angular.z=0;
 
 		if(anyway || cmd.linear.x>=0.5 || cmd.linear.y>=0.5 || cmd.linear.z>=0.5){
@@ -143,12 +153,12 @@ private:
 		return false;
 	}
 
-	void publishRotationComand(geometry_msgs::Transform_<std::allocator<void> > punto, bool start){
+	void publishRotationComand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint, bool start){
 		//comando di allineamento, permesse solo rotazioni sull'asse z
 		cmd.linear.x=cmd.linear.y=cmd.linear.z=cmd.angular.x=cmd.angular.y=0;
 		//start = true --> devo tornare nell'orientazione 0
-		//start = false --> devo arrivare al'orientazione punto.rotation.z
-		cmd.angular.z=(start?0-punto.rotation.z:punto.rotation.z);
+		//start = false --> devo arrivare al'orientazione trajectoryPoint.rotation.z
+		cmd.angular.z=(start?0-trajectoryPoint.rotation.z:trajectoryPoint.rotation.z);
 
 		printCmdInfo();
 
