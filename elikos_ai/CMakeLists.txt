@@ -21,8 +21,10 @@ include_directories(
   	${catkin_INCLUDE_DIRS}
     src/ai
   	src/ai/StateMachine
+    src/ai/Context
+    src/ai/Consideration
 	src/ai/Robot
-    src/ai/Consideration)
+	src/ai/Util)
 
 set(STATE_MACHINE_SRC
     src/ai/StateMachine/StateMachine.h
@@ -34,9 +36,25 @@ set(STATE_MACHINE_SRC
     src/ai/StateMachine/Command.cpp
     src/ai/StateMachine/Command.h)
 
+set(CONTEXT_SRC
+    src/ai/Context/AbstractLine.cpp
+    src/ai/Context/AbstractLine.h
+	src/ai/Context/AbstractArena.h
+	src/ai/Context/AbstractArena.cpp
+    src/ai/Context/ArenaA.cpp
+    src/ai/Context/ArenaA.h
+    src/ai/Context/ArenaB.cpp
+    src/ai/Context/ArenaB.h
+    src/ai/Context/RedLine.cpp
+    src/ai/Context/RedLine.h
+    src/ai/Context/WhiteLine.cpp
+    src/ai/Context/WhiteLine.h
+    src/ai/Context/GreenLine.cpp
+    src/ai/Context/GreenLine.h src/ai/Context/ContextTypes.h)
+
 set(ROBOT_SRC
-    src/ai/Robot/Robot.h
-    src/ai/Robot/Robot.cpp
+		src/ai/Robot/AbstractRobot.h
+		src/ai/Robot/AbstractRobot.cpp
     src/ai/Robot/QuadRobot.h
     src/ai/Robot/QuadRobot.cpp
     src/ai/Robot/TargetRobot.h
@@ -62,7 +80,7 @@ set(UTIL_SRC
     src/ai/Util/Line.cpp
     src/ai/Util/Line.h
     src/ai/Util/Segment.cpp
-    src/ai/Util/Segment.h)
+    src/ai/Util/Segment.h src/ai/Context/TargetOrientationEvaluation.cpp src/ai/Context/TargetOrientationEvaluation.h)
 
 add_executable(elikos_ai
     src/ai/main.cpp
@@ -76,8 +94,11 @@ add_executable(elikos_ai
     src/ai/MessageEmulator.cpp
     ${CONSIDERATION_SRC}
     ${STATE_MACHINE_SRC}
+    ${CONTEXT_SRC}
     ${ROBOT_SRC}
 	${UTIL_SRC})
 
 target_link_libraries(elikos_ai
   ${catkin_LIBRARIES})
+
+

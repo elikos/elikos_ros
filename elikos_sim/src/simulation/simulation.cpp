@@ -146,7 +146,7 @@ namespace elikos_sim
 
         double distance = mavPosition.distance(robotPosition);
 
-        if (distance < 0.35 && height < 0.1)
+        if (distance < 0.35 && height < 0.1 && height > 0.0)
         {
             robot->interact(true);
             return true;

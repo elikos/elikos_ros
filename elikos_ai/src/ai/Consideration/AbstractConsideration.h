@@ -5,29 +5,26 @@
 #ifndef AI_ABSTRACT_CONSIDERATION_H
 #define AI_ABSTRACT_CONSIDERATION_H
 
-#include "RobotTypes.h"
+#include "Robot/RobotTypes.h"
 #include <vector>
+
 
 namespace ai
 {
 
+class AbstractArena;
 
 class AbstractConsideration
 {
 public:
-
-    static constexpr double MAX_DISTANCE { 20.0 };
-    static constexpr double LEFT_SIDE  { -10.0 };
-    static constexpr double RIGHT_SIDE {  10.0 };
-    static constexpr double UP_SIDE    {  10.0 };
-    static constexpr double DOWN_SIDE  { -10.0 };
-
-    static const int N_CORNERS { 4 };
-    static const tf::Vector3 corners[N_CORNERS];
-
     AbstractConsideration() = default;
+    AbstractConsideration(AbstractArena* arena);
     virtual ~AbstractConsideration() = 0;
     virtual void evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad) = 0;
+
+protected:
+    AbstractArena* arena_;
+
 };
 
 }

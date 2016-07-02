@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include <queue>
 
-#include "TargetRobot.h"
-#include "QuadRobot.h"
+#include "Robot/TargetRobot.h"
+#include "Robot/QuadRobot.h"
 #include "AbstractState.h"
 #include "Command.h"
 

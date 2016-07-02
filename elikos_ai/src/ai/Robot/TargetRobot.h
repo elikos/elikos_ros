@@ -1,12 +1,12 @@
 #ifndef AI_ROBOT_TARGET_H
 #define AI_ROBOT_TARGET_H
 
-#include "Robot.h"
+#include "AbstractRobot.h"
 
 namespace ai
 {
 
-class TargetRobot : public Robot
+class TargetRobot : public AbstractRobot
 {
 public:
     TargetRobot() = default;

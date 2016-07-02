@@ -5,7 +5,7 @@
 #ifndef ELIKOS_AI_OBSERVATION_STATE_H
 #define ELIKOS_AI_OBSERVATION_STATE_H
 
-#include "RobotTypes.h"
+#include "Robot/RobotTypes.h"
 
 #include "AbstractState.h"
 

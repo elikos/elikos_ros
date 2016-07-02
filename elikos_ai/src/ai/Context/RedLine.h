@@ -1,0 +1,27 @@
+//
+// Created by olivier on 01/07/16.
+//
+
+#ifndef AI_RED_LINE_H
+#define AI_RED_LINE_H
+
+#include "AbstractLine.h"
+
+namespace ai
+{
+
+class RedLine : public AbstractLine
+{
+public:
+    RedLine(const tf::Point& cornerA, const tf::Point& cornerB);
+    virtual ~RedLine();
+
+    virtual void evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation);
+
+private:
+    RedLine() = delete;
+};
+
+}
+
+#endif //AI_RED_LINE_H

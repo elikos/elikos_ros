@@ -69,11 +69,11 @@ int CmdLineParser::checkModeArg()
 
 void CmdLineParser::parseMode(int mode)
 {
-    ConsiderationPipeline *pipeline = Agent::getInstance()->getConsiderationPipeline();
+    ConsiderationPipeline* pipeline = Agent::getInstance()->getConsiderationPipeline();
 
     if ((mode & RED_LINE_MASK) == RED_LINE_MASK)
     {
-        pipeline->addConsideration(std::unique_ptr<RedLineDistance>(new RedLineDistance()));
+        pipeline->addConsideration(std::unique_ptr<RedLineDistance>(new RedLineDistance(pipeline->getArena())));
     }
 
     if ((mode & QUAD_DISTANCE_MASK) == QUAD_DISTANCE_MASK)

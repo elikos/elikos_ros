@@ -16,9 +16,20 @@ Line::Line(tf::Point origin, tf::Vector3 orientation)
 
 bool Line::getIntersectionPoint(const Segment& segment, tf::Point& intersection) const
 {
-    if (!isIntersecting(segment)) return false;
+    if (!isIntersecting(segment))
+    {
+        return false;
+    }
 
-    //TODO: more math stuff here...
+    tf::Vector3 originDistanceA = segment.getA() - origin_;
+    tf::Vector3 originDistanceB = segment.getB() - origin_;
+
+    double projA = orientation_.dot(originDistanceA);
+    double projB = orientation_.dot(originDistanceB);
+    double intersectionDistance = (projA + projB) / 2.0;
+
+    intersection = origin_ + orientation_ * intersectionDistance;
+    return true;
 }
 
 bool Line::isIntersecting(const Segment& segment) const

@@ -5,7 +5,7 @@
 #ifndef AI_INTERACTION_STATE_H
 #define AI_INTERACTION_STATE_H
 
-#include "RobotTypes.h"
+#include "Robot/RobotTypes.h"
 
 #include "AbstractState.h"
 

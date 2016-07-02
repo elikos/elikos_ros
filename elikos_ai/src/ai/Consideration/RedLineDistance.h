@@ -6,6 +6,7 @@
 #define AI_RED_LINE_DISTANCE_H
 
 #include "AbstractConsideration.h"
+#include "TargetOrientationEvaluation.h"
 
 namespace ai
 {
@@ -14,10 +15,11 @@ class RedLineDistance : public AbstractConsideration
 {
 public:
     RedLineDistance() = default;
+    RedLineDistance(AbstractArena* arena);
     virtual ~RedLineDistance();
     virtual void evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad);
 private:
-    double findDistanceToClosestRedLine(const TargetRobot& target);
+    void applyPriorityEvaluation(TargetRobot& robot, const TargetOrientationEvaluation& evaluation);
 };
 
 }

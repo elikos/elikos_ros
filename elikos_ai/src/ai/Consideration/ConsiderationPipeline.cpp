@@ -2,14 +2,17 @@
 // Created by olivier on 27/06/16.
 //
 #include "AbstractConsideration.h"
-
 #include "ConsiderationPipeline.h"
+
+#include "ArenaA.h"
+#include "ArenaB.h"
 
 namespace ai
 {
 
     ConsiderationPipeline::ConsiderationPipeline()
     {
+        arena_ = std::unique_ptr<ArenaA>(new ArenaA());
         for (uint8_t i = 0; i < 10; ++i)
         {
             targets_.push_back({i, 0});

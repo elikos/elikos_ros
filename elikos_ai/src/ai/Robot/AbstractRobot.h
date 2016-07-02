@@ -6,13 +6,13 @@
 namespace ai
 {
 
-class Robot
+class AbstractRobot
 {
 public:
     static const double SPEED;
 
-    Robot() = default;
-    virtual ~Robot() = 0;
+    AbstractRobot() = default;
+    virtual ~AbstractRobot() = 0;
 
     inline const tf::Pose& getPose() const;
 
@@ -20,7 +20,7 @@ public:
     inline void setIsUpdated(const bool& isUpdated);
 
     void updatePositionRadius(const double& dt);
-    tfScalar getDistance(Robot* robot);
+    tfScalar getDistance(AbstractRobot* robot);
 
 
 private:
@@ -29,19 +29,19 @@ private:
     tf::Pose pose_;
 };
 
-inline const tf::Pose& Robot::getPose() const
+inline const tf::Pose& AbstractRobot::getPose() const
 {
    return pose_;
 }
 
 
-inline void Robot::setPose(const tf::Pose pose)
+inline void AbstractRobot::setPose(const tf::Pose pose)
 {
    pose_ = pose;
 }
 
 
-inline void Robot::setIsUpdated(const bool& isUpdated)
+inline void AbstractRobot::setIsUpdated(const bool& isUpdated)
 {
     isUpdated_ = isUpdated;
 }
