@@ -2,11 +2,13 @@
 #include <actionlib/server/action_server.h>
 #include <pthread.h>
 
+#include <tf/transform_datatypes.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
 #include <action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
 
-
+//Large parts of the code come from : https://github.com/AlessioTonioni/Autonomous-Flight-ROS
 class Controller{
 private:
 	typedef actionlib::ActionServer<action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
@@ -28,6 +30,7 @@ public:
 		empty.angular.y=0;
 		empty.angular.x=0;
 		pub_topic = node_.advertise<geometry_msgs::Twist>("/mavros/setpoint_velocity/cmd_vel", 1);
+		pub_topic_test = node_.advertise<geometry_msgs::PoseStamped>("/lineartest", 1);//test
 		action_server_.start();
 		ROS_INFO_STREAM("Node ready!");
 }
@@ -35,6 +38,7 @@ private:
 	ros::NodeHandle node_;
 	ActionServer action_server_;
 	ros::Publisher pub_topic;
+	ros::Publisher pub_topic_test;//test
 	geometry_msgs::Twist empty;
 	geometry_msgs::Transform_<std::allocator<void> > lastPosition;
 	geometry_msgs::Twist cmd;
@@ -99,94 +103,56 @@ private:
 	}
 
 	void executeTrajectory(){
-		if(trajectoryToExecute.joint_names[0]=="virtual_joint" && trajectoryToExecute.points.size()>0){
+		if(trajectoryToExecute.joint_names[0]=="virtual_joint" && trajectoryToExecute.points.size()>0)
+		{
+			//Set start position
+			geometry_msgs::Transform_<std::allocator<void> > trajectoryStartPoint = trajectoryToExecute.points[0].transforms[0];
+			lastPosition.translation=trajectoryStartPoint.translation;
+			lastPosition.rotation=trajectoryStartPoint.rotation;
+
 			//For now we only exec the first transform of the trajectory.
-			for(int k=0; k < 1 && k < trajectoryToExecute.points.size(); k++){
-				std::cout << "test avant "<<std::endl;
-				std::cout << "Velocities size: "<< trajectoryToExecute.points[k].velocities.size() <<std::endl;
-				std::cout << "Transforms size: "<< trajectoryToExecute.points[k].transforms.size() <<std::endl;
+			for(int k=1; k < 2 && k < trajectoryToExecute.points.size(); k++){
+
 				geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[k].transforms[0];
-				bool isExecuted=true;
-				if(k!=0){
-					isExecuted=publishTranslationComand(trajectoryPoint,false);
-					if(k==(trajectoryToExecute.points.size()-1)){
-						if(!isExecuted) publishTranslationComand(trajectoryPoint,true);
-						publishRotationComand(trajectoryPoint,false);
-					}
-				} else {
-					publishRotationComand(trajectoryPoint,true);
-				}
-				pub_topic.publish(empty);
-				//aggiorno start position
-				if(isExecuted){
-					lastPosition.translation=trajectoryPoint.translation;
-					lastPosition.rotation=trajectoryPoint.rotation;
-				}
+
+				publishCommand(trajectoryPoint);
+
+				//update start position
+				lastPosition.translation=trajectoryPoint.translation;
+				lastPosition.rotation=trajectoryPoint.rotation;
 			}
 		}
 		active_goal_.setSucceeded();
 		has_active_goal_=false;
 		creato=0;
-
 	}
-	bool publishCommand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint)
+	void publishCommand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint)
 	{
-		cmd.linear.x=trajectoryPoint.translation.x-lastPosition.translation.x;
-		cmd.linear.y=trajectoryPoint.translation.y-lastPosition.translation.y;
-		cmd.linear.z=trajectoryPoint.translation.z-lastPosition.translation.z;
-	}
-	bool publishTranslationComand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint, bool anyway){
-		//creazione comando di traslazione
-		cmd.linear.x=trajectoryPoint.translation.x-lastPosition.translation.x;
-		cmd.linear.y=trajectoryPoint.translation.y-lastPosition.translation.y;
-		cmd.linear.z=trajectoryPoint.translation.z-lastPosition.translation.z;
-		cmd.angular.x=cmd.angular.y=cmd.angular.z=0;
+		//Compute the transform between the current point and the last one
+		tf::Transform ref2lastposition;
+    tf::transformMsgToTF(lastPosition, ref2lastposition);
+		tf::Transform ref2nextposition;
+    tf::transformMsgToTF(trajectoryPoint, ref2nextposition);
 
-		if(anyway || cmd.linear.x>=0.5 || cmd.linear.y>=0.5 || cmd.linear.z>=0.5){
-			printPositionInfo();
-			printCmdInfo();
-			pub_topic.publish(cmd);
-			//tempo d'esecuzione
-			ros::Duration(1.0).sleep();
-			return true;
-		}
-		return false;
-	}
+		tf::Transform direction = ref2lastposition.inverse() * ref2nextposition;
 
-	void publishRotationComand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint, bool start){
-		//comando di allineamento, permesse solo rotazioni sull'asse z
-		cmd.linear.x=cmd.linear.y=cmd.linear.z=cmd.angular.x=cmd.angular.y=0;
-		//start = true --> devo tornare nell'orientazione 0
-		//start = false --> devo arrivare al'orientazione trajectoryPoint.rotation.z
-		cmd.angular.z=(start?0-trajectoryPoint.rotation.z:trajectoryPoint.rotation.z);
+		//Construct command
+		tf::vector3TFToMsg(direction.getOrigin().normalize(), cmd.linear);
+		tf::vector3TFToMsg(direction.getRotation().getAxis(), cmd.angular);
 
-		printCmdInfo();
-
-		double sleep=cmd.angular.z*3.0; //tempo necessario a tornare nella giusta orientazione
-		if(sleep<0) sleep=-sleep;
+		//Publish command
 		pub_topic.publish(cmd);
-		ros::Duration(sleep).sleep();
-		cmd.angular.z=0;
-	}
 
-	void printPositionInfo(){
-		ROS_INFO_STREAM("Start Position: ["<<lastPosition.translation.x<<
-				", "<<lastPosition.translation.y<<
-				", "<<lastPosition.translation.z<<"] "<<
-				"[ "<<lastPosition.rotation.x<<
-				", "<<lastPosition.rotation.y<<
-				", "<<lastPosition.rotation.z<<" ]");
+		//Vizualisation
+		geometry_msgs::PoseStamped poseTest;
+		poseTest.header.stamp = ros::Time();
+		poseTest.header.frame_id = "base_link";
+		poseTest.pose.position.x = cmd.linear.x;
+		poseTest.pose.position.y = cmd.linear.y;
+		poseTest.pose.position.z = cmd.linear.z;
+		tf::quaternionTFToMsg(direction.getRotation(), poseTest.pose.orientation);
+		pub_topic_test.publish(poseTest);//test
 	}
-
-	void printCmdInfo(){
-		ROS_INFO_STREAM("cmd to execute: "<<"x:"<<cmd.linear.x
-				<<" y: " << cmd.linear.y
-				<<" z: " << cmd.linear.z
-				<<" rX: " << cmd.angular.x
-				<<" rY: " << cmd.angular.y
-				<<" rZ: " << cmd.angular.z);
-	}
-
 };
 
 int main(int argc, char** argv)
