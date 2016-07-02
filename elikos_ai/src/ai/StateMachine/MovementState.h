@@ -18,7 +18,7 @@ public:
 
     MovementState(StateMachine* stateMachine, QuadRobot* quad);
     virtual ~MovementState();
-
+    virtual void handlePriorityUpdate(TargetRobot* highestPriorityTarget);
     virtual void behave();
 
 private:

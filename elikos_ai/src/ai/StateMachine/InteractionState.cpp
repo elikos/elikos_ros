@@ -15,8 +15,18 @@ InteractionState::InteractionState(StateMachine* stateMachine, QuadRobot* quad)
 {
 }
 
+
+
 InteractionState::~InteractionState()
 {
+}
+
+void InteractionState::handlePriorityUpdate(TargetRobot* highestPriorityTarget)
+{
+    if (highestPriorityTarget->getId() != target_->getId())
+    {
+        stateMachine_->setState(StateMachine::OBSERVATION, target_);
+    }
 }
 
 void InteractionState::behave()
@@ -25,7 +35,7 @@ void InteractionState::behave()
     MessageHandler::getInstance()->sendDestination(destination);
     if (hasReachedDestination(quad_->getPose().getOrigin(), destination))
     {
-        stateMachine_->setState(StateMachine::OBSERVATION, target_);
+        stateMachine_->setState(StateMachine::MOVEMENT, target_);
     }
 }
 

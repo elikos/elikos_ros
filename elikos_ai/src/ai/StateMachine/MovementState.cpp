@@ -19,6 +19,11 @@ MovementState::~MovementState()
 {
 }
 
+void MovementState::handlePriorityUpdate(TargetRobot* highestPriorityTarget)
+{
+    target_ = highestPriorityTarget;
+}
+
 void MovementState::behave()
 {
     tf::Vector3 destination = target_->getPose().getOrigin();

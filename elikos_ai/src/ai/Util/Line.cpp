@@ -44,7 +44,7 @@ bool Line::projectionIsIntersecting(const tf::Vector3& orientation, const tf::Po
 {
     double projA = orientation.dot(originDistanceA);
     double projB = orientation.dot(originDistanceB);
-    return !std::signbit(projA) && !std::signbit(projB);
+    return std::signbit(projA) && !std::signbit(projB);
 }
 
 tf::Vector3 Line::get2DPerpendicularOrientation() const

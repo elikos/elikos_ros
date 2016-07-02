@@ -22,6 +22,8 @@ public:
 
     InteractionState(StateMachine* stateMachine, QuadRobot* quad);
 
+    virtual void handlePriorityUpdate(TargetRobot* highestPriorityTarget);
+
     virtual void behave();
     virtual ~InteractionState();
 

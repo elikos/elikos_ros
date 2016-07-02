@@ -101,12 +101,10 @@ namespace elikos_sim
             //Collision checking
             for(auto& robot1 : robots)
             {
-                if (!handleCollision(robot1, mav))
-                {
-                    for(auto& robot2 : robots)
-                        if( robot1 != robot2 && checkCollision(robot1, robot2))
-                            robot1->collide();
-                }
+                handleCollision(robot1, mav);
+                for(auto& robot2 : robots)
+                    if( robot1 != robot2 && checkCollision(robot1, robot2))
+                        robot1->collide();
 
             }
 
@@ -133,9 +131,8 @@ namespace elikos_sim
 
     bool Simulation::handleCollision(elikos_sim::Robot* robot, elikos_sim::MAV* mav)
     {
-
         tf::Vector3 mavPosition = mav->getTransform().getOrigin();
-        tf::Vector3 robotPosition = mav->getTransform().getOrigin();
+        tf::Vector3 robotPosition = robot->getTransform().getOrigin();
 
         double height = mavPosition.getZ();
 
@@ -143,8 +140,7 @@ namespace elikos_sim
         robotPosition.setZ(0.0);
 
         double distance = mavPosition.distance(robotPosition);
-
-        if (distance < 0.35 && height < 0.1 && height > 0.0)
+        if (std::abs(distance) < 0.35 && height < 0.1 && height > 0.0)
         {
             robot->interact(true);
             return true;
