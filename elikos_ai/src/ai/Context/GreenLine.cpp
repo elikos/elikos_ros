@@ -18,15 +18,12 @@ GreenLine::GreenLine(const tf::Point& cornerA, const tf::Point& cornerB)
 void GreenLine::evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation)
 {
     evaluation.setGoodIntersection(true);
-
-    tf::Pose pose = robot.getPose();
-    tf::Vector3 orientation = tf::quatRotate(pose.getRotation(), tf::Vector3());
-    util::Line line(pose.getOrigin(), orientation);
-
+    util::Line line(robot.getPose().getOrigin(), robot.getOrientation());
     tf::Point point;
-    bool succes = segment_.getIntersectionPoint(line, point);
+    bool success = segment_.getIntersectionPoint(line, point);
+    assert(success);
     evaluation.setIntersectionPoint(point);
-    double distance = point.distance(pose.getOrigin());
+    double distance = point.distance(robot.getPose().getOrigin());
     evaluation.setLineIntersectionDistance(distance);
 }
 

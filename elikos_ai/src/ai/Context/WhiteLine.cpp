@@ -21,18 +21,16 @@ WhiteLine::~WhiteLine()
 
 void WhiteLine::evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation)
 {
-    evaluation.setGoodIntersection(false);
-
-    tf::Pose pose = robot.getPose();
-    tf::Vector3 orientation = tf::quatRotate(pose.getRotation(), tf::Vector3(1, 0, 0));
-    util::Line line(pose.getOrigin(), orientation);
+    util::Line line(robot.getPose().getOrigin(), robot.getOrientation());
 
     tf::Point point;
     bool success = segment_.getIntersectionPoint(line, point);
     assert(success);
+
     evaluation.setIntersectionPoint(point);
-    double distance = point.distance(pose.getOrigin());
+    double distance = point.distance(robot.getPose().getOrigin());
     evaluation.setLineIntersectionDistance(distance);
+    evaluation.setGoodIntersection(false);
 }
 
 }

@@ -27,6 +27,7 @@ public:
     ~StateMachine() = default;
 
     inline void setState(EnumState state);
+    inline AbstractState* getState(EnumState state);
     void handleTargetSelection(TargetRobot* target, const QuadRobot& quad);
 
 private:
@@ -39,6 +40,11 @@ private:
 inline void StateMachine::setState(EnumState state)
 {
     currentState_ = states_[state].get();
+}
+
+inline AbstractState* StateMachine::getState(EnumState state)
+{
+    return states_[state].get();
 }
 
 }

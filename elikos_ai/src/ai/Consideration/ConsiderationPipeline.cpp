@@ -24,9 +24,18 @@ namespace ai
         considerations_.push_back(std::move(consideration));
     }
 
+    void ConsiderationPipeline::resetPriority()
+    {
+        for (int i = 0; i < targets_.size(); ++i)
+        {
+            targets_[i].setPriority(0.0);
+        }
+    }
+
     TargetRobot* ConsiderationPipeline::evaluateTargetSelection(const QuadRobot& quad)
     {
         //TODO: evaluate after every update on a single robot so multithreading can be used.
+        resetPriority();
         for (int i = 0; i < considerations_.size(); ++i)
         {
             considerations_[i]->evaluatePriority(targets_, quad);

@@ -21,7 +21,7 @@ MovementState::~MovementState()
 
 void MovementState::handleTargetSelection(TargetRobot* target, const QuadRobot& quad)
 {
-    tf::Vector3 destination = target->getPose().getOrigin();
+    tf::Vector3 destination = destination_;
     destination.setZ(FLIGHT_HEIGHT);
     MessageHandler::getInstance()->sendDestination(destination);
     if (hasReachedDestination(quad.getPose().getOrigin(), destination))

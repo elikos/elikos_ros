@@ -25,7 +25,7 @@ void InteractionState::handleTargetSelection(TargetRobot* target, const QuadRobo
     MessageHandler::getInstance()->sendDestination(destination);
     if (hasReachedDestination(quad.getPose().getOrigin(), destination))
     {
-        stateMachine_->setState(StateMachine::MOVEMENT);
+        stateMachine_->setState(StateMachine::OBSERVATION);
     }
 }
 

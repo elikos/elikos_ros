@@ -28,12 +28,7 @@ AbstractLine::~AbstractLine()
 
 bool AbstractLine::isInThePath(const TargetRobot& robot) const
 {
-    tf::Pose pose = robot.getPose();
-
-    tf::Quaternion q = pose.getRotation();
-    tf::Vector3 orientation = tf::quatRotate(pose.getRotation(), tf::Vector3(1, 0, 0));
-
-    util::Line line(pose.getOrigin(), orientation);
+    util::Line line(robot.getPose().getOrigin(), robot.getOrientation());
     return segment_.isIntersecting(line);
 }
 

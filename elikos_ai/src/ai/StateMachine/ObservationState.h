@@ -17,6 +17,9 @@ class StateMachine;
 class ObservationState : public AbstractState
 {
 public:
+
+    static const tf::Point OBSERVATION_POSITION;
+
     ObservationState(StateMachine* reference);
     virtual ~ObservationState();
     virtual void handleTargetSelection(TargetRobot* target, const QuadRobot& quad);

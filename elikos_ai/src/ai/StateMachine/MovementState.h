@@ -22,6 +22,7 @@ public:
 
 private:
     MovementState() = delete;
+    TargetRobot* target_;
 };
 
 }

@@ -23,6 +23,7 @@ public:
     void addConsideration(std::unique_ptr<AbstractConsideration>);
     inline void updateTarget(uint8_t id, uint8_t color, const tf::Pose& pose);
     inline AbstractArena* getArena() const;
+    void resetPriority();
 
     TargetRobot* evaluateTargetSelection(const QuadRobot& quad);
 
