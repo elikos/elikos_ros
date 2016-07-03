@@ -9,7 +9,7 @@
 #include <action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
 
-//Large parts of the code come from : https://github.com/AlessioTonioni/Autonomous-Flight-ROS
+//Some parts of the code come from : https://github.com/AlessioTonioni/Autonomous-Flight-ROS
 class Controller{
 private:
 	typedef actionlib::ActionServer<action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
@@ -23,15 +23,10 @@ public:
 				false),
 				has_active_goal_(false),
 				parent_frame_("elikos_base_link"),
-				child_frame_("elikos_setpoint")
+				child_frame_("elikos_setpoint"),
+				tolerance_(0.3)
 {
 		creato=0;
-		empty.linear.x=0;
-		empty.linear.y=0;
-		empty.linear.z=0;
-		empty.angular.z=0;
-		empty.angular.y=0;
-		empty.angular.x=0;
 		action_server_.start();
 		ROS_INFO_STREAM("Node ready!");
 }
@@ -39,14 +34,11 @@ private:
 	ros::NodeHandle node_;
 	ActionServer action_server_;
 	tf::TransformBroadcaster tf_broadcaster_;
-	geometry_msgs::Twist empty;
-	geometry_msgs::Transform_<std::allocator<void> > lastPosition;
-	geometry_msgs::Twist cmd;
 	pthread_t trajectoryExecutor;
 	int creato;
 	std::string parent_frame_;
 	std::string child_frame_;
-
+	double tolerance_;
 	bool has_active_goal_;
 	GoalHandle active_goal_;
 	trajectory_msgs::MultiDOFJointTrajectory_<std::allocator<void> > trajectoryToExecute;
@@ -105,28 +97,27 @@ private:
 	void executeTrajectory(){
 		if(trajectoryToExecute.joint_names[0]=="virtual_joint" && trajectoryToExecute.points.size()>0)
 		{
-			//Set start position
-			geometry_msgs::Transform_<std::allocator<void> > trajectoryStartPoint = trajectoryToExecute.points[0].transforms[0];
-			lastPosition.translation=trajectoryStartPoint.translation;
-			lastPosition.rotation=trajectoryStartPoint.rotation;
 
-			//For now we only exec the first transform of the trajectory.
-			for(int k=1; k < 2 && k < trajectoryToExecute.points.size(); k++){
-
-				geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[k].transforms[0];
-
-				publishCommand(trajectoryPoint);
-
-				//update start position
-				lastPosition.translation=trajectoryPoint.translation;
-				lastPosition.rotation=trajectoryPoint.rotation;
+			int i = 0;
+			geometry_msgs::Vector3 translation;
+			while(i < trajectoryToExecute.points.size()-1)
+			{
+				translation = trajectoryToExecute.points[i].transforms[0].translation;
+				if(std::sqrt(pow(translation.x, 2)+pow(translation.y, 2)+pow(translation.z, 2)) > tolerance_)
+					break;
+				i++;
 			}
+			geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[i].transforms[0];
+
+			publishTrajectoryPoint(trajectoryPoint);
+
+
 		}
 		active_goal_.setSucceeded();
 		has_active_goal_=false;
 		creato=0;
 	}
-	void publishCommand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint)
+	void publishTrajectoryPoint(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint)
 	{
 		//Convert geometry_msgs::Transform to tf::Transform
 		tf::Transform tfTrajectoryPoint;
