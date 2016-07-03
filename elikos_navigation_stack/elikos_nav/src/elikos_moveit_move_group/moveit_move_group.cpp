@@ -28,37 +28,41 @@ int main(int argc, char* argv[])
     //The workspace represents the boundaries of the planning volume.
     group_.setWorkspace(-10,-10,0,10,10,10);
 
-    std::vector<double> quad_variable_values;
-
-    group_.getCurrentState()->copyJointGroupPositions(group_.getCurrentState()->getRobotModel()->getJointModelGroup(group_.getName()), quad_variable_values);
-
-    //This is position and orientation for the quadcopter
-    quad_variable_values[0]=2.0;//position.x
-    quad_variable_values[1]=0.7;//position y
-    quad_variable_values[2]=1.0;//position z
-    quad_variable_values[3]=std::sqrt(2)/2;//quaternion x
-    quad_variable_values[4]=0.0;//quaternion y
-    quad_variable_values[5]=0.0;//quaternion z
-    quad_variable_values[6]=std::sqrt(2)/2;//quaternion w
-
-    //Plan the goal pose
-    group_.setJointValueTarget(quad_variable_values);
-    moveit::planning_interface::MoveGroup::Plan my_plan;
-    bool  success = group_.plan(my_plan);
-    ROS_INFO("Visualizing plan 1 (pose goal) %s",success?"":"FAILED");
-
-    //Publish trajectory for rviz
-    display_trajectory.trajectory_start = my_plan.start_state_;
-    display_trajectory.trajectory.push_back(my_plan.trajectory_);
-    display_publisher_.publish(display_trajectory);
-
-    //Plan and execute the trajectory
-    group_.asyncMove();
 
     ros::Rate r(30);
     while(ros::ok())
     {
+        if(messageHandler.getHasTarget())
+        {
+          geometry_msgs::PoseStamped target = messageHandler.getTarget();
 
+          std::vector<double> quad_variable_values;
+
+          group_.getCurrentState()->copyJointGroupPositions(group_.getCurrentState()->getRobotModel()->getJointModelGroup(group_.getName()), quad_variable_values);
+
+          //This is the new position and orientation for the quadcopter
+          quad_variable_values[0] = target.pose.position.x;//position.x
+          quad_variable_values[1] = target.pose.position.y;//position y
+          quad_variable_values[2] = target.pose.position.z;//position z
+          quad_variable_values[3] = target.pose.orientation.x;//quaternion x
+          quad_variable_values[4] = target.pose.orientation.y;//quaternion y
+          quad_variable_values[5] = target.pose.orientation.z;//quaternion z
+          quad_variable_values[6] = target.pose.orientation.w;//quaternion w
+
+          //Plan the goal pose
+          group_.setJointValueTarget(quad_variable_values);
+          moveit::planning_interface::MoveGroup::Plan my_plan;
+          bool  success = group_.plan(my_plan);
+          ROS_INFO("Visualizing plan 1 (pose goal) %s",success?"":"FAILED");
+
+          //Publish trajectory for rviz
+          display_trajectory.trajectory_start = my_plan.start_state_;
+          display_trajectory.trajectory.push_back(my_plan.trajectory_);
+          display_publisher_.publish(display_trajectory);
+
+          //Plan and execute the trajectory
+          group_.asyncMove();
+        }
         ros::spinOnce();
         r.sleep();
     }
