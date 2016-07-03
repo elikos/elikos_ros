@@ -1,14 +1,14 @@
 <package>
-  <name>action_controller</name>
+  <name>elikos_action_controller</name>
   <version>0.1.0</version>
-  <author email="unknown@unknown.com">Alessio</author>
-  <maintainer email="unknown@unknown.com">Alessio</maintainer>
+  <author email="unknown@unknown.com">elikos</author>
+  <maintainer email="unknown@unknown.com">elikos</maintainer>
   <description>
 
-     action_controller
+     elikos_action_controller
 
   </description>
-  <author>Alessio</author>
+  <author>elikos</author>
   <license>BSD</license>
   <url>http://ros.org/wiki/action_controller</url>
 	<buildtool_depend>catkin</buildtool_depend>

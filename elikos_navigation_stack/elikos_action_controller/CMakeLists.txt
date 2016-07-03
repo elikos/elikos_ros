@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(action_controller)
+project(elikos_action_controller)
 
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
@@ -40,7 +40,7 @@ generate_messages(
   std_msgs
   trajectory_msgs
   actionlib_msgs
-  action_controller
+  elikos_action_controller
 )
 
 catkin_package(
@@ -55,8 +55,8 @@ catkin_package(
 include_directories(include)
 
 # add_library(action_controller src/actionController.cpp)
-add_executable(action_controller src/actionController.cpp)
-target_link_libraries(action_controller ${catkin_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+add_executable(elikos_action_controller src/elikos_actionController.cpp)
+target_link_libraries(elikos_action_controller ${catkin_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 
-#install(TARGETS action_controller LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+#install(TARGETS elikos_action_controller LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})

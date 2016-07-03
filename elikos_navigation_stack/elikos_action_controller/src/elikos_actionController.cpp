@@ -6,13 +6,13 @@
 #include <tf/transform_datatypes.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
-#include <action_controller/MultiDofFollowJointTrajectoryAction.h>
+#include <elikos_action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
 
 //Some parts of the code come from : https://github.com/AlessioTonioni/Autonomous-Flight-ROS
 class Controller{
 private:
-	typedef actionlib::ActionServer<action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
+	typedef actionlib::ActionServer<elikos_action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
 	typedef ActionServer::GoalHandle GoalHandle;
 public:
 	Controller(ros::NodeHandle &n) :
@@ -130,7 +130,7 @@ private:
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "my_controller_node");
+	ros::init(argc, argv, "elikos_controller_node");
 	ros::NodeHandle node;//("~");
 	Controller control(node);
 
