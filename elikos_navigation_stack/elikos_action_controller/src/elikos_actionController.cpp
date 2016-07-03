@@ -9,7 +9,6 @@
 #include <elikos_action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
 
-//Some parts of the code come from : https://github.com/AlessioTonioni/Autonomous-Flight-ROS
 class Controller{
 private:
 	typedef actionlib::ActionServer<elikos_action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
