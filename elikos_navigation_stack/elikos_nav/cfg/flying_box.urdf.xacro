@@ -1,5 +1,5 @@
 <robot name="flying_box">
-  <link name="base_link">
+  <link name="elikos_base_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>

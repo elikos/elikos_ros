@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   std_msgs
   message_generation
+  tf
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
@@ -48,6 +49,7 @@ catkin_package(
   DEPENDS
   CATKIN_DEPENDS message_runtime
   moveit_core
+  tf
 )
 
 include_directories(include)
@@ -58,5 +60,3 @@ target_link_libraries(action_controller ${catkin_LIBRARIES} ${CMAKE_THREAD_LIBS_
 
 
 #install(TARGETS action_controller LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
-
-

@@ -2,6 +2,7 @@
 #include <actionlib/server/action_server.h>
 #include <pthread.h>
 
+#include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
@@ -20,7 +21,9 @@ public:
 				boost::bind(&Controller::goalCB, this, _1),
 				boost::bind(&Controller::cancelCB, this, _1),
 				false),
-				has_active_goal_(false)
+				has_active_goal_(false),
+				parent_frame_("elikos_base_link"),
+				child_frame_("elikos_setpoint")
 {
 		creato=0;
 		empty.linear.x=0;
@@ -29,21 +32,20 @@ public:
 		empty.angular.z=0;
 		empty.angular.y=0;
 		empty.angular.x=0;
-		pub_topic = node_.advertise<geometry_msgs::Twist>("/mavros/setpoint_velocity/cmd_vel", 1);
-		pub_topic_test = node_.advertise<geometry_msgs::PoseStamped>("/lineartest", 1);//test
 		action_server_.start();
 		ROS_INFO_STREAM("Node ready!");
 }
 private:
 	ros::NodeHandle node_;
 	ActionServer action_server_;
-	ros::Publisher pub_topic;
-	ros::Publisher pub_topic_test;//test
+	tf::TransformBroadcaster tf_broadcaster_;
 	geometry_msgs::Twist empty;
 	geometry_msgs::Transform_<std::allocator<void> > lastPosition;
 	geometry_msgs::Twist cmd;
 	pthread_t trajectoryExecutor;
 	int creato;
+	std::string parent_frame_;
+	std::string child_frame_;
 
 	bool has_active_goal_;
 	GoalHandle active_goal_;
@@ -58,7 +60,6 @@ private:
 				pthread_cancel(trajectoryExecutor);
 				creato=0;
 			}
-			pub_topic.publish(empty);
 
 			// Marks the current goal as canceled.
 			active_goal_.setCanceled();
@@ -74,7 +75,6 @@ private:
 				pthread_cancel(trajectoryExecutor);
 				creato=0;
 			}
-			pub_topic.publish(empty);
 
 			// Marks the current goal as canceled.
 			active_goal_.setCanceled();
@@ -128,30 +128,12 @@ private:
 	}
 	void publishCommand(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint)
 	{
-		//Compute the transform between the current point and the last one
-		tf::Transform ref2lastposition;
-    tf::transformMsgToTF(lastPosition, ref2lastposition);
-		tf::Transform ref2nextposition;
-    tf::transformMsgToTF(trajectoryPoint, ref2nextposition);
+		//Convert geometry_msgs::Transform to tf::Transform
+		tf::Transform tfTrajectoryPoint;
+    tf::transformMsgToTF(trajectoryPoint, tfTrajectoryPoint);
 
-		tf::Transform direction = ref2lastposition.inverse() * ref2nextposition;
-
-		//Construct command
-		tf::vector3TFToMsg(direction.getOrigin().normalize(), cmd.linear);
-		tf::vector3TFToMsg(direction.getRotation().getAxis(), cmd.angular);
-
-		//Publish command
-		pub_topic.publish(cmd);
-
-		//Vizualisation
-		geometry_msgs::PoseStamped poseTest;
-		poseTest.header.stamp = ros::Time();
-		poseTest.header.frame_id = "base_link";
-		poseTest.pose.position.x = cmd.linear.x;
-		poseTest.pose.position.y = cmd.linear.y;
-		poseTest.pose.position.z = cmd.linear.z;
-		tf::quaternionTFToMsg(direction.getRotation(), poseTest.pose.orientation);
-		pub_topic_test.publish(poseTest);//test
+		//Broadcast command
+		tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), parent_frame_, child_frame_));
 	}
 };
 

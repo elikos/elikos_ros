@@ -4,6 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
+        - /Status1
         - /MotionPlanning1
         - /Pose1
         - /TF1
@@ -65,7 +67,7 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          base_link:
+          elikos_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -113,7 +115,7 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          base_link:
+          elikos_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -142,14 +144,14 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        absolute_origin:
-          Value: false
-        base_link:
-          Value: true
         camera_color_optical_frame:
           Value: false
         camera_depth_optical_frame:
           Value: false
+        elikos_base_link:
+          Value: true
+        elikos_local_origin:
+          Value: true
         realsense_frame:
           Value: false
       Marker Scale: 1
@@ -158,20 +160,19 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        absolute_origin:
-          base_link:
-            {}
-          realsense_frame:
-            camera_color_optical_frame:
-              {}
-            camera_depth_optical_frame:
-              {}
+        elikos_local_origin:
+          elikos_base_link:
+            realsense_frame:
+              camera_color_optical_frame:
+                {}
+              camera_depth_optical_frame:
+                {}
       Update Interval: 0
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: absolute_origin
+    Fixed Frame: elikos_local_origin
     Frame Rate: 30
   Name: root
   Tools:
@@ -195,10 +196,10 @@ Visualization Manager:
         Z: 2.23518e-07
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.319797
+      Pitch: -0.0402032
       Target Frame: base_link
       Value: XYOrbit (rviz)
-      Yaw: 1.39177
+      Yaw: 0.921769
     Saved: ~
 Window Geometry:
   Displays:

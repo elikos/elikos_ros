@@ -13,10 +13,6 @@
     <arg name="load_robot_description" value="true"/>
   </include>
 
-  <!-- If needed, broadcast static tf for robot root -->
-    <node pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 absolute_origin base_link 100" />
-
-
   <!-- We do not have a robot connected, so publish fake joint states -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
     <param name="/use_gui" value="false"/>
@@ -45,5 +41,7 @@
     <arg name="moveit_warehouse_database_path" value="$(arg db_path)"/>
   </include>
 
-  <node pkg="tf" type="static_transform_publisher" name="absolute_origin_broadcaster" args="0 0 0 0 0 0 1 absolute_origin realsense_frame 100" />
+  <!-- If needed, broadcast static tf for robot root -->
+  <node pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 elikos_local_origin elikos_base_link 100" />
+  <node pkg="tf" type="static_transform_publisher" name="origin_broadcaster" args="0 0 0 0 0 0 1 elikos_base_link realsense_frame 100" />
 </launch>
