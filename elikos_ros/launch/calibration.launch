@@ -23,13 +23,5 @@
       <param name="bayer_pattern" value="rggb" />
       <param name="bayer_mode" value="AHD" />
   </node>
-  <include file="$(find mavros)/launch/px4.launch" />
-  <rosparam command="load">
-  local_position:
-    tf:
-      send: true
-  global_position:
-    tf:
-      send: false
-  </rosparam>
+	<include file="$(find elikos_ros)/launch/mavros_config.launch"/>
 </launch>
