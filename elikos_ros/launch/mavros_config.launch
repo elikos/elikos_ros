@@ -1,0 +1,16 @@
+<launch>
+  <include file="$(find mavros)/launch/px4.launch" />
+  <rosparam command="load">
+  local_position:
+    tf:
+      send: true
+  global_position:
+    tf:
+      send: false
+  setpoint_position:
+    tf:
+      listen: true
+      frame_id: elikos_base_link
+      child_frame_id: elikos_setpoint
+  </rosparam>
+</launch>

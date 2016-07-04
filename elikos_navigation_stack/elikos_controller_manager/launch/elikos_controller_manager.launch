@@ -1,0 +1,3 @@
+<launch>
+  <node name="elikos_controller_manager" pkg="elikos_controller_manager" type="elikos_controller_manager"/>
+</launch>

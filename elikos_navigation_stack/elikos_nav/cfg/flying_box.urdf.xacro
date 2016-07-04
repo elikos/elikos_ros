@@ -1,0 +1,10 @@
+<robot name="flying_box">
+  <link name="elikos_base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+          <cylinder length="0.3" radius="0.3"/>
+      </geometry>
+    </visual>
+  </link>
+</robot>

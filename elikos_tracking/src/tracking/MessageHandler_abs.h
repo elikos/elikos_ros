@@ -15,16 +15,13 @@ public:
     MessageHandler_abs();
     ~MessageHandler_abs();
     void dispatchMessageRobotRaw(const elikos_ros::RobotRawArray::ConstPtr &input);
-    void dispatchMessagePose(const geometry_msgs::PoseStamped::ConstPtr &input);
 
 private:
     ros::NodeHandle nh_;
     ros::Subscriber sub_;
     ros::Publisher pubTest_;
     elikos_ros::RobotRawArray newArray_;
-    geometry_msgs::PoseStamped inputPose_;
-	TransformationUnit transformationUnit_;
+	  TransformationUnit transformationUnit_;
 };
 
 #endif /// MESSAGE_HANDLER_TTF
-

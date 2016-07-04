@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 2.8.3)
 project(elikos_ros)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -6,10 +5,11 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
-find_package( catkin REQUIRED COMPONENTS
+find_package( catkin REQUIRED)
+find_package( catkin REQUIRED COMPONENTS 
    message_generation
-   roscpp
-   tf
+   roscpp 
+   tf 
    std_msgs
    genmsg
    sensor_msgs
@@ -102,7 +102,7 @@ generate_messages(
 catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
-LIBRARIES elikos_lib
+#  LIBRARIES elikos
 CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs geometry_msgs
 #  DEPENDS system_lib
 )
@@ -126,12 +126,24 @@ include/elikos_lib/PositionHelper.h)
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
 
-#add_executable( robotsim
-#  src/simulation/simulation.cpp
-#  src/simulation/Robot.cpp
-#  src/simulation/TargetRobot.cpp
-#  src/simulation/ObstacleRobot.cpp
-#  src/simulation/MAV.cpp)
+add_executable( robotsim
+  src/simulation/simulation.cpp
+  src/simulation/Robot.cpp
+  src/simulation/TargetRobot.cpp
+  src/simulation/ObstacleRobot.cpp
+  src/simulation/MAV.cpp)
+
+add_executable( tracking
+  src/RobotDetection/RobotDesc.h
+  src/RobotDetection/RobotDesc.cpp
+  src/RobotDetection/Detection.h
+  src/RobotDetection/Detection.cpp
+  src/RobotDetection/detectMain.cpp)
+
+add_executable( navigator
+  src/navigator/navigator.cpp
+  src/navigator/SetpointManager.h
+  src/navigator/SetpointManager.cpp)
 
 #add_executable( pose_offset
 #    src/pose_offset/pose_offset.cpp
@@ -144,48 +156,53 @@ include/elikos_lib/PositionHelper.h)
 #)
 
 
-#add_executable( dnt
-#    src/dnt/dnt.cpp
-#    src/dnt/MessageHandler.h
-#    src/dnt/MessageHandler.cpp
-#	src/dnt/BlobDetection/RobotDesc.h
-#	src/dnt/BlobDetection/RobotDesc.cpp
-#	src/dnt/BlobDetection/Color.cpp
-#	src/dnt/BlobDetection/Color.h
-#	src/dnt/BlobDetection/GreenColor.cpp
-#	src/dnt/BlobDetection/GreenColor.h
-#	src/dnt/BlobDetection/RedColor.cpp
-#	src/dnt/BlobDetection/RedColor.h
-#	src/dnt/BlobDetection/WhiteColor.cpp
-#	src/dnt/BlobDetection/WhiteColor.h
-#    src/dnt/BlobDetection/RobotDetection.cpp
-#    src/dnt/BlobDetection/RobotDetection.h
-#    src/dnt/BlobDetection/BlobTracking.h
-#    src/dnt/BlobDetection/BlobTracking.cpp)
+add_executable( dnt
+    src/dnt/dnt.cpp
+    src/dnt/MessageHandler.h
+    src/dnt/MessageHandler.cpp
+	src/dnt/BlobDetection/RobotDesc.h
+	src/dnt/BlobDetection/RobotDesc.cpp
+	src/dnt/BlobDetection/Color.cpp
+	src/dnt/BlobDetection/Color.h
+	src/dnt/BlobDetection/GreenColor.cpp
+	src/dnt/BlobDetection/GreenColor.h
+	src/dnt/BlobDetection/RedColor.cpp
+	src/dnt/BlobDetection/RedColor.h
+	src/dnt/BlobDetection/WhiteColor.cpp
+	src/dnt/BlobDetection/WhiteColor.h
+    src/dnt/BlobDetection/RobotDetection.cpp
+    src/dnt/BlobDetection/RobotDetection.h
+    src/dnt/BlobDetection/BlobTracking.h 
+    src/dnt/BlobDetection/BlobTracking.cpp)
 
-#add_executable( tracking_abs
-#    src/tracking_abs/tracking_abs.cpp
-#    src/tracking_abs/MessageHandler_abs.h
-#    src/tracking_abs/MessageHandler_abs.cpp
-#    src/tracking_abs/TransformationUnit.h
-#    src/tracking_abs/TransformationUnit.cpp)
+add_executable( tracking_abs
+    src/tracking_abs/tracking_abs.cpp
+    src/tracking_abs/MessageHandler_abs.h
+    src/tracking_abs/MessageHandler_abs.cpp
+    src/tracking_abs/TransformationUnit.h
+    src/tracking_abs/TransformationUnit.cpp)
 
-
-#add_subdirectory(src/ai)
+add_executable( moveit_test
+    src/moveittest/move_group_interface_tutorial.cpp)
+add_subdirectory(src/ai)
 
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 #add_dependencies(robotsim elikos_lib)
 
-# add_dependencies(elikos_lib
-#     mavros_msgs
-#     sensor_msgs
-# )
+add_dependencies(tracking
+    elikos_ros_generate_messages_cpp
+)
 
-#add_dependencies( tracking_abs
-#    elikos_ros_generate_messages_cpp
-#)
+add_dependencies(elikos_lib
+    mavros_msgs
+    sensor_msgs
+)
+
+add_dependencies( tracking_abs
+    elikos_ros_generate_messages_cpp
+)
 
 
 ## Specify libraries to link a library or executable target against
@@ -194,9 +211,11 @@ include/elikos_lib/PositionHelper.h)
 #)
 
 target_link_libraries( elikos_lib ${catkin_LIBRARIES})
-#target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
-#target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
-#target_link_libraries( tracking_abs ${catkin_LIBRARIES})
+target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( tracking ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries( navigator elikos_lib ${catkin_LIBRARIES})
+target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries( tracking_abs ${catkin_LIBRARIES})
 
 #############
 ## Install ##
