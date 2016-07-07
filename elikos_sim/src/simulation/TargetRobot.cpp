@@ -53,6 +53,12 @@ void TargetRobot::reverse() {
     isSpinning = true;
 }
 
+void TargetRobot::turnRight()
+{
+    turnAngle -= PI / 2.0;
+    isSpinning = true;
+}
+
 void TargetRobot::autoReverse() {
     lastAutoReverse = ros::Time::now();
     reverse();
@@ -67,6 +73,22 @@ void TargetRobot::collide(){
     if(!isSpinning)
         reverse();
 }
+
+void TargetRobot::interact(bool topInteraction)
+{
+    if(!isSpinning)
+    {
+        if (topInteraction)
+        {
+            turnRight();
+        }
+        else
+        {
+            reverse();
+        }
+    }
+}
+
 
 double TargetRobot::limitTurn(double& angle, double angularSpeed, double cycleDuration){
     double limitedAngle;

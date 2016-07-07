@@ -12,6 +12,8 @@ int main(int argc, char* argv[])
     parser.parse();
 
     ai::MessageHandler::getInstance()->lookForMessages();
+
     ai::MessageHandler::freeInstance();
     ai::MessageEmulator::freeInstance();
+    ai::Agent::freeInstance();
 }

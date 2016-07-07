@@ -23,12 +23,14 @@ public:
 
     void move(ros::Duration cycleTime);
     void collide();
+    void interact(bool topInteraction);
 private:
     Color color;
     ros::Time lastNoise, lastAutoReverse;
     bool isSpinning, isStopped;
 
     void reverse();
+    void turnRight();
     void autoReverse();
     void noise();
     double limitTurn(double& angle, double angularSpeed, double cycleDuration);

@@ -19,34 +19,71 @@ catkin_package(
 
 include_directories(
   	${catkin_INCLUDE_DIRS}
+    src/ai
   	src/ai/StateMachine
-    src/ai/Strategy
+    src/ai/Context
+    src/ai/Consideration
 	src/ai/Robot
-	src/ai
-)
+	src/ai/Util)
 
 set(STATE_MACHINE_SRC
     src/ai/StateMachine/StateMachine.h
     src/ai/StateMachine/StateMachine.cpp
-    src/ai/StateMachine/State.h
-    src/ai/StateMachine/State.cpp)
+    src/ai/StateMachine/AbstractState.h
+    src/ai/StateMachine/AbstractState.cpp
+    src/ai/StateMachine/MovementState.cpp
+    src/ai/StateMachine/MovementState.h
+    src/ai/StateMachine/Command.cpp
+    src/ai/StateMachine/Command.h)
 
-set(STRATEGY_SRC
-    src/ai/Strategy/Strategy.h
-    src/ai/Strategy/Strategy.cpp
-    src/ai/Strategy/FollowClosestTarget.cpp
-    src/ai/Strategy/FollowClosestTarget.h)
+set(CONTEXT_SRC
+    src/ai/Context/AbstractLine.cpp
+    src/ai/Context/AbstractLine.h
+	src/ai/Context/AbstractArena.h
+	src/ai/Context/AbstractArena.cpp
+    src/ai/Context/ArenaA.cpp
+    src/ai/Context/ArenaA.h
+    src/ai/Context/ArenaB.cpp
+    src/ai/Context/ArenaB.h
+    src/ai/Context/RedLine.cpp
+    src/ai/Context/RedLine.h
+    src/ai/Context/WhiteLine.cpp
+    src/ai/Context/WhiteLine.h
+    src/ai/Context/GreenLine.cpp
+    src/ai/Context/GreenLine.h
+    src/ai/Context/ContextTypes.h)
 
 set(ROBOT_SRC
-    src/ai/Robot/Robot.h
-    src/ai/Robot/Robot.cpp
-    src/ai/Robot/ObstacleRobot.h
-    src/ai/Robot/ObstacleRobot.cpp
+    src/ai/Robot/AbstractRobot.h
+    src/ai/Robot/AbstractRobot.cpp
     src/ai/Robot/QuadRobot.h
     src/ai/Robot/QuadRobot.cpp
     src/ai/Robot/TargetRobot.h
     src/ai/Robot/TargetRobot.cpp
     src/ai/Robot/RobotTypes.h)
+
+set(CONSIDERATION_SRC
+        src/ai/Consideration/PriorityEvaluationPipeline.cpp
+        src/ai/Consideration/PriorityEvaluationPipeline.h
+    src/ai/Consideration/AbstractConsideration.cpp
+    src/ai/Consideration/AbstractConsideration.h
+    src/ai/Consideration/QuadDistance.cpp
+    src/ai/Consideration/QuadDistance.h
+        src/ai/Consideration/TargetDestination.cpp
+        src/ai/Consideration/TargetDestination.h
+    src/ai/Consideration/ConsiderationTypes.h
+    src/ai/StateMachine/ObservationState.cpp
+    src/ai/StateMachine/ObservationState.h
+    src/ai/StateMachine/InteractionState.cpp
+    src/ai/StateMachine/InteractionState.h)
+
+set(UTIL_SRC
+    src/ai/Util/Line.cpp
+    src/ai/Util/Line.h
+    src/ai/Util/Segment.cpp
+    src/ai/Util/Segment.h
+    src/ai/Context/TargetOrientationEvaluation.cpp
+    src/ai/Context/TargetOrientationEvaluation.h)
 
 add_executable(elikos_ai
     src/ai/main.cpp
@@ -56,12 +93,15 @@ add_executable(elikos_ai
     src/ai/Agent.h
     src/ai/MessageHandler.h
     src/ai/MessageHandler.cpp
-        src/ai/MessageEmulator.h
-        src/ai/MessageEmulator.cpp
+    src/ai/MessageEmulator.h
+    src/ai/MessageEmulator.cpp
+    ${CONSIDERATION_SRC}
     ${STATE_MACHINE_SRC}
-    ${STRATEGY_SRC}
-    ${ROBOT_SRC})
+    ${CONTEXT_SRC}
+    ${ROBOT_SRC}
+	${UTIL_SRC})
 
 target_link_libraries(elikos_ai
-  ${catkin_LIBRARIES}
-)
+  ${catkin_LIBRARIES})
+
+
