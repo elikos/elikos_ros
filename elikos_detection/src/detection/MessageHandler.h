@@ -9,7 +9,7 @@
 #include <elikos_ros/RobotRawArray.h>
 #include "BlobDetection/BlobTracking.h"
 
-namespace dnt 
+namespace dnt
 {
 
 class MessageHandler
@@ -26,8 +26,8 @@ private:
     ros::Publisher pub_;
     BlobTracking detection_;
     image_transport::Publisher pubImages_;//debug only
-    image_transport::Publisher pubRed_;//debug only
-    image_transport::Publisher pubGreen_;//debug only
+    //image_transport::Publisher pubRed_;//debug only
+    //image_transport::Publisher pubGreen_;//debug only
 };
 
 }
