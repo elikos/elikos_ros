@@ -42,6 +42,10 @@ set(STATE_MACHINE_SRC
     src/ai/StateMachine/AbstractState.cpp
     src/ai/StateMachine/MovementState.cpp
     src/ai/StateMachine/MovementState.h
+    src/ai/StateMachine/ObservationState.cpp
+    src/ai/StateMachine/ObservationState.h
+    src/ai/StateMachine/InteractionState.cpp
+    src/ai/StateMachine/InteractionState.h
     src/ai/StateMachine/Command.cpp
     src/ai/StateMachine/Command.h)
 
@@ -60,6 +64,8 @@ set(CONTEXT_SRC
     src/ai/Context/WhiteLine.h
     src/ai/Context/GreenLine.cpp
     src/ai/Context/GreenLine.h
+    src/ai/Context/TargetOrientationEvaluation.cpp
+    src/ai/Context/TargetOrientationEvaluation.h
     src/ai/Context/ContextTypes.h)
 
 set(ROBOT_SRC
@@ -81,18 +87,14 @@ set(CONSIDERATION_SRC
     src/ai/Consideration/TargetDestination.cpp
     src/ai/Consideration/TargetDestination.h
     src/ai/Consideration/ConsiderationTypes.h
-    src/ai/StateMachine/ObservationState.cpp
-    src/ai/StateMachine/ObservationState.h
-    src/ai/StateMachine/InteractionState.cpp
-    src/ai/StateMachine/InteractionState.h src/ai/Consideration/ClusterSize.cpp src/ai/Consideration/ClusterSize.h)
+    src/ai/Consideration/ClusterSize.cpp
+    src/ai/Consideration/ClusterSize.h)
 
 set(UTIL_SRC
     src/ai/Util/Line.cpp
     src/ai/Util/Line.h
     src/ai/Util/Segment.cpp
-    src/ai/Util/Segment.h
-    src/ai/Context/TargetOrientationEvaluation.cpp
-    src/ai/Context/TargetOrientationEvaluation.h)
+    src/ai/Util/Segment.h)
 
 add_executable(elikos_ai
     src/ai/main.cpp
