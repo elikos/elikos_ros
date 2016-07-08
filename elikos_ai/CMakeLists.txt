@@ -24,7 +24,16 @@ include_directories(
     src/ai/Context
     src/ai/Consideration
 	src/ai/Robot
-	src/ai/Util)
+	src/ai/Util
+	src/ai/Behavior)
+
+set(BEHAVIOR_SRC
+    src/ai/Behavior/AbstractBehavior.cpp
+    src/ai/Behavior/AbstractBehavior.h
+    src/ai/Behavior/AggressiveBehavior.cpp
+    src/ai/Behavior/AggressiveBehavior.h
+    src/ai/Behavior/PreventiveBehavior.cpp
+    src/ai/Behavior/PreventiveBehavior.h)
 
 set(STATE_MACHINE_SRC
     src/ai/StateMachine/StateMachine.h
@@ -63,19 +72,19 @@ set(ROBOT_SRC
     src/ai/Robot/RobotTypes.h)
 
 set(CONSIDERATION_SRC
-        src/ai/Consideration/PriorityEvaluationPipeline.cpp
-        src/ai/Consideration/PriorityEvaluationPipeline.h
+    src/ai/Consideration/PriorityEvaluationPipeline.cpp
+    src/ai/Consideration/PriorityEvaluationPipeline.h
     src/ai/Consideration/AbstractConsideration.cpp
     src/ai/Consideration/AbstractConsideration.h
     src/ai/Consideration/QuadDistance.cpp
     src/ai/Consideration/QuadDistance.h
-        src/ai/Consideration/TargetDestination.cpp
-        src/ai/Consideration/TargetDestination.h
+    src/ai/Consideration/TargetDestination.cpp
+    src/ai/Consideration/TargetDestination.h
     src/ai/Consideration/ConsiderationTypes.h
     src/ai/StateMachine/ObservationState.cpp
     src/ai/StateMachine/ObservationState.h
     src/ai/StateMachine/InteractionState.cpp
-    src/ai/StateMachine/InteractionState.h)
+    src/ai/StateMachine/InteractionState.h src/ai/Consideration/ClusterSize.cpp src/ai/Consideration/ClusterSize.h)
 
 set(UTIL_SRC
     src/ai/Util/Line.cpp
@@ -99,7 +108,8 @@ add_executable(elikos_ai
     ${STATE_MACHINE_SRC}
     ${CONTEXT_SRC}
     ${ROBOT_SRC}
-	${UTIL_SRC})
+	${UTIL_SRC}
+	${BEHAVIOR_SRC})
 
 target_link_libraries(elikos_ai
   ${catkin_LIBRARIES})

@@ -24,7 +24,6 @@ public:
 
 protected:
     AbstractArena* arena_;
-
 };
 
 }

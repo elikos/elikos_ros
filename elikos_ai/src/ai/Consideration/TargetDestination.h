@@ -11,12 +11,14 @@
 namespace ai
 {
 
-class RedLineDistance : public AbstractConsideration
+class AbstractArena;
+
+class TargetDestination : public AbstractConsideration
 {
 public:
-    RedLineDistance() = default;
-    RedLineDistance(AbstractArena* arena);
-    virtual ~RedLineDistance();
+    TargetDestination() = default;
+    TargetDestination(AbstractArena* arena);
+    virtual ~TargetDestination();
     virtual void evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad);
 private:
     void applyPriorityEvaluation(TargetRobot& robot, const TargetOrientationEvaluation& evaluation);

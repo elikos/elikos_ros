@@ -5,22 +5,21 @@
 
 #include <queue>
 #include "TargetDestination.h"
-#include "TargetOrientationEvaluation.h"
 #include "AbstractArena.h"
 
 namespace ai
 {
 
-RedLineDistance::RedLineDistance(AbstractArena* arena)
+TargetDestination::TargetDestination(AbstractArena* arena)
     : AbstractConsideration(arena)
 {
 }
 
-RedLineDistance::~RedLineDistance()
+TargetDestination::~TargetDestination()
 {
 }
 
-void RedLineDistance::evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad)
+void TargetDestination::evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad)
 {
     for (int i = 0; i < targets.size(); ++i)
     {
@@ -30,7 +29,7 @@ void RedLineDistance::evaluatePriority(std::vector<TargetRobot>& targets, const 
     }
 }
 
-void RedLineDistance::applyPriorityEvaluation(TargetRobot& robot, const TargetOrientationEvaluation& evaluation)
+void TargetDestination::applyPriorityEvaluation(TargetRobot& robot, const TargetOrientationEvaluation& evaluation)
 {
     if (!evaluation.getGoodIntersection())
     {
