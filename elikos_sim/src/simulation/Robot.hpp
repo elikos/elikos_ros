@@ -20,6 +20,7 @@ public:
     virtual visualization_msgs::Marker getVizMarker() = 0;
 
     virtual void collide() = 0;
+    virtual void interact(bool topInteraction);
     virtual void move(ros::Duration cycleTime) = 0;
 
 protected:

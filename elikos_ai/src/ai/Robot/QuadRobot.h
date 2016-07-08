@@ -1,12 +1,12 @@
 #ifndef AI_QUADROBOT_H
 #define AI_QUADROBOT_H
 
-#include "Robot.h"
+#include "AbstractRobot.h"
 
 namespace ai
 {
 
-class QuadRobot : public Robot
+class QuadRobot : public AbstractRobot
 {
 public:
     QuadRobot() = default;

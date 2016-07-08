@@ -2,7 +2,7 @@
 
 MessageHandler_moveit::MessageHandler_moveit()
 {
-   sub_ = nh_.subscribe("ai_target", 1, &MessageHandler_moveit::dispatchMessageTarget, this);
+   sub_ = nh_.subscribe("elikos_target", 1, &MessageHandler_moveit::dispatchMessageTarget, this);
    hasTarget_ = false;
 }
 

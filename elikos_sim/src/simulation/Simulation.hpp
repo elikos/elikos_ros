@@ -21,6 +21,7 @@ namespace elikos_sim {
 
     private:
         bool checkCollision(const elikos_sim::Robot* ra, const elikos_sim::Robot* rb);
+        bool handleCollision(elikos_sim::Robot* robot, elikos_sim::MAV* mav);
         double collisionAngle(tf::Vector3 v, double yaw);
         void setupArenaBoundaries(visualization_msgs::MarkerArray* arenaMarkers);
         bool static isOutOfBounds(const elikos_sim::Robot* robot);
