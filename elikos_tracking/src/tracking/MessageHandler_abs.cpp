@@ -4,7 +4,7 @@ MessageHandler_abs::MessageHandler_abs()
 {
 	sub_ = nh_.subscribe("elikos_robot_raw_array", 1, &MessageHandler_abs::dispatchMessageRobotRaw, this);
 
-	pubTest_ = nh_.advertise<geometry_msgs::PoseArray>("elikos_robot_pose_array",1);
+	//pubTest_ = nh_.advertise<geometry_msgs::PoseArray>("elikos_robot_pose_array",1);
 }
 
 
