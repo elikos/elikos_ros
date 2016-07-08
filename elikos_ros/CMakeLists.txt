@@ -107,6 +107,7 @@ CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
+
 ###########
 ## Build ##
 ###########
@@ -122,6 +123,10 @@ add_library( elikos_lib
   src/elikos_lib/pid.cpp
   src/elikos_lib/RCReceiver.cpp
 include/elikos_lib/PositionHelper.h)
+
+add_dependencies( elikos_lib
+    elikos_ros_generate_messages_cpp
+)
 
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
@@ -183,9 +188,6 @@ include/elikos_lib/PositionHelper.h)
 #     sensor_msgs
 # )
 
-#add_dependencies( tracking_abs
-#    elikos_ros_generate_messages_cpp
-#)
 
 
 ## Specify libraries to link a library or executable target against
