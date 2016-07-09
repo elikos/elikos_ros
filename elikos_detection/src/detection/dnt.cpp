@@ -7,40 +7,40 @@ int main(int argc, char* argv[])
 {
     // ROS Init
     ros::init( argc, argv, "elikos_dnt" );
-   
-	string extension = ".calib";
-	string inputFile, outputFile;
-	
+
+  	string extension = ".calib";
+  	string inputFile, outputFile;
+
     ros::NodeHandle nh_;
-	
-	string calibFolderPath;
+
+	  string calibFolderPath;
     if (!nh_.getParam("/dnt/dir", calibFolderPath))
-	{
-		calibFolderPath = "";
-	}
+  	{
+  		calibFolderPath = "";
+  	}
     if (!nh_.getParam("/dnt/file_in", inputFile))
-	{
-		inputFile = "calibration_initial";
-	}
+  	{
+  		inputFile = "calibration_initial";
+  	}
     if (!nh_.getParam("/dnt/file_out", outputFile))
-	{
-		outputFile = "new_calibration";
-	}
+  	{
+  		outputFile = "new_calibration";
+  	}
     dnt::MessageHandler messageHandler(calibFolderPath+inputFile+extension);
-    
+
     bool calibrationOn;
     nh_.getParam("/dnt/calibration", calibrationOn);
-    
+
     ros::Rate r(30);
     // Endless loop
-    while(ros::ok()) 
+    while(ros::ok())
     {
         ros::spinOnce();
         if(calibrationOn) {
-			//if the 's' key is pressed, that save the calibration.
-			int key = waitKey(20);
-			if(((char)key)=='s') messageHandler.saveCalibration(calibFolderPath+outputFile+extension);
-		}
+    			//if the 's' key is pressed, that save the calibration.
+    			int key = waitKey(20);
+    			if(((char)key)=='s') messageHandler.saveCalibration(calibFolderPath+outputFile+extension);
+    		}
         r.sleep();
     }
 }

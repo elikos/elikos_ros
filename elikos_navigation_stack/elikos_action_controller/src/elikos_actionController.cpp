@@ -110,7 +110,6 @@ private:
 
 			publishTrajectoryPoint(trajectoryPoint);
 
-
 		}
 		active_goal_.setSucceeded();
 		has_active_goal_=false;

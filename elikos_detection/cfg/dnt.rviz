@@ -57,13 +57,15 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        absolute_origin:
+        elikos_arena_origin:
           Value: true
-        camera:
+        elikos_base_link:
           Value: true
-        fcu:
+        elikos_fcu:
           Value: true
-        local_origin:
+        elikos_ffmv_bottom:
+          Value: true
+        elikos_local_origin:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -71,10 +73,12 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        absolute_origin:
-          local_origin:
-            fcu:
-              camera:
+        elikos_arena_origin:
+          elikos_local_origin:
+            elikos_fcu:
+              elikos_base_link:
+                {}
+              elikos_ffmv_bottom:
                 {}
       Update Interval: 0
       Value: true
@@ -118,7 +122,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: local_origin
+    Fixed Frame: elikos_local_origin
     Frame Rate: 30
   Name: root
   Tools:
@@ -139,7 +143,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 21.9317
+      Distance: 3.64315
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -151,10 +155,10 @@ Visualization Manager:
         Z: 1.90735e-06
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.145398
+      Pitch: 1.2954
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.45724
+      Yaw: 0.695414
     Saved: ~
 Window Geometry:
   Camera:
@@ -176,5 +180,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1535
-  X: 65
-  Y: 24
+  X: 55
+  Y: 14

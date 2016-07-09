@@ -101,20 +101,20 @@ void RobotDetection::createTrackbars() {
     string WhiteTrackbars = "White Calibration Trackbars";
     string RedTrackbars = "Red Calibration Trackbars";
     string GreenTrackbars = "Green Calibration Trackbars";
-    
+
     namedWindow(WhiteTrackbars, 0);
     namedWindow(RedTrackbars, 1);
     namedWindow(GreenTrackbars, 2);
-    
-	startWindowThread();
-	
-	whiteColor_.createTrackbars(WhiteTrackbars);
-	redColor_.createTrackbars(RedTrackbars);
-	greenColor_.createTrackbars(GreenTrackbars);
-	
-	imshow( WhiteTrackbars, trackbarsWhiteMat_);
-	imshow( RedTrackbars, trackbarsRedMat_);
-	imshow( GreenTrackbars, trackbarsGreenMat_);
+
+  	startWindowThread();
+
+  	whiteColor_.createTrackbars(WhiteTrackbars);
+  	redColor_.createTrackbars(RedTrackbars);
+  	greenColor_.createTrackbars(GreenTrackbars);
+
+  	imshow( WhiteTrackbars, trackbarsWhiteMat_);
+  	imshow( RedTrackbars, trackbarsRedMat_);
+  	imshow( GreenTrackbars, trackbarsGreenMat_);
 }
 void RobotDetection::saveCalibration(string filename){
   std::fstream fs;
@@ -130,7 +130,7 @@ void RobotDetection::saveCalibration(string filename){
 	  fs << *whiteColor_.PRE_EROSIONS << endl;
 	  fs << *whiteColor_.DILATIONS << endl;
 	  fs << *whiteColor_.POST_EROSIONS << endl;
-	  
+
 	  fs << *redColor_.H_MIN << endl;
 	  fs << *redColor_.H_MAX << endl;
 	  fs << *redColor_.S_MIN << endl;
@@ -140,7 +140,7 @@ void RobotDetection::saveCalibration(string filename){
 	  fs << *redColor_.PRE_EROSIONS << endl;
 	  fs << *redColor_.DILATIONS << endl;
 	  fs << *redColor_.POST_EROSIONS << endl;
-	  
+
 	  fs << *greenColor_.H_MIN << endl;
 	  fs << *greenColor_.H_MAX << endl;
 	  fs << *greenColor_.S_MIN << endl;
@@ -150,9 +150,9 @@ void RobotDetection::saveCalibration(string filename){
 	  fs << *greenColor_.PRE_EROSIONS << endl;
 	  fs << *greenColor_.DILATIONS << endl;
 	  fs << *greenColor_.POST_EROSIONS << endl;
-	  
+
 	  fs.close();
-  }  
+  }
 }
 void RobotDetection::loadCalibration(string filename){
   std::fstream fs;
@@ -168,7 +168,7 @@ void RobotDetection::loadCalibration(string filename){
 	  fs >> *whiteColor_.PRE_EROSIONS;
 	  fs >> *whiteColor_.DILATIONS;
 	  fs >> *whiteColor_.POST_EROSIONS;
-	  
+
 	  fs >> *redColor_.H_MIN;
 	  fs >> *redColor_.H_MAX;
 	  fs >> *redColor_.S_MIN;
@@ -178,7 +178,7 @@ void RobotDetection::loadCalibration(string filename){
 	  fs >> *redColor_.PRE_EROSIONS;
 	  fs >> *redColor_.DILATIONS;
 	  fs >> *redColor_.POST_EROSIONS;
-	  
+
 	  fs >> *greenColor_.H_MIN;
 	  fs >> *greenColor_.H_MAX;
 	  fs >> *greenColor_.S_MIN;
@@ -188,8 +188,7 @@ void RobotDetection::loadCalibration(string filename){
 	  fs >> *greenColor_.PRE_EROSIONS;
 	  fs >> *greenColor_.DILATIONS;
 	  fs >> *greenColor_.POST_EROSIONS;
-	  
+
 	  fs.close();
   }
 }
-
