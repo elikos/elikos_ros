@@ -21,17 +21,23 @@ ArenaA::~ArenaA()
 {
 }
 
-void ArenaA::evaluateTargetOrientation(const TargetRobot& robot, TargetOrientationEvaluation &evaluation)
+void ArenaA::evaluateTargetOrientation(const TargetRobot& robot)
 {
-    for (int i = 0; i < lines_.size(); i++)
+    bool lineFound = false;
+    for (int i = 0; i < lines_.size() && !lineFound; i++)
     {
         if (lines_[i]->isInThePath(robot))
         {
-            lines_[i]->evaluate(robot, evaluation);
-            return;
+            lines_[i]->evaluate(robot);
+            lineFound = true;
         }
     }
 }
 
+void ArenaA::populateTargets(std::vector<TargetRobot> targets)
+{
+    targets.clear();
+    targets.resize(10);
+}
 
 }

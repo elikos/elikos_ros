@@ -2,6 +2,8 @@
 // Created by olivier on 01/07/16.
 //
 
+#include "TargetRobot.h"
+
 #include "RedLine.h"
 
 namespace ai
@@ -16,10 +18,9 @@ RedLine::~RedLine()
 {
 }
 
-void RedLine::evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation)
+bool RedLine::isGoodLineIntersection(const TargetRobot& robot)
 {
-
+    return false;
 }
-
 
 }

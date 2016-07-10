@@ -10,31 +10,14 @@
 namespace ai
 {
 
-TargetDestination::TargetDestination(AbstractArena* arena)
-    : AbstractConsideration(arena)
-{
-}
-
 TargetDestination::~TargetDestination()
 {
 }
 
-void TargetDestination::evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad)
+void TargetDestination::evaluatePriority(TargetRobot& target)
 {
-    for (int i = 0; i < targets.size(); ++i)
-    {
-        TargetOrientationEvaluation evaluation;
-        arena_->evaluateTargetOrientation(targets[i], evaluation);
-        applyPriorityEvaluation(targets[i], evaluation);
-    }
-}
-
-void TargetDestination::applyPriorityEvaluation(TargetRobot& robot, const TargetOrientationEvaluation& evaluation)
-{
-    if (!evaluation.getGoodIntersection())
-    {
-        robot.setPriority((30.0 - evaluation.getLineIntersectionDistance()) / 30.0);
-    }
+    TargetOrientationEvaluation* evaluation = target.getOrientationEvaluation();
+    target.setPriority((30.0 - evaluation->getLineIntersectionDistance()) / 30.0);
 }
 
 }

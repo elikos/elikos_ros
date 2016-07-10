@@ -50,16 +50,7 @@ void MessageHandler::lookForMessages()
 
 void MessageHandler::handleTrgtMsg(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
-    PriorityEvaluationPipeline* pipeline = agent_->getConsiderationPipeline();
-    const elikos_ros::TargetRobot_<std::allocator<void>>* targets = input->targets.data();
-
-    size_t n = input->targets.size();
-    for (size_t i = 0; i < n; ++i)
-    {
-        tf::Pose pose;
-        tf::poseMsgToTF(targets[i].poseOrigin.pose, pose);
-        pipeline->updateTarget(targets[i].id, targets[i].color, pose);
-    }
+    agent_->updateTargets(input);
 }
 
 void MessageHandler::handleMavMsg(const geometry_msgs::PoseStamped::ConstPtr &input)

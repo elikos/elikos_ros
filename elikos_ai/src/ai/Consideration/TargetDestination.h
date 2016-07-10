@@ -17,11 +17,8 @@ class TargetDestination : public AbstractConsideration
 {
 public:
     TargetDestination() = default;
-    TargetDestination(AbstractArena* arena);
     virtual ~TargetDestination();
-    virtual void evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad);
-private:
-    void applyPriorityEvaluation(TargetRobot& robot, const TargetOrientationEvaluation& evaluation);
+    virtual void evaluatePriority(TargetRobot& target);
 };
 
 }

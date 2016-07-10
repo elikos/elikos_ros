@@ -15,7 +15,8 @@ class ArenaB : public AbstractArena
 public:
     ArenaB();
     virtual ~ArenaB();
-    virtual void evaluateTargetOrientation(const TargetRobot& robot, TargetOrientationEvaluation& evaluation);
+    virtual void evaluateTargetOrientation(const TargetRobot& robot);
+    virtual void populateTargets(std::vector<TargetRobot> robots);
 };
 
 }

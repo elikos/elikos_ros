@@ -6,6 +6,7 @@
 #define AI_AGGRESSIVE_BEHAVIOR_H
 
 #include "AbstractBehavior.h"
+#include "TargetDestination.h"
 
 namespace ai
 {
@@ -14,7 +15,15 @@ class AggressiveBehavior : public AbstractBehavior
 {
 public:
     AggressiveBehavior() = default;
-    virtual ~AggressiveBehavior() = default;
+    virtual ~AggressiveBehavior();
+
+    virtual void generateCommands(CommandQueue& q, Context& context);
+    virtual bool isContextCritical(Context& context);
+
+private:
+    TargetRobot* currentTarget_;
+    void generateInteractionCommands(CommandQueue& q, Context& context);
+    TargetRobot* chooseTargetRobot();
 
 };
 

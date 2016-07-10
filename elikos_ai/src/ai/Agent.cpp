@@ -1,5 +1,7 @@
 #include "Agent.h"
 #include "MessageHandler.h"
+#include "PreventiveBehavior.h"
+#include "AggressiveBehavior.h"
 
 namespace ai
 {
@@ -16,8 +18,10 @@ Agent* Agent::getInstance()
 }
 
 Agent::Agent()
-    : pipeline_(quad_), stateMachine_(quad_)
 {
+    behaviors_[PREVENTIVE] = std::unique_ptr<PreventiveBehavior>(new PreventiveBehavior());
+    behaviors_[AGGRESSIVE] = std::unique_ptr<AggressiveBehavior>(new AggressiveBehavior());
+    currentBehavior_ = behaviors_[AGGRESSIVE].get();
 }
 
 void Agent::freeInstance()
@@ -26,12 +30,39 @@ void Agent::freeInstance()
     instance_ = nullptr;
 }
 
-void Agent::behave()
+AbstractBehavior* Agent::resolveCurrentBehavior()
 {
-    TargetRobot* target = pipeline_.evaluateTargetSelection(quad_);
-    stateMachine_.updatePriorityTarget(target);
-    stateMachine_.behave();
+    AbstractBehavior* behavior = nullptr;
+    // Check for robots that are about to go out of the arena first
+    if( behaviors_[PREVENTIVE]->isContextCritical(context_)) {
+        behavior = behaviors_[PREVENTIVE].get();
+    // Check if the current target has a good orientation
+    } else if (behaviors_[AGGRESSIVE]->isContextCritical(context_)) {
+        behavior = behaviors_[AGGRESSIVE].get();
+    // Interact with highest priority target
+    } else {
+        behavior = behaviors_[PREVENTIVE].get();
+    }
+    return behavior;
 }
 
+void Agent::behave()
+{
+    if (!q_.empty()) {
+        if (q_.front()->execute()) {
+            q_.pop();
+        }
+    } else {
+        currentBehavior_->generateCommands(q_, context_);
+    }
+
+}
+
+void Agent::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
+{
+    context_.updateTargets(input);
+    pipeline_.evaluatePriority(context_);
+    currentBehavior_ = resolveCurrentBehavior();
+}
 
 };

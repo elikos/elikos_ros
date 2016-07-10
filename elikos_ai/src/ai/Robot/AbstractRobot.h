@@ -23,7 +23,7 @@ public:
     void updatePositionRadius(const double& dt);
     tfScalar getDistance(AbstractRobot* robot);
 
-private:
+protected:
     bool isUpdated_{ false };
     double positionRadius_{ 30.0 };
     tf::Pose pose_;

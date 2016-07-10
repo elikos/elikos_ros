@@ -14,11 +14,13 @@ ArenaB::~ArenaB()
 {
 }
 
-void ArenaB::evaluateTargetOrientation(const TargetRobot& robot, TargetOrientationEvaluation &evaluation)
+void ArenaB::evaluateTargetOrientation(const TargetRobot& robot)
 {
+
 }
+void ArenaB::populateTargets(std::vector<TargetRobot> robots)
+{
 
-
-
+}
 
 }

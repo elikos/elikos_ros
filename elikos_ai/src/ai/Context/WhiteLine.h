@@ -16,7 +16,7 @@ public:
     WhiteLine(const tf::Point& cornerA, const tf::Point& cornerB);
     virtual ~WhiteLine();
 
-    virtual void evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation);
+    virtual bool isGoodLineIntersection(const TargetRobot& robot);
 
 private:
     WhiteLine() = delete;

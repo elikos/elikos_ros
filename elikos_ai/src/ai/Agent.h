@@ -3,29 +3,43 @@
 
 #include <memory>
 #include <tf/tf.h>
-#include "StateMachine.h"
+#include "Context.h"
+#include "CommandQueue.h"
 #include "Robot/QuadRobot.h"
 #include "PriorityEvaluationPipeline.h"
+#include "AbstractBehavior.h"
+#include <elikos_ros/TargetRobotArray.h>
 
 namespace ai {
 
 class Agent
 {
 public:
+    enum EnumBehavior
+    {
+        PREVENTIVE,
+        AGGRESSIVE
+    };
+
     static Agent* getInstance();
     static void freeInstance();
 
     inline PriorityEvaluationPipeline* getConsiderationPipeline();
+
     inline void updateQuadRobot(const tf::Pose& pose);
+    void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
     void behave();
 
 private:
     static Agent* instance_;
+    Context context_;
 
-    QuadRobot quad_;
-    StateMachine stateMachine_;
+    CommandQueue q_;
+    std::unique_ptr<AbstractBehavior> behaviors_[2];
+    AbstractBehavior* currentBehavior_;
     PriorityEvaluationPipeline pipeline_;
 
+    AbstractBehavior* resolveCurrentBehavior();
     Agent();
     ~Agent() = default;
 };
@@ -37,7 +51,7 @@ inline PriorityEvaluationPipeline* Agent::getConsiderationPipeline()
 
 inline void Agent::updateQuadRobot(const tf::Pose& pose)
 {
-    quad_.setPose(pose);
+    context_.getQuad().setPose(pose);
 }
 
 }

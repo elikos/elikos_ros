@@ -16,7 +16,7 @@ public:
     GreenLine(const tf::Point &cornerA, const tf::Point &cornerB);
     ~GreenLine() = default;
 
-    virtual void evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation);
+    virtual bool isGoodLineIntersection(const TargetRobot& robot);
 
 private:
     GreenLine() = delete;

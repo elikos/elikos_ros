@@ -13,8 +13,16 @@ namespace ai
 class PreventiveBehavior : public AbstractBehavior
 {
 public:
+    static constexpr double MIN_ACCEPTABLE_LINE_DISTANCE { 1.0 };
+
     PreventiveBehavior() = default;
-    virtual ~PreventiveBehavior() = default;
+    virtual ~PreventiveBehavior();
+
+    virtual void generateCommands(CommandQueue& command, Context& context);
+    virtual bool isContextCritical(Context& context);
+private:
+    bool isAlreadyCritical = false;
+
 };
 
 }

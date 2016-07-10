@@ -21,13 +21,15 @@ public:
     AbstractLine();
     AbstractLine(const tf::Point& cornerA, const tf::Point& cornerB);
     bool isInThePath(const TargetRobot& robot) const;
-    virtual void evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation) = 0;
+
+    void evaluate(const TargetRobot& robot);
 
     virtual ~AbstractLine() = 0;
 
 protected:
     util::Segment segment_;
 
+    virtual bool isGoodLineIntersection( const TargetRobot& robot) = 0;
 };
 
 }

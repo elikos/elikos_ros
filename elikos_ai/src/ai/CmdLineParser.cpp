@@ -73,12 +73,7 @@ void CmdLineParser::parseMode(int mode)
 
     if ((mode & RED_LINE_MASK) == RED_LINE_MASK)
     {
-        pipeline->addConsideration(std::unique_ptr<TargetDestination>(new TargetDestination(pipeline->getArena())));
-    }
-
-    if ((mode & QUAD_DISTANCE_MASK) == QUAD_DISTANCE_MASK)
-    {
-        pipeline->addConsideration(std::unique_ptr<QuadDistance>(new QuadDistance()));
+        pipeline->addConsideration(std::unique_ptr<TargetDestination>(new TargetDestination()));
     }
 }
 

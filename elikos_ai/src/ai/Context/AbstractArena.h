@@ -26,7 +26,8 @@ public:
     AbstractArena() = default;
     virtual ~AbstractArena() = 0;
 
-    virtual void evaluateTargetOrientation(const TargetRobot& robot, TargetOrientationEvaluation& evaluation) = 0;
+    virtual void evaluateTargetOrientation(const TargetRobot& robot) = 0;
+    virtual void populateTargets(std::vector<TargetRobot> robots) = 0;
 
 protected:
     std::vector<std::unique_ptr<AbstractLine>> lines_;

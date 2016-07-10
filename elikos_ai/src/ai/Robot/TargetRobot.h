@@ -1,7 +1,10 @@
 #ifndef AI_ROBOT_TARGET_H
 #define AI_ROBOT_TARGET_H
 
+#include "TargetOrientationEvaluation.h"
+
 #include "AbstractRobot.h"
+#include "LineTypes.h"
 
 namespace ai
 {
@@ -22,11 +25,14 @@ public:
     inline void setPriority(double priority);
     inline double getPriority() const;
 
+    inline TargetOrientationEvaluation* getOrientationEvaluation();
 
 private:
     uint8_t id_;
     uint8_t color_;
     double priority_;
+
+    TargetOrientationEvaluation evaluation_;
 };
 
 inline void TargetRobot::setId(uint8_t id)
@@ -57,6 +63,11 @@ inline void TargetRobot::setColor(uint8_t color)
 inline uint8_t TargetRobot::getColor() const
 {
     return color_;
+}
+
+inline TargetOrientationEvaluation* TargetRobot::getOrientationEvaluation()
+{
+    return &evaluation_;
 }
 
 }

@@ -9,11 +9,6 @@
 namespace ai
 {
 
-AbstractConsideration::AbstractConsideration(AbstractArena *arena)
-    : arena_(arena)
-{
-}
-
 AbstractConsideration::~AbstractConsideration()
 {
 }

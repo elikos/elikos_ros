@@ -20,12 +20,12 @@ catkin_package(
 include_directories(
   	${catkin_INCLUDE_DIRS}
     src/ai
-  	src/ai/StateMachine
-    src/ai/Context
+	src/ai/Command
     src/ai/Consideration
 	src/ai/Robot
 	src/ai/Util
-	src/ai/Behavior)
+	src/ai/Behavior
+    src/ai/Context)
 
 set(BEHAVIOR_SRC
     src/ai/Behavior/AbstractBehavior.cpp
@@ -33,21 +33,24 @@ set(BEHAVIOR_SRC
     src/ai/Behavior/AggressiveBehavior.cpp
     src/ai/Behavior/AggressiveBehavior.h
     src/ai/Behavior/PreventiveBehavior.cpp
-    src/ai/Behavior/PreventiveBehavior.h)
+    src/ai/Behavior/PreventiveBehavior.h
+    src/ai/Behavior/PassiveBehavior.cpp
+    src/ai/Behavior/PassiveBehavior.h)
 
-set(STATE_MACHINE_SRC
-    src/ai/StateMachine/StateMachine.h
-    src/ai/StateMachine/StateMachine.cpp
-    src/ai/StateMachine/AbstractState.h
-    src/ai/StateMachine/AbstractState.cpp
-    src/ai/StateMachine/MovementState.cpp
-    src/ai/StateMachine/MovementState.h
-    src/ai/StateMachine/ObservationState.cpp
-    src/ai/StateMachine/ObservationState.h
-    src/ai/StateMachine/InteractionState.cpp
-    src/ai/StateMachine/InteractionState.h
-    src/ai/StateMachine/Command.cpp
-    src/ai/StateMachine/Command.h)
+set(COMMAND_SRC
+    src/ai/Command/CommandQueue.h
+    src/ai/Command/CommandQueue.cpp
+    src/ai/Command/AbstractCommand.h
+    src/ai/Command/AbstractCommand.cpp
+    src/ai/Command/MovementCommand.cpp
+    src/ai/Command/MovementCommand.h
+    src/ai/Command/ObservationCommand.cpp
+    src/ai/Command/ObservationCommand.h
+    src/ai/Command/TopInteractionCommand.cpp
+    src/ai/Command/TopInteractionCommand.h
+    src/ai/Command/FrontInteractionCommand.cpp
+    src/ai/Command/FrontInteractionCommand.h)
+
 
 set(CONTEXT_SRC
     src/ai/Context/AbstractLine.cpp
@@ -66,7 +69,9 @@ set(CONTEXT_SRC
     src/ai/Context/GreenLine.h
     src/ai/Context/TargetOrientationEvaluation.cpp
     src/ai/Context/TargetOrientationEvaluation.h
-    src/ai/Context/ContextTypes.h)
+    src/ai/Context/LineTypes.h
+    src/ai/Context/Context.cpp
+    src/ai/Context/Context.h)
 
 set(ROBOT_SRC
     src/ai/Robot/AbstractRobot.h
@@ -107,7 +112,7 @@ add_executable(elikos_ai
     src/ai/MessageEmulator.h
     src/ai/MessageEmulator.cpp
     ${CONSIDERATION_SRC}
-    ${STATE_MACHINE_SRC}
+    ${COMMAND_SRC}
     ${CONTEXT_SRC}
     ${ROBOT_SRC}
 	${UTIL_SRC}
