@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
           //This is the new position and orientation for the quadcopter
           quad_variable_values[0] = target.pose.position.x;//position.x
           quad_variable_values[1] = target.pose.position.y;//position y
-          quad_variable_values[2] = target.pose.position.z;//position z
+          quad_variable_values[2] = target.pose.position.z+5;//position z
           quad_variable_values[3] = target.pose.orientation.x;//quaternion x
           quad_variable_values[4] = target.pose.orientation.y;//quaternion y
           quad_variable_values[5] = target.pose.orientation.z;//quaternion z
