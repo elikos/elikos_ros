@@ -17,7 +17,7 @@ MessageHandler::MessageHandler(string calibrationFilename) :
 {
 	   is_ = it_.subscribe("elikos_ffmv_bottom_camera/image_raw", 1, &MessageHandler::dispatchMessage, this);
     pub_ = nh_.advertise<elikos_ros::RobotRawArray>("elikos_robot_raw_array", 1);
-    pubImages_ = it_.advertise("camera/image_opencv", 1);//debug only
+    pubImages_ = it_.advertise("camera_test/image_opencv", 1);//debug only
     //pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
     //pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
 

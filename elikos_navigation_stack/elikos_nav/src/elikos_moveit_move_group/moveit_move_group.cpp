@@ -26,13 +26,13 @@ int main(int argc, char* argv[])
     group_.setPlanningTime(1.0);//In seconds
     //group_.setGoalTolerance (0.1);//In meters
     //The workspace represents the boundaries of the planning volume.
-    group_.setWorkspace(-10,-10,0,10,10,10);
+    group_.setWorkspace(-20,-20,-20,20,20,20);
 
 
     ros::Rate r(30);
     while(ros::ok())
     {
-        if(messageHandler.getHasTarget())
+        if(messageHandler.getHasTarget() || true)
         {
           geometry_msgs::PoseStamped target = messageHandler.getTarget();
 
@@ -41,13 +41,20 @@ int main(int argc, char* argv[])
           group_.getCurrentState()->copyJointGroupPositions(group_.getCurrentState()->getRobotModel()->getJointModelGroup(group_.getName()), quad_variable_values);
 
           //This is the new position and orientation for the quadcopter
-          quad_variable_values[0] = target.pose.position.x;//position.x
+          /*quad_variable_values[0] = target.pose.position.x;//position.x
           quad_variable_values[1] = target.pose.position.y;//position y
-          quad_variable_values[2] = target.pose.position.z+5;//position z
+          quad_variable_values[2] = target.pose.position.z;//position z
           quad_variable_values[3] = target.pose.orientation.x;//quaternion x
           quad_variable_values[4] = target.pose.orientation.y;//quaternion y
           quad_variable_values[5] = target.pose.orientation.z;//quaternion z
-          quad_variable_values[6] = target.pose.orientation.w;//quaternion w
+          quad_variable_values[6] = target.pose.orientation.w;//quaternion w*/
+          quad_variable_values[0] = -10;//position.x
+          quad_variable_values[1] = 0;//position y
+          quad_variable_values[2] = 1;//position z
+          quad_variable_values[3] = 0;//quaternion x
+          quad_variable_values[4] = 0;//quaternion y
+          quad_variable_values[5] = 0;//quaternion z
+          quad_variable_values[6] = 1;//quaternion w
 
           //Plan the goal pose
           group_.setJointValueTarget(quad_variable_values);

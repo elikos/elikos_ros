@@ -2,6 +2,7 @@
 #include <actionlib/server/action_server.h>
 #include <pthread.h>
 
+#include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -21,10 +22,9 @@ public:
 				boost::bind(&Controller::cancelCB, this, _1),
 				false),
 				has_active_goal_(false),
-				parent_frame_("elikos_local_origin"),
+				parent_frame_("elikos_arena_origin"),
 				child_frame_("elikos_setpoint"),
-				tolerance_(0.3),
-				isFirst_(true)
+				tolerance_(0.3)
 {
 		creato=0;
 		action_server_.start();
@@ -42,8 +42,7 @@ private:
 	bool has_active_goal_;
 	GoalHandle active_goal_;
 	trajectory_msgs::MultiDOFJointTrajectory_<std::allocator<void> > trajectoryToExecute;
-	bool isFirst_;
-	geometry_msgs::Vector3 oldTranslation_;
+  tf::TransformListener listener;
 
 	void cancelCB(GoalHandle gh){
 		if (active_goal_ == gh)
@@ -76,8 +75,6 @@ private:
 		}
 
 		gh.setAccepted();
-		active_goal_ = gh;
-		has_active_goal_ = true;
 		trajectoryToExecute = gh.getGoal()->trajectory;
 
 		//controllore solo per il giunto virtuale Base
@@ -100,25 +97,30 @@ private:
 	void executeTrajectory(){
 		if(trajectoryToExecute.joint_names[0]=="virtual_joint" && trajectoryToExecute.points.size()>0)
 		{
-			int i = 0;
-			geometry_msgs::Vector3 translation;
-			translation = trajectoryToExecute.points[0].transforms[0].translation;
-			if(!isFirst_)
-			{
+	    try{
+				int i = 0;
+				geometry_msgs::Vector3 target;
+				tf::StampedTransform currentPosition;
+	      listener.lookupTransform(parent_frame_, "elikos_fcu",
+	                                ros::Time(0), currentPosition);
+
 				while(i < trajectoryToExecute.points.size()-1)
 				{
-					translation = trajectoryToExecute.points[i].transforms[0].translation;
-					if(std::sqrt(pow(translation.x-oldTranslation_.x, 2)+pow(translation.y-oldTranslation_.y, 2)+pow(translation.z-oldTranslation_.z, 2)) > tolerance_)
-						break;
-					i++;
+						target = trajectoryToExecute.points[i].transforms[0].translation;
+						if(std::sqrt(pow(target.x-currentPosition.getOrigin().x(), 2)+pow(target.y-currentPosition.getOrigin().y(), 2)+pow(target.z-currentPosition.getOrigin().z(), 2)) > tolerance_)
+							break;
+						i++;
 				}
-			}
-			else isFirst_ = false;
 
-			oldTranslation_ = translation;
-			geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[i].transforms[0];
+				geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[i].transforms[0];
 
-			publishTrajectoryPoint(trajectoryPoint);
+				publishTrajectoryPoint(trajectoryPoint);
+	    }
+	    catch (tf::TransformException ex){
+	       ROS_ERROR("%s",ex.what());
+	       ros::Duration(1.0).sleep();
+	    }
+
 
 		}
 		active_goal_.setSucceeded();
