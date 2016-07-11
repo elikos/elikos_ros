@@ -17,6 +17,7 @@ public:
     virtual ~ArenaB();
     virtual void evaluateTargetOrientation(const TargetRobot& robot);
     virtual void populateTargets(std::vector<TargetRobot> robots);
+    virtual int getNRotationsForOptimalDirection(const TargetRobot& target) const;
 };
 
 }

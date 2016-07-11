@@ -17,7 +17,26 @@ GreenLine::GreenLine(const tf::Point& cornerA, const tf::Point& cornerB)
 {
 }
 
-bool isGoodLineIntersection(const TargetRobot& robot)
+void GreenLine::concreteEvaluate(TargetRobot& target)
+{
+    tf::Vector3 direction = target.getOrientation();
+    tf::Vector3 possibleOrientations[4]  {
+        tf::Vector3( direction.x(),  direction.y(), direction.z()),
+        tf::Vector3(-direction.x(),  direction.y(), direction.z()),
+        tf::Vector3(-direction.x(), -direction.y(), direction.z()),
+        tf::Vector3( direction.x(), -direction.y(), direction.z())
+    };
+
+    bool directionFound = false;
+    int i = 0;
+    for (i = 0; i < 4 && !directionFound; ++i)
+    {
+        util::Line line(target.getPose().getOrigin(), possibleOrientations[i]);
+        directionFound = segment_.isIntersecting(line);
+    }
+}
+
+bool GreenLine::isGoodLineIntersection(const TargetRobot& robot)
 {
     return true;
 }

@@ -32,21 +32,26 @@ bool AbstractLine::isInThePath(const TargetRobot& robot) const
     return segment_.isIntersecting(line);
 }
 
-void AbstractLine::evaluate(const TargetRobot& robot)
+void AbstractLine::evaluate(TargetRobot& robot)
 {
-    TargetOrientationEvaluation evaluation;
+    TargetOrientationEvaluation* evaluation = robot.getOrientationEvaluation();
     util::Line line(robot.getPose().getOrigin(), robot.getOrientation());
     tf::Point point;
 
     bool success = segment_.getIntersectionPoint(line, point);
     if (success) {
-        evaluation.setIntersectionPoint(point);
+        evaluation->setIntersectionPoint(point);
         double distance = point.distance(robot.getPose().getOrigin());
 
-        evaluation.setLineIntersectionDistance(distance);
-        evaluation.setGoodIntersection(false);
-        evaluation.setGoodIntersection(isGoodLineIntersection(robot));
+        evaluation->setLineIntersectionDistance(distance);
+        evaluation->setGoodIntersection(false);
+        evaluation->setGoodIntersection(isGoodLineIntersection(robot));
     }
+    concreteEvaluate(robot);
+}
+
+void AbstractLine::concreteEvaluate(TargetRobot& robot)
+{
 }
 
 }

@@ -18,8 +18,9 @@ public:
     PreventiveBehavior() = default;
     virtual ~PreventiveBehavior();
 
-    virtual void generateCommands(CommandQueue& command, Context& context);
+    virtual void generateCommands(Context& context);
     virtual bool isContextCritical(Context& context);
+
 private:
     bool isAlreadyCritical = false;
 

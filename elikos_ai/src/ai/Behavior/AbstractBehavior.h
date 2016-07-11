@@ -16,9 +16,12 @@ class AbstractBehavior
 public:
     AbstractBehavior() = default;
     virtual ~AbstractBehavior() = 0;
-    virtual void generateCommands(CommandQueue& q, Context& context) = 0;
-    virtual bool isContextCritical(Context& contest) = 0;
+    void executeCommands() = 0;
+    virtual void generateCommands(Context& context) = 0;
+    virtual bool isContextCritical(Context& context) = 0;
 
+protected:
+    CommandQueue q_;
 };
 
 inline AbstractBehavior::~AbstractBehavior() {}

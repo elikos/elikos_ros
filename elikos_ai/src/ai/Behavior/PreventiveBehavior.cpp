@@ -15,13 +15,14 @@ PreventiveBehavior::~PreventiveBehavior()
 {
 }
 
-void PreventiveBehavior::generateCommands(CommandQueue& command, Context& context)
+void PreventiveBehavior::generateCommands(Context& context)
 {
     TargetRobot* target = context.findHighestPriorityTarget();
     QuadRobot* quad = &context.getQuad();
-    command.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
-    command.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, target)));
-    command.push(std::unique_ptr<TopInteractionCommand>(new ObservationCommand(quad, target)));
+    q_.clear();
+    q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, target)));
+    q_.push(std::unique_ptr<TopInteractionCommand>(new ObservationCommand(quad, target)));
+    q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
 }
 
 bool PreventiveBehavior::isContextCritical(Context& context)

@@ -23,4 +23,9 @@ void ArenaB::populateTargets(std::vector<TargetRobot> robots)
 
 }
 
+int getNRotationsForOptimalDirection(const TargetRobot& target) const
+{
+    return 0;
+}
+
 }

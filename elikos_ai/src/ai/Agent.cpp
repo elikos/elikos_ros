@@ -43,26 +43,23 @@ AbstractBehavior* Agent::resolveCurrentBehavior()
     } else {
         behavior = behaviors_[PREVENTIVE].get();
     }
-    return behavior;
+
+    if (currentBehavior_ != behavior)
+    {
+        currentBehavior_ = behavior;
+        currentBehavior_->generateCommands(context_);
+    }
 }
 
 void Agent::behave()
 {
-    if (!q_.empty()) {
-        if (q_.front()->execute()) {
-            q_.pop();
-        }
-    } else {
-        currentBehavior_->generateCommands(q_, context_);
-    }
-
 }
 
 void Agent::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
     context_.updateTargets(input);
     pipeline_.evaluatePriority(context_);
-    currentBehavior_ = resolveCurrentBehavior();
+    resolveCurrentBehavior();
 }
 
 };

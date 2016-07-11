@@ -17,7 +17,7 @@ public:
     ~GreenLine() = default;
 
     virtual bool isGoodLineIntersection(const TargetRobot& robot);
-
+    virtual void concreteEvaluate(TargetRobot& target);
 private:
     GreenLine() = delete;
 };

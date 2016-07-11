@@ -18,7 +18,8 @@ public:
 
     inline void setPose(const tf::Pose pose);
     inline const tf::Pose& getPose() const;
-    inline const tf::Vector3& getOrientation()const;
+    inline const tf::Vector3& getDirection()const;
+    inline const void setDirection(const tf::Vector3& direction);
 
     void updatePositionRadius(const double& dt);
     tfScalar getDistance(AbstractRobot* robot);
@@ -48,9 +49,14 @@ inline void AbstractRobot::setIsUpdated(const bool& isUpdated)
     isUpdated_ = isUpdated;
 }
 
-inline const tf::Vector3& AbstractRobot::getOrientation() const
+inline const tf::Vector3& AbstractRobot::getDirection() const
 {
     return direction_;
+}
+
+inline const void AbstractRobot::setDirection(const tf::Vector3& direction)
+{
+    direction_ = direction;
 }
 
 }
