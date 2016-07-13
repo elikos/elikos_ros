@@ -7,7 +7,12 @@
 namespace ai
 {
 
-void ClusterSize::evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad)
+ClusterSize::~ClusterSize()
+{
+
+}
+
+void ClusterSize::evaluatePriority(TargetRobot& robot, AbstractArena* arena)
 {
 
 }

@@ -3,9 +3,10 @@
 //
 
 #include "MessageHandler.h"
+#include "TargetRobot.h"
+#include "QuadRobot.h"
 
 #include "MovementCommand.h"
-#include "CommandQueue.h"
 
 namespace ai
 {

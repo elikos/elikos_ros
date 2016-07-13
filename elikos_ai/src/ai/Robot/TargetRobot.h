@@ -1,13 +1,19 @@
 #ifndef AI_ROBOT_TARGET_H
 #define AI_ROBOT_TARGET_H
 
-#include "TargetOrientationEvaluation.h"
-
 #include "AbstractRobot.h"
 #include "LineTypes.h"
 
 namespace ai
 {
+
+struct OrientationEvaluation
+{
+    bool isGoodIntersection_{ false };
+    double lineIntersectionDistance_;
+    tf::Point intersectionPoint_;
+    tf::Vector3 optimalOrientation_;
+};
 
 class TargetRobot : public AbstractRobot
 {
@@ -25,14 +31,14 @@ public:
     inline void setPriority(double priority);
     inline double getPriority() const;
 
-    inline TargetOrientationEvaluation* getOrientationEvaluation();
+    inline OrientationEvaluation* getOrientationEvaluation();
 
 private:
     uint8_t id_;
     uint8_t color_;
     double priority_;
 
-    TargetOrientationEvaluation evaluation_;
+    OrientationEvaluation evaluation_;
 };
 
 inline void TargetRobot::setId(uint8_t id)
@@ -65,7 +71,7 @@ inline uint8_t TargetRobot::getColor() const
     return color_;
 }
 
-inline TargetOrientationEvaluation* TargetRobot::getOrientationEvaluation()
+inline OrientationEvaluation* TargetRobot::getOrientationEvaluation()
 {
     return &evaluation_;
 }

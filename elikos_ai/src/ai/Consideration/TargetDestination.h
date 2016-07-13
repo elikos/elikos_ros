@@ -6,7 +6,6 @@
 #define AI_RED_LINE_DISTANCE_H
 
 #include "AbstractConsideration.h"
-#include "TargetOrientationEvaluation.h"
 
 namespace ai
 {
@@ -18,7 +17,7 @@ class TargetDestination : public AbstractConsideration
 public:
     TargetDestination() = default;
     virtual ~TargetDestination();
-    virtual void evaluatePriority(TargetRobot& target);
+    virtual void evaluatePriority(TargetRobot& targetRobot, AbstractArena* arena);
 };
 
 }

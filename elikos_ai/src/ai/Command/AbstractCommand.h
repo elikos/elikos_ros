@@ -1,6 +1,7 @@
 #ifndef ABSTRACT_STATE_H
 #define ABSTRACT_STATE_H
 
+#include <tf/tf.h>
 #include <memory>
 
 namespace ai

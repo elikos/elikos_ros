@@ -2,8 +2,8 @@
 // Created by olivier on 08/07/16.
 //
 
-#ifndef ELIKOS_AI_FRONTINTERACTIONCOMMAND_H
-#define ELIKOS_AI_FRONTINTERACTIONCOMMAND_H
+#ifndef AI_FRONT_INTERACTION_COMMAND_H
+#define AI_FRONT_INTERACTION_COMMAND_H
 
 #include "AbstractCommand.h"
 
@@ -14,8 +14,8 @@ namespace ai
 class FrontInteractionCommand : public AbstractCommand
 {
 public:
+    static const double FORWARD_OFFSET;
 
-    static constexpr double FORWARD_OFFSET{ 0.50 };
     FrontInteractionCommand(QuadRobot* quad, TargetRobot* target);
     virtual ~FrontInteractionCommand();
     virtual bool execute();
@@ -27,4 +27,4 @@ private:
 
 }
 
-#endif //ELIKOS_AI_FRONTINTERACTIONCOMMAND_H
+#endif // AI_FRONT_INTERACTION_COMMAND_H

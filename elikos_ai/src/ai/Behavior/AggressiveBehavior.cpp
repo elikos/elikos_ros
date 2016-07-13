@@ -2,27 +2,24 @@
 // Created by olivier on 07/07/16.
 //
 
+#include "AbstractArena.h"
+
 #include "AggressiveBehavior.h"
 #include "CommandTypes.h"
 
 namespace ai
 {
 
-AggressiveBehavior::AggressiveBehavior()
-{
-    q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, currentTarget_)));
-}
-
 AggressiveBehavior::~AggressiveBehavior()
 {
 }
 
-void AggressiveBehavior::generateCommands(Context& context)
+void AggressiveBehavior::generateCommands(AbstractArena* arena)
 {
-    QuadRobot* quad = &context.getQuad();
+    QuadRobot* quad = &arena->getQuad();
     q_.clear();
     q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, currentTarget_)));
-    int nLeftRotations = context.getArena()->getNRotationsForOptimalDirection(*currentTarget_);
+    int nLeftRotations = arena->getNRotationsForOptimalDirection(*currentTarget_);
     switch (nLeftRotations)
     {
         case 1:
@@ -45,14 +42,14 @@ void AggressiveBehavior::generateCommands(Context& context)
     }
 }
 
-bool AggressiveBehavior::isContextCritical(Context& context)
+bool AggressiveBehavior::isStateCritical(AbstractArena* arena)
 {
     if (currentTarget_ == nullptr)
     {
         return false;
     }
-    TargetOrientationEvaluation evaluation;
-    return evaluation.getGoodIntersection();
+    OrientationEvaluation* evaluation = currentTarget_->getOrientationEvaluation();
+    return evaluation->isGoodIntersection_;
 }
 
 TargetRobot* AggressiveBehavior::chooseTargetRobot()
@@ -60,7 +57,7 @@ TargetRobot* AggressiveBehavior::chooseTargetRobot()
     return nullptr;
 }
 
-void AggressiveBehavior::generateInteractionCommands(Context& context)
+void AggressiveBehavior::generateInteractionCommands(AbstractArena* arena)
 {
     q_.clear();
 }

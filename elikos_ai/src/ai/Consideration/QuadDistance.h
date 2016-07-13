@@ -15,7 +15,7 @@ class QuadDistance : public AbstractConsideration
 public:
     QuadDistance() = default;
     virtual ~QuadDistance();
-    virtual void evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad);
+    virtual void evaluatePriority(TargetRobot& robot, AbstractArena* arena);
 
 };
 

@@ -5,8 +5,6 @@
 #ifndef ELIKOS_AI_OBSERVATION_STATE_H
 #define ELIKOS_AI_OBSERVATION_STATE_H
 
-#include "Robot/RobotTypes.h"
-
 #include "AbstractCommand.h"
 
 namespace ai
@@ -19,7 +17,6 @@ class ObservationCommand : public AbstractCommand
 public:
 
     static const tf::Point OBSERVATION_POSITION;
-
 
     ObservationCommand(QuadRobot* quad, TargetRobot* target);
     virtual ~ObservationCommand();

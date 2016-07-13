@@ -19,7 +19,7 @@ GreenLine::GreenLine(const tf::Point& cornerA, const tf::Point& cornerB)
 
 void GreenLine::concreteEvaluate(TargetRobot& target)
 {
-    tf::Vector3 direction = target.getOrientation();
+    tf::Vector3 direction = target.getDirection();
     tf::Vector3 possibleOrientations[4]  {
         tf::Vector3( direction.x(),  direction.y(), direction.z()),
         tf::Vector3(-direction.x(),  direction.y(), direction.z()),

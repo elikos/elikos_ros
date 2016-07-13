@@ -7,7 +7,9 @@
 namespace ai
 {
 
-void AbstractBehavior::executeCommands()
+
+
+void AbstractBehavior::behave()
 {
     if (!q_.empty()) {
         if (q_.front()->execute()) {

@@ -18,8 +18,8 @@ public:
     PreventiveBehavior() = default;
     virtual ~PreventiveBehavior();
 
-    virtual void generateCommands(Context& context);
-    virtual bool isContextCritical(Context& context);
+    virtual void generateCommands(AbstractArena* arena);
+    virtual bool isStateCritical(AbstractArena* arena);
 
 private:
     bool isAlreadyCritical = false;

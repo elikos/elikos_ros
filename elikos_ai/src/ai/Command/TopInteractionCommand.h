@@ -5,8 +5,6 @@
 #ifndef AI_INTERACTION_STATE_H
 #define AI_INTERACTION_STATE_H
 
-#include "Robot/RobotTypes.h"
-
 #include "AbstractCommand.h"
 
 namespace ai
@@ -17,8 +15,8 @@ class CommandQueue;
 class TopInteractionCommand : public AbstractCommand
 {
 public:
-
     static constexpr double HEIGHT_OFFSET{ 0.0 };
+
     TopInteractionCommand(QuadRobot* quad, TargetRobot* target);
     virtual ~TopInteractionCommand();
 

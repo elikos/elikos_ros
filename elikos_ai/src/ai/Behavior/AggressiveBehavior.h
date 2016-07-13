@@ -17,13 +17,14 @@ public:
     AggressiveBehavior() = default;
     virtual ~AggressiveBehavior();
 
-    virtual void generateCommands(Context& context);
-    virtual bool isContextCritical(Context& context);
+    virtual void generateCommands(AbstractArena* arena);
+    virtual bool isStateCritical(AbstractArena* arena);
 
 private:
     TargetRobot* currentTarget_;
-    void generateInteractionCommands(Context& context);
+    void generateInteractionCommands(AbstractArena* arena);
     TargetRobot* chooseTargetRobot();
+
 };
 
 }

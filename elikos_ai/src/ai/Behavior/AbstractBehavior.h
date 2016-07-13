@@ -5,20 +5,21 @@
 #ifndef AI_ABSTRACT_BEHAVIOR_H
 #define AI_ABSTRACT_BEHAVIOR_H
 
-#include "Context.h"
 #include "CommandQueue.h"
 
 namespace ai
 {
+
+class AbstractArena;
 
 class AbstractBehavior
 {
 public:
     AbstractBehavior() = default;
     virtual ~AbstractBehavior() = 0;
-    void executeCommands() = 0;
-    virtual void generateCommands(Context& context) = 0;
-    virtual bool isContextCritical(Context& context) = 0;
+    void behave();
+    virtual void generateCommands(AbstractArena* arena) = 0;
+    virtual bool isStateCritical(AbstractArena* arena) = 0;
 
 protected:
     CommandQueue q_;

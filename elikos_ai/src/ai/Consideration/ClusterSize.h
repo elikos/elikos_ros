@@ -14,8 +14,8 @@ class ClusterSize : public AbstractConsideration
 {
 public:
     ClusterSize() = default;
-    virtual ~ClusterSize() = default;
-    virtual void evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad);
+    virtual ~ClusterSize();
+    virtual void evaluatePriority(TargetRobot& robot, AbstractArena* arena);
 };
 
 }

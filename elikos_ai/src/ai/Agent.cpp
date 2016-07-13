@@ -1,7 +1,7 @@
 #include "Agent.h"
-#include "MessageHandler.h"
 #include "PreventiveBehavior.h"
 #include "AggressiveBehavior.h"
+#include "ConsiderationTypes.h"
 
 namespace ai
 {
@@ -34,10 +34,10 @@ AbstractBehavior* Agent::resolveCurrentBehavior()
 {
     AbstractBehavior* behavior = nullptr;
     // Check for robots that are about to go out of the arena first
-    if( behaviors_[PREVENTIVE]->isContextCritical(context_)) {
+    if( behaviors_[PREVENTIVE]->isStateCritical(pipeline_.getArena())){
         behavior = behaviors_[PREVENTIVE].get();
     // Check if the current target has a good orientation
-    } else if (behaviors_[AGGRESSIVE]->isContextCritical(context_)) {
+    } else if (behaviors_[AGGRESSIVE]->isStateCritical(pipeline_.getArena())) {
         behavior = behaviors_[AGGRESSIVE].get();
     // Interact with highest priority target
     } else {
@@ -47,19 +47,40 @@ AbstractBehavior* Agent::resolveCurrentBehavior()
     if (currentBehavior_ != behavior)
     {
         currentBehavior_ = behavior;
-        currentBehavior_->generateCommands(context_);
+        currentBehavior_->generateCommands(pipeline_.getArena());
     }
 }
 
 void Agent::behave()
 {
+    resolveCurrentBehavior();
+    currentBehavior_->behave();
+}
+
+void Agent::addConsideration(Consideration consideration)
+{
+    switch (consideration)
+    {
+        case TARGET_DESTINATION:
+            pipeline_.addConsideration(std::unique_ptr<TargetDestination>(new TargetDestination()));
+            break;
+        case QUAD_DISTANCE:
+            pipeline_.addConsideration(std::unique_ptr<QuadDistance>(new QuadDistance()));
+            break;
+        case CLUSTER_SIZE:
+            pipeline_.addConsideration(std::unique_ptr<ClusterSize>(new ClusterSize()));
+            break;
+    }
 }
 
 void Agent::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
-    context_.updateTargets(input);
-    pipeline_.evaluatePriority(context_);
-    resolveCurrentBehavior();
+    pipeline_.updateTargets(input);
+}
+
+void Agent::updateQuadRobot(const tf::Pose& pose)
+{
+    pipeline_.updateQuadRobot(pose);
 }
 
 };

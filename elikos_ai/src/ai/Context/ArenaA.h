@@ -10,13 +10,15 @@
 namespace ai
 {
 
+class TargetRobot;
+
 class ArenaA : public AbstractArena
 {
 public:
     ArenaA();
     virtual ~ArenaA();
-    virtual void evaluateTargetOrientation(TargetRobot& robot);
-    virtual void populateTargets(std::vector<TargetRobot> robots);
+
+    virtual void evaluateTargetOrientation(TargetRobot& target);
     virtual int getNRotationsForOptimalDirection(const TargetRobot& target) const;
 
 };

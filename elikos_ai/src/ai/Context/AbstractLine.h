@@ -7,8 +7,6 @@
 
 #include <tf/tf.h>
 #include "Segment.h"
-#include "TargetOrientationEvaluation.h"
-
 
 namespace ai
 {
@@ -29,7 +27,6 @@ public:
 
 protected:
     util::Segment segment_;
-
 };
 
 }

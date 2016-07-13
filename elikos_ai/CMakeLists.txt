@@ -33,9 +33,7 @@ set(BEHAVIOR_SRC
     src/ai/Behavior/AggressiveBehavior.cpp
     src/ai/Behavior/AggressiveBehavior.h
     src/ai/Behavior/PreventiveBehavior.cpp
-    src/ai/Behavior/PreventiveBehavior.h
-    src/ai/Behavior/PassiveBehavior.cpp
-    src/ai/Behavior/PassiveBehavior.h)
+    src/ai/Behavior/PreventiveBehavior.h)
 
 set(COMMAND_SRC
     src/ai/Command/CommandQueue.h
@@ -51,7 +49,6 @@ set(COMMAND_SRC
     src/ai/Command/FrontInteractionCommand.cpp
     src/ai/Command/FrontInteractionCommand.h)
 
-
 set(CONTEXT_SRC
     src/ai/Context/AbstractLine.cpp
     src/ai/Context/AbstractLine.h
@@ -59,19 +56,13 @@ set(CONTEXT_SRC
 	src/ai/Context/AbstractArena.cpp
     src/ai/Context/ArenaA.cpp
     src/ai/Context/ArenaA.h
-    src/ai/Context/ArenaB.cpp
-    src/ai/Context/ArenaB.h
     src/ai/Context/RedLine.cpp
     src/ai/Context/RedLine.h
     src/ai/Context/WhiteLine.cpp
     src/ai/Context/WhiteLine.h
     src/ai/Context/GreenLine.cpp
     src/ai/Context/GreenLine.h
-    src/ai/Context/TargetOrientationEvaluation.cpp
-    src/ai/Context/TargetOrientationEvaluation.h
-    src/ai/Context/LineTypes.h
-    src/ai/Context/Context.cpp
-    src/ai/Context/Context.h)
+    src/ai/Context/LineTypes.h)
 
 set(ROBOT_SRC
     src/ai/Robot/AbstractRobot.h

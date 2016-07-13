@@ -2,12 +2,7 @@
 // Created by olivier on 01/07/16.
 //
 
-#include "TargetRobot.h"
-#include "GreenLine.h"
-
-#include "WhiteLine.h"
 #include "ArenaA.h"
-#include "Line.h"
 
 namespace ai
 {
@@ -35,12 +30,6 @@ void ArenaA::evaluateTargetOrientation(TargetRobot& robot)
             lineFound = true;
         }
     }
-}
-
-void ArenaA::populateTargets(std::vector<TargetRobot> targets)
-{
-    targets.clear();
-    targets.resize(10);
 }
 
 int ArenaA::getNRotationsForOptimalDirection(const TargetRobot& target) const

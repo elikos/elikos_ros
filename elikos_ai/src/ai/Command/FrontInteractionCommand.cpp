@@ -3,12 +3,15 @@
 //
 
 #include "MessageHandler.h"
+#include "TargetRobot.h"
+#include "QuadRobot.h"
 
-#include "CommandQueue.h"
 #include "FrontInteractionCommand.h"
 
 namespace ai
 {
+
+const double FrontInteractionCommand::FORWARD_OFFSET = 0.5;
 
 FrontInteractionCommand::FrontInteractionCommand(QuadRobot* quad, TargetRobot* target)
     : AbstractCommand(quad, target)

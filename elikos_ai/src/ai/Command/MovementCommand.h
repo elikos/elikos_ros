@@ -1,8 +1,6 @@
 #ifndef AI_MOVEMENT_STATE_H
 #define AI_MOVEMENT_STATE_H
 
-#include "Robot/RobotTypes.h"
-
 #include "AbstractCommand.h"
 
 namespace ai

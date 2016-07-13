@@ -5,21 +5,20 @@
 #ifndef AI_ABSTRACT_CONSIDERATION_H
 #define AI_ABSTRACT_CONSIDERATION_H
 
-#include "RobotTypes.h"
-
 #include <vector>
 
 namespace ai
 {
 
 class AbstractArena;
+class TargetRobot;
 
 class AbstractConsideration
 {
 public:
     AbstractConsideration() = default;
     virtual ~AbstractConsideration() = 0;
-    virtual void evaluatePriority(TargetRobot& robot) = 0;
+    virtual void evaluatePriority(TargetRobot& robot, AbstractArena* arena) = 0;
 };
 
 }

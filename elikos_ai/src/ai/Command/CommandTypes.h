@@ -1,5 +1,5 @@
-#ifndef STATE_TYPES_H
-#define STATE_TYPES_H
+#ifndef COMMAND_TYPES_H
+#define COMMAND_TYPES_H
 
 #include "AbstractCommand.h"
 #include "TopInteractionCommand.h"
@@ -7,4 +7,4 @@
 #include "MovementCommand.h"
 #include "ObservationCommand.h"
 
-#endif // STATE_TYPES_H
+#endif // COMMAND_TYPES_H
