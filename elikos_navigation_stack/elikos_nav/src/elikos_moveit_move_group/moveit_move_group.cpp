@@ -1,5 +1,6 @@
 #include <memory>
 #include "MessageHandler_moveit.h"
+#include <std_srvs/Empty.h>
 
 int main(int argc, char* argv[])
 {
@@ -18,18 +19,18 @@ int main(int argc, char* argv[])
     MessageHandler_moveit messageHandler;
 
     //Initialization
-    display_publisher_ = nh_.advertise<moveit_msgs::DisplayTrajectory>("/move_group/display_planned_path", 1, true);
   	moveit::planning_interface::MoveGroup group_ = moveit::planning_interface::MoveGroup("elikos_moveit_quadrotor_group");
-    moveit_msgs::DisplayTrajectory display_trajectory;
 
     //move_group settings
     group_.setPlanningTime(1.0);//In seconds
     //group_.setGoalTolerance (0.1);//In meters
     //The workspace represents the boundaries of the planning volume.
-    group_.setWorkspace(-20,-20,-20,20,20,20);
+    group_.setWorkspace(-10,-10,0,10,10,3);
 
+    group_.allowReplanning(true);
 
-    ros::Rate r(30);
+    ros::Rate r(10);
+    int i = 0;
     while(ros::ok())
     {
         if(messageHandler.getHasTarget() || true)
@@ -48,9 +49,9 @@ int main(int argc, char* argv[])
           quad_variable_values[4] = target.pose.orientation.y;//quaternion y
           quad_variable_values[5] = target.pose.orientation.z;//quaternion z
           quad_variable_values[6] = target.pose.orientation.w;//quaternion w*/
-          quad_variable_values[0] = -10;//position.x
+          quad_variable_values[0] = 10;//position.x
           quad_variable_values[1] = 0;//position y
-          quad_variable_values[2] = 1;//position z
+          quad_variable_values[2] = 0.5;//position z
           quad_variable_values[3] = 0;//quaternion x
           quad_variable_values[4] = 0;//quaternion y
           quad_variable_values[5] = 0;//quaternion z
@@ -58,20 +59,22 @@ int main(int argc, char* argv[])
 
           //Plan the goal pose
           group_.setJointValueTarget(quad_variable_values);
-          moveit::planning_interface::MoveGroup::Plan my_plan;
-          bool  success = group_.plan(my_plan);
-          ROS_INFO("Visualizing plan 1 (pose goal) %s",success?"":"FAILED");
-
-          //Publish trajectory for rviz
-          display_trajectory.trajectory_start = my_plan.start_state_;
-          display_trajectory.trajectory.push_back(my_plan.trajectory_);
-          display_publisher_.publish(display_trajectory);
 
           //Plan and execute the trajectory
           group_.asyncMove();
+
+          //Clear octomap at each 5 seconds.
+          /*if(i%50 == 0)
+          {
+            std_srvs::Empty::Request req;
+            std_srvs::Empty::Response res;
+            ros::service::call("/clear_octomap", req, res);
+          }*/
+          i++;
         }
         ros::spinOnce();
         r.sleep();
     }
+
 
 }

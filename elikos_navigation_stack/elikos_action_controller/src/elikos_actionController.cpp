@@ -24,7 +24,9 @@ public:
 				has_active_goal_(false),
 				parent_frame_("elikos_arena_origin"),
 				child_frame_("elikos_setpoint"),
-				tolerance_(0.3)
+				toleranceNextGoal_(0.3),
+				toleranceAchieveGoal_(0.2),
+				toleranceFreeOctomap_(2.0)
 {
 		creato=0;
 		action_server_.start();
@@ -38,7 +40,9 @@ private:
 	int creato;
 	std::string parent_frame_;
 	std::string child_frame_;
-	double tolerance_;
+	double toleranceNextGoal_;
+	double toleranceAchieveGoal_;
+	double toleranceFreeOctomap_;
 	bool has_active_goal_;
 	GoalHandle active_goal_;
 	trajectory_msgs::MultiDOFJointTrajectory_<std::allocator<void> > trajectoryToExecute;
@@ -99,22 +103,40 @@ private:
 		{
 	    try{
 				int i = 0;
-				geometry_msgs::Vector3 target;
-				tf::StampedTransform currentPosition;
-	      listener.lookupTransform(parent_frame_, "elikos_fcu",
-	                                ros::Time(0), currentPosition);
 
 				while(i < trajectoryToExecute.points.size()-1)
 				{
-						target = trajectoryToExecute.points[i].transforms[0].translation;
-						if(std::sqrt(pow(target.x-currentPosition.getOrigin().x(), 2)+pow(target.y-currentPosition.getOrigin().y(), 2)+pow(target.z-currentPosition.getOrigin().z(), 2)) > tolerance_)
-							break;
-						i++;
+					tf::StampedTransform currentPosition;
+		      listener.lookupTransform(parent_frame_, "elikos_fcu",
+	                                ros::Time(0), currentPosition);
+					while(i < trajectoryToExecute.points.size()-1)
+					{
+							geometry_msgs::Vector3 target = trajectoryToExecute.points[i].transforms[0].translation;
+							if(pow(target.x-currentPosition.getOrigin().x(), 2)+
+									pow(target.y-currentPosition.getOrigin().y(), 2)+
+									pow(target.z-currentPosition.getOrigin().z(), 2) > pow(toleranceNextGoal_,2))
+								break;
+							i++;
+					}
+
+					geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[i].transforms[0];
+					ROS_ERROR_STREAM("POINT #"<<i);
+					publishTrajectoryPoint(trajectoryPoint);
+					i++;
+
+					//Wait to acheive the goal
+					do
+					{
+			      listener.lookupTransform(parent_frame_, "elikos_fcu",
+		                                ros::Time(0), currentPosition);
+						/*ROS_ERROR_STREAM("Wait achievement.");
+						ROS_ERROR_STREAM("Target: x:"<<trajectoryPoint.translation.x<<" y:"<<trajectoryPoint.translation.y<<" z:"<<trajectoryPoint.translation.z);
+						ROS_ERROR_STREAM("CurrentPosition: x:"<<currentPosition.getOrigin().x()<<" y:"<<currentPosition.getOrigin().y()<<" z:"<<currentPosition.getOrigin().z());*/
+					}
+					while(pow(trajectoryPoint.translation.x-currentPosition.getOrigin().x(), 2)+
+									pow(trajectoryPoint.translation.y-currentPosition.getOrigin().y(), 2)+
+									pow(trajectoryPoint.translation.z-currentPosition.getOrigin().z(), 2) > pow(toleranceAchieveGoal_, 2));
 				}
-
-				geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[i].transforms[0];
-
-				publishTrajectoryPoint(trajectoryPoint);
 	    }
 	    catch (tf::TransformException ex){
 	       ROS_ERROR("%s",ex.what());

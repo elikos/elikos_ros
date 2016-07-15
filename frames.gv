@@ -1,0 +1,14 @@
+digraph G {
+"elikos_fcu" -> "elikos_base_link"[label="Broadcaster: /baselink_broadcaster\nAverage rate: 10.221 Hz\nMost recent transform: 1126.570 ( -0.087 sec old)\nBuffer length: 4.305 sec\n"];
+"elikos_fcu" -> "elikos_ffmv_bottom"[label="Broadcaster: /camera_broadcaster\nAverage rate: 10.204 Hz\nMost recent transform: 1126.505 ( -0.022 sec old)\nBuffer length: 4.214 sec\n"];
+"elikos_arena_origin" -> "elikos_local_origin"[label="Broadcaster: /arena_origin_broadcaster\nAverage rate: 10.197 Hz\nMost recent transform: 1126.515 ( -0.032 sec old)\nBuffer length: 4.217 sec\n"];
+"elikos_base_link" -> "r200"[label="Broadcaster: /origin_broadcaster\nAverage rate: 10.216 Hz\nMost recent transform: 1126.524 ( -0.041 sec old)\nBuffer length: 4.209 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1126.483"[ shape=plaintext ] ;
+ }->"elikos_fcu";
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1126.483"[ shape=plaintext ] ;
+ }->"elikos_arena_origin";
+}

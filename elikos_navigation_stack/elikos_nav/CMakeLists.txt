@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
    moveit_ros_planning_interface
    pluginlib
    cmake_modules
+   std_srvs
 )
 find_package(OpenCV REQUIRED)
 
