@@ -29,14 +29,14 @@ public:
     virtual ~AbstractArena() = 0;
 
     inline QuadRobot& getQuad();
-    inline std::vector<TargetRobot>& getTargets();
+    TargetRobot* updateTarget(const elikos_ros::TargetRobot& targetUpdate, int i);
 
     virtual void evaluateTargetOrientation(TargetRobot& target) = 0;
     virtual int getNRotationsForOptimalDirection(const TargetRobot& target) const = 0;
+    virtual TargetRobot* findClosestTargetToGoodLine() = 0;
 
     TargetRobot* findHighestPriorityTarget();
     void resetPriority();
-    void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
 
 protected:
     std::vector<std::unique_ptr<AbstractLine>> lines_;
@@ -49,10 +49,6 @@ inline QuadRobot& AbstractArena::getQuad()
    return quad_;
 }
 
-inline std::vector<TargetRobot>& AbstractArena::getTargets()
-{
-   return targets_;
-}
 
 }
 

@@ -9,31 +9,29 @@
 
 namespace ai
 {
+PreventiveBehavior::PreventiveBehavior(AbstractArena* arena)
+        : AbstractBehavior(arena)
+{
+}
 
 PreventiveBehavior::~PreventiveBehavior()
 {
 }
 
-void PreventiveBehavior::generateCommands(AbstractArena* arena)
+void PreventiveBehavior::generateCommands()
 {
-    TargetRobot* target = arena->findHighestPriorityTarget();
-    QuadRobot* quad = &arena->getQuad();
+    TargetRobot* target = arena_->findHighestPriorityTarget();
+    QuadRobot* quad = &arena_->getQuad();
     q_.clear();
     q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, target)));
     q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, target)));
     q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
 }
 
-bool PreventiveBehavior::isStateCritical(AbstractArena* arena)
+bool PreventiveBehavior::isStateCritical()
 {
-    bool isAcceptable = true;
-    std::vector<TargetRobot>& targets = arena->getTargets();
-    for (int i = 0; i < targets.size() && isAcceptable; ++i)
-    {
-        OrientationEvaluation* evaluation = targets[i].getOrientationEvaluation();
-        isAcceptable = evaluation->lineIntersectionDistance_ > MIN_ACCEPTABLE_LINE_DISTANCE;
-    }
-    return isAcceptable;
+    TargetRobot* target = arena_->findHighestPriorityTarget();
+    return target->getPriority() > MAX_ACCEPTABLE_PRIORITY;
 }
 
 }

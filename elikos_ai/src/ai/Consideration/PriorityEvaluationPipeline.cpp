@@ -7,7 +7,6 @@
 #include "PriorityEvaluationPipeline.h"
 #include "ArenaA.h"
 
-
 namespace ai
 {
 
@@ -25,29 +24,26 @@ void PriorityEvaluationPipeline::updateTargets(const elikos_ros::TargetRobotArra
 {
     const elikos_ros::TargetRobot* targets = input->targets.data();
     size_t n = input->targets.size();
-    std::thread th[n];
+    //std::thread th[n];
 
     for (int i = 0; i < n; ++i)
     {
-        th[i] = std::thread(&PriorityEvaluationPipeline::updateTarget, this, targets[i], i);
+        updateTarget(targets[i], i);
+        //th[i] = std::thread(&PriorityEvaluationPipeline::updateTarget, this, targets[i], i);
     }
 
     for (int i = 0; i < n; ++i)
     {
-        th[i].join();
+        //th[i].join();
     }
 }
 
 void PriorityEvaluationPipeline::updateTarget(const elikos_ros::TargetRobot& targetUpdate, int i)
 {
-    std::vector<TargetRobot>& targets = arena_->getTargets();
-    tf::Pose pose;
-    tf::poseMsgToTF(targetUpdate.poseOrigin.pose, pose);
-    targets[i].setPose(pose);
-    targets[i].setId(targetUpdate.id);
-    targets[i].setColor(targetUpdate.color);
-    arena_->evaluateTargetOrientation(targets[i]);
-    evaluatePriority(targets[i]);
+    // TODO: Remove the index and implement a way to match the target update in arena.
+    TargetRobot* target = arena_->updateTarget(targetUpdate, i);
+    arena_->evaluateTargetOrientation(*target);
+    evaluatePriority(*target);
 }
 
 void PriorityEvaluationPipeline::evaluatePriority(TargetRobot& target)

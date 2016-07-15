@@ -21,6 +21,7 @@ public:
     virtual void evaluateTargetOrientation(TargetRobot& target);
     virtual int getNRotationsForOptimalDirection(const TargetRobot& target) const;
 
+    virtual TargetRobot* findClosestTargetToGoodLine();
 };
 
 }

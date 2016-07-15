@@ -11,7 +11,7 @@
 namespace ai
 {
 
-const double FrontInteractionCommand::FORWARD_OFFSET = 0.5;
+const double FrontInteractionCommand::FORWARD_OFFSET = 2.0;
 
 FrontInteractionCommand::FrontInteractionCommand(QuadRobot* quad, TargetRobot* target)
     : AbstractCommand(quad, target)

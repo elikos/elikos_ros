@@ -6,8 +6,10 @@
 
 namespace ai
 {
-
-
+AbstractBehavior::AbstractBehavior(AbstractArena* arena)
+    : arena_(arena)
+{
+}
 
 void AbstractBehavior::behave()
 {
@@ -15,6 +17,8 @@ void AbstractBehavior::behave()
         if (q_.front()->execute()) {
             q_.pop();
         }
+    } else {
+        generateCommands();
     }
 }
 

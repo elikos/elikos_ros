@@ -14,17 +14,15 @@ namespace ai
 class AggressiveBehavior : public AbstractBehavior
 {
 public:
-    AggressiveBehavior() = default;
+    AggressiveBehavior(AbstractArena* arena);
     virtual ~AggressiveBehavior();
 
-    virtual void generateCommands(AbstractArena* arena);
-    virtual bool isStateCritical(AbstractArena* arena);
+    virtual void generateCommands();
+    virtual bool isStateCritical();
 
 private:
     TargetRobot* currentTarget_;
-    void generateInteractionCommands(AbstractArena* arena);
-    TargetRobot* chooseTargetRobot();
-
+    AggressiveBehavior() = default;
 };
 
 }

@@ -13,6 +13,7 @@ ArenaA::ArenaA()
     lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(BOTTOM_LEFT_CORNER, TOP_LEFT_CORNER)));
     lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(BOTTOM_RIGHT_CORNER, BOTTOM_LEFT_CORNER)));
     lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(TOP_RIGHT_CORNER, BOTTOM_RIGHT_CORNER)));
+    targets_.resize(10);
 }
 
 ArenaA::~ArenaA()
@@ -53,6 +54,23 @@ int ArenaA::getNRotationsForOptimalDirection(const TargetRobot& target) const
         lineFound = lines_[0]->isInThePath(target);
     }
     return nRobot;
+}
+
+TargetRobot* ArenaA::findClosestTargetToGoodLine()
+{
+    double linePosition = 10.0;
+    double minDistance = std::abs(targets_[0].getPose().getOrigin().y() - linePosition);
+    TargetRobot* closestRobot = &targets_[0];
+    for (int i = 1; i < targets_.size(); ++i)
+    {
+        double distance = std::abs(targets_[0].getPose().getOrigin().y() - linePosition);
+        if (distance < minDistance)
+        {
+            minDistance = distance;
+            closestRobot = &targets_[i];
+        }
+    }
+    return closestRobot;
 }
 
 }

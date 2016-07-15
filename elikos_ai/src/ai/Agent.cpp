@@ -19,8 +19,8 @@ Agent* Agent::getInstance()
 
 Agent::Agent()
 {
-    behaviors_[PREVENTIVE] = std::unique_ptr<PreventiveBehavior>(new PreventiveBehavior());
-    behaviors_[AGGRESSIVE] = std::unique_ptr<AggressiveBehavior>(new AggressiveBehavior());
+    behaviors_[PREVENTIVE] = std::unique_ptr<PreventiveBehavior>(new PreventiveBehavior(pipeline_.getArena()));
+    behaviors_[AGGRESSIVE] = std::unique_ptr<AggressiveBehavior>(new AggressiveBehavior(pipeline_.getArena()));
     currentBehavior_ = behaviors_[AGGRESSIVE].get();
 }
 
@@ -32,22 +32,15 @@ void Agent::freeInstance()
 
 AbstractBehavior* Agent::resolveCurrentBehavior()
 {
-    AbstractBehavior* behavior = nullptr;
     // Check for robots that are about to go out of the arena first
-    if( behaviors_[PREVENTIVE]->isStateCritical(pipeline_.getArena())){
-        behavior = behaviors_[PREVENTIVE].get();
+    if( behaviors_[PREVENTIVE]->isStateCritical()) {
+        currentBehavior_ = behaviors_[PREVENTIVE].get();
     // Check if the current target has a good orientation
-    } else if (behaviors_[AGGRESSIVE]->isStateCritical(pipeline_.getArena())) {
-        behavior = behaviors_[AGGRESSIVE].get();
+    } else if (behaviors_[AGGRESSIVE]->isStateCritical()) {
+        currentBehavior_ = behaviors_[AGGRESSIVE].get();
     // Interact with highest priority target
     } else {
-        behavior = behaviors_[PREVENTIVE].get();
-    }
-
-    if (currentBehavior_ != behavior)
-    {
-        currentBehavior_ = behavior;
-        currentBehavior_->generateCommands(pipeline_.getArena());
+        currentBehavior_ = behaviors_[PREVENTIVE].get();
     }
 }
 

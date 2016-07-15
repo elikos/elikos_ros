@@ -14,16 +14,18 @@ class PreventiveBehavior : public AbstractBehavior
 {
 public:
     static constexpr double MIN_ACCEPTABLE_LINE_DISTANCE { 1.0 };
+    static constexpr double MAX_ACCEPTABLE_PRIORITY { 0.90 };
 
-    PreventiveBehavior() = default;
+    PreventiveBehavior(AbstractArena* arena);
     virtual ~PreventiveBehavior();
 
-    virtual void generateCommands(AbstractArena* arena);
-    virtual bool isStateCritical(AbstractArena* arena);
+    virtual void generateCommands();
+    virtual bool isStateCritical();
 
 private:
     bool isAlreadyCritical = false;
 
+    PreventiveBehavior() = default;
 };
 
 }

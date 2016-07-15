@@ -15,14 +15,18 @@ class AbstractArena;
 class AbstractBehavior
 {
 public:
-    AbstractBehavior() = default;
+    AbstractBehavior(AbstractArena* arena);
     virtual ~AbstractBehavior() = 0;
     void behave();
-    virtual void generateCommands(AbstractArena* arena) = 0;
-    virtual bool isStateCritical(AbstractArena* arena) = 0;
+    virtual void generateCommands() = 0;
+    virtual bool isStateCritical() = 0;
 
 protected:
     CommandQueue q_;
+    AbstractArena* arena_;
+
+private:
+    AbstractBehavior() = default;
 };
 
 inline AbstractBehavior::~AbstractBehavior() {}

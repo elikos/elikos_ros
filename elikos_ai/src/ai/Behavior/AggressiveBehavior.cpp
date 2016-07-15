@@ -3,23 +3,31 @@
 //
 
 #include "AbstractArena.h"
+#include "CommandTypes.h"
 
 #include "AggressiveBehavior.h"
-#include "CommandTypes.h"
 
 namespace ai
 {
+
+AggressiveBehavior::AggressiveBehavior(AbstractArena* arena)
+    : AbstractBehavior(arena)
+{
+}
+
 
 AggressiveBehavior::~AggressiveBehavior()
 {
 }
 
-void AggressiveBehavior::generateCommands(AbstractArena* arena)
+void AggressiveBehavior::generateCommands()
 {
-    QuadRobot* quad = &arena->getQuad();
+    currentTarget_ = arena_->findClosestTargetToGoodLine();
+
+    QuadRobot* quad = &arena_->getQuad();
     q_.clear();
     q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, currentTarget_)));
-    int nLeftRotations = arena->getNRotationsForOptimalDirection(*currentTarget_);
+    int nLeftRotations = arena_->getNRotationsForOptimalDirection(*currentTarget_);
     switch (nLeftRotations)
     {
         case 1:
@@ -42,26 +50,17 @@ void AggressiveBehavior::generateCommands(AbstractArena* arena)
     }
 }
 
-bool AggressiveBehavior::isStateCritical(AbstractArena* arena)
+bool AggressiveBehavior::isStateCritical()
 {
-    if (currentTarget_ == nullptr)
-    {
-        return false;
-    }
+    currentTarget_ = arena_->findClosestTargetToGoodLine();
     OrientationEvaluation* evaluation = currentTarget_->getOrientationEvaluation();
-    return evaluation->isGoodIntersection_;
+    bool isCritical = !evaluation->isGoodIntersection_;
+    if (!isCritical) {
+        q_.clear();
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), currentTarget_)));
+    }
+    return isCritical;
 }
-
-TargetRobot* AggressiveBehavior::chooseTargetRobot()
-{
-    return nullptr;
-}
-
-void AggressiveBehavior::generateInteractionCommands(AbstractArena* arena)
-{
-    q_.clear();
-}
-
 
 
 }

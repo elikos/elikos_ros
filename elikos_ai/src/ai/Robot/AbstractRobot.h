@@ -14,9 +14,9 @@ public:
     AbstractRobot() = default;
     virtual ~AbstractRobot() = 0;
 
-    inline void setIsUpdated(const bool& isUpdated);
+    inline void setIsUpdated(bool isUpdated);
 
-    inline void setPose(const tf::Pose pose);
+    inline void setPose(const tf::Pose& pose);
     inline const tf::Pose& getPose() const;
     inline const tf::Vector3& getDirection()const;
     inline const void setDirection(const tf::Vector3& direction);
@@ -37,14 +37,14 @@ inline const tf::Pose& AbstractRobot::getPose() const
 }
 
 
-inline void AbstractRobot::setPose(const tf::Pose pose)
+inline void AbstractRobot::setPose(const tf::Pose& pose)
 {
     direction_ = tf::Vector3(pose.getOrigin() - pose_.getOrigin()).normalized();
     pose_ = pose;
 }
 
 
-inline void AbstractRobot::setIsUpdated(const bool& isUpdated)
+inline void AbstractRobot::setIsUpdated(bool isUpdated)
 {
     isUpdated_ = isUpdated;
 }
