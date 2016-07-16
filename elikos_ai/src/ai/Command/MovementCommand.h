@@ -15,7 +15,8 @@ public:
 
     MovementCommand(QuadRobot* quad, TargetRobot* target);
     virtual ~MovementCommand();
-    virtual bool execute();
+    virtual bool isCommmandDone();
+    virtual void execute();
 
 private:
     MovementCommand() = delete;

@@ -19,7 +19,7 @@ public:
     virtual ~AbstractBehavior() = 0;
     void behave();
     virtual void generateCommands() = 0;
-    virtual bool isStateCritical() = 0;
+    virtual int resolveCurrentStateLevel() = 0;
 
 protected:
     CommandQueue q_;

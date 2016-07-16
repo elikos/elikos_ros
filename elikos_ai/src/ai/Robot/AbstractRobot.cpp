@@ -14,9 +14,16 @@ void AbstractRobot::updatePositionRadius(const double& dt)
     positionRadius_ += SPEED * dt;
 }
 
-tfScalar AbstractRobot::getDistance(AbstractRobot* robot)
+tfScalar AbstractRobot::getDistance(AbstractRobot* robot) const
 {
     return tf::tfDistance(pose_.getOrigin(), robot->getPose().getOrigin());
+}
+
+tfScalar AbstractRobot::getDistance(const elikos_ros::TargetRobot& target) const
+{
+    tf::Pose pose;
+    tf::poseMsgToTF(target.poseOrigin.pose, pose);
+    return pose_.getOrigin().distance(pose.getOrigin());
 }
 
 };

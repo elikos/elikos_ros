@@ -24,13 +24,12 @@ public:
     inline void updateQuadRobot(const tf::Pose& pose);
     inline AbstractArena* getArena();
     void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
-    TargetRobot* findHighestPriorityTarget();
 
 private:
     std::vector<std::unique_ptr<AbstractConsideration>> considerations_;
     std::unique_ptr<AbstractArena> arena_;
 
-    void updateTarget(const elikos_ros::TargetRobot& target, int i);
+    void updateTarget(const elikos_ros::TargetRobot& target);
     void evaluatePriority(TargetRobot& target);
 
 };

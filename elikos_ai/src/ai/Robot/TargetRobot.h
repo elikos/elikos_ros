@@ -1,6 +1,7 @@
 #ifndef AI_ROBOT_TARGET_H
 #define AI_ROBOT_TARGET_H
 
+
 #include "AbstractRobot.h"
 #include "LineTypes.h"
 
@@ -10,6 +11,7 @@ namespace ai
 struct OrientationEvaluation
 {
     bool isGoodIntersection_{ false };
+    bool isOutOfBound_{ false };
     double lineIntersectionDistance_;
     tf::Point intersectionPoint_;
     tf::Vector3 optimalOrientation_;
@@ -19,8 +21,10 @@ class TargetRobot : public AbstractRobot
 {
 public:
     TargetRobot() = default;
-    TargetRobot(uint8_t id, uint8_t color);
+    TargetRobot(uint8_t id, uint8_t color, tf::Vector3 position);
     virtual ~TargetRobot();
+
+    inline void updateFrom(const elikos_ros::TargetRobot& targetUpdate);
 
     inline void setId(uint8_t id);
     inline uint8_t getId() const;
@@ -40,6 +44,16 @@ private:
 
     OrientationEvaluation evaluation_;
 };
+
+inline void TargetRobot::updateFrom(const elikos_ros::TargetRobot& targetUpdate)
+{
+    tf::Pose poseUpdate;
+    tf::poseMsgToTF(targetUpdate.poseOrigin.pose, poseUpdate);
+    direction_ = tf::Vector3(poseUpdate.getOrigin() - pose_.getOrigin()).normalized();
+    pose_ = poseUpdate;
+    id_ = targetUpdate.id;
+    color_ = targetUpdate.color;
+}
 
 inline void TargetRobot::setId(uint8_t id)
 {

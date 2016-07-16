@@ -18,7 +18,7 @@ public:
     virtual ~AggressiveBehavior();
 
     virtual void generateCommands();
-    virtual bool isStateCritical();
+    virtual int resolveCurrentStateLevel();
 
 private:
     TargetRobot* currentTarget_;

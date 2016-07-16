@@ -16,11 +16,13 @@ class TopInteractionCommand : public AbstractCommand
 {
 public:
     static constexpr double HEIGHT_OFFSET{ 0.0 };
+    static constexpr double WAIT_TIME{ 1.0 };
 
     TopInteractionCommand(QuadRobot* quad, TargetRobot* target);
     virtual ~TopInteractionCommand();
 
-    virtual bool execute();
+    virtual bool isCommmandDone();
+    virtual void execute();
 
 private:
     TopInteractionCommand() = delete;

@@ -20,7 +20,7 @@ public:
     virtual ~PreventiveBehavior();
 
     virtual void generateCommands();
-    virtual bool isStateCritical();
+    virtual int resolveCurrentStateLevel();
 
 private:
     bool isAlreadyCritical = false;

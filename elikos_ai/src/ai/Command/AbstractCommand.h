@@ -3,6 +3,7 @@
 
 #include <tf/tf.h>
 #include <memory>
+#include "Timer.h"
 
 namespace ai
 {
@@ -19,11 +20,13 @@ public:
     AbstractCommand(QuadRobot* quad, TargetRobot* target_);
     virtual ~AbstractCommand() = 0;
 
-    virtual bool execute() = 0;
+    virtual void execute() = 0;
+    virtual bool isCommmandDone() = 0;
 
 protected:
     QuadRobot* quad_;
     TargetRobot* target_;
+    util::Timer timer_;
 
     bool hasReachedDestination(const tf::Vector3& currentPosition, const tf::Vector3& destination);
     AbstractCommand() = default;

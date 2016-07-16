@@ -14,7 +14,8 @@ AbstractBehavior::AbstractBehavior(AbstractArena* arena)
 void AbstractBehavior::behave()
 {
     if (!q_.empty()) {
-        if (q_.front()->execute()) {
+        q_.front()->execute();
+        if (q_.front()->isCommmandDone()) {
             q_.pop();
         }
     } else {

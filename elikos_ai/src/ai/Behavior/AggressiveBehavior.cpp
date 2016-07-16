@@ -23,8 +23,8 @@ AggressiveBehavior::~AggressiveBehavior()
 void AggressiveBehavior::generateCommands()
 {
     currentTarget_ = arena_->findClosestTargetToGoodLine();
-
     QuadRobot* quad = &arena_->getQuad();
+
     q_.clear();
     q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, currentTarget_)));
     int nLeftRotations = arena_->getNRotationsForOptimalDirection(*currentTarget_);
@@ -50,17 +50,21 @@ void AggressiveBehavior::generateCommands()
     }
 }
 
-bool AggressiveBehavior::isStateCritical()
+int AggressiveBehavior::resolveCurrentStateLevel()
 {
     currentTarget_ = arena_->findClosestTargetToGoodLine();
     OrientationEvaluation* evaluation = currentTarget_->getOrientationEvaluation();
-    bool isCritical = !evaluation->isGoodIntersection_;
-    if (!isCritical) {
+    int stateLevel = 0;
+    if (evaluation->isGoodIntersection_) {
+        // TODO: Something better should be done here
+        // We need to clear the q if the target is going in the good direction or the ai will keep executing the
+        // interaction commands that are still there.
         q_.clear();
         q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), currentTarget_)));
+    } else {
+        stateLevel = 1;
     }
-    return isCritical;
+    return stateLevel;
 }
-
 
 }

@@ -33,21 +33,20 @@ void Agent::freeInstance()
 AbstractBehavior* Agent::resolveCurrentBehavior()
 {
     // Check for robots that are about to go out of the arena first
-    if( behaviors_[PREVENTIVE]->isStateCritical()) {
-        currentBehavior_ = behaviors_[PREVENTIVE].get();
-    // Check if the current target has a good orientation
-    } else if (behaviors_[AGGRESSIVE]->isStateCritical()) {
-        currentBehavior_ = behaviors_[AGGRESSIVE].get();
-    // Interact with highest priority target
-    } else {
-        currentBehavior_ = behaviors_[PREVENTIVE].get();
+    int preventiveStateLevel = behaviors_[PREVENTIVE]->resolveCurrentStateLevel();
+    int aggressiveStateLevel = behaviors_[AGGRESSIVE]->resolveCurrentStateLevel();
+    AbstractBehavior* behavior = behaviors_[AGGRESSIVE].get();
+
+    if (preventiveStateLevel > aggressiveStateLevel) {
+        behavior = behaviors_[PREVENTIVE].get();
     }
+    return behavior;
 }
 
 void Agent::behave()
 {
-    resolveCurrentBehavior();
-    currentBehavior_->behave();
+    AbstractBehavior* currentBehavior = resolveCurrentBehavior();
+    currentBehavior->behave();
 }
 
 void Agent::addConsideration(Consideration consideration)
@@ -74,6 +73,11 @@ void Agent::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
 void Agent::updateQuadRobot(const tf::Pose& pose)
 {
     pipeline_.updateQuadRobot(pose);
+}
+void Agent::forceCommandGeneration()
+{
+    behaviors_[PREVENTIVE]->generateCommands();
+    behaviors_[AGGRESSIVE]->generateCommands();
 }
 
 };

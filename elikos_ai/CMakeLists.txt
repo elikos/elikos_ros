@@ -90,7 +90,7 @@ set(UTIL_SRC
     src/ai/Util/Line.cpp
     src/ai/Util/Line.h
     src/ai/Util/Segment.cpp
-    src/ai/Util/Segment.h)
+    src/ai/Util/Segment.h src/ai/Util/Timer.cpp src/ai/Util/Timer.h)
 
 add_executable(elikos_ai
     src/ai/main.cpp

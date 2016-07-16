@@ -30,6 +30,7 @@ public:
     void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
     void updateQuadRobot(const tf::Pose& pose);
     void addConsideration(Consideration consideration);
+    void forceCommandGeneration();
 
     void behave();
 

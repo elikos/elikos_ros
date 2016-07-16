@@ -20,18 +20,33 @@ PreventiveBehavior::~PreventiveBehavior()
 
 void PreventiveBehavior::generateCommands()
 {
+    q_.clear();
     TargetRobot* target = arena_->findHighestPriorityTarget();
     QuadRobot* quad = &arena_->getQuad();
-    q_.clear();
-    q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, target)));
-    q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, target)));
-    q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
+
+    if (target != nullptr) {
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, target)));
+        q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, target)));
+        q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
+    } else {
+        q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
+    }
+
 }
 
-bool PreventiveBehavior::isStateCritical()
+int PreventiveBehavior::resolveCurrentStateLevel()
 {
     TargetRobot* target = arena_->findHighestPriorityTarget();
-    return target->getPriority() > MAX_ACCEPTABLE_PRIORITY;
+    int stateLevel = 0;
+    if (target != nullptr) {
+        double priority = target->getPriority();
+        if (priority > MAX_ACCEPTABLE_PRIORITY) {
+            stateLevel = 2;
+        } else if (priority > 0.0) {
+            stateLevel = 1;
+        }
+    }
+    return stateLevel;
 }
 
 }

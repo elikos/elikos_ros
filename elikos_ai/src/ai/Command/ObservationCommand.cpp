@@ -22,9 +22,13 @@ ObservationCommand::~ObservationCommand()
 {
 }
 
-bool ObservationCommand::execute()
+void ObservationCommand::execute()
 {
     MessageHandler::getInstance()->sendDestination(OBSERVATION_POSITION);
+}
+
+
+bool ObservationCommand::isCommmandDone(){
     return hasReachedDestination(quad_->getPose().getOrigin(), OBSERVATION_POSITION);
 }
 

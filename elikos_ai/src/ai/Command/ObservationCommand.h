@@ -20,7 +20,9 @@ public:
 
     ObservationCommand(QuadRobot* quad, TargetRobot* target);
     virtual ~ObservationCommand();
-    virtual bool execute();
+
+    virtual bool isCommmandDone();
+    virtual void execute();
 
 private:
     ObservationCommand() = delete;

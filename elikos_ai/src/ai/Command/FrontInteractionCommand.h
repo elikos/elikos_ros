@@ -14,11 +14,15 @@ namespace ai
 class FrontInteractionCommand : public AbstractCommand
 {
 public:
+    static const double WAIT_TIME;
     static const double FORWARD_OFFSET;
 
     FrontInteractionCommand(QuadRobot* quad, TargetRobot* target);
     virtual ~FrontInteractionCommand();
-    virtual bool execute();
+
+    virtual bool isCommmandDone();
+    virtual void execute();
+
 
 private:
     FrontInteractionCommand() = delete;

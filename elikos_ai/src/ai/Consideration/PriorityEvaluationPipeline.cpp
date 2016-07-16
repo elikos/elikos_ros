@@ -26,37 +26,31 @@ void PriorityEvaluationPipeline::updateTargets(const elikos_ros::TargetRobotArra
     size_t n = input->targets.size();
     //std::thread th[n];
 
+    arena_->prepareUpdate();
     for (int i = 0; i < n; ++i)
     {
-        updateTarget(targets[i], i);
-        //th[i] = std::thread(&PriorityEvaluationPipeline::updateTarget, this, targets[i], i);
-    }
-
-    for (int i = 0; i < n; ++i)
-    {
+        updateTarget(targets[i]);
+        //th[i] = std::thread(&PriorityEvaluationPipeline::updateTarget, this, targets[i]);
         //th[i].join();
     }
 }
 
-void PriorityEvaluationPipeline::updateTarget(const elikos_ros::TargetRobot& targetUpdate, int i)
+void PriorityEvaluationPipeline::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
 {
     // TODO: Remove the index and implement a way to match the target update in arena.
-    TargetRobot* target = arena_->updateTarget(targetUpdate, i);
-    arena_->evaluateTargetOrientation(*target);
-    evaluatePriority(*target);
+    TargetRobot* target = arena_->updateTarget(targetUpdate);
+    if (target != nullptr) {
+        arena_->evaluateTargetOrientation(*target);
+        evaluatePriority(*target);
+    }
 }
 
 void PriorityEvaluationPipeline::evaluatePriority(TargetRobot& target)
 {
-    for (int j = 0; j < considerations_.size(); j++)
+    for (int i = 0; i < considerations_.size(); i++)
     {
-        considerations_[j]->evaluatePriority(target, arena_.get());
+        considerations_[i]->evaluatePriority(target, arena_.get());
     }
-}
-
-TargetRobot* PriorityEvaluationPipeline::findHighestPriorityTarget()
-{
-    return arena_->findHighestPriorityTarget();
 }
 
 }

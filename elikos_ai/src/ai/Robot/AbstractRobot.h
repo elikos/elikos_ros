@@ -3,6 +3,8 @@
 
 #include <tf/tf.h>
 
+#include <elikos_ros/TargetRobotArray.h>
+
 namespace ai
 {
 
@@ -22,13 +24,15 @@ public:
     inline const void setDirection(const tf::Vector3& direction);
 
     void updatePositionRadius(const double& dt);
-    tfScalar getDistance(AbstractRobot* robot);
+    tfScalar getDistance(AbstractRobot* robot) const;
+    tfScalar getDistance(const elikos_ros::TargetRobot& target) const;
 
 protected:
     bool isUpdated_{ false };
     double positionRadius_{ 30.0 };
     tf::Pose pose_;
     tf::Vector3 direction_;
+
 };
 
 inline const tf::Pose& AbstractRobot::getPose() const

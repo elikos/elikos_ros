@@ -20,11 +20,17 @@ MovementCommand::~MovementCommand()
 {
 }
 
-bool MovementCommand::execute()
+void MovementCommand::execute()
 {
     tf::Vector3 destination = target_->getPose().getOrigin();
     destination.setZ(FLIGHT_HEIGHT);
     MessageHandler::getInstance()->sendDestination(destination);
+}
+
+bool MovementCommand::isCommmandDone()
+{
+    tf::Vector3 destination = target_->getPose().getOrigin();
+    destination.setZ(FLIGHT_HEIGHT);
     return hasReachedDestination(quad_->getPose().getOrigin(), destination);
 }
 
