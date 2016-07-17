@@ -4,9 +4,8 @@
 #include <vector>
 
 #include <memory>
-#include "Robot/RobotTypes.h"
-#include "AbstractConsideration.h"
 #include "AbstractArena.h"
+#include "AbstractConsideration.h"
 
 class TargetRobot;
 
@@ -16,34 +15,31 @@ namespace ai
 class PriorityEvaluationPipeline
 {
 public:
-    PriorityEvaluationPipeline(QuadRobot& quad);
-    //TODO: add set/get for arena and add an option in the cmd parser
+    PriorityEvaluationPipeline();
     ~PriorityEvaluationPipeline() = default;
 
+    //TODO: add set/get for arena and add an option in the cmd parser
     void addConsideration(std::unique_ptr<AbstractConsideration>);
-    inline void updateTarget(uint8_t id, uint8_t color, const tf::Pose& pose);
-    inline AbstractArena* getArena() const;
-    void resetPriority();
-    TargetRobot* evaluateTargetSelection(const QuadRobot& quad);
+
+    inline void updateQuadRobot(const tf::Pose& pose);
+    inline AbstractArena* getArena();
+    void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
 
 private:
-    std::vector<TargetRobot> targets_;
-    QuadRobot& quad_;
     std::vector<std::unique_ptr<AbstractConsideration>> considerations_;
     std::unique_ptr<AbstractArena> arena_;
 
-    TargetRobot* findHighestPriorityTarget();
-    PriorityEvaluationPipeline() = delete;
+    void updateTarget(const elikos_ros::TargetRobot& target);
+    void evaluatePriority(TargetRobot& target);
+
 };
 
-inline void PriorityEvaluationPipeline::updateTarget(uint8_t id, uint8_t color, const tf::Pose& pose)
+void PriorityEvaluationPipeline::updateQuadRobot(const tf::Pose& pose)
 {
-    targets_[id].setPose(pose);
-    targets_[id].setColor(color);
-    targets_[id].setIsUpdated(true);
+    arena_->getQuad().setPose(pose);
 }
 
-inline AbstractArena* PriorityEvaluationPipeline::getArena() const
+inline AbstractArena* PriorityEvaluationPipeline::getArena()
 {
     return arena_.get();
 }

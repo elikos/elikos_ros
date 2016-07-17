@@ -69,16 +69,17 @@ int CmdLineParser::checkModeArg()
 
 void CmdLineParser::parseMode(int mode)
 {
-    PriorityEvaluationPipeline* pipeline = Agent::getInstance()->getConsiderationPipeline();
-
-    if ((mode & RED_LINE_MASK) == RED_LINE_MASK)
+    if ((mode & TARGET_DESTINATION_MASK) == TARGET_DESTINATION_MASK)
     {
-        pipeline->addConsideration(std::unique_ptr<RedLineDistance>(new RedLineDistance(pipeline->getArena())));
+        Agent::getInstance()->addConsideration(Agent::Consideration::TARGET_DESTINATION);
     }
-
     if ((mode & QUAD_DISTANCE_MASK) == QUAD_DISTANCE_MASK)
     {
-        pipeline->addConsideration(std::unique_ptr<QuadDistance>(new QuadDistance()));
+        Agent::getInstance()->addConsideration(Agent::Consideration::QUAD_DISTANCE);
+    }
+    if ((mode & CLUSTER_SIZE_MASK) == CLUSTER_SIZE_MASK)
+    {
+        Agent::getInstance()->addConsideration(Agent::Consideration::CLUSTER_SIZE);
     }
 }
 

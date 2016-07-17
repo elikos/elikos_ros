@@ -1,23 +1,18 @@
 //
 // Created by olivier on 27/06/16.
 //
+
+#include <thread>
 #include "AbstractConsideration.h"
 #include "PriorityEvaluationPipeline.h"
-
 #include "ArenaA.h"
-#include "ArenaB.h"
 
 namespace ai
 {
 
-PriorityEvaluationPipeline::PriorityEvaluationPipeline(QuadRobot& quad)
-    : quad_(quad)
+PriorityEvaluationPipeline::PriorityEvaluationPipeline()
 {
     arena_ = std::unique_ptr<ArenaA>(new ArenaA());
-    for (uint8_t i = 0; i < 10; ++i)
-    {
-        targets_.push_back({i, 0});
-    }
 }
 
 void PriorityEvaluationPipeline::addConsideration(std::unique_ptr<AbstractConsideration> consideration)
@@ -25,38 +20,37 @@ void PriorityEvaluationPipeline::addConsideration(std::unique_ptr<AbstractConsid
     considerations_.push_back(std::move(consideration));
 }
 
-void PriorityEvaluationPipeline::resetPriority()
+void PriorityEvaluationPipeline::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
-    for (int i = 0; i < targets_.size(); ++i)
+    const elikos_ros::TargetRobot* targets = input->targets.data();
+    size_t n = input->targets.size();
+    //std::thread th[n];
+
+    arena_->prepareUpdate();
+    for (int i = 0; i < n; ++i)
     {
-        targets_[i].setPriority(0.0);
+        updateTarget(targets[i]);
+        //th[i] = std::thread(&PriorityEvaluationPipeline::updateTarget, this, targets[i]);
+        //th[i].join();
     }
 }
 
-TargetRobot* PriorityEvaluationPipeline::evaluateTargetSelection(const QuadRobot& quad)
+void PriorityEvaluationPipeline::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
 {
-    //TODO: evaluate after every update on a single robot so multithreading can be used.
-    resetPriority();
-    for (int i = 0; i < considerations_.size(); ++i)
-    {
-        considerations_[i]->evaluatePriority(targets_, quad);
+    // TODO: Remove the index and implement a way to match the target update in arena.
+    TargetRobot* target = arena_->updateTarget(targetUpdate);
+    if (target != nullptr) {
+        arena_->evaluateTargetOrientation(*target);
+        evaluatePriority(*target);
     }
-    return findHighestPriorityTarget();
 }
 
-TargetRobot* PriorityEvaluationPipeline::findHighestPriorityTarget()
+void PriorityEvaluationPipeline::evaluatePriority(TargetRobot& target)
 {
-    TargetRobot* target = &targets_[0];
-    double highestPriority = targets_[0].getPriority();
-    for ( int i = 1; i < targets_.size(); ++i)
+    for (int i = 0; i < considerations_.size(); i++)
     {
-        if (targets_[i].getPriority() > highestPriority)
-        {
-            target = &targets_[i];
-            highestPriority = targets_[i].getPriority();
-        }
+        considerations_[i]->evaluatePriority(target, arena_.get());
     }
-    return target;
 }
 
 }

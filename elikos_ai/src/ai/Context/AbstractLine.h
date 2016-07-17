@@ -7,8 +7,6 @@
 
 #include <tf/tf.h>
 #include "Segment.h"
-#include "TargetOrientationEvaluation.h"
-
 
 namespace ai
 {
@@ -21,13 +19,14 @@ public:
     AbstractLine();
     AbstractLine(const tf::Point& cornerA, const tf::Point& cornerB);
     bool isInThePath(const TargetRobot& robot) const;
-    virtual void evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation) = 0;
+
+    virtual bool isGoodLineIntersection(const TargetRobot& robot) = 0;
+    void evaluate(TargetRobot& robot);
 
     virtual ~AbstractLine() = 0;
 
 protected:
     util::Segment segment_;
-
 };
 
 }

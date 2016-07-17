@@ -12,7 +12,7 @@ QuadDistance::~QuadDistance()
 
 }
 
-void QuadDistance::evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad)
+void QuadDistance::evaluatePriority(TargetRobot& robot, AbstractArena* arena)
 {
 }
 

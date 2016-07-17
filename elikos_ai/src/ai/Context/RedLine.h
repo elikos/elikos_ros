@@ -16,7 +16,7 @@ public:
     RedLine(const tf::Point& cornerA, const tf::Point& cornerB);
     virtual ~RedLine();
 
-    virtual void evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation);
+    virtual bool isGoodLineIntersection(const TargetRobot& robot);
 
 private:
     RedLine() = delete;
