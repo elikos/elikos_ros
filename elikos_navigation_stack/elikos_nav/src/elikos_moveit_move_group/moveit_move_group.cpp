@@ -49,9 +49,9 @@ int main(int argc, char* argv[])
           quad_variable_values[4] = target.pose.orientation.y;//quaternion y
           quad_variable_values[5] = target.pose.orientation.z;//quaternion z
           quad_variable_values[6] = target.pose.orientation.w;//quaternion w*/
-          quad_variable_values[0] = 10;//position.x
-          quad_variable_values[1] = 0;//position y
-          quad_variable_values[2] = 0.5;//position z
+          quad_variable_values[0] = 0;//position.x
+          quad_variable_values[1] = 10;//position y
+          quad_variable_values[2] = 1.0;//position z
           quad_variable_values[3] = 0;//quaternion x
           quad_variable_values[4] = 0;//quaternion y
           quad_variable_values[5] = 0;//quaternion z

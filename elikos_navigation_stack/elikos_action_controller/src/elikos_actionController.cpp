@@ -9,6 +9,11 @@
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
 #include <elikos_action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
+#include <opencv2/opencv.hpp>
+
+#ifndef PI
+#define PI 3.14159265
+#endif
 
 class Controller{
 private:
@@ -118,9 +123,15 @@ private:
 								break;
 							i++;
 					}
-
 					geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint = trajectoryToExecute.points[i].transforms[0];
-					ROS_ERROR_STREAM("POINT #"<<i);
+
+					//Set the rotation to face the direction which it is heading.
+					tf::Quaternion rotation = tf::createIdentityQuaternion();
+					double direction = cv::fastAtan2(trajectoryPoint.translation.y - currentPosition.getOrigin().y(), trajectoryPoint.translation.x - currentPosition.getOrigin().x()) / 360 * 2 *PI;
+					rotation.setRPY((double) 0.0 , (double) 0.0, direction);
+
+					tf::quaternionTFToMsg(rotation, trajectoryPoint.rotation);
+
 					publishTrajectoryPoint(trajectoryPoint);
 					i++;
 
@@ -129,9 +140,6 @@ private:
 					{
 			      listener.lookupTransform(parent_frame_, "elikos_fcu",
 		                                ros::Time(0), currentPosition);
-						/*ROS_ERROR_STREAM("Wait achievement.");
-						ROS_ERROR_STREAM("Target: x:"<<trajectoryPoint.translation.x<<" y:"<<trajectoryPoint.translation.y<<" z:"<<trajectoryPoint.translation.z);
-						ROS_ERROR_STREAM("CurrentPosition: x:"<<currentPosition.getOrigin().x()<<" y:"<<currentPosition.getOrigin().y()<<" z:"<<currentPosition.getOrigin().z());*/
 					}
 					while(pow(trajectoryPoint.translation.x-currentPosition.getOrigin().x(), 2)+
 									pow(trajectoryPoint.translation.y-currentPosition.getOrigin().y(), 2)+
