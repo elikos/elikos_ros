@@ -10,6 +10,7 @@
 #include <elikos_action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
 #include <opencv2/opencv.hpp>
+#include <std_srvs/Empty.h>
 
 #ifndef PI
 #define PI 3.14159265
@@ -29,9 +30,9 @@ public:
 				has_active_goal_(false),
 				parent_frame_("elikos_arena_origin"),
 				child_frame_("elikos_setpoint"),
-				toleranceNextGoal_(0.3),
+				toleranceNextGoal_(0.4),
 				toleranceAchieveGoal_(0.2),
-				toleranceFreeOctomap_(2.0)
+				toleranceFreeOctomap_(0.1)
 {
 		creato=0;
 		action_server_.start();
@@ -107,6 +108,9 @@ private:
 		if(trajectoryToExecute.joint_names[0]=="virtual_joint" && trajectoryToExecute.points.size()>0)
 		{
 	    try{
+            std_srvs::Empty::Request req;
+            std_srvs::Empty::Response res;
+            ros::service::call("/clear_octomap", req, res);
 				int i = 0;
 
 				while(i < trajectoryToExecute.points.size()-1)
@@ -140,6 +144,14 @@ private:
 					{
 			      listener.lookupTransform(parent_frame_, "elikos_fcu",
 		                                ros::Time(0), currentPosition);
+
+						//If the quadrotor is too low, it clears the octomap.
+						if(currentPosition.getOrigin().z() < toleranceFreeOctomap_)
+						{
+	            std_srvs::Empty::Request req;
+	            std_srvs::Empty::Response res;
+	            ros::service::call("/clear_octomap", req, res);
+						}
 					}
 					while(pow(trajectoryPoint.translation.x-currentPosition.getOrigin().x(), 2)+
 									pow(trajectoryPoint.translation.y-currentPosition.getOrigin().y(), 2)+

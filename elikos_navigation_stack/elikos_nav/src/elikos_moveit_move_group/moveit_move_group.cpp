@@ -1,6 +1,5 @@
 #include <memory>
 #include "MessageHandler_moveit.h"
-#include <std_srvs/Empty.h>
 
 int main(int argc, char* argv[])
 {
@@ -63,13 +62,6 @@ int main(int argc, char* argv[])
           //Plan and execute the trajectory
           group_.asyncMove();
 
-          //Clear octomap at each 5 seconds.
-          /*if(i%50 == 0)
-          {
-            std_srvs::Empty::Request req;
-            std_srvs::Empty::Response res;
-            ros::service::call("/clear_octomap", req, res);
-          }*/
           i++;
         }
         ros::spinOnce();
