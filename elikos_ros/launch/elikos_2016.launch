@@ -1,4 +1,12 @@
 <launch>
+  <!-- HARDWARE -->
+	<!-- FF cameras -->
+	<!-- RealSense cameras -->
+	<!-- MAVROS -->
+	<include file="$(find elikos_ros)/launch/mavros_config.launch"/>
+  <!-- HARDWARE -->
+
+  <!-- SOFTWARE -->
 	<!-- Target detection -->
 	<arg name="rviz" default="true" />
 	<arg name="image" default="false" />
@@ -20,4 +28,5 @@
 	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
 	<node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
 	<node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_ffmv_bottom 100" />
+  <!-- SOFTWARE -->
 </launch>
