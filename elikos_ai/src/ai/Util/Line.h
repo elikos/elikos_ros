@@ -30,9 +30,7 @@ private:
     tf::Point origin_;
     tf::Vector3 orientation_;
 
-
     bool projectionIsIntersecting(const tf::Vector3& orientation, const tf::Point& dA, const tf::Point& dB) const;
-
     Line() = delete;
 };
 
@@ -55,7 +53,6 @@ inline const tf::Vector3 Line::getOrientation() const
 {
     return orientation_;
 }
-
 
 }
 

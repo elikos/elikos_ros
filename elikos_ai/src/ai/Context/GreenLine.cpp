@@ -2,6 +2,8 @@
 // Created by olivier on 01/07/16.
 //
 
+#include "TargetRobot.h"
+
 #include "Line.h"
 #include "TargetRobot.h"
 
@@ -15,17 +17,28 @@ GreenLine::GreenLine(const tf::Point& cornerA, const tf::Point& cornerB)
 {
 }
 
-void GreenLine::evaluate(const TargetRobot& robot, TargetOrientationEvaluation& evaluation)
+void GreenLine::concreteEvaluate(TargetRobot& target)
 {
-    evaluation.setGoodIntersection(true);
-    util::Line line(robot.getPose().getOrigin(), robot.getOrientation());
-    tf::Point point;
-    bool success = segment_.getIntersectionPoint(line, point);
-    assert(success);
-    evaluation.setIntersectionPoint(point);
-    double distance = point.distance(robot.getPose().getOrigin());
-    evaluation.setLineIntersectionDistance(distance);
+    tf::Vector3 direction = target.getDirection();
+    tf::Vector3 possibleOrientations[4]  {
+        tf::Vector3( direction.x(),  direction.y(), direction.z()),
+        tf::Vector3(-direction.x(),  direction.y(), direction.z()),
+        tf::Vector3(-direction.x(), -direction.y(), direction.z()),
+        tf::Vector3( direction.x(), -direction.y(), direction.z())
+    };
+
+    bool directionFound = false;
+    int i = 0;
+    for (i = 0; i < 4 && !directionFound; ++i)
+    {
+        util::Line line(target.getPose().getOrigin(), possibleOrientations[i]);
+        directionFound = segment_.isIntersecting(line);
+    }
 }
 
+bool GreenLine::isGoodLineIntersection(const TargetRobot& robot)
+{
+    return true;
+}
 
 }

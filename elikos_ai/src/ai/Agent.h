@@ -2,43 +2,49 @@
 #define AI_FACADE_H
 
 #include <memory>
-#include <tf/tf.h>
-#include "StateMachine.h"
-#include "Robot/QuadRobot.h"
 #include "PriorityEvaluationPipeline.h"
+#include "AbstractBehavior.h"
+#include <elikos_ros/TargetRobotArray.h>
 
 namespace ai {
 
 class Agent
 {
 public:
+    enum EnumBehavior
+    {
+        PREVENTIVE,
+        AGGRESSIVE
+    };
+
+    enum Consideration
+    {
+        TARGET_DESTINATION,
+        QUAD_DISTANCE,
+        CLUSTER_SIZE
+    };
+
     static Agent* getInstance();
     static void freeInstance();
 
-    inline PriorityEvaluationPipeline* getConsiderationPipeline();
-    inline void updateQuadRobot(const tf::Pose& pose);
+    void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
+    void updateQuadRobot(const tf::Pose& pose);
+    void addConsideration(Consideration consideration);
+    void forceCommandGeneration();
+
     void behave();
 
 private:
     static Agent* instance_;
 
-    QuadRobot quad_;
-    StateMachine stateMachine_;
+    std::unique_ptr<AbstractBehavior> behaviors_[2];
+    AbstractBehavior* currentBehavior_;
     PriorityEvaluationPipeline pipeline_;
 
+    AbstractBehavior* resolveCurrentBehavior();
     Agent();
     ~Agent() = default;
 };
-
-inline PriorityEvaluationPipeline* Agent::getConsiderationPipeline()
-{
-    return &pipeline_;
-}
-
-inline void Agent::updateQuadRobot(const tf::Pose& pose)
-{
-    quad_.setPose(pose);
-}
 
 }
 

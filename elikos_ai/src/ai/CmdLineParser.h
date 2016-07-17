@@ -18,13 +18,11 @@ public:
     static const char* ARG_MODE;
 
     // 0001
-    static const int RED_LINE_MASK { 1 };
+    static const int TARGET_DESTINATION_MASK { 1 };
     // 0010
-    static const int GREEN_LINE_MASK { 2 };
+    static const int QUAD_DISTANCE_MASK { 2 };
     // 0100
-    static const int QUAD_DISTANCE_MASK { 4 };
-    // 1000
-    static const int ORIENTATION_MASK = { 8 };
+    static const int CLUSTER_SIZE_MASK { 4 };
 
     CmdLineParser() = delete;
     CmdLineParser(int argc, char* argv[]);

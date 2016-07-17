@@ -20,21 +20,34 @@ catkin_package(
 include_directories(
   	${catkin_INCLUDE_DIRS}
     src/ai
-  	src/ai/StateMachine
-    src/ai/Context
+	src/ai/Command
     src/ai/Consideration
 	src/ai/Robot
-	src/ai/Util)
+	src/ai/Util
+	src/ai/Behavior
+    src/ai/Context)
 
-set(STATE_MACHINE_SRC
-    src/ai/StateMachine/StateMachine.h
-    src/ai/StateMachine/StateMachine.cpp
-    src/ai/StateMachine/AbstractState.h
-    src/ai/StateMachine/AbstractState.cpp
-    src/ai/StateMachine/MovementState.cpp
-    src/ai/StateMachine/MovementState.h
-    src/ai/StateMachine/Command.cpp
-    src/ai/StateMachine/Command.h)
+set(BEHAVIOR_SRC
+    src/ai/Behavior/AbstractBehavior.cpp
+    src/ai/Behavior/AbstractBehavior.h
+    src/ai/Behavior/AggressiveBehavior.cpp
+    src/ai/Behavior/AggressiveBehavior.h
+    src/ai/Behavior/PreventiveBehavior.cpp
+    src/ai/Behavior/PreventiveBehavior.h)
+
+set(COMMAND_SRC
+    src/ai/Command/CommandQueue.h
+    src/ai/Command/CommandQueue.cpp
+    src/ai/Command/AbstractCommand.h
+    src/ai/Command/AbstractCommand.cpp
+    src/ai/Command/MovementCommand.cpp
+    src/ai/Command/MovementCommand.h
+    src/ai/Command/ObservationCommand.cpp
+    src/ai/Command/ObservationCommand.h
+    src/ai/Command/TopInteractionCommand.cpp
+    src/ai/Command/TopInteractionCommand.h
+    src/ai/Command/FrontInteractionCommand.cpp
+    src/ai/Command/FrontInteractionCommand.h)
 
 set(CONTEXT_SRC
     src/ai/Context/AbstractLine.cpp
@@ -43,15 +56,13 @@ set(CONTEXT_SRC
 	src/ai/Context/AbstractArena.cpp
     src/ai/Context/ArenaA.cpp
     src/ai/Context/ArenaA.h
-    src/ai/Context/ArenaB.cpp
-    src/ai/Context/ArenaB.h
     src/ai/Context/RedLine.cpp
     src/ai/Context/RedLine.h
     src/ai/Context/WhiteLine.cpp
     src/ai/Context/WhiteLine.h
     src/ai/Context/GreenLine.cpp
     src/ai/Context/GreenLine.h
-    src/ai/Context/ContextTypes.h)
+    src/ai/Context/LineTypes.h)
 
 set(ROBOT_SRC
     src/ai/Robot/AbstractRobot.h
@@ -63,27 +74,23 @@ set(ROBOT_SRC
     src/ai/Robot/RobotTypes.h)
 
 set(CONSIDERATION_SRC
-        src/ai/Consideration/PriorityEvaluationPipeline.cpp
-        src/ai/Consideration/PriorityEvaluationPipeline.h
+    src/ai/Consideration/PriorityEvaluationPipeline.cpp
+    src/ai/Consideration/PriorityEvaluationPipeline.h
     src/ai/Consideration/AbstractConsideration.cpp
     src/ai/Consideration/AbstractConsideration.h
     src/ai/Consideration/QuadDistance.cpp
     src/ai/Consideration/QuadDistance.h
-        src/ai/Consideration/TargetDestination.cpp
-        src/ai/Consideration/TargetDestination.h
+    src/ai/Consideration/TargetDestination.cpp
+    src/ai/Consideration/TargetDestination.h
     src/ai/Consideration/ConsiderationTypes.h
-    src/ai/StateMachine/ObservationState.cpp
-    src/ai/StateMachine/ObservationState.h
-    src/ai/StateMachine/InteractionState.cpp
-    src/ai/StateMachine/InteractionState.h)
+    src/ai/Consideration/ClusterSize.cpp
+    src/ai/Consideration/ClusterSize.h)
 
 set(UTIL_SRC
     src/ai/Util/Line.cpp
     src/ai/Util/Line.h
     src/ai/Util/Segment.cpp
-    src/ai/Util/Segment.h
-    src/ai/Context/TargetOrientationEvaluation.cpp
-    src/ai/Context/TargetOrientationEvaluation.h)
+    src/ai/Util/Segment.h src/ai/Util/Timer.cpp src/ai/Util/Timer.h)
 
 add_executable(elikos_ai
     src/ai/main.cpp
@@ -96,10 +103,11 @@ add_executable(elikos_ai
     src/ai/MessageEmulator.h
     src/ai/MessageEmulator.cpp
     ${CONSIDERATION_SRC}
-    ${STATE_MACHINE_SRC}
+    ${COMMAND_SRC}
     ${CONTEXT_SRC}
     ${ROBOT_SRC}
-	${UTIL_SRC})
+	${UTIL_SRC}
+	${BEHAVIOR_SRC})
 
 target_link_libraries(elikos_ai
   ${catkin_LIBRARIES})

@@ -1,41 +1,21 @@
 //
 // Created by olivier on 27/06/16.
 //
-#include <cmath>
 
-#include <queue>
-#include "TargetDestination.h"
-#include "TargetOrientationEvaluation.h"
 #include "AbstractArena.h"
+#include "TargetDestination.h"
 
 namespace ai
 {
 
-RedLineDistance::RedLineDistance(AbstractArena* arena)
-    : AbstractConsideration(arena)
+TargetDestination::~TargetDestination()
 {
 }
 
-RedLineDistance::~RedLineDistance()
+void TargetDestination::evaluatePriority(TargetRobot& target, AbstractArena* arena)
 {
-}
-
-void RedLineDistance::evaluatePriority(std::vector<TargetRobot>& targets, const QuadRobot& quad)
-{
-    for (int i = 0; i < targets.size(); ++i)
-    {
-        TargetOrientationEvaluation evaluation;
-        arena_->evaluateTargetOrientation(targets[i], evaluation);
-        applyPriorityEvaluation(targets[i], evaluation);
-    }
-}
-
-void RedLineDistance::applyPriorityEvaluation(TargetRobot& robot, const TargetOrientationEvaluation& evaluation)
-{
-    if (!evaluation.getGoodIntersection())
-    {
-        robot.setPriority((30.0 - evaluation.getLineIntersectionDistance()) / 30.0);
-    }
+    OrientationEvaluation* evaluation = target.getOrientationEvaluation();
+    target.setPriority((30.0 - evaluation->lineIntersectionDistance_) / 30.0);
 }
 
 }

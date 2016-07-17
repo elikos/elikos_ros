@@ -1,0 +1,3 @@
+<launch>
+    <node name="elikos_ai" pkg="elikos_ai" type="elikos_ai"/>
+</launch>

@@ -3,6 +3,8 @@
 
 #include <tf/tf.h>
 
+#include <elikos_ros/TargetRobotArray.h>
+
 namespace ai
 {
 
@@ -14,20 +16,23 @@ public:
     AbstractRobot() = default;
     virtual ~AbstractRobot() = 0;
 
-    inline void setIsUpdated(const bool& isUpdated);
+    inline void setIsUpdated(bool isUpdated);
 
-    inline void setPose(const tf::Pose pose);
+    inline void setPose(const tf::Pose& pose);
     inline const tf::Pose& getPose() const;
-    inline const tf::Vector3& getOrientation()const;
+    inline const tf::Vector3& getDirection()const;
+    inline const void setDirection(const tf::Vector3& direction);
 
     void updatePositionRadius(const double& dt);
-    tfScalar getDistance(AbstractRobot* robot);
+    tfScalar getDistance(AbstractRobot* robot) const;
+    tfScalar getDistance(const elikos_ros::TargetRobot& target) const;
 
-private:
+protected:
     bool isUpdated_{ false };
     double positionRadius_{ 30.0 };
     tf::Pose pose_;
     tf::Vector3 direction_;
+
 };
 
 inline const tf::Pose& AbstractRobot::getPose() const
@@ -36,21 +41,26 @@ inline const tf::Pose& AbstractRobot::getPose() const
 }
 
 
-inline void AbstractRobot::setPose(const tf::Pose pose)
+inline void AbstractRobot::setPose(const tf::Pose& pose)
 {
     direction_ = tf::Vector3(pose.getOrigin() - pose_.getOrigin()).normalized();
     pose_ = pose;
 }
 
 
-inline void AbstractRobot::setIsUpdated(const bool& isUpdated)
+inline void AbstractRobot::setIsUpdated(bool isUpdated)
 {
     isUpdated_ = isUpdated;
 }
 
-inline const tf::Vector3& AbstractRobot::getOrientation() const
+inline const tf::Vector3& AbstractRobot::getDirection() const
 {
     return direction_;
+}
+
+inline const void AbstractRobot::setDirection(const tf::Vector3& direction)
+{
+    direction_ = direction;
 }
 
 }
