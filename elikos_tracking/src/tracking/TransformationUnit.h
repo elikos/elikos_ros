@@ -43,6 +43,7 @@ class TransformationUnit
     const double CAMERA_FOV_V = 63 * PI/180.0;
 		static const int CAM_HEIGHT = 480;
 		static const int CAM_WIDTH = 640;
+		const double TOLERANCE_HEIGHT = 0.1;
 };
 
 #endif

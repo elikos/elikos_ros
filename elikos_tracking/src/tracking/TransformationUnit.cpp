@@ -32,7 +32,7 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
 			ros::Duration(1.0).sleep();
 		}
 		//Get the fcu to camera transform
-        tf::StampedTransform fcu2camera;
+    tf::StampedTransform fcu2camera;
 		try {
 			tf_listener_.lookupTransform("elikos_fcu", "elikos_ffmv_bottom", ros::Time(0), fcu2camera);
 		}
@@ -93,8 +93,20 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
 		target.poseFcu = robotPoseFcu;
 		targetArray.targets.push_back(target);
 	}
-	pub_.publish(targetArray);
-	oldArray_ = targetArray;
+
+	//Get the origin to fcu transform
+	tf::StampedTransform origin2fcu;
+	try {
+		tf_listener_.lookupTransform("elikos_arena_origin", "elikos_fcu", ros::Time(0), origin2fcu);
+	}
+	catch (tf::TransformException &ex) {
+		ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
+		ros::Duration(1.0).sleep();
+	}
+	if(origin2fcu.getOrigin().z()>TOLERANCE_HEIGHT){
+		pub_.publish(targetArray);
+		oldArray_ = targetArray;
+	}
   return results;
 }
 tf::Transform TransformationUnit::computeRobotTransform(tf::Transform origin2turret){

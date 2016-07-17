@@ -1,0 +1,8 @@
+<launch>
+  <!-- HARDWARE -->
+  <!-- HARDWARE -->
+
+  <!-- SOFTWARE -->
+	<include file="$(find elikos_ros)/launch/elikos_software_stack.launch" />
+  <!-- SOFTWARE -->
+</launch>

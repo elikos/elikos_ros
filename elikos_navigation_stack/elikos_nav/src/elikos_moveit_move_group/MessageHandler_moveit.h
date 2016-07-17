@@ -18,7 +18,7 @@ class MessageHandler_moveit
 public:
     MessageHandler_moveit();
     ~MessageHandler_moveit();
-    void dispatchMessageTarget(const geometry_msgs::PoseArray::ConstPtr &input);
+    void dispatchMessageTarget(const geometry_msgs::PoseStamped::ConstPtr &input);
 
     geometry_msgs::PoseStamped getTarget();
     bool getHasTarget();

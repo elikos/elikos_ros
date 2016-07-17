@@ -146,12 +146,12 @@ private:
 		                                ros::Time(0), currentPosition);
 
 						//If the quadrotor is too low, it clears the octomap.
-						if(currentPosition.getOrigin().z() < toleranceFreeOctomap_)
+						/*if(currentPosition.getOrigin().z() < toleranceFreeOctomap_)
 						{
 	            std_srvs::Empty::Request req;
 	            std_srvs::Empty::Response res;
 	            ros::service::call("/clear_octomap", req, res);
-						}
+						}*/
 					}
 					while(pow(trajectoryPoint.translation.x-currentPosition.getOrigin().x(), 2)+
 									pow(trajectoryPoint.translation.y-currentPosition.getOrigin().y(), 2)+
