@@ -40,9 +40,11 @@ include_directories(
 )
 
 add_executable( elikos_moveit_move_group
+    src/elikos_moveit_move_group/moveit_move_group.h
     src/elikos_moveit_move_group/moveit_move_group.cpp
     src/elikos_moveit_move_group/MessageHandler_moveit.h
-    src/elikos_moveit_move_group/MessageHandler_moveit.cpp)
+    src/elikos_moveit_move_group/MessageHandler_moveit.cpp
+    src/elikos_moveit_move_group/main.cpp)
 
 
 add_dependencies( elikos_moveit_move_group

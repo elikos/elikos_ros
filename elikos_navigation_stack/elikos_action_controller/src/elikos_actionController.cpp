@@ -30,8 +30,8 @@ public:
 				has_active_goal_(false),
 				parent_frame_("elikos_arena_origin"),
 				child_frame_("elikos_setpoint"),
-				toleranceNextGoal_(0.4),
-				toleranceAchieveGoal_(0.2),
+				toleranceNextGoal_(0.3),
+				toleranceAchieveGoal_(0.3),
 				toleranceFreeOctomap_(0.1)
 {
 		creato=0;
