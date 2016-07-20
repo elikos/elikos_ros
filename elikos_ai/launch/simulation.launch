@@ -2,5 +2,5 @@
     <node name="elikos_sim" pkg="elikos_sim" type="elikos_sim" output="screen"/>
     	<rosparam command="load" file="$(find elikos_ros)/param/config.yaml" />
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_sim)/launch/tf_markerarray.rviz" />
-    <node name="elikos_ai" pkg="elikos_ai" type="elikos_ai" args="--sim --mode 1" />
+    <node name="elikos_ai" pkg="elikos_ai" type="elikos_ai" args="--sim" />
 </launch>
