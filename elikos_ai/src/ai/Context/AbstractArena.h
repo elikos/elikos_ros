@@ -8,7 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #include <elikos_ros/TargetRobotArray.h>
 #include "RobotTypes.h"
@@ -48,13 +48,12 @@ public:
 protected:
     std::vector<std::unique_ptr<AbstractLine>> lines_;
     std::vector<TargetRobot> targets_;
-    std::vector<int> noUpdateFlags_;
-    std::mutex mutex_;
+    std::unordered_map<int, TargetRobot*> targetsId_;
 
     QuadRobot quad_;
     util::Timer timer_;
 
-    int findMostLikelyUpdateCondidate(const elikos_ros::TargetRobot& targetUpdate) const;
+    TargetRobot* findMostLikelyUpdateCondidate(const elikos_ros::TargetRobot& targetUpdate);
     void evaluateOutOfBound(TargetRobot& target);
 };
 

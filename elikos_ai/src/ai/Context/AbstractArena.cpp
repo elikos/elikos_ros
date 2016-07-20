@@ -18,7 +18,6 @@ AbstractArena::AbstractArena()
 {
     timer_.start();
     targets_.resize(10);
-    noUpdateFlags_.resize(10);
 }
 
 AbstractArena::~AbstractArena()
@@ -52,39 +51,43 @@ void AbstractArena::prepareUpdate()
             // TODO: Need a better way of doing this.
             Agent::getInstance()->forceCommandGeneration();
         }
-        targets_[i].setPriority(0.0);
-        noUpdateFlags_[i]++;
+        targets_[i].prepareForUpdate();
     }
 }
 
 TargetRobot* AbstractArena::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
 {
-    int iTarget = findMostLikelyUpdateCondidate(targetUpdate);
-
-    if (iTarget < 0) {
-        return nullptr;
-        //TODO : add log error.
-    }
-
-    targets_[iTarget].updateFrom(targetUpdate);
-    noUpdateFlags_[iTarget] = 0;
-    return &targets_[iTarget];
+    TargetRobot* target = findMostLikelyUpdateCondidate(targetUpdate);
+    target->updateFrom(targetUpdate);
+    return target;
 }
 
-int AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::TargetRobot& targetUpdate) const
+TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::TargetRobot& targetUpdate)
 {
-    int iMin = -1;
-    double minDistance = 40.0;
-    for (int i = 0; i < targets_.size(); ++i)
-    {
-        double distance = targets_[i].getDistance(targetUpdate);
-        if (distance < minDistance && noUpdateFlags_[i] != 0)
+    std::unordered_map<int, TargetRobot*>::iterator it = targetsId_.find(targetUpdate.id);
+    TargetRobot* candidate = nullptr;
+    // If this id is being tracked, juste update that robot
+    if (it != targetsId_.end()) {
+        candidate = it->second;
+    } else {
+        // This is a new id, so find the most likely candidate
+        double minDistance = 40.0;
+        for (int i = 0; i < targets_.size(); ++i)
         {
-            iMin = i;
-            minDistance = distance;
+            double distance = targets_[i].getDistance(targetUpdate);
+            // We don't want to update a target discovered in this update iteration (its missed updates will be 0)
+            if (distance < minDistance && targets_[i].getNMissedUpdates() != 0)
+            {
+                minDistance = distance;
+                candidate = &targets_[i];
+            }
         }
+        // Insert the new id in the hashed table
+        targetsId_.insert({ targetUpdate.id, candidate });
+        // TODO: Maybe remove the least likely id.
     }
-    return iMin;
+    return candidate;
+
 }
 
 void AbstractArena::evaluateOutOfBound(TargetRobot& target)

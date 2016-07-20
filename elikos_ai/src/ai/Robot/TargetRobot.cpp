@@ -12,4 +12,10 @@ TargetRobot::~TargetRobot()
 {
 }
 
+void TargetRobot::prepareForUpdate()
+{
+    priority_ = 0.0;
+    nMissedUpdates_++;
+}
+
 };
