@@ -11,12 +11,15 @@
 namespace ai
 {
 
-const double FrontInteractionCommand::FORWARD_OFFSET = 5.0;
-const double FrontInteractionCommand::WAIT_TIME = 2.0;
+const double FrontInteractionCommand::FORWARD_OFFSET = 1.5;
+const double FrontInteractionCommand::WAIT_TIME = 5.0;
 
 FrontInteractionCommand::FrontInteractionCommand(QuadRobot* quad, TargetRobot* target)
     : AbstractCommand(quad, target)
 {
+    destination_ = target_->getPose().getOrigin() + (target_->getDirection() * FORWARD_OFFSET);
+    destination_.setZ(0.0);
+    timer_.start();
 }
 
 FrontInteractionCommand::~FrontInteractionCommand()
@@ -25,12 +28,7 @@ FrontInteractionCommand::~FrontInteractionCommand()
 
 void FrontInteractionCommand::execute()
 {
-    tf::Vector3 destination = target_->getPose().getOrigin();
-    destination += (target_->getDirection() * FORWARD_OFFSET);
-    MessageHandler::getInstance()->sendDestination(destination);
-    if (hasReachedDestination(quad_->getPose().getOrigin(), destination) && !timer_.isStarted()) {
-        timer_.start();
-    }
+    MessageHandler::getInstance()->sendDestination(destination_);
 }
 
 bool FrontInteractionCommand::isCommmandDone()

@@ -3,37 +3,19 @@
 #include <iostream>
 
 #include "MessageEmulator.h"
-
 #include "MessageHandler.h"
 
-namespace ai
+namespace emu
 {
 
-const std::string MessageEmulator::WORLD_FRAME = "world";
-const std::string MessageEmulator::MAV_FRAME = "MAV";
-const std::string MessageEmulator::TRGT_FRAME = "trgtRobot";
-
-const double MessageEmulator::virtualRadius = 10.0;
-bool MessageEmulator::started_ = false;
+const std::string MessageEmulator::SIM_MAV_FRAME = "MAV";
+const std::string MessageEmulator::SIM_TRGT_FRAME = "trgtRobot";
 
 MessageEmulator* MessageEmulator::instance_ = nullptr;
 
 MessageEmulator::MessageEmulator()
 {
-    trgtPub_ = nh_.advertise<elikos_ros::TargetRobotArray>(MessageHandler::TRGT_TOPIC, 1);
-    mavPub_ = nh_.advertise<geometry_msgs::PoseStamped>(MessageHandler::MAV_TOPIC, 1);
-}
-
-bool MessageEmulator::start()
-{
-    if (!started_)
-    {
-        std::thread th(&MessageEmulator::lookForTf, this);
-        th.detach();
-        started_ = true;
-        return true;
-    }
-    return false;
+    trgtPub_ = nh_.advertise<elikos_ros::TargetRobotArray>(ai::TRGT_TOPIC, 1);
 }
 
 MessageEmulator* MessageEmulator::getInstance()
@@ -68,22 +50,15 @@ void MessageEmulator::lookForMav()
     tf::StampedTransform stf;
     try
     {
-        listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), stf);
+        listener_.lookupTransform(ai::WORLD_FRAME, SIM_MAV_FRAME, ros::Time(0), stf);
     }
     catch (tf::TransformException e)
     {
         return;
     }
 
-    // From stamped transform to stamped pose
-    tf::Stamped<tf::Pose> poseTf;
-    poseTf.setOrigin(stf.getOrigin());
-    poseTf.setRotation(stf.getRotation());
-
-    // From tf to msg
-    geometry_msgs::PoseStamped poseMsg;
-    tf::poseStampedTFToMsg(poseTf, poseMsg);
-    mavPub_.publish(poseMsg);
+    mavPosition_ = stf.getOrigin();
+    broadcaster_.sendTransform(tf::StampedTransform(stf, ros::Time::now(), ai::WORLD_FRAME, ai::MAV_FRAME));
 }
 
 
@@ -96,7 +71,7 @@ void MessageEmulator::lookForTargets()
         tf::StampedTransform stf;
         try
         {
-            listener_.lookupTransform(WORLD_FRAME, TRGT_FRAME + std::to_string(i), ros::Time(0), stf);
+            listener_.lookupTransform(ai::WORLD_FRAME, SIM_TRGT_FRAME + std::to_string(i), ros::Time(0), stf);
             addTarget(stf, i);
         }
         catch(tf::TransformException e)

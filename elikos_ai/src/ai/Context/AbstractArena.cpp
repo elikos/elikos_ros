@@ -42,16 +42,20 @@ TargetRobot* AbstractArena::findHighestPriorityTarget()
 void AbstractArena::prepareUpdate()
 {
     size_t n = targets_.size();
+    std::cout << n << std::endl;
     for (int i = 0; i < targets_.size(); ++i)
     {
+        targets_[i].prepareForUpdate();
         if (targets_[i].getOrientationEvaluation()->isOutOfBound_) {
+            targetsId_.erase(targets_[i].getId());
             targets_[i] = targets_[n - 1];
             targets_.pop_back();
+            // Update id hash table
+            targetsId_.find(targets_[i].getId())->second = &targets_[i];
+            Agent::getInstance()->forceCommandGeneration();
             // This is a workaround, since we just deleted a target, we want to make sure there are no invalid pointers.
             // TODO: Need a better way of doing this.
-            Agent::getInstance()->forceCommandGeneration();
         }
-        targets_[i].prepareForUpdate();
     }
 }
 
@@ -92,12 +96,12 @@ TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::Targ
 
 void AbstractArena::evaluateOutOfBound(TargetRobot& target)
 {
-    const double MIN = -10.0;
-    const double MAX = 10.0;
+    const double MIN = -9.5;
+    const double MAX = 9.5;
     double x = target.getPose().getOrigin().x();
     double y = target.getPose().getOrigin().y();
 
-    if (!(MIN < x && x < MAX && MIN < y && y < MAX)) {
+    if (!(MIN <= x && x <= MAX && MIN <= y && y <= MAX)) {
         target.getOrientationEvaluation()->isOutOfBound_ = true;
     }
 }

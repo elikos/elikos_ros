@@ -31,7 +31,8 @@ bool MovementCommand::isCommmandDone()
 {
     tf::Vector3 destination = target_->getPose().getOrigin();
     destination.setZ(FLIGHT_HEIGHT);
-    return hasReachedDestination(quad_->getPose().getOrigin(), destination);
+    return hasReachedDestination(quad_->getPose().getOrigin(), destination) ||
+            timer_.getElapsedS() > WAIT_TIME;
 }
 
 }
