@@ -66,7 +66,8 @@ TargetRobot* ArenaA::findClosestTargetToGoodLine()
     for (int i = 1; i < targets_.size(); ++i)
     {
         double distance = std::abs(targets_[i].getPose().getOrigin().y() - linePosition);
-        if (distance < minDistance)
+        if (distance < minDistance &&
+            !targets_[i].getOrientationEvaluation()->isOutOfBound_)
         {
             minDistance = distance;
             closestRobot = &targets_[i];
