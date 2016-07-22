@@ -33,6 +33,7 @@ void AggressiveBehavior::generateCommands()
         case 1:
             // 180 rotation then right 90 rotation
             q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, currentTarget_)));
             q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
             break;
 

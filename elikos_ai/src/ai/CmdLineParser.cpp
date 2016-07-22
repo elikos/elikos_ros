@@ -4,15 +4,12 @@
 
 #include "CmdLineParser.h"
 
-#include "MessageEmulator.h"
 #include "Agent.h"
-#include "ConsiderationTypes.h"
 
 namespace ai
 {
 
 const char* CmdLineParser::SIM_LAUNCH_CMD{ "roslaunch elikos_sim simulation.launch" };
-const char* CmdLineParser::ARG_SIM  { "--sim" };
 const char* CmdLineParser::ARG_MODE { "--mode" };
 
 CmdLineParser::CmdLineParser(int argc, char* argv[])
@@ -23,30 +20,11 @@ CmdLineParser::CmdLineParser(int argc, char* argv[])
 
 void CmdLineParser::parse()
 {
-    bool isSimulation = checkSimArg();
-    if(isSimulation)
-    {
-        launchSimulation();
-    }
-
     int mode = checkModeArg();
     if (mode > 0)
     {
         parseMode(mode);
     }
-}
-
-bool CmdLineParser::checkSimArg()
-{
-    bool foundParam = false;
-    for (int i = 0; i < argc_ && !foundParam; ++i)
-    {
-        if (strcmp(argv_[i], ARG_SIM) == 0)
-        {
-            foundParam = true;
-        }
-    }
-    return foundParam;
 }
 
 int CmdLineParser::checkModeArg()
@@ -80,17 +58,6 @@ void CmdLineParser::parseMode(int mode)
     if ((mode & CLUSTER_SIZE_MASK) == CLUSTER_SIZE_MASK)
     {
         Agent::getInstance()->addConsideration(Agent::Consideration::CLUSTER_SIZE);
-    }
-}
-
-void CmdLineParser::launchSimulation()
-{
-    //std::system(SIM_LAUNCH_CMD.c_str());
-    bool success = MessageEmulator::getInstance()->start();
-    if(!success)
-    {
-        std::cout << "Error: Failed to start msg emulator." << std::endl;
-        exit(0);
     }
 }
 

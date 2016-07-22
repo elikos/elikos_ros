@@ -26,6 +26,7 @@ public:
 
 private:
     FrontInteractionCommand() = delete;
+    tf::Vector3 destination_;
 
 };
 

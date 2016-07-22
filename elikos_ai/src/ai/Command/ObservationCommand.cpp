@@ -16,6 +16,7 @@ const tf::Point ObservationCommand::OBSERVATION_POSITION{ 0.0, 0.0, 3.0 };
 ObservationCommand::ObservationCommand(QuadRobot* quad, TargetRobot* target)
     : AbstractCommand(quad, target)
 {
+    timer_.start();
 }
 
 ObservationCommand::~ObservationCommand()
@@ -28,7 +29,8 @@ void ObservationCommand::execute()
 }
 
 
-bool ObservationCommand::isCommmandDone(){
+bool ObservationCommand::isCommmandDone()
+{
     return hasReachedDestination(quad_->getPose().getOrigin(), OBSERVATION_POSITION);
 }
 

@@ -35,10 +35,8 @@ private:
     int argc_;
     char** argv_;
 
-    bool checkSimArg();
     int checkModeArg();
     void parseMode(int mode);
-    void launchSimulation();
 };
 
 }

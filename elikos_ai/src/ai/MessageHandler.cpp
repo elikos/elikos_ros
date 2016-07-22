@@ -8,10 +8,7 @@
 namespace ai
 {
 
-const std::string MessageHandler::TRGT_TOPIC = "target_robot_array";
-const std::string MessageHandler::SETPOINT_TOPIC = "mavros/setpoint/local_position";
-const std::string MessageHandler::MAV_TOPIC = "mavros/local_position";
-const std::string MessageHandler::WORLD_FRAME = "world";
+
 MessageHandler* MessageHandler::instance_ = nullptr;
 
 MessageHandler* MessageHandler::getInstance()
@@ -27,7 +24,6 @@ MessageHandler::MessageHandler()
 {
     agent_ = Agent::getInstance();
     trgtSub_ = nh_.subscribe<elikos_ros::TargetRobotArray>(TRGT_TOPIC, 1, &MessageHandler::handleTrgtMsg, this);
-    mavSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(MAV_TOPIC, 1, &MessageHandler::handleMavMsg, this);
     mavPub_ = nh_.advertise<geometry_msgs::PoseStamped>(SETPOINT_TOPIC, 1);
 }
 
@@ -43,6 +39,7 @@ void MessageHandler::lookForMessages()
     while(ros::ok())
     {
         ros::spinOnce();
+        lookForMav();
         agent_->behave();
         rate.sleep();
     }
@@ -53,11 +50,22 @@ void MessageHandler::handleTrgtMsg(const elikos_ros::TargetRobotArray::ConstPtr&
     agent_->updateTargets(input);
 }
 
-void MessageHandler::handleMavMsg(const geometry_msgs::PoseStamped::ConstPtr &input)
+void MessageHandler::lookForMav()
 {
-    tf::Pose pose;
-    tf::poseMsgToTF(input->pose, pose);
-    agent_->updateQuadRobot(pose);
+    tf::StampedTransform stf;
+
+    try {
+        mavListener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), stf);
+    } catch(tf::TransformException e) {
+        return;
+    }
+
+    // From stamped transform to stamped pose
+    tf::Stamped<tf::Pose> poseTf;
+    poseTf.setOrigin(stf.getOrigin());
+    poseTf.setRotation(stf.getRotation());
+
+    Agent::getInstance()->updateQuadRobot(poseTf);
 }
 
 void MessageHandler::sendDestination(const tf::Vector3& destination)

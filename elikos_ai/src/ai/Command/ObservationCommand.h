@@ -26,6 +26,7 @@ public:
 
 private:
     ObservationCommand() = delete;
+    util::Timer timer_;
 };
 
 }

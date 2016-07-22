@@ -1,0 +1,93 @@
+include_directories(
+  	${catkin_INCLUDE_DIRS}
+    Command
+    Consideration
+	Robot
+	Util
+	Behavior
+    Context)
+
+set(BEHAVIOR_SRC
+    Behavior/AbstractBehavior.cpp
+    Behavior/AbstractBehavior.h
+    Behavior/AggressiveBehavior.cpp
+    Behavior/AggressiveBehavior.h
+    Behavior/PreventiveBehavior.cpp
+    Behavior/PreventiveBehavior.h)
+
+set(COMMAND_SRC
+    Command/CommandQueue.h
+    Command/CommandQueue.cpp
+    Command/AbstractCommand.h
+    Command/AbstractCommand.cpp
+    Command/MovementCommand.cpp
+    Command/MovementCommand.h
+    Command/ObservationCommand.cpp
+    Command/ObservationCommand.h
+    Command/TopInteractionCommand.cpp
+    Command/TopInteractionCommand.h
+    Command/FrontInteractionCommand.cpp
+    Command/FrontInteractionCommand.h)
+
+set(CONTEXT_SRC
+    Context/AbstractLine.cpp
+    Context/AbstractLine.h
+	Context/AbstractArena.h
+	Context/AbstractArena.cpp
+    Context/ArenaA.cpp
+    Context/ArenaA.h
+    Context/RedLine.cpp
+    Context/RedLine.h
+    Context/WhiteLine.cpp
+    Context/WhiteLine.h
+    Context/GreenLine.cpp
+    Context/GreenLine.h
+    Context/LineTypes.h)
+
+set(ROBOT_SRC
+    Robot/AbstractRobot.h
+    Robot/AbstractRobot.cpp
+    Robot/QuadRobot.h
+    Robot/QuadRobot.cpp
+    Robot/TargetRobot.h
+    Robot/TargetRobot.cpp
+    Robot/RobotTypes.h)
+
+set(CONSIDERATION_SRC
+    Consideration/PriorityEvaluationPipeline.cpp
+    Consideration/PriorityEvaluationPipeline.h
+    Consideration/AbstractConsideration.cpp
+    Consideration/AbstractConsideration.h
+    Consideration/QuadDistance.cpp
+    Consideration/QuadDistance.h
+    Consideration/TargetDestination.cpp
+    Consideration/TargetDestination.h
+    Consideration/ConsiderationTypes.h
+    Consideration/ClusterSize.cpp
+    Consideration/ClusterSize.h)
+
+set(UTIL_SRC
+    Util/Line.cpp
+    Util/Line.h
+    Util/Segment.cpp
+    Util/Segment.h 
+    Util/Timer.cpp 
+    Util/Timer.h)
+
+add_executable(elikos_ai
+    Ai.cpp
+    CmdLineParser.h
+    CmdLineParser.cpp
+    Agent.cpp
+    Agent.h
+    MessageHandler.h
+    MessageHandler.cpp
+    ${CONSIDERATION_SRC}
+    ${COMMAND_SRC}
+    ${CONTEXT_SRC}
+    ${ROBOT_SRC}
+	${UTIL_SRC}
+	${BEHAVIOR_SRC})
+
+target_link_libraries(elikos_ai
+    ${catkin_LIBRARIES})

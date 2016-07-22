@@ -1,7 +1,6 @@
 #include "MessageHandler.h"
 #include "Agent.h"
 #include "CmdLineParser.h"
-#include "MessageEmulator.h"
 
 int main(int argc, char* argv[])
 {
@@ -14,6 +13,5 @@ int main(int argc, char* argv[])
     ai::MessageHandler::getInstance()->lookForMessages();
 
     ai::MessageHandler::freeInstance();
-    ai::MessageEmulator::freeInstance();
     ai::Agent::freeInstance();
 }
