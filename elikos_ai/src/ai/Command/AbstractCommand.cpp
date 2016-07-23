@@ -16,7 +16,7 @@ bool AbstractCommand::hasReachedDestination(const tf::Vector3& currentPosition, 
 {
     double distance = tf::tfDistance(currentPosition, destination);
     //30 cm is a bit less than the quadrotor size.
-    return std::abs(distance) < 0.3;
+    return std::abs(distance) < 0.4;
 }
 
 }

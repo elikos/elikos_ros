@@ -12,12 +12,15 @@ MessageHandler_moveit::~MessageHandler_moveit()
 
 void MessageHandler_moveit::dispatchMessageTarget(const geometry_msgs::PoseStamped::ConstPtr &input)
 {
-  if(!hasTarget_ || (inputTarget_.pose.position.x!=(*input).pose.position.x ||
-      inputTarget_.pose.position.y!=(*input).pose.position.y ||
-      inputTarget_.pose.position.z!=(*input).pose.position.z))
-  {
-     move_group_.move(*input);
-	   inputTarget_ = *input;
-     hasTarget_ = true;
-  }
+  inputTarget_ = *input;
+  hasTarget_ = true;
+}
+
+geometry_msgs::PoseStamped MessageHandler_moveit::getTarget()
+{
+  return inputTarget_;
+}
+bool MessageHandler_moveit::hasTarget()
+{
+  return hasTarget_;
 }

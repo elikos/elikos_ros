@@ -16,9 +16,16 @@ int main(int argc, char* argv[])
     //Messagehandler to receive the goal pose.
     MessageHandler_moveit messageHandler;
 
-    ros::Rate r(10);
+    Moveit_move_group move_group_;
+
+    ros::Rate r(1);
     while(ros::ok())
-    {
+    {;
+        if(messageHandler.hasTarget())
+        {
+          geometry_msgs::PoseStamped goal = messageHandler.getTarget();
+          move_group_.move(goal);
+        }
         ros::spinOnce();
         r.sleep();
     }

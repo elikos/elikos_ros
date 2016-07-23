@@ -7,7 +7,7 @@
 #include <tf/transform_datatypes.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
-#include <elikos_action_controller/MultiDofFollowJointTrajectoryAction.h>
+#include <action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
 #include <opencv2/opencv.hpp>
 #include <std_srvs/Empty.h>
@@ -18,7 +18,7 @@
 
 class Controller{
 private:
-	typedef actionlib::ActionServer<elikos_action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
+	typedef actionlib::ActionServer<action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
 	typedef ActionServer::GoalHandle GoalHandle;
 public:
 	Controller(ros::NodeHandle &n) :
@@ -108,9 +108,7 @@ private:
 		if(trajectoryToExecute.joint_names[0]=="virtual_joint" && trajectoryToExecute.points.size()>0)
 		{
 	    try{
-            std_srvs::Empty::Request req;
-            std_srvs::Empty::Response res;
-            ros::service::call("/clear_octomap", req, res);
+            
 				int i = 0;
 
 				while(i < trajectoryToExecute.points.size()-1)

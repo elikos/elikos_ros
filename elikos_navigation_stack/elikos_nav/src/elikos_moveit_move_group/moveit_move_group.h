@@ -13,6 +13,15 @@
 
 #include <geometry_msgs/PoseArray.h>
 
+#include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+
+#include <opencv2/opencv.hpp>
+
+#ifndef PI
+#define PI 3.14159265
+#endif
 class Moveit_move_group
 {
 public:
@@ -20,9 +29,22 @@ public:
     ~Moveit_move_group();
 
     void move(geometry_msgs::PoseStamped target);
+    void publishTrajectoryPoint(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint);
 
 private:
     moveit::planning_interface::MoveGroup group_ = moveit::planning_interface::MoveGroup("elikos_moveit_quadrotor_group");
+
+    tf::TransformBroadcaster tf_broadcaster_;
+    tf::TransformListener listener;
+
+    std::string parent_frame_;
+  	std::string child_frame_;
+  	double toleranceNextGoal_;
+  	double toleranceFreeOctomap_;
+  	double toleranceAchieveGoal_;
+    geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint_;
+
+    bool isFirst_;
 };
 
 #endif
