@@ -10,6 +10,8 @@
 
 #include <moveit_msgs/DisplayRobotState.h>
 #include <moveit_msgs/DisplayTrajectory.h>
+#include <trajectory_msgs/MultiDOFJointTrajectory.h>
+#include <moveit_msgs/MoveItErrorCodes.h>
 
 #include <geometry_msgs/PoseArray.h>
 
@@ -18,6 +20,8 @@
 #include <tf/transform_datatypes.h>
 
 #include <opencv2/opencv.hpp>
+
+#include <std_srvs/Empty.h>
 
 #ifndef PI
 #define PI 3.14159265

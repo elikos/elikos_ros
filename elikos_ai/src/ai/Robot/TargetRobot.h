@@ -35,15 +35,25 @@ public:
     inline void setPriority(double priority);
     inline double getPriority() const;
 
+    inline int getNMissedUpdates() const;
+
+    void prepareForUpdate();
+
     inline OrientationEvaluation* getOrientationEvaluation();
 
 private:
-    uint8_t id_;
-    uint8_t color_;
-    double priority_;
+    uint8_t id_{ 0 };
+    uint8_t color_{ 0 };
+    double priority_{ 0.0 };
+    int nMissedUpdates_{ 0 };
 
     OrientationEvaluation evaluation_;
 };
+
+inline int TargetRobot::getNMissedUpdates() const
+{
+   return nMissedUpdates_;
+}
 
 inline void TargetRobot::updateFrom(const elikos_ros::TargetRobot& targetUpdate)
 {
@@ -53,6 +63,7 @@ inline void TargetRobot::updateFrom(const elikos_ros::TargetRobot& targetUpdate)
     pose_ = poseUpdate;
     id_ = targetUpdate.id;
     color_ = targetUpdate.color;
+    nMissedUpdates_ = 0;
 }
 
 inline void TargetRobot::setId(uint8_t id)

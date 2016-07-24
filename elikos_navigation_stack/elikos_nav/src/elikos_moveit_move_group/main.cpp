@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 
     Moveit_move_group move_group_;
 
-    ros::Rate r(1);
+    ros::Rate r(10);
     while(ros::ok())
     {;
         if(messageHandler.hasTarget())

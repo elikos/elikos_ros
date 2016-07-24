@@ -1,6 +1,6 @@
 
 #include "moveit_move_group.h"
-#include <trajectory_msgs/MultiDOFJointTrajectory.h>
+
 Moveit_move_group::Moveit_move_group():
   parent_frame_("elikos_arena_origin"),
   child_frame_("elikos_setpoint"),
@@ -45,6 +45,7 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
   //Plan and execute the trajectory
   //group_.asyncMove();
   moveit::planning_interface::MoveGroup::Plan plan;
+
   try
   {
     tf::StampedTransform currentPosition;
@@ -57,24 +58,36 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
     {
 
       ROS_ERROR_STREAM("New trajectory!");
-      group_.plan(plan);
+      moveit_msgs::MoveItErrorCodes err = group_.plan(plan);
 
-      //Execute first point in trajectory.
-      trajectory_msgs::MultiDOFJointTrajectory trajectoryToExecute = plan.trajectory_.multi_dof_joint_trajectory;
-      listener.lookupTransform(parent_frame_, "elikos_fcu",
-                              ros::Time(0), currentPosition);
-      int i = 0;
-      while(i < trajectoryToExecute.points.size()-1)
+      if(err.val == moveit_msgs::MoveItErrorCodes::SUCCESS)
       {
-          geometry_msgs::Vector3 targetTranslation = trajectoryToExecute.points[i].transforms[0].translation;
-          if(pow(targetTranslation.x-currentPosition.getOrigin().x(), 2)+
-              pow(targetTranslation.y-currentPosition.getOrigin().y(), 2)+
-              pow(targetTranslation.z-currentPosition.getOrigin().z(), 2) > pow(toleranceNextGoal_,2))
-            break;
-          i++;
+        //Execute first point in trajectory.
+        trajectory_msgs::MultiDOFJointTrajectory trajectoryToExecute = plan.trajectory_.multi_dof_joint_trajectory;
+        listener.lookupTransform(parent_frame_, "elikos_fcu",
+                                ros::Time(0), currentPosition);
+        int i = 0;
+        while(i < trajectoryToExecute.points.size()-1)
+        {
+            geometry_msgs::Vector3 targetTranslation = trajectoryToExecute.points[i].transforms[0].translation;
+            if(pow(targetTranslation.x-currentPosition.getOrigin().x(), 2)+
+                pow(targetTranslation.y-currentPosition.getOrigin().y(), 2)+
+                pow(targetTranslation.z-currentPosition.getOrigin().z(), 2) > pow(toleranceNextGoal_,2))
+              break;
+            i++;
+        }
+        trajectoryPoint_ = trajectoryToExecute.points[i].transforms[0];
       }
-      trajectoryPoint_ = trajectoryToExecute.points[i].transforms[0];
+      else
+      {
+        trajectoryPoint_.translation.x = currentPosition.getOrigin().x();
+        trajectoryPoint_.translation.y = currentPosition.getOrigin().y();
+        trajectoryPoint_.translation.z = 1.0;
 
+        std_srvs::Empty::Request req;
+        std_srvs::Empty::Response res;
+        ros::service::call("/clear_octomap", req, res);
+      }
       //Set the rotation to face the direction which it is heading.
       tf::Quaternion rotation = tf::createIdentityQuaternion();
       double direction = cv::fastAtan2(trajectoryPoint_.translation.y - currentPosition.getOrigin().y(), trajectoryPoint_.translation.x - currentPosition.getOrigin().x()) / 360 * 2 *PI;

@@ -1,6 +1,4 @@
 <launch>
-  <!-- ROVIO localisation -->
-
   <!-- Target detection -->
   <arg name="rviz" default="true" />
   <arg name="image" default="false" />
