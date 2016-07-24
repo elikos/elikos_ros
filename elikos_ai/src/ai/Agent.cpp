@@ -22,6 +22,7 @@ Agent::Agent()
     behaviors_[PREVENTIVE] = std::unique_ptr<PreventiveBehavior>(new PreventiveBehavior(pipeline_.getArena()));
     behaviors_[AGGRESSIVE] = std::unique_ptr<AggressiveBehavior>(new AggressiveBehavior(pipeline_.getArena()));
     currentBehavior_ = behaviors_[AGGRESSIVE].get();
+    updateTimer_.start();
 }
 
 void Agent::freeInstance()
@@ -45,8 +46,8 @@ AbstractBehavior* Agent::resolveCurrentBehavior()
 
 void Agent::behave()
 {
-    AbstractBehavior* currentBehavior = resolveCurrentBehavior();
-    currentBehavior->behave();
+    currentBehavior_ = resolveCurrentBehavior();
+    currentBehavior_->behave();
 }
 
 void Agent::addConsideration(Consideration consideration)
@@ -67,6 +68,7 @@ void Agent::addConsideration(Consideration consideration)
 
 void Agent::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
+    updateTimer_.reset();
     pipeline_.updateTargets(input);
 }
 
@@ -74,10 +76,12 @@ void Agent::updateQuadRobot(const tf::Pose& pose)
 {
     pipeline_.updateQuadRobot(pose);
 }
-void Agent::forceCommandGeneration()
+
+void Agent::checkForTargetUpdate()
 {
-    behaviors_[PREVENTIVE]->generateCommands();
-    behaviors_[AGGRESSIVE]->generateCommands();
+    if (updateTimer_.getElapsedS() > 2.0 ) {
+        currentBehavior_->searchForTargets();
+    }
 }
 
 };

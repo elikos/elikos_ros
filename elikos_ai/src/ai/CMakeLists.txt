@@ -22,6 +22,8 @@ set(COMMAND_SRC
     Command/AbstractCommand.cpp
     Command/MovementCommand.cpp
     Command/MovementCommand.h
+	Command/FollowCommand.cpp
+	Command/FollowCommand.h
     Command/ObservationCommand.cpp
     Command/ObservationCommand.h
     Command/TopInteractionCommand.cpp

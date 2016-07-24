@@ -21,7 +21,6 @@ const std::string SETPOINT_TOPIC { "elikos_ai_cmd" };
 const std::string WORLD_FRAME = { "elikos_arena_origin" };
 // TODO: change this for the right name for the frame
 const std::string MAV_FRAME = { "elikos_fcu" };
-
 class Agent;
 
 class MessageHandler

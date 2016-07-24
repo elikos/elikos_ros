@@ -10,12 +10,15 @@ namespace emu
 
 const std::string MessageEmulator::SIM_MAV_FRAME = "MAV";
 const std::string MessageEmulator::SIM_TRGT_FRAME = "trgtRobot";
+const std::string MessageEmulator::SIM_DST_TOPIC = "mavros/setpoint/local_position";
 
 MessageEmulator* MessageEmulator::instance_ = nullptr;
 
 MessageEmulator::MessageEmulator()
 {
     trgtPub_ = nh_.advertise<elikos_ros::TargetRobotArray>(ai::TRGT_TOPIC, 1);
+    dstSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(ai::SETPOINT_TOPIC, 1, &MessageEmulator::handleDstMsg, this);
+    dstPub_ = nh_.advertise<geometry_msgs::PoseStamped>(SIM_DST_TOPIC, 1);
 }
 
 MessageEmulator* MessageEmulator::getInstance()
@@ -50,7 +53,7 @@ void MessageEmulator::lookForMav()
     tf::StampedTransform stf;
     try
     {
-        listener_.lookupTransform(ai::WORLD_FRAME, SIM_MAV_FRAME, ros::Time(0), stf);
+        listener_.lookupTransform("world", SIM_MAV_FRAME, ros::Time(0), stf);
     }
     catch (tf::TransformException e)
     {
@@ -71,7 +74,7 @@ void MessageEmulator::lookForTargets()
         tf::StampedTransform stf;
         try
         {
-            listener_.lookupTransform(ai::WORLD_FRAME, SIM_TRGT_FRAME + std::to_string(i), ros::Time(0), stf);
+            listener_.lookupTransform("world", SIM_TRGT_FRAME + std::to_string(i), ros::Time(0), stf);
             addTarget(stf, i);
         }
         catch(tf::TransformException e)
@@ -80,6 +83,11 @@ void MessageEmulator::lookForTargets()
         }
     }
     trgtPub_.publish(targets_);
+}
+
+void MessageEmulator::handleDstMsg(geometry_msgs::PoseStamped input)
+{
+    dstPub_.publish(input);
 }
 
 void MessageEmulator::addTarget(const tf::StampedTransform& stf, unsigned char id)
