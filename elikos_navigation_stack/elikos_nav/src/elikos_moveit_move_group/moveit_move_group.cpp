@@ -6,8 +6,7 @@ Moveit_move_group::Moveit_move_group():
   child_frame_("elikos_setpoint"),
   toleranceAchieveGoal_(0.4),
   toleranceNextGoal_(0.4),
-  toleranceFreeOctomap_(0.1),
-  isFirst_(true)
+  toleranceFreeOctomap_(0.1)
 {
   //move_group settings
   group_.setPlanningTime(1.0);//In seconds
@@ -51,8 +50,13 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
     tf::StampedTransform currentPosition;
     listener.lookupTransform(parent_frame_, "elikos_fcu",
                               ros::Time(0), currentPosition);
-    if(isFirst_ ||
-        pow(target.pose.position.x-currentPosition.getOrigin().x(), 2)+
+    if(currentPosition.getOrigin().z() < toleranceAchieveGoal_ || target.pose.position.z == -1.0)
+    {
+      trajectoryPoint_.translation.x = target.pose.position.x; 
+      trajectoryPoint_.translation.y = target.pose.position.y;
+      trajectoryPoint_.translation.z = target.pose.position.z;
+    }
+    else if( pow(target.pose.position.x-currentPosition.getOrigin().x(), 2)+
         pow(target.pose.position.y-currentPosition.getOrigin().y(), 2)+
         pow(target.pose.position.z-currentPosition.getOrigin().z(), 2) > pow(toleranceAchieveGoal_, 2))
     {
@@ -88,15 +92,13 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
         std_srvs::Empty::Response res;
         ros::service::call("/clear_octomap", req, res);
       }
-      //Set the rotation to face the direction which it is heading.
-      tf::Quaternion rotation = tf::createIdentityQuaternion();
-      double direction = cv::fastAtan2(trajectoryPoint_.translation.y - currentPosition.getOrigin().y(), trajectoryPoint_.translation.x - currentPosition.getOrigin().x()) / 360 * 2 *PI;
-      rotation.setRPY((double) 0.0 , (double) 0.0, direction);
-
-      tf::quaternionTFToMsg(rotation, trajectoryPoint_.rotation);
-
-      isFirst_ = false;
     }
+    //Set the rotation to face the direction which it is heading.
+    tf::Quaternion rotation = tf::createIdentityQuaternion();
+    double direction = cv::fastAtan2(trajectoryPoint_.translation.y - currentPosition.getOrigin().y(), trajectoryPoint_.translation.x - currentPosition.getOrigin().x()) / 360 * 2 *PI;
+    rotation.setRPY((double) 0.0 , (double) 0.0, direction);
+
+    tf::quaternionTFToMsg(rotation, trajectoryPoint_.rotation);
 
     publishTrajectoryPoint(trajectoryPoint_);
 

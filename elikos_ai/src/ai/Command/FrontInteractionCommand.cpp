@@ -18,7 +18,7 @@ FrontInteractionCommand::FrontInteractionCommand(QuadRobot* quad, TargetRobot* t
     : AbstractCommand(quad, target)
 {
     destination_ = target_->getPose().getOrigin() + (target_->getDirection() * FORWARD_OFFSET);
-    destination_.setZ(0.0);
+    destination_.setZ(-1.0);
     timer_.start();
 }
 

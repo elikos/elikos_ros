@@ -48,7 +48,6 @@ private:
   	double toleranceAchieveGoal_;
     geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint_;
 
-    bool isFirst_;
 };
 
 #endif
