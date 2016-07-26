@@ -61,13 +61,14 @@ int ArenaA::getNRotationsForOptimalDirection(const TargetRobot& target) const
 TargetRobot* ArenaA::findClosestTargetToGoodLine()
 {
     double linePosition = 10.0;
-    double minDistance = std::abs(targets_[0].getPose().getOrigin().y() - linePosition);
-    TargetRobot* closestRobot = &targets_[0];
-    for (int i = 1; i < targets_.size(); ++i)
+    double minDistance = 20;
+    TargetRobot* closestRobot = nullptr;
+    for (int i = 0; i < targets_.size(); ++i)
     {
         double distance = std::abs(targets_[i].getPose().getOrigin().y() - linePosition);
         if (distance < minDistance &&
-            !targets_[i].getOrientationEvaluation()->isOutOfBound_)
+            !targets_[i].getOrientationEvaluation()->isOutOfBound_ &&
+             targets_[i].getNMissedUpdates() < 10)
         {
             minDistance = distance;
             closestRobot = &targets_[i];

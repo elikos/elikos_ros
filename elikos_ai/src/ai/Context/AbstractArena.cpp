@@ -33,7 +33,8 @@ TargetRobot* AbstractArena::findHighestPriorityTarget()
     for (int i = 0; i < targets_.size(); ++i)
     {
         if (targets_[i].getPriority() > maxPriority &&
-           !targets_[i].getOrientationEvaluation()->isOutOfBound_)
+           !targets_[i].getOrientationEvaluation()->isOutOfBound_ &&
+            targets_[i].getNMissedUpdates() < 10)
         {
             maxPriority = targets_[i].getPriority();
             highestPriorityTarget = &targets_[i];

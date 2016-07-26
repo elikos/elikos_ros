@@ -45,7 +45,7 @@ private:
     uint8_t id_{ 0 };
     uint8_t color_{ 0 };
     double priority_{ 0.0 };
-    int nMissedUpdates_{ 0 };
+    int nMissedUpdates_{ 100 };
 
     OrientationEvaluation evaluation_;
 };

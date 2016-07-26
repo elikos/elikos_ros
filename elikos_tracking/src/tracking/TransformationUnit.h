@@ -10,8 +10,6 @@
 #include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
-#include "tf/message_filter.h"
-#include "message_filters/subscriber.h"
 #include <elikos_ros/RobotRawArray.h>
 #include <elikos_ros/RobotRaw.h>
 #include <elikos_ros/TargetRobotArray.h>
@@ -31,7 +29,7 @@ class TransformationUnit
 	private:
 		tf::Quaternion computeTurretRotation(elikos_ros::RobotRaw);
 		tf::Transform computeRobotTransform(tf::Transform);
-		
+
     tf::TransformBroadcaster tf_broadcaster_;
     tf::TransformListener tf_listener_;
 
@@ -40,11 +38,12 @@ class TransformationUnit
 
 		elikos_ros::TargetRobotArray oldArray_;
 
-        //TODO: Check the validity of those values
-        const double CAMERA_FOV_H = 89 * PI/180.0;
-        const double CAMERA_FOV_V = 63 * PI/180.0;
+    //TODO: Check the validity of those values
+    const double CAMERA_FOV_H = 89 * PI/180.0;
+    const double CAMERA_FOV_V = 63 * PI/180.0;
 		static const int CAM_HEIGHT = 480;
 		static const int CAM_WIDTH = 640;
+		const double TOLERANCE_HEIGHT = 0.1;
 };
 
 #endif

@@ -2,6 +2,8 @@
 #define AI_FACADE_H
 
 #include <memory>
+
+#include "Timer.h"
 #include "PriorityEvaluationPipeline.h"
 #include "AbstractBehavior.h"
 #include <elikos_ros/TargetRobotArray.h>
@@ -30,18 +32,20 @@ public:
     void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
     void updateQuadRobot(const tf::Pose& pose);
     void addConsideration(Consideration consideration);
-    void forceCommandGeneration();
 
     void behave();
 
 private:
     static Agent* instance_;
 
+
     std::unique_ptr<AbstractBehavior> behaviors_[2];
     AbstractBehavior* currentBehavior_;
     PriorityEvaluationPipeline pipeline_;
+    util::Timer updateTimer_;
 
     AbstractBehavior* resolveCurrentBehavior();
+    void checkForTargetUpdate();
     Agent();
     ~Agent() = default;
 };

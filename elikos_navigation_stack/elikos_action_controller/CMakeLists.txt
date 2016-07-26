@@ -19,7 +19,10 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   tf
+  cv_bridge
 )
+
+find_package(OpenCV REQUIRED)
 
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})
@@ -50,7 +53,9 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
   moveit_core
   tf
+  cv_bridge
 )
+
 
 include_directories(include)
 

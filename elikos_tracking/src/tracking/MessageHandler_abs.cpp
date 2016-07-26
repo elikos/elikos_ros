@@ -3,6 +3,7 @@
 MessageHandler_abs::MessageHandler_abs()
 {
 	sub_ = nh_.subscribe("elikos_robot_raw_array", 1, &MessageHandler_abs::dispatchMessageRobotRaw, this);
+
 	pubTest_ = nh_.advertise<geometry_msgs::PoseArray>("elikos_robot_pose_array",1);
 }
 
@@ -17,7 +18,7 @@ void MessageHandler_abs::dispatchMessageRobotRaw(const elikos_ros::RobotRawArray
 
 	newArray_ = *input;
 
-	//Les calculs suivant sont temporaires en attendant qu'on les publies.
+	//Le vecteur results est pour l'affichage dans rviz.
 	geometry_msgs::PoseArray results = transformationUnit_.computeTransformForRobots(newArray_);
 
 	//publish results

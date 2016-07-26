@@ -21,6 +21,9 @@ public:
 
     static const std::string SIM_TRGT_FRAME;
     static const std::string SIM_MAV_FRAME;
+    static const std::string SIM_DST_TOPIC;
+
+
 
     static MessageEmulator* getInstance();
     static void freeInstance();
@@ -36,6 +39,8 @@ private:
     tf::TransformListener listener_;
     tf::TransformBroadcaster broadcaster_;
     ros::Publisher trgtPub_;
+    ros::Publisher dstPub_;
+    ros::Subscriber dstSub_;
 
     tf::Point mavPosition_;
 
@@ -44,6 +49,7 @@ private:
     void lookForTargets();
     void lookForMav();
     void addTarget(const tf::StampedTransform& stf, unsigned char i);
+    void handleDstMsg(geometry_msgs::PoseStamped input);
 };
 
 }

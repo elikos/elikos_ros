@@ -8,7 +8,6 @@
 namespace ai
 {
 
-
 MessageHandler* MessageHandler::instance_ = nullptr;
 
 MessageHandler* MessageHandler::getInstance()

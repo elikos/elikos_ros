@@ -6,5 +6,6 @@
 #include "FrontInteractionCommand.h"
 #include "MovementCommand.h"
 #include "ObservationCommand.h"
+#include "FollowCommand.h"
 
 #endif // COMMAND_TYPES_H

@@ -16,12 +16,11 @@ namespace tf
 
 namespace ai
 {
-const std::string TRGT_TOPIC { "target_robot_array" };
-const std::string SETPOINT_TOPIC { "mavros/setpoint/local_position" };
-const std::string WORLD_FRAME = { "world" };
+const std::string TRGT_TOPIC { "elikos_target_robot_array" };
+const std::string SETPOINT_TOPIC { "elikos_ai_cmd" };
+const std::string WORLD_FRAME = { "elikos_arena_origin" };
 // TODO: change this for the right name for the frame
-const std::string MAV_FRAME = { "MAV" };
-
+const std::string MAV_FRAME = { "elikos_fcu" };
 class Agent;
 
 class MessageHandler

@@ -42,6 +42,6 @@
   </include>
 
   <!-- If needed, broadcast static tf for robot root -->
-  <node pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 elikos_local_origin elikos_base_link 100" />
-  <node pkg="tf" type="static_transform_publisher" name="origin_broadcaster" args="0 0 0 0 0 0 1 elikos_base_link realsense_frame 100" />
+  <!--<node pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 elikos_local_origin elikos_base_link 100" />-->
+  <node pkg="tf" type="static_transform_publisher" name="origin_broadcaster" args="0 0 0 -0.5 0.5 -0.5 0.5 elikos_base_link r200 100" />
 </launch>

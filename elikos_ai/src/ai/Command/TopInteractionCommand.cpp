@@ -26,6 +26,7 @@ TopInteractionCommand::~TopInteractionCommand()
 void TopInteractionCommand::execute()
 {
     tf::Vector3 destination = target_->getPose().getOrigin();
+    destination.setZ(-1.0);
     MessageHandler::getInstance()->sendDestination(destination);
     if (hasReachedDestination(quad_->getPose().getOrigin(), destination) && !timer_.isStarted()) {
         timer_.start();

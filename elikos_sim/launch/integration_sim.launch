@@ -1,0 +1,24 @@
+<launch>
+	<!-- Target detection -->
+	<arg name="rviz" default="true" />
+	<arg name="image" default="false" />
+	<arg name="calib" default="false" />
+	<arg name="calib_in" default="calibration_initial" />
+	<arg name="calib_out" default="new_calibration" />
+	<arg name="calib_dir" default="$(find elikos_detection)/cfg/" />
+	<include file="$(find elikos_detection)/launch/detection.launch"/>
+
+	<!-- Target tracking -->
+	<include file="$(find elikos_tracking)/launch/tracking.launch"/>
+
+	<!-- AI -->
+	<include file="$(find elikos_ai)/launch/ai.launch"/>
+
+	<!-- Path planning and navigation -->
+  <include file="$(find elikos_nav)/launch/nav.launch"/>
+
+	<!-- Static transforms -->
+	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
+	<node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
+	<node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_ffmv_bottom 100" />
+</launch>

@@ -7,9 +7,11 @@ Panels:
         - /Global Options1
         - /Status1
         - /MotionPlanning1
+        - /MotionPlanning1/Planning Request1
         - /Pose1
         - /TF1
         - /TF1/Frames1
+        - /Pose2
       Splitter Ratio: 0.74256
     Tree Height: 180
   - Class: rviz/Help
@@ -93,7 +95,7 @@ Visualization Manager:
         Interactive Marker Size: 0
         Joint Violation Color: 255; 0; 255
         Planning Group: elikos_moveit_quadrotor_group
-        Query Goal State: true
+        Query Goal State: false
         Query Start State: false
         Show Workspace: false
         Start State Alpha: 1
@@ -144,15 +146,19 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        camera_color_optical_frame:
-          Value: false
-        camera_depth_optical_frame:
-          Value: false
-        elikos_base_link:
+        elikos_arena_origin:
           Value: true
+        elikos_base_link:
+          Value: false
+        elikos_fcu:
+          Value: true
+        elikos_ffmv_bottom:
+          Value: false
         elikos_local_origin:
           Value: true
-        realsense_frame:
+        elikos_setpoint:
+          Value: true
+        r200:
           Value: false
       Marker Scale: 1
       Name: TF
@@ -160,19 +166,45 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        elikos_local_origin:
-          elikos_base_link:
-            realsense_frame:
-              camera_color_optical_frame:
+        elikos_arena_origin:
+          elikos_local_origin:
+            elikos_fcu:
+              elikos_base_link:
+                r200:
+                  {}
+              elikos_ffmv_bottom:
                 {}
-              camera_depth_optical_frame:
-                {}
+          elikos_setpoint:
+            {}
       Update Interval: 0
+      Value: true
+    - Arrow Length: 0.3
+      Class: rviz/PoseArray
+      Color: 255; 25; 0
+      Enabled: true
+      Name: PoseArray
+      Topic: /elikos_robot_pose_array
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Axes Length: 0.5
+      Axes Radius: 0.05
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.3
+      Head Radius: 0.1
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.05
+      Shape: Axes
+      Topic: /elikos_ai_cmd
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: elikos_local_origin
+    Fixed Frame: elikos_arena_origin
     Frame Rate: 30
   Name: root
   Tools:
@@ -184,7 +216,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 4.13851
+      Distance: 2.84875
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -196,10 +228,10 @@ Visualization Manager:
         Z: 2.23518e-07
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: -0.0402032
+      Pitch: -0.395202
       Target Frame: base_link
       Value: XYOrbit (rviz)
-      Yaw: 0.921769
+      Yaw: 5.77677
     Saved: ~
 Window Geometry:
   Displays:
@@ -215,5 +247,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1535
-  X: 65
-  Y: 24
+  X: 112
+  Y: 101

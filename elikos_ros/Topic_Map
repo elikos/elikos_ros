@@ -5,13 +5,14 @@ elikos_detection:
 
 elikos_tracking:
   input : elikos_robot_raw_array
-  output: elikos_robot_pose_array
+  output: elikos_target_robot_array
+          elikos_robot_pose_array (debug only)
 
 elikos_ai:
   input:  elikos_robot_pose_array
           mavros/local_position
-  output: elikos_target
+  output: elikos_ai_target
 
 elikos_navigation_stack:
-  input:  elikos_target
+  input:  elikos_ai_target
   output: /move_group/display_planned_path (debug only)

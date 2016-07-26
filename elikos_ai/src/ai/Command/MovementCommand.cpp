@@ -11,8 +11,8 @@
 namespace ai
 {
 
-MovementCommand::MovementCommand(QuadRobot* quad, TargetRobot* target)
-    : AbstractCommand(quad, target)
+MovementCommand::MovementCommand(QuadRobot* quad, const tf::Point& destination)
+    : AbstractCommand(quad, nullptr), destination_(destination)
 {
 }
 
@@ -22,16 +22,12 @@ MovementCommand::~MovementCommand()
 
 void MovementCommand::execute()
 {
-    tf::Vector3 destination = target_->getPose().getOrigin();
-    destination.setZ(FLIGHT_HEIGHT);
-    MessageHandler::getInstance()->sendDestination(destination);
+    MessageHandler::getInstance()->sendDestination(destination_);
 }
 
 bool MovementCommand::isCommmandDone()
 {
-    tf::Vector3 destination = target_->getPose().getOrigin();
-    destination.setZ(FLIGHT_HEIGHT);
-    return hasReachedDestination(quad_->getPose().getOrigin(), destination) ||
+    return hasReachedDestination(quad_->getPose().getOrigin(), destination_) ||
             timer_.getElapsedS() > WAIT_TIME;
 }
 

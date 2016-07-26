@@ -11,7 +11,7 @@
 namespace ai
 {
 
-const tf::Point ObservationCommand::OBSERVATION_POSITION{ 0.0, 0.0, 3.0 };
+const tf::Point ObservationCommand::OBSERVATION_POSITION{ 0.0, 0.0, 2.0 };
 
 ObservationCommand::ObservationCommand(QuadRobot* quad, TargetRobot* target)
     : AbstractCommand(quad, target)

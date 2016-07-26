@@ -13,5 +13,5 @@
         <joint name="virtual_joint" />
     </group>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
-    <virtual_joint name="virtual_joint" type="floating" parent_frame="elikos_local_origin" child_link="elikos_base_link" />
+    <virtual_joint name="virtual_joint" type="floating" parent_frame="elikos_arena_origin" child_link="elikos_base_link" />
 </robot>

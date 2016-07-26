@@ -4,6 +4,7 @@
 
 #include "AbstractArena.h"
 #include "CommandTypes.h"
+#include "FollowCommand.h"
 
 #include "PreventiveBehavior.h"
 
@@ -25,11 +26,11 @@ void PreventiveBehavior::generateCommands()
     QuadRobot* quad = &arena_->getQuad();
 
     if (target != nullptr) {
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(quad, target)));
+        q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, target)));
         q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, target)));
         q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
     } else {
-        q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
+        searchForTargets();
     }
 
 }

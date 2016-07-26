@@ -15,7 +15,8 @@ AbstractCommand::~AbstractCommand()
 bool AbstractCommand::hasReachedDestination(const tf::Vector3& currentPosition, const tf::Vector3& destination)
 {
     double distance = tf::tfDistance(currentPosition, destination);
-    return std::abs(distance) < 0.1;
+    
+    return std::abs(distance) < 0.4;
 }
 
 }
