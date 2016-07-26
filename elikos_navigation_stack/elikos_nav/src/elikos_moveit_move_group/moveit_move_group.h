@@ -22,6 +22,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <std_srvs/Empty.h>
+#include <ctime>
 
 #ifndef PI
 #define PI 3.14159265
@@ -48,6 +49,7 @@ private:
   	double toleranceAchieveGoal_;
     geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint_;
 
+    double safetyTime_;
 };
 
 #endif
