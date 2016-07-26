@@ -52,7 +52,22 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
     tf::StampedTransform currentPosition;
     listener.lookupTransform(parent_frame_, "elikos_base_link",
                               ros::Time(0), currentPosition);
-    if( pow(target.pose.position.x-currentPosition.getOrigin().x(), 2)+
+    if(target.pose.position.z == -1.0)
+    {
+      trajectoryPoint_.translation.x = target.pose.position.x;
+      trajectoryPoint_.translation.y = target.pose.position.y;
+      trajectoryPoint_.translation.z = target.pose.position.z;
+
+      //Set the rotation to face the direction which it is heading.
+      tf::Quaternion rotation = tf::createIdentityQuaternion();
+      double direction = cv::fastAtan2(trajectoryPoint_.translation.y - currentPosition.getOrigin().y(), trajectoryPoint_.translation.x - currentPosition.getOrigin().x()) / 360 * 2 *PI;
+      rotation.setRPY((double) 0.0 , (double) 0.0, direction);
+
+      tf::quaternionTFToMsg(rotation, trajectoryPoint_.rotation);
+
+      publishTrajectoryPoint(trajectoryPoint_);
+    }
+    else if( pow(target.pose.position.x-currentPosition.getOrigin().x(), 2)+
         pow(target.pose.position.y-currentPosition.getOrigin().y(), 2)+
         pow(target.pose.position.z-currentPosition.getOrigin().z(), 2) > pow(toleranceAchieveGoal_, 2))
     {
