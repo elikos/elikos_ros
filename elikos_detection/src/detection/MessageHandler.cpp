@@ -25,7 +25,7 @@ MessageHandler::MessageHandler(string calibrationFilename) :
 
     //Calibration trackbars
   	bool calibrationOn;
-    if (nh_.getParam("/dnt/calibration", calibrationOn))
+    if (nh_.getParam("/elikos_detection/calibration", calibrationOn))
   	{
   		if(calibrationOn) detection_.createTrackbars();
   	}

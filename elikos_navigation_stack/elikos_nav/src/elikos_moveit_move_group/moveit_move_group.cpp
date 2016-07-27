@@ -58,12 +58,8 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
       trajectoryPoint_.translation.y = target.pose.position.y;
       trajectoryPoint_.translation.z = target.pose.position.z;
 
-      //Set the rotation to face the direction which it is heading.
-      tf::Quaternion rotation = tf::createIdentityQuaternion();
-      double direction = cv::fastAtan2(trajectoryPoint_.translation.y - currentPosition.getOrigin().y(), trajectoryPoint_.translation.x - currentPosition.getOrigin().x()) / 360 * 2 *PI;
-      rotation.setRPY((double) 0.0 , (double) 0.0, direction);
-
-      tf::quaternionTFToMsg(rotation, trajectoryPoint_.rotation);
+      //Set the rotation to the current one.
+      tf::quaternionTFToMsg(currentPosition.getRotation(), trajectoryPoint_.rotation);
 
       publishTrajectoryPoint(trajectoryPoint_);
     }

@@ -1,5 +1,4 @@
 #include "RedColor.h"
-
 RedColor::RedColor()
 {
     H_MIN =  new int(0);
