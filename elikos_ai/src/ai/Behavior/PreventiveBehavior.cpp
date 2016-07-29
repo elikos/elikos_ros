@@ -29,10 +29,7 @@ void PreventiveBehavior::generateCommands()
         q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, target)));
         q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, target)));
         q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
-    } else {
-        searchForTargets();
     }
-
 }
 
 int PreventiveBehavior::resolveCurrentStateLevel()

@@ -34,7 +34,7 @@ TargetRobot* AbstractArena::findHighestPriorityTarget()
     {
         if (targets_[i].getPriority() > maxPriority &&
            !targets_[i].getOrientationEvaluation()->isOutOfBound_ &&
-            targets_[i].getNMissedUpdates() < 10)
+            targets_[i].getNMissedUpdates() < 100)
         {
             maxPriority = targets_[i].getPriority();
             highestPriorityTarget = &targets_[i];
@@ -46,7 +46,6 @@ TargetRobot* AbstractArena::findHighestPriorityTarget()
 void AbstractArena::prepareUpdate()
 {
     size_t n = targets_.size();
-    std::cout << n << std::endl;
     for (int i = 0; i < targets_.size(); ++i)
     {
         targets_[i].prepareForUpdate();
@@ -68,7 +67,6 @@ TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::Targ
     TargetRobot* candidate = nullptr;
     // If this id is being tracked, juste update that robot
     if (it != targetsId_.end()) {
-        int test = it->second->getId();
         candidate = it->second;
     } else {
         int maxNMissedUpdates = 0;
@@ -90,7 +88,6 @@ TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::Targ
         }
     }
     return candidate;
-
 }
 
 void AbstractArena::evaluateOutOfBound(TargetRobot& target)
@@ -100,6 +97,18 @@ void AbstractArena::evaluateOutOfBound(TargetRobot& target)
     double x = target.getPose().getOrigin().x();
     double y = target.getPose().getOrigin().y();
     target.getOrientationEvaluation()->isOutOfBound_ = !(MIN <= x && x <= MAX && MIN <= y && y <= MAX);
+}
+
+int AbstractArena::getNbrOfUpdatedTargets()
+{
+    int nTargets = 0;
+    for (int i = 0; i < targets_.size(); ++i) {
+        if (targets_[i].getNMissedUpdates() < 100 &&
+           !targets_[i].getOrientationEvaluation()->isOutOfBound_) {
+            nTargets++;
+        }
+    }
+    return nTargets;
 }
 
 }

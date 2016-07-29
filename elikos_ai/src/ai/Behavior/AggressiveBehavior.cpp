@@ -23,13 +23,10 @@ AggressiveBehavior::~AggressiveBehavior()
 void AggressiveBehavior::generateCommands()
 {
     currentTarget_ = arena_->findClosestTargetToGoodLine();
+    if (currentTarget_ == nullptr) return;
+
     QuadRobot* quad = &arena_->getQuad();
     q_.clear();
-
-    if (currentTarget_ == nullptr) {
-        searchForTargets();
-        return;
-    }
 
     q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, currentTarget_)));
     int nLeftRotations = arena_->getNRotationsForOptimalDirection(*currentTarget_);
@@ -37,14 +34,18 @@ void AggressiveBehavior::generateCommands()
     {
         case 1:
             // 180 rotation then right 90 rotation
-            q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
             q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, currentTarget_)));
             q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
             break;
 
         case 2:
             // 180 rotation
-            q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
             break;
         case 3:
             // single 90 rotation

@@ -92,15 +92,25 @@ void MessageEmulator::handleDstMsg(geometry_msgs::PoseStamped input)
 
 void MessageEmulator::addTarget(const tf::StampedTransform& stf, unsigned char id)
 {
-    tf::Pose poseTf(stf);
-    geometry_msgs::Pose poseMsg;
-    tf::poseTFToMsg(poseTf, poseMsg);
+    if (inputIsInRange(stf)) {
+        tf::Pose poseTf(stf);
+        geometry_msgs::Pose poseMsg;
+        tf::poseTFToMsg(poseTf, poseMsg);
 
-    elikos_ros::TargetRobot target;
-    target.color = 0;
-    target.id = id;
-    target.poseOrigin.pose = poseMsg;
-    targets_.targets.push_back(target);
+        elikos_ros::TargetRobot target;
+        target.color = 0;
+        target.id = id;
+        target.poseOrigin.pose = poseMsg;
+        targets_.targets.push_back(target);
+    }
 }
-    
+
+bool MessageEmulator::inputIsInRange(tf::StampedTransform stf) const
+{
+    double radius = mavPosition_.getZ();
+    tf::Vector3 mavPosition2D(mavPosition_);
+    mavPosition2D.setZ(0.0);
+    return tf::tfDistance(stf.getOrigin(), mavPosition2D) < std::abs(radius);
+}
+
 };
