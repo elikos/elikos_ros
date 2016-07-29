@@ -1,6 +1,7 @@
 #include "Agent.h"
 #include "PreventiveBehavior.h"
 #include "AggressiveBehavior.h"
+#include "TargetResearch.h"
 #include "ConsiderationTypes.h"
 
 namespace ai
@@ -21,6 +22,7 @@ Agent::Agent()
 {
     behaviors_[PREVENTIVE] = std::unique_ptr<PreventiveBehavior>(new PreventiveBehavior(pipeline_.getArena()));
     behaviors_[AGGRESSIVE] = std::unique_ptr<AggressiveBehavior>(new AggressiveBehavior(pipeline_.getArena()));
+    behaviors_[RESEARCH] = std::unique_ptr<TargetResearch>(new TargetResearch(pipeline_.getArena()));
     currentBehavior_ = behaviors_[AGGRESSIVE].get();
     updateTimer_.start();
 }
@@ -33,13 +35,18 @@ void Agent::freeInstance()
 
 AbstractBehavior* Agent::resolveCurrentBehavior()
 {
-    // Check for robots that are about to go out of the arena first
-    int preventiveStateLevel = behaviors_[PREVENTIVE]->resolveCurrentStateLevel();
-    int aggressiveStateLevel = behaviors_[AGGRESSIVE]->resolveCurrentStateLevel();
+    int researchStateLevel = behaviors_[RESEARCH]->resolveCurrentStateLevel();
     AbstractBehavior* behavior = behaviors_[AGGRESSIVE].get();
+    if (researchStateLevel > 0) {
+        // Check for robots that are about to go out of the arena first
+        int preventiveStateLevel = behaviors_[PREVENTIVE]->resolveCurrentStateLevel();
+        int aggressiveStateLevel = behaviors_[AGGRESSIVE]->resolveCurrentStateLevel();
 
-    if (preventiveStateLevel > aggressiveStateLevel) {
-        behavior = behaviors_[PREVENTIVE].get();
+        if (preventiveStateLevel > aggressiveStateLevel) {
+            behavior = behaviors_[PREVENTIVE].get();
+        }
+    } else {
+        behavior = behaviors_[RESEARCH].get();
     }
     return behavior;
 }
@@ -75,13 +82,6 @@ void Agent::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
 void Agent::updateQuadRobot(const tf::Pose& pose)
 {
     pipeline_.updateQuadRobot(pose);
-}
-
-void Agent::checkForTargetUpdate()
-{
-    if (updateTimer_.getElapsedS() > 2.0 ) {
-        currentBehavior_->searchForTargets();
-    }
 }
 
 };

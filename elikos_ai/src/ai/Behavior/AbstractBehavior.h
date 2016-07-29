@@ -20,7 +20,6 @@ public:
     void behave();
     virtual void generateCommands() = 0;
     virtual int resolveCurrentStateLevel() = 0;
-    void searchForTargets();
 
 protected:
     CommandQueue q_;

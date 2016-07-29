@@ -16,7 +16,8 @@ public:
     enum EnumBehavior
     {
         PREVENTIVE,
-        AGGRESSIVE
+        AGGRESSIVE,
+        RESEARCH
     };
 
     enum Consideration
@@ -39,13 +40,12 @@ private:
     static Agent* instance_;
 
 
-    std::unique_ptr<AbstractBehavior> behaviors_[2];
+    std::unique_ptr<AbstractBehavior> behaviors_[3];
     AbstractBehavior* currentBehavior_;
     PriorityEvaluationPipeline pipeline_;
     util::Timer updateTimer_;
 
     AbstractBehavior* resolveCurrentBehavior();
-    void checkForTargetUpdate();
     Agent();
     ~Agent() = default;
 };

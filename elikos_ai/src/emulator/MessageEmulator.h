@@ -50,6 +50,7 @@ private:
     void lookForMav();
     void addTarget(const tf::StampedTransform& stf, unsigned char i);
     void handleDstMsg(geometry_msgs::PoseStamped input);
+    bool inputIsInRange(tf::StampedTransform) const;
 };
 
 }

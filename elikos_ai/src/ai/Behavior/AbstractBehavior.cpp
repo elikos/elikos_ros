@@ -27,17 +27,6 @@ void AbstractBehavior::behave()
     arena_->prepareUpdate();
 }
 
-void AbstractBehavior::searchForTargets()
-{
-    if (q_.empty()) {
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -5.0,  0.0, 2.0 })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -5.0, 2.0 })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  5.0,  0.0, 2.0 })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  5.0, 2.0 })));
-    }
-
-}
-
 }
 
 

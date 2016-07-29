@@ -15,7 +15,7 @@ AbstractCommand::~AbstractCommand()
 bool AbstractCommand::hasReachedDestination(const tf::Vector3& currentPosition, const tf::Vector3& destination)
 {
     double distance;
-    if(destination.getZ() == -1.0)
+    if(destination.getZ() < -0.5)
     {
       tf::Vector3 groundPosition = destination;
       groundPosition.setZ(0);
@@ -25,7 +25,7 @@ bool AbstractCommand::hasReachedDestination(const tf::Vector3& currentPosition, 
     {
       distance = tf::tfDistance(currentPosition, destination);
     }
-    return std::abs(distance) < 0.4;
+    return std::abs(distance) < 0.2;
 }
 
 }

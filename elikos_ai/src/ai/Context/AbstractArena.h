@@ -44,6 +44,7 @@ public:
     virtual TargetRobot* findClosestTargetToGoodLine() = 0;
 
     TargetRobot* findHighestPriorityTarget();
+    int getNbrOfUpdatedTargets();
 
 protected:
     std::vector<std::unique_ptr<AbstractLine>> lines_;
