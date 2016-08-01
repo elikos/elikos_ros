@@ -13,7 +13,10 @@ set(BEHAVIOR_SRC
     Behavior/AggressiveBehavior.cpp
     Behavior/AggressiveBehavior.h
     Behavior/PreventiveBehavior.cpp
-    Behavior/PreventiveBehavior.h Behavior/TargetResearch.cpp Behavior/TargetResearch.h)
+    Behavior/PreventiveBehavior.h
+    Behavior/TargetResearch.cpp
+    Behavior/TargetResearch.h
+    Behavior/BehaviorTypes.h)
 
 set(COMMAND_SRC
     Command/CommandQueue.h

@@ -11,6 +11,9 @@
 namespace ai
 {
 
+const double AbstractArena::MIN_EDGE = -9.5;
+const double AbstractArena::MAX_EDGE =  9.5;
+
 const tf::Point AbstractArena::TOP_RIGHT_CORNER{ 10.0, 10.0, 0.0 };
 const tf::Point AbstractArena::TOP_LEFT_CORNER{ -10.0, 10.0, 0.0 };
 const tf::Point AbstractArena::BOTTOM_LEFT_CORNER{ -10.0, -10.0, 0.0 };
@@ -33,7 +36,6 @@ TargetRobot* AbstractArena::findHighestPriorityTarget()
     for (int i = 0; i < targets_.size(); ++i)
     {
         if (targets_[i].getPriority() > maxPriority &&
-           !targets_[i].getOrientationEvaluation()->isOutOfBound_ &&
             targets_[i].getNMissedUpdates() < 100)
         {
             maxPriority = targets_[i].getPriority();
@@ -54,9 +56,15 @@ void AbstractArena::prepareUpdate()
 
 TargetRobot* AbstractArena::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
 {
-    TargetRobot* target = findMostLikelyUpdateCondidate(targetUpdate);
-    if (target != nullptr) {
-        target->updateFrom(targetUpdate);
+    tf::Pose pose;
+    tf::poseMsgToTF(targetUpdate.poseOrigin.pose, pose);
+
+    TargetRobot* target = nullptr;
+    if (!isOutOfBound(pose.getOrigin())) {
+        target = findMostLikelyUpdateCondidate(targetUpdate);
+        if (target != nullptr) {
+            target->updateFrom(targetUpdate);
+        }
     }
     return target;
 }
@@ -73,9 +81,7 @@ TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::Targ
         for (int i = 0; i < targets_.size(); ++i)
         {
             int nMissedUpdates = targets_[i].getNMissedUpdates();
-            if ( nMissedUpdates > maxNMissedUpdates &&
-                 !targets_[i].getOrientationEvaluation()->isOutOfBound_ &&
-                  targets_[i].getNMissedUpdates() > 0)
+            if ( nMissedUpdates > maxNMissedUpdates)
             {
                 maxNMissedUpdates = nMissedUpdates;
                 candidate = &targets_[i];
@@ -96,7 +102,18 @@ void AbstractArena::evaluateOutOfBound(TargetRobot& target)
     const double MAX = 9.5;
     double x = target.getPose().getOrigin().x();
     double y = target.getPose().getOrigin().y();
-    target.getOrientationEvaluation()->isOutOfBound_ = !(MIN <= x && x <= MAX && MIN <= y && y <= MAX);
+    target.getOrientationEvaluation()->isOutOfBound_ = isOutOfBound(target);
+}
+
+bool AbstractArena::isOutOfBound(tf::Point position)
+{
+    return !(MIN_EDGE <= position.x() && position.x() <= MAX_EDGE &&
+             MIN_EDGE <= position.y() && position.y() <= MAX_EDGE);
+}
+
+bool AbstractArena::isOutOfBound(TargetRobot& target)
+{
+   return isOutOfBound(target.getPose().getOrigin());
 }
 
 int AbstractArena::getNbrOfUpdatedTargets()
