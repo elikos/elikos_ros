@@ -5,7 +5,6 @@
 #include <iterator>
 
 #include "AbstractArena.h"
-
 #include "Agent.h"
 
 namespace ai
@@ -120,8 +119,7 @@ int AbstractArena::getNbrOfUpdatedTargets()
 {
     int nTargets = 0;
     for (int i = 0; i < targets_.size(); ++i) {
-        if (targets_[i].getNMissedUpdates() < 100 &&
-           !targets_[i].getOrientationEvaluation()->isOutOfBound_) {
+        if (targets_[i].getNMissedUpdates() < 100) {
             nTargets++;
         }
     }
