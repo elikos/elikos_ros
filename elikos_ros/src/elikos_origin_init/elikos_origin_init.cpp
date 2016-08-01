@@ -25,7 +25,18 @@ int main(int argc, char* argv[])
 
   tf::TransformListener tf_listener_;
   tf::TransformBroadcaster tf_broadcaster_;
-  tf::StampedTransform originTransform;
+  tf::StampedTransform arenaOriginTransform;
+
+  tf::StampedTransform initialFcu;
+  tf::Quaternion initialFcuOrientation;
+  try {
+    tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), initialFcu);
+    initialFcuOrientation = initialFcu.getRotation();
+  }
+  catch (tf::TransformException &ex) {
+    ROS_ERROR("Origin init failed!!!! Exception : %s",ex.what());
+  }
+
   bool lookupDone = false;
 
   ros::ServiceServer service = n.advertiseService("elikos_origin_init", initialize);
@@ -38,14 +49,15 @@ int main(int argc, char* argv[])
       if(!lookupDone)
       {
         try {
-    			tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), originTransform);
+    			tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), arenaOriginTransform);
+          arenaOriginTransform.setRotation(initialFcuOrientation);
           lookupDone = true;
     		}
     		catch (tf::TransformException &ex) {
     			ROS_ERROR("Origin init failed!!!! Exception : %s",ex.what());
     		}
       }
-      tf_broadcaster_.sendTransform(tf::StampedTransform(originTransform.inverse(), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_LOCAL_ORIGIN));
+      tf_broadcaster_.sendTransform(tf::StampedTransform(arenaOriginTransform.inverse(), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_LOCAL_ORIGIN));
     }
     else
     {
