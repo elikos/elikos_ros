@@ -36,7 +36,6 @@ TargetRobot* AbstractArena::findHighestPriorityTarget()
     for (int i = 0; i < targets_.size(); ++i)
     {
         if (targets_[i].getPriority() > maxPriority &&
-           !targets_[i].getOrientationEvaluation()->isOutOfBound_ &&
             targets_[i].getNMissedUpdates() < 100)
         {
             maxPriority = targets_[i].getPriority();
@@ -57,9 +56,15 @@ void AbstractArena::prepareUpdate()
 
 TargetRobot* AbstractArena::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
 {
-    TargetRobot* target = findMostLikelyUpdateCondidate(targetUpdate);
-    if (target != nullptr) {
-        target->updateFrom(targetUpdate);
+    tf::Pose pose;
+    tf::poseMsgToTF(targetUpdate.poseOrigin.pose, pose);
+
+    TargetRobot* target = nullptr;
+    if (!isOutOfBound(pose.getOrigin())) {
+        target = findMostLikelyUpdateCondidate(targetUpdate);
+        if (target != nullptr) {
+            target->updateFrom(targetUpdate);
+        }
     }
     return target;
 }
@@ -76,9 +81,7 @@ TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::Targ
         for (int i = 0; i < targets_.size(); ++i)
         {
             int nMissedUpdates = targets_[i].getNMissedUpdates();
-            if ( nMissedUpdates > maxNMissedUpdates &&
-                 !targets_[i].getOrientationEvaluation()->isOutOfBound_ &&
-                  targets_[i].getNMissedUpdates() > 0)
+            if ( nMissedUpdates > maxNMissedUpdates)
             {
                 maxNMissedUpdates = nMissedUpdates;
                 candidate = &targets_[i];

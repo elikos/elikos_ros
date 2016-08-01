@@ -26,8 +26,8 @@ class TargetRobot;
 class AbstractArena
 {
 public:
-    static const double MIN_EDGE = -9.5;
-    static const double MAX_EDGE =  9.5;
+    static const double MIN_EDGE;
+    static const double MAX_EDGE;
 
     static const tf::Point TOP_RIGHT_CORNER;
     static const tf::Point TOP_LEFT_CORNER;
