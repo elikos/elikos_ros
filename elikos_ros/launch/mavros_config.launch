@@ -10,7 +10,7 @@
   setpoint_position:
     tf:
       listen: true
-      frame_id: elikos_base_link
+      frame_id: elikos_arena_origin
       child_frame_id: elikos_setpoint
   </rosparam>
 </launch>

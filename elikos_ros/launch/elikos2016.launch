@@ -1,5 +1,6 @@
 <launch>
   <!-- HARDWARE -->
+	<include file="$(find elikos_ros)/launch/elikos_drivers.launch" />
   <!-- HARDWARE -->
 
   <!-- SOFTWARE -->
