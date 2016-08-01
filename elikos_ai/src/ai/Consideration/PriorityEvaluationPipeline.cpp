@@ -37,7 +37,6 @@ void PriorityEvaluationPipeline::updateTargets(const elikos_ros::TargetRobotArra
 
 void PriorityEvaluationPipeline::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
 {
-    // TODO: Remove the index and implement a way to match the target update in arena.
     TargetRobot* target = arena_->updateTarget(targetUpdate);
     if (target != nullptr) {
         arena_->evaluateTargetOrientation(*target);

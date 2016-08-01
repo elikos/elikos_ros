@@ -8,7 +8,8 @@
 #include "AbstractBehavior.h"
 #include <elikos_ros/TargetRobotArray.h>
 
-namespace ai {
+namespace ai
+{
 
 class Agent
 {
