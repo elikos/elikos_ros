@@ -28,10 +28,9 @@ int main(int argc, char* argv[])
   tf::StampedTransform arenaOriginTransform;
 
   tf::StampedTransform initialFcu;
-  tf::Quaternion initialFcuOrientation;
   try {
+    tf_listener_.waitForTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time::now(), ros::Duration(3.0));
     tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), initialFcu);
-    initialFcuOrientation = initialFcu.getRotation();
   }
   catch (tf::TransformException &ex) {
     ROS_ERROR("Origin init failed!!!! Exception : %s",ex.what());
@@ -50,7 +49,7 @@ int main(int argc, char* argv[])
       {
         try {
     			tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), arenaOriginTransform);
-          arenaOriginTransform.setRotation(initialFcuOrientation);
+          arenaOriginTransform.setRotation(initialFcu.getRotation());
           lookupDone = true;
     		}
     		catch (tf::TransformException &ex) {
