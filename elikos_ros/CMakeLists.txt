@@ -19,6 +19,7 @@ find_package( catkin REQUIRED COMPONENTS
    sensor_msgs
    cv_bridge
    geometry_msgs
+   std_srvs
 )
 find_package(OpenCV REQUIRED)
 
@@ -103,7 +104,7 @@ catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
 LIBRARIES elikos_lib
-CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs geometry_msgs
+CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs geometry_msgs roscpp tf
 #  DEPENDS system_lib
 )
 
@@ -127,6 +128,8 @@ include/elikos_lib/PositionHelper.h)
 add_dependencies( elikos_lib
     elikos_ros_generate_messages_cpp
 )
+
+
 
 ## Declare a cpp executable
 # add_executable(elikos_node src/elikos_node.cpp)
@@ -175,6 +178,9 @@ add_dependencies( elikos_lib
 #    src/tracking_abs/TransformationUnit.h
 #    src/tracking_abs/TransformationUnit.cpp)
 
+add_executable( elikos_origin_init
+  src/elikos_origin_init/elikos_origin_init.cpp
+)
 
 #add_subdirectory(src/ai)
 
@@ -199,7 +205,9 @@ target_link_libraries( elikos_lib ${catkin_LIBRARIES})
 #target_link_libraries( robotsim elikos_lib ${catkin_LIBRARIES})
 #target_link_libraries( dnt ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #target_link_libraries( tracking_abs ${catkin_LIBRARIES})
-
+target_link_libraries(elikos_origin_init
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############
