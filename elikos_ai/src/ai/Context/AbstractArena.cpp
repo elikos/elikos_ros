@@ -11,6 +11,9 @@
 namespace ai
 {
 
+const double AbstractArena::MIN_EDGE = -9.5;
+const double AbstractArena::MAX_EDGE =  9.5;
+
 const tf::Point AbstractArena::TOP_RIGHT_CORNER{ 10.0, 10.0, 0.0 };
 const tf::Point AbstractArena::TOP_LEFT_CORNER{ -10.0, 10.0, 0.0 };
 const tf::Point AbstractArena::BOTTOM_LEFT_CORNER{ -10.0, -10.0, 0.0 };
@@ -96,7 +99,18 @@ void AbstractArena::evaluateOutOfBound(TargetRobot& target)
     const double MAX = 9.5;
     double x = target.getPose().getOrigin().x();
     double y = target.getPose().getOrigin().y();
-    target.getOrientationEvaluation()->isOutOfBound_ = !(MIN <= x && x <= MAX && MIN <= y && y <= MAX);
+    target.getOrientationEvaluation()->isOutOfBound_ = isOutOfBound(target);
+}
+
+bool AbstractArena::isOutOfBound(tf::Point position)
+{
+    return !(MIN_EDGE <= position.x() && position.x() <= MAX_EDGE &&
+             MIN_EDGE <= position.y() && position.y() <= MAX_EDGE);
+}
+
+bool AbstractArena::isOutOfBound(TargetRobot& target)
+{
+   return isOutOfBound(target.getPose().getOrigin());
 }
 
 int AbstractArena::getNbrOfUpdatedTargets()

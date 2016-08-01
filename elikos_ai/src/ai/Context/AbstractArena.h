@@ -26,6 +26,9 @@ class TargetRobot;
 class AbstractArena
 {
 public:
+    static const double MIN_EDGE = -9.5;
+    static const double MAX_EDGE =  9.5;
+
     static const tf::Point TOP_RIGHT_CORNER;
     static const tf::Point TOP_LEFT_CORNER;
     static const tf::Point BOTTOM_LEFT_CORNER;
@@ -42,6 +45,9 @@ public:
     virtual void evaluateTargetOrientation(TargetRobot& target) = 0;
     virtual int getNRotationsForOptimalDirection(const TargetRobot& target) const = 0;
     virtual TargetRobot* findClosestTargetToGoodLine() = 0;
+
+    bool isOutOfBound(tf::Point position);
+    bool isOutOfBound(TargetRobot& target);
 
     TargetRobot* findHighestPriorityTarget();
     int getNbrOfUpdatedTargets();
