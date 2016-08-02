@@ -8,6 +8,7 @@
 const std::string ELIKOS_ARENA_ORIGIN = "elikos_arena_origin";
 const std::string ELIKOS_LOCAL_ORIGIN = "elikos_local_origin";
 const std::string ELIKOS_FCU = "elikos_fcu";
+const std::string WORLD = "world";
 
 bool isInit_ = false;
 bool initialize(std_srvs::Empty::Request  &req,
@@ -62,6 +63,7 @@ int main(int argc, char* argv[])
     {
       tf_broadcaster_.sendTransform(tf::StampedTransform(tf::Transform::getIdentity(), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_LOCAL_ORIGIN));
     }
+    tf_broadcaster_.sendTransform(tf::StampedTransform(initialFcu, ros::Time::now(), ELIKOS_LOCAL_ORIGIN, WORLD));
     ros::spinOnce();
     r.sleep();
   }

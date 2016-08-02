@@ -21,6 +21,7 @@ TargetResearch::~TargetResearch()
 void TargetResearch::generateCommands()
 {
     if (q_.empty()) {
+    	q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.0, 2.0 })));
         q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  6.0, 2.0 })));
         q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -6.0,  0.0, 2.0 })));
         q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  6.0,  0.0, 2.0 })));

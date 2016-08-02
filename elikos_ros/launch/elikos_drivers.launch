@@ -11,4 +11,7 @@
   	<include file="$(find elikos_ros)/launch/px4.launch" />
 
 	<include file="$(find rovio)/launch/rovio_node.launch" />
+
+  	<!-- elikos_arena_origin initialisation -->
+  	<include file="$(find elikos_ros)/launch/elikos_origin_init.launch"/>
 </launch>

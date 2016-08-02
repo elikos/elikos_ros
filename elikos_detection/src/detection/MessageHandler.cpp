@@ -15,7 +15,7 @@ namespace dnt
 MessageHandler::MessageHandler(string calibrationFilename) :
     it_(nh_)
 {
-	   is_ = it_.subscribe("elikos_ffmv_bottom_camera/image_raw", 1, &MessageHandler::dispatchMessage, this);
+	is_ = it_.subscribe("/cam1/camera/image_raw", 1, &MessageHandler::dispatchMessage, this);
     pub_ = nh_.advertise<elikos_ros::RobotRawArray>("elikos_robot_raw_array", 1);
     pubImages_ = it_.advertise("camera_test/image_opencv", 1);//debug only
     //pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only

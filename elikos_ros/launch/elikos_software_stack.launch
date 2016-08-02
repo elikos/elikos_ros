@@ -17,11 +17,8 @@
   <!-- Path planning and navigation -->
   <include file="$(find elikos_nav)/launch/nav.launch"/>
 
-  <!-- elikos_arena_origin initialisation -->
-  <include file="$(find elikos_ros)/launch/elikos_origin_init.launch"/>
-
   <!-- Static transforms -->
   <node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
-  <node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="-0.11 0.0 0.0 0.707107 -0.707107 0.0 0.0 elikos_fcu elikos_ffmv_bottom 100" />
+  <node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="-0.117 0.0 -0.027 0.707107 -0.707107 0.0 0.0 elikos_base_link elikos_ffmv_bottom 100" />
   <node pkg="tf" type="static_transform_publisher" name="r200_broadcaster" args="0.141 0 0 -0.59 0.59 -00.39 0.39 elikos_base_link r200 100" />
 </launch>
