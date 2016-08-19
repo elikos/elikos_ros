@@ -22,5 +22,6 @@
 *Description*  
     * Définit le type de trajectoire généré pour chaque jointure du modèle (.urdf).
 * Plusieurs autres sans importance.
+
 ## À savoir!
 * Le principal launch file (`moveit_master.launch`) est lancé dans `nav.launch` du package **elikos_nav**. 
