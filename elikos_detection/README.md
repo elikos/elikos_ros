@@ -18,8 +18,8 @@
     * `rviz` : si `true`, lance RViz.
 
 ## Nodes  
-* detection : Effectue le blob detection.  
-* transformation : Transforme les coordonnées du repère de l'image vers le repère de l'arène.  
+* **detection** : Effectue le blob detection.  
+* **transformation** : Transforme les coordonnées du repère de l'image vers le repère de l'arène.  
 
 ## Input topics  
 * `/cam1/camera/image_raw`  
