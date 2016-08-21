@@ -6,7 +6,7 @@
 int main(int argc, char* argv[])
 {
     // ROS Init
-    ros::init( argc, argv, "elikos_dnt" );
+    ros::init( argc, argv, "elikos_detection" );
 
   	string extension = ".calib";
   	string inputFile, outputFile;
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   	{
   		outputFile = "new_calibration";
   	}
-    dnt::MessageHandler messageHandler(calibFolderPath+inputFile+extension);
+    MessageHandler messageHandler(calibFolderPath+inputFile+extension);
 
     bool calibrationOn;
     nh_.getParam("/elikos_detection/calibration", calibrationOn);

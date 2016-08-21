@@ -2,8 +2,8 @@
 // Created by ta11e4rand on 19/11/15.
 //
 
-#ifndef DETECTION_AND_TRACKING_ROBOTDETECTION_H
-#define DETECTION_AND_TRACKING_ROBOTDETECTION_H
+#ifndef DETECTION_AND_TRACKING_BLOBDETECTION_H
+#define DETECTION_AND_TRACKING_BLOBDETECTION_H
 
 #include <string>
 #include <opencv2/opencv.hpp>
@@ -17,10 +17,10 @@ using namespace std;
 using namespace cv;
 
 //This class implements the detection of robots
-class RobotDetection {
+class BlobDetection {
 public:
     //constructor
-    RobotDetection();
+    BlobDetection();
 
     //Trackbars
     void createTrackbars();
@@ -65,4 +65,4 @@ public://Public constants, used in TrackingCircles
     const int FRAME_HEIGHT = 480;
 private:
 };
-#endif //DETECTION_AND_TRACKING_ROBOTDETECTION_H
+#endif //DETECTION_AND_TRACKING_BLOBDETECTION_H

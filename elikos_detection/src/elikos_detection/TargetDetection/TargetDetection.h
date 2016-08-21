@@ -2,15 +2,15 @@
 // Created by ta11e4rand on 10/02/16.
 //
 
-#ifndef DETECTION_AND_TRACKING_BLOBTRACKING_H
-#define DETECTION_AND_TRACKING_BLOBTRACKING_H
-#include "RobotDetection.h"
+#ifndef DETECTION_AND_TRACKING_TargetDetection_H
+#define DETECTION_AND_TRACKING_TargetDetection_H
+#include "BlobDetection.h"
 
 #include <list>
-class BlobTracking {
+class TargetDetection {
 
 public:
-	BlobTracking();
+	TargetDetection();
     //Robot tracking algorithm. Includes color and robot detection
     void detect(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
     //Method to detect blobs of color on frames
@@ -30,7 +30,7 @@ private:
     vector<RobotDesc> robots;
     //Attributes
     //Detection class
-    RobotDetection detection;
+    BlobDetection detection;
 };
 
-#endif //DETECTION_AND_TRACKING_BLOBTRACKING_H
+#endif //DETECTION_AND_TRACKING_TargetDetection_H

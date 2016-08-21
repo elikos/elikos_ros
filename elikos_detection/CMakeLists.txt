@@ -24,23 +24,23 @@ include_directories(
 )
 
 add_executable( elikos_detection
-    src/detection/dnt.cpp
-    src/detection/MessageHandler.h
-    src/detection/MessageHandler.cpp
-	src/detection/BlobDetection/RobotDesc.h
-	src/detection/BlobDetection/RobotDesc.cpp
-	src/detection/BlobDetection/Color.cpp
-	src/detection/BlobDetection/Color.h
-	src/detection/BlobDetection/GreenColor.cpp
-	src/detection/BlobDetection/GreenColor.h
-	src/detection/BlobDetection/RedColor.cpp
-	src/detection/BlobDetection/RedColor.h
-	src/detection/BlobDetection/WhiteColor.cpp
-	src/detection/BlobDetection/WhiteColor.h
-    src/detection/BlobDetection/RobotDetection.cpp
-    src/detection/BlobDetection/RobotDetection.h
-    src/detection/BlobDetection/BlobTracking.h
-    src/detection/BlobDetection/BlobTracking.cpp)
+    src/elikos_detection/elikos_detection.cpp
+    src/elikos_detection/MessageHandler.h
+    src/elikos_detection/MessageHandler.cpp
+    src/elikos_detection/TargetDetection/RobotDesc.h
+    src/elikos_detection/TargetDetection/RobotDesc.cpp
+    src/elikos_detection/TargetDetection/Color.cpp
+    src/elikos_detection/TargetDetection/Color.h
+    src/elikos_detection/TargetDetection/GreenColor.cpp
+    src/elikos_detection/TargetDetection/GreenColor.h
+    src/elikos_detection/TargetDetection/RedColor.cpp
+    src/elikos_detection/TargetDetection/RedColor.h
+    src/elikos_detection/TargetDetection/WhiteColor.cpp
+    src/elikos_detection/TargetDetection/WhiteColor.h
+    src/elikos_detection/TargetDetection/BlobDetection.cpp
+    src/elikos_detection/TargetDetection/BlobDetection.h
+    src/elikos_detection/TargetDetection/TargetDetection.h
+    src/elikos_detection/TargetDetection/TargetDetection.cpp)
 
 target_link_libraries(elikos_detection
   ${catkin_LIBRARIES}

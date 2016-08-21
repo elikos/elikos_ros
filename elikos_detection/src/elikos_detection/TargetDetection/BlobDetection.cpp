@@ -1,7 +1,7 @@
-#include "RobotDetection.h"
+#include "BlobDetection.h"
 #include <opencv2/core/core.hpp>
 
-RobotDetection::RobotDetection(){
+BlobDetection::BlobDetection(){
     //foundCircles initialisation
     //Maximum of 20 circles detected at the same time
     //It allows to loose a circle for a few frames without loosing its information
@@ -16,7 +16,7 @@ RobotDetection::RobotDetection(){
 }
 
 //Color detection algorithm
-void RobotDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output){
+void BlobDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output){
     //Check if the input is empty
     if(!input.data)
         cerr << "Input of detecRobots is empty";//TODO:throw an exception
@@ -92,11 +92,11 @@ void RobotDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Ma
     output = input;
 }
 
-vector<RobotDesc> RobotDetection::getBlobObjects(){
+vector<RobotDesc> BlobDetection::getBlobObjects(){
     return blobObjects;
 }
 
-void RobotDetection::createTrackbars() {
+void BlobDetection::createTrackbars() {
     //create windows for trackbars
     string WhiteTrackbars = "White Calibration Trackbars";
     string RedTrackbars = "Red Calibration Trackbars";
@@ -116,7 +116,7 @@ void RobotDetection::createTrackbars() {
   	imshow( RedTrackbars, trackbarsRedMat_);
   	imshow( GreenTrackbars, trackbarsGreenMat_);
 }
-void RobotDetection::saveCalibration(string filename){
+void BlobDetection::saveCalibration(string filename){
   std::fstream fs;
   fs.open (filename, std::fstream::out | std::fstream::trunc);
 
@@ -154,7 +154,7 @@ void RobotDetection::saveCalibration(string filename){
 	  fs.close();
   }
 }
-void RobotDetection::loadCalibration(string filename){
+void BlobDetection::loadCalibration(string filename){
   std::fstream fs;
   fs.open (filename, std::fstream::in);
 

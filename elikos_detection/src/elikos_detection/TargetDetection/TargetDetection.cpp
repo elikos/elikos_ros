@@ -1,15 +1,15 @@
 //
 // Created by ta11e4rand on 10/02/16.
 //
-#include "BlobTracking.h"
+#include "TargetDetection.h"
 
-BlobTracking::BlobTracking(){
+TargetDetection::TargetDetection(){
 }
 /*
  * This method is the first step of the tracking algorithm
  * params: input: frame from the camera, output_*: output matrix with color, output: general output matrix
  */
-void BlobTracking::detect(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output){
+void TargetDetection::detect(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output){
 
     //Color detection
     detectColor(input, output_w, output_r, output_g, output);
@@ -17,7 +17,7 @@ void BlobTracking::detect(const cv::Mat &input, cv::Mat &output_w, cv::Mat &outp
     emplaceNewRobots(output);
 }
 
-void BlobTracking::emplaceNewRobots(cv::Mat &output){
+void TargetDetection::emplaceNewRobots(cv::Mat &output){
 	//Reset robot container
     robots.erase(robots.begin(),robots.end());
 
@@ -28,15 +28,15 @@ void BlobTracking::emplaceNewRobots(cv::Mat &output){
 	}
 }
 
-void BlobTracking::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output){
+void TargetDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output){
     detection.detectColor(input, output_w, output_r, output_g, output);
 }
 
-vector<RobotDesc> BlobTracking::getRobots(){
+vector<RobotDesc> TargetDetection::getRobots(){
     return robots;
 }
 //Method to display the direction arrow (for tests usage only)
-void BlobTracking::displayID(RobotDesc robot, cv::Mat &output){
+void TargetDetection::displayID(RobotDesc robot, cv::Mat &output){
     //center
     Point center(cvRound(robot.getXPos()), cvRound(robot.getYPos()));
     //circle

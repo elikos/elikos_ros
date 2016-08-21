@@ -5,10 +5,10 @@
 
 ## Stratégies  
 * Blob detection.  
-* TF transforms.  
+* [TF transforms](http://wiki.ros.org/tf).  
 
 ## Launch files  
-* `detection.launch`  
+* `elikos_detection.launch`  
 *Paramètres*  
     * `calib` : si `true`, lance l'outil de calibration.  
     * `calib_in` : spécifie le nom du fichier de calibration initial.  
@@ -18,8 +18,8 @@
     * `rviz` : si `true`, lance RViz.
 
 ## Nodes  
-* **detection** : Effectue le blob detection.  
-* **transformation** : Transforme les coordonnées du repère de l'image vers le repère de l'arène.  
+* **elikos_detection** : Effectue le blob detection.  
+* **elikos_transformation** : Transforme les coordonnées du repère de l'image vers le repère de l'arène.  
 
 ## Input topics  
 * `/cam1/camera/image_raw`  

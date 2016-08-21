@@ -6,7 +6,7 @@
   <arg name="calib_in" default="calibration_initial" />
   <arg name="calib_out" default="new_calibration" />
   <arg name="calib_dir" default="$(find elikos_detection)/cfg/" />
-  <include file="$(find elikos_detection)/launch/detection.launch"/>
+  <include file="$(find elikos_detection)/launch/elikos_detection.launch"/>
 
   <!-- Target tracking -->
   <include file="$(find elikos_tracking)/launch/tracking.launch"/>
