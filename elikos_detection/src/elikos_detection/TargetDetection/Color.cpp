@@ -1,6 +1,13 @@
+#include <opencv2/core/gpumat.hpp>
 #include "Color.h"
+#include "GpuCV.h"
+#include "CpuCV.h"
 
-Color::Color() {}
+Color::Color() {
+    int nDevices = gpu::getCudaEnabledDeviceCount();
+    cvWrapper = (nDevices > 0 ? (CVWrapperInterface*) new GpuCV() :
+                                (CVWrapperInterface*) new CpuCV());
+}
 
 Color::~Color() {}
 
@@ -17,19 +24,24 @@ string Color::intToString(int number) {
 
 Mat Color::generateThreshold(const Mat& image)
 {
-    cvtColor(image, hsv, COLOR_BGR2HSV);
-
+    Mat imageCpy = image.clone();
+    cvWrapper->upload(imageCpy);
+    cvWrapper->cvtColor(COLOR_BGR2HSV);
     BLUR_AMOUNT = PRE_BLUR + 1;
-    blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
+    cvWrapper->blur(Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
+    // No inRange implementation for gpu module.
+    // This should not cause performance problems on the jetson.
+    cvWrapper->download(hsv);
 
     inRange(hsv, Scalar(*H_MIN, *S_MIN, *V_MIN), Scalar(*H_MAX, *S_MAX, *V_MAX), threshold);
-
+    cvWrapper->upload(threshold);
     // Consolidate the colored parts into one big blob to delimit the robot
-    erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
+    cvWrapper->erode(getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
           *PRE_EROSIONS);
-    dilate(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), *DILATIONS);
-    erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
+    cvWrapper->dilate(getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), *DILATIONS);
+    cvWrapper->erode(getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
           *POST_EROSIONS);
+    cvWrapper->download(threshold);
 
     return threshold;
 }
@@ -43,6 +55,7 @@ void Color::trackFilteredObjects(Mat &cameraFeed) {
     threshold.copyTo(temp);
     //these two vectors needed for output of findContours
     vector<vector<Point> > contours;
+
     vector<Vec4i> hierarchy;
     //find contours of filtered image using openCV findContours function
     findContours(temp, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);

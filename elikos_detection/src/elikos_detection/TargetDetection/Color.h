@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include "RobotDesc.h"
+#include "CVWrapperInterface.h"
 
 using namespace std;
 using namespace cv;
@@ -37,7 +38,7 @@ protected:
     Mat threshold;
     Mat hsv;
     vector<RobotDesc> foundObjects;
-
+	CVWrapperInterface* cvWrapper;
 
     int PRE_BLUR = 2;
     int BLUR_AMOUNT;
