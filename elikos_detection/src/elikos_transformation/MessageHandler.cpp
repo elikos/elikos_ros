@@ -1,19 +1,19 @@
-#include "MessageHandler_abs.h"
+#include "MessageHandler.h"
 
-MessageHandler_abs::MessageHandler_abs()
+MessageHandler::MessageHandler()
 {
-	sub_ = nh_.subscribe("elikos_robot_raw_array", 1, &MessageHandler_abs::dispatchMessageRobotRaw, this);
+	sub_ = nh_.subscribe("elikos_robot_raw_array", 1, &MessageHandler::dispatchMessageRobotRaw, this);
 
 	pubTest_ = nh_.advertise<geometry_msgs::PoseArray>("elikos_robot_pose_array",1);
 }
 
 
-MessageHandler_abs::~MessageHandler_abs()
+MessageHandler::~MessageHandler()
 {
 }
 
 
-void MessageHandler_abs::dispatchMessageRobotRaw(const elikos_ros::RobotRawArray::ConstPtr& input)
+void MessageHandler::dispatchMessageRobotRaw(const elikos_ros::RobotRawArray::ConstPtr& input)
 {
 
 	newArray_ = *input;

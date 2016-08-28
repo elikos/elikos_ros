@@ -7,15 +7,17 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   elikos_ros
   image_transport
+  geometry_msgs
   sensor_msgs
   std_msgs
+  tf
 )
 find_package(OpenCV REQUIRED)
 
 catkin_package(
 #   INCLUDE_DIRS include
 #   LIBRARIES elikos_detection
-	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs std_msgs
+	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf
 #   DEPENDS system_lib
 )
 
@@ -43,5 +45,16 @@ add_executable( elikos_detection
     src/elikos_detection/TargetDetection/TargetDetection.cpp)
 
 target_link_libraries(elikos_detection
+  ${catkin_LIBRARIES}
+)
+
+add_executable( elikos_transformation
+   src/elikos_transformation/elikos_transformation.cpp
+   src/elikos_transformation/MessageHandler.h
+   src/elikos_transformation/MessageHandler.cpp
+   src/elikos_transformation/TransformationUnit.h
+   src/elikos_transformation/TransformationUnit.cpp)
+
+target_link_libraries(elikos_transformation
   ${catkin_LIBRARIES}
 )

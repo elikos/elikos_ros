@@ -1,12 +1,12 @@
 #include <memory>
-#include "MessageHandler_abs.h"
+#include "MessageHandler.h"
 
 int main(int argc, char* argv[])
 {
     // ROS Init
-    ros::init( argc, argv, "elikos_tracking_abs" );
+    ros::init( argc, argv, "elikos_transformation" );
 
-    MessageHandler_abs messageHandler;
+    MessageHandler messageHandler;
 
     ros::Rate r(30);
     // Endless loop

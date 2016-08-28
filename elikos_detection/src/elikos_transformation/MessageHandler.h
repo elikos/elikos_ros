@@ -1,5 +1,5 @@
-#ifndef MESSAGE_HANDLER_ABS
-#define MESSAGE_HANDLER_ABS
+#ifndef MESSAGE_HANDLER
+#define MESSAGE_HANDLER
 
 #include <ros/ros.h>
 #include <elikos_ros/RobotRaw.h>
@@ -9,11 +9,11 @@
 
 #include "TransformationUnit.h"
 
-class MessageHandler_abs
+class MessageHandler
 {
 public:
-    MessageHandler_abs();
-    ~MessageHandler_abs();
+    MessageHandler();
+    ~MessageHandler();
     void dispatchMessageRobotRaw(const elikos_ros::RobotRawArray::ConstPtr &input);
 
 private:
@@ -21,7 +21,7 @@ private:
     ros::Subscriber sub_;
     ros::Publisher pubTest_;
     elikos_ros::RobotRawArray newArray_;
-	  TransformationUnit transformationUnit_;
+	TransformationUnit transformationUnit_;
 };
 
 #endif /// MESSAGE_HANDLER_TTF

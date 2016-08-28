@@ -12,4 +12,6 @@
       <param name="file_out" value="$(arg calib_out)" />
       <param name="dir" value="$(arg calib_dir)" />
   </node>
+
+  <node name="elikos_transformation" pkg="elikos_detection" type="elikos_transformation" />
 </launch>
