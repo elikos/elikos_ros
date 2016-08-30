@@ -1,41 +1,26 @@
-//
-// Created by olivier on 06/07/16.
-//
-
 #include "CpuCV.h"
-
 CpuCV::~CpuCV()
 {
 }
 
-void CpuCV::upload(const cv::Mat& src)
+void CpuCV::cvtColor(const cv::Mat& src, cv::Mat& dst, int code)
 {
-    mat_ = src;
+    cv::cvtColor(src, dst, code);
 }
 
-void CpuCV::download(cv::Mat& dst)
+void CpuCV::blur(const cv::Mat& src, cv::Mat& dst, cv::Size ksize, cv::Point anchor)
 {
-    dst = mat_;
+    cv::blur(src, dst, ksize, anchor);
 }
 
-void CpuCV::cvtColor(int code, int dstCn)
+void CpuCV::erode(const cv::Mat& src, cv::Mat& dst, cv::Mat kernel, cv::Point anchor, int iterations)
 {
-    cv::cvtColor(mat_, mat_, code, dstCn);
+    cv::erode(src, dst, kernel, anchor, iterations);
 }
 
-void CpuCV::blur(cv::Size ksize, cv::Point anchor)
+void CpuCV::dilate(const cv::Mat& src, cv::Mat& dst, cv::Mat kernel, cv::Point anchor, int iterations)
 {
-    cv::blur(mat_, mat_, ksize, anchor);
-}
-
-void CpuCV::erode(cv::Mat kernel, cv::Point anchor, int iterations)
-{
-    cv::erode(mat_, mat_, kernel, anchor, iterations);
-}
-
-void CpuCV::dilate(cv::Mat kernel, cv::Point anchor, int iterations)
-{
-    cv::erode(mat_, mat_, kernel, anchor, iterations);
+    cv::erode(src, dst, kernel, anchor, iterations);
 }
 
 

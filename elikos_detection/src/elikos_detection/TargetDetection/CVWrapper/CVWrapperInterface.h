@@ -1,7 +1,3 @@
-//
-// Created by olivier on 06/07/16.
-//
-
 #ifndef CV_WRAPPER_INTERFACE
 #define CV_WRAPPER_INTERFACE
 
@@ -12,14 +8,10 @@ class CVWrapperInterface
 public:
     CVWrapperInterface() = default;
     virtual ~CVWrapperInterface() = 0;
-
-    virtual void upload(const cv::Mat& src) = 0;
-    virtual void download(cv::Mat& dst) = 0;
-
-    virtual void cvtColor(int code, int dstCn = 0) = 0;
-    virtual void blur(cv::Size ksize, cv::Point anchor=cv::Point(-1, -1)) = 0;
-    virtual void erode(cv::Mat kernel, cv::Point anchor = cv::Point(-1, -1), int iterations = 1) = 0;
-    virtual void dilate(cv::Mat kernel, cv::Point anchor = cv::Point(-1, -1), int iterations=1) = 0;
+    virtual void cvtColor(const cv::Mat&, cv::Mat&, int code) = 0;
+    virtual void blur(const cv::Mat&, cv::Mat&, cv::Size ksize, cv::Point anchor) = 0;
+    virtual void erode(const cv::Mat&, cv::Mat&, cv::Mat kernel, cv::Point anchor, int iterations) = 0;
+    virtual void dilate(const cv::Mat&, cv::Mat&, cv::Mat kernel, cv::Point anchor, int iterations) = 0;
 };
 
 inline CVWrapperInterface::~CVWrapperInterface() { }

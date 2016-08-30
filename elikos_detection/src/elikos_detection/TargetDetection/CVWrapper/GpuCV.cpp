@@ -1,40 +1,50 @@
-//
-// Created by olivier on 06/07/16.
-//
-
 #include "GpuCV.h"
 
 GpuCV::~GpuCV()
 {
 }
 
-void GpuCV::upload(const cv::Mat& src)
+void GpuCV::cvtColor(const cv::Mat& src, cv::Mat& dst, int code)
 {
-    mat_.upload(src);
+    cv::gpu::GpuMat srcGPU, dstGPU;
+    srcGPU.upload(src);
+    dstGPU.upload(dst);
+
+    cv::gpu::cvtColor(srcGPU, dstGPU, code);
+
+    dstGPU.download(dst);
 }
 
-void GpuCV::download(cv::Mat& dst)
+void GpuCV::blur(const cv::Mat& src, cv::Mat& dst, cv::Size ksize, cv::Point anchor)
 {
-    mat_.download(dst);
+    cv::gpu::GpuMat srcGPU, dstGPU;
+    srcGPU.upload(src);
+    dstGPU.upload(dst);
+
+    cv::gpu::blur(srcGPU, dstGPU, ksize, anchor);
+
+    dstGPU.download(dst);
 }
 
-void GpuCV::cvtColor(int code, int dstCn)
+void GpuCV::erode(const cv::Mat& src, cv::Mat& dst, cv::Mat kernel, cv::Point anchor, int iterations)
 {
-    cv::gpu::cvtColor(mat_, mat_, code, dstCn);
+    cv::gpu::GpuMat srcGPU, dstGPU;
+    srcGPU.upload(src);
+    dstGPU.upload(dst);
+
+    cv::gpu::erode(srcGPU, dstGPU, kernel, anchor, iterations);
+
+    dstGPU.download(dst);
 }
 
-void GpuCV::blur(cv::Size ksize, cv::Point anchor)
+void GpuCV::dilate(const cv::Mat& src, cv::Mat& dst, cv::Mat kernel, cv::Point anchor, int iterations)
 {
-    cv::gpu::blur(mat_, mat_, ksize, anchor);
-}
+    cv::gpu::GpuMat srcGPU, dstGPU;
+    srcGPU.upload(src);
+    dstGPU.upload(dst);
 
-void GpuCV::erode(cv::Mat kernel, cv::Point anchor, int iterations)
-{
-    cv::gpu::erode(mat_, mat_, kernel, anchor, iterations);
-}
+    cv::gpu::dilate(srcGPU, dstGPU, kernel, anchor, iterations);
 
-void GpuCV::dilate(cv::Mat kernel, cv::Point anchor, int iterations)
-{
-    cv::gpu::dilate(mat_, mat_, kernel, anchor, iterations);
+    dstGPU.download(dst);
 }
 

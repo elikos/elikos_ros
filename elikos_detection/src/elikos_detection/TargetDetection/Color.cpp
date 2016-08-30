@@ -9,7 +9,9 @@ Color::Color() {
                                 (CVWrapperInterface*) new CpuCV());
 }
 
-Color::~Color() {}
+Color::~Color() {
+    delete cvWrapper;
+}
 
 Mat& Color::getThreshold()
 {
@@ -24,24 +26,19 @@ string Color::intToString(int number) {
 
 Mat Color::generateThreshold(const Mat& image)
 {
-    Mat imageCpy = image.clone();
-    cvWrapper->upload(imageCpy);
-    cvWrapper->cvtColor(COLOR_BGR2HSV);
+    cvWrapper->cvtColor(image, hsv, COLOR_BGR2HSV);
     BLUR_AMOUNT = PRE_BLUR + 1;
-    cvWrapper->blur(Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
+    cvWrapper->blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
     // No inRange implementation for gpu module.
     // This should not cause performance problems on the jetson.
-    cvWrapper->download(hsv);
 
     inRange(hsv, Scalar(*H_MIN, *S_MIN, *V_MIN), Scalar(*H_MAX, *S_MAX, *V_MAX), threshold);
-    cvWrapper->upload(threshold);
     // Consolidate the colored parts into one big blob to delimit the robot
-    cvWrapper->erode(getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
+    cvWrapper->erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
           *PRE_EROSIONS);
-    cvWrapper->dilate(getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), *DILATIONS);
-    cvWrapper->erode(getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
+    cvWrapper->dilate(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), *DILATIONS);
+    cvWrapper->erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
           *POST_EROSIONS);
-    cvWrapper->download(threshold);
 
     return threshold;
 }
