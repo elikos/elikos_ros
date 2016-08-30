@@ -15,7 +15,6 @@ MessageHandler::~MessageHandler()
 
 void MessageHandler::dispatchMessageRobotRaw(const elikos_ros::RobotRawArray::ConstPtr& input)
 {
-
 	newArray_ = *input;
 
 	//Le vecteur results est pour l'affichage dans rviz.

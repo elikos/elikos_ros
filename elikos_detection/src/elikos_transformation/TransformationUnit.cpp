@@ -1,7 +1,36 @@
 #include "TransformationUnit.h"
 
-TransformationUnit::TransformationUnit(){
+TransformationUnit::TransformationUnit()
+{
 	pub_ = nh_.advertise<elikos_ros::TargetRobotArray>("elikos_target_robot_array",1);
+	
+	//Parameters
+    if (!nh_.getParam("/elikos_detection/frame", cameraFrameID_))
+  	{
+  		cameraFrameID_ = "";
+  	}
+    if (!nh_.getParam("/elikos_detection/cam_fov_h", cam_fov_h_))
+  	{
+  		cam_fov_h_ = 89;
+  	}
+	cam_fov_h_ *= PI/180.0;
+    if (!nh_.getParam("/elikos_detection/cam_fov_v", cam_fov_v_))
+  	{
+  		cam_fov_v_ = 63;
+  	}
+	cam_fov_v_ *= PI/180.0;
+    if (!nh_.getParam("/elikos_detection/cam_height", cam_height_))
+  	{
+  		cam_height_ = 480;
+  	}
+    if (!nh_.getParam("/elikos_detection/cam_width", cam_width_))
+  	{
+  		cam_width_ = 640;
+  	}
+    if (!nh_.getParam("/elikos_detection/tolerance_height", min_height_))
+  	{
+  		min_height_ = 0.1;
+  	}
 }
 
 geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ros::RobotRawArray robotArray){
@@ -25,16 +54,16 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
 		//Get the origin to camera transform
 		tf::StampedTransform origin2camera;
 		try {
-			tf_listener_.lookupTransform("elikos_arena_origin", "elikos_ffmv_bottom", ros::Time(0), origin2camera);
+			tf_listener_.lookupTransform("elikos_arena_origin", cameraFrameID_, ros::Time(0), origin2camera);
 		}
 		catch (tf::TransformException &ex) {
 			ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
 			ros::Duration(1.0).sleep();
 		}
 		//Get the fcu to camera transform
-    tf::StampedTransform fcu2camera;
+    	tf::StampedTransform fcu2camera;
 		try {
-			tf_listener_.lookupTransform("elikos_fcu", "elikos_ffmv_bottom", ros::Time(0), fcu2camera);
+			tf_listener_.lookupTransform("elikos_fcu", cameraFrameID_, ros::Time(0), fcu2camera);
 		}
 		catch (tf::TransformException &ex) {
 			ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
@@ -103,7 +132,7 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
 		ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
 		ros::Duration(1.0).sleep();
 	}
-	if(origin2fcu.getOrigin().z()>TOLERANCE_HEIGHT){
+	if(origin2fcu.getOrigin().z()>min_height_){
 		pub_.publish(targetArray);
 		oldArray_ = targetArray;
 	}
@@ -137,8 +166,8 @@ tf::Quaternion TransformationUnit::computeTurretRotation(elikos_ros::RobotRaw ro
 	//initialization
 	tf::Quaternion rotation = tf::createIdentityQuaternion();
 	//compute angles
-	double roll = -((double) (robot.point.y - CAM_HEIGHT / 2) / (double) CAM_HEIGHT) * CAMERA_FOV_V;
-	double pitch = ((double) (robot.point.x - CAM_WIDTH / 2) / (double) CAM_WIDTH) * CAMERA_FOV_H;
+	double roll = -((double) (robot.point.y - cam_height_ / 2) / (double) cam_height_) * cam_fov_v_;
+	double pitch = ((double) (robot.point.x - cam_width_ / 2) / (double) cam_width_) * cam_fov_h_;
 	//set rotation
 	rotation.setRPY(roll , pitch, (double) 0.0);
 	return rotation;

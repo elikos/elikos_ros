@@ -30,20 +30,22 @@ class TransformationUnit
 		tf::Quaternion computeTurretRotation(elikos_ros::RobotRaw);
 		tf::Transform computeRobotTransform(tf::Transform);
 
-    tf::TransformBroadcaster tf_broadcaster_;
-    tf::TransformListener tf_listener_;
+		tf::TransformBroadcaster tf_broadcaster_;
+		tf::TransformListener tf_listener_;
 
 		ros::NodeHandle nh_;
 		ros::Publisher pub_;
 
 		elikos_ros::TargetRobotArray oldArray_;
 
-    //TODO: Check the validity of those values
-    const double CAMERA_FOV_H = 89 * PI/180.0;
-    const double CAMERA_FOV_V = 63 * PI/180.0;
-		static const int CAM_HEIGHT = 480;
-		static const int CAM_WIDTH = 640;
-		const double TOLERANCE_HEIGHT = 0.1;
+	  	std::string cameraFrameID_;
+
+		//TODO: Check the validity of those values
+		double cam_fov_h_ = 89 * PI/180.0;
+		double cam_fov_v_ = 63 * PI/180.0;
+		int cam_height_ = 480;
+		int cam_width_ = 640;
+		double min_height_ = 0.1;
 };
 
 #endif

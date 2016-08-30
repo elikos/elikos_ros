@@ -10,9 +10,15 @@
 MessageHandler::MessageHandler(string calibrationFilename) :
     it_(nh_)
 {
-	  is_ = it_.subscribe("/cam1/camera/image_raw", 1, &MessageHandler::dispatchMessage, this);
+    std::string inputTopic;
+    if (!nh_.getParam("/elikos_detection/topic", inputTopic))
+  	{
+  		inputTopic = "";
+  	}
+
+	  is_ = it_.subscribe(inputTopic, 1, &MessageHandler::dispatchMessage, this);
     pub_ = nh_.advertise<elikos_ros::RobotRawArray>("elikos_robot_raw_array", 1);
-    pubImages_ = it_.advertise("camera_test/image_opencv", 1);//debug only
+    pubImages_ = it_.advertise(inputTopic + "/debug", 1);//debug only
     //pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
     //pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
 

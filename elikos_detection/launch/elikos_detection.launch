@@ -4,14 +4,29 @@
 	<arg name="calib" default="false" />
 	<arg name="calib_in" default="calibration_initial" />
 	<arg name="calib_out" default="new_calibration" />
-	<arg name="calib_dir" default="$(find elikos_detection)/cfg/" />
+	<arg name="calib_dir" default="$(find elikos_detection)/cfg/calibrations" />
+  <arg name="topic" default="/cam1/camera/image_raw" />
+  <arg name="frame" default="elikos_ffmv_bottom" />
+  <arg name="cam_height" default="480" />
+  <arg name="cam_width" default="640" />
+  <arg name="cam_fov_v" default="63" />
+  <arg name="cam_fov_h" default="89" />
+  <arg name="tolerance_height" default="0.1" />
 
   <node name="elikos_detection" pkg="elikos_detection" type="elikos_detection">
       <param name="calibration" value="$(arg calib)" />
       <param name="file_in" value="$(arg calib_in)" />
       <param name="file_out" value="$(arg calib_out)" />
       <param name="dir" value="$(arg calib_dir)" />
+      <param name="topic" value="$(arg topic)" />
   </node>
 
-  <node name="elikos_transformation" pkg="elikos_detection" type="elikos_transformation" />
+  <node name="elikos_transformation" pkg="elikos_detection" type="elikos_transformation">
+      <param name="frame" value="$(arg frame)" />
+      <param name="cam_height" value="$(arg cam_height)" />
+      <param name="cam_width" value="$(arg cam_width)" />
+      <param name="cam_fov_v" value="$(arg cam_fov_v)" />
+      <param name="cam_fov_h" value="$(arg cam_fov_h)" />
+      <param name="tolerance_height" value="$(arg tolerance_height)" />
+  </node>
 </launch>
