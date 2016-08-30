@@ -14,22 +14,22 @@ int main(int argc, char* argv[])
     ros::NodeHandle nh_;
 
 	  string calibFolderPath;
-    if (!nh_.getParam("/elikos_detection/dir", calibFolderPath))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/dir", calibFolderPath))
   	{
   		calibFolderPath = "";
   	}
-    if (!nh_.getParam("/elikos_detection/file_in", inputFile))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/file_in", inputFile))
   	{
   		inputFile = "calibration_initial";
   	}
-    if (!nh_.getParam("/elikos_detection/file_out", outputFile))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/file_out", outputFile))
   	{
   		outputFile = "new_calibration";
   	}
     MessageHandler messageHandler(calibFolderPath+inputFile+extension);
 
     bool calibrationOn;
-    nh_.getParam("/elikos_detection/calibration", calibrationOn);
+    nh_.getParam("/"+ros::this_node::getName()+"/calibration", calibrationOn);
 
     ros::Rate r(30);
     // Endless loop

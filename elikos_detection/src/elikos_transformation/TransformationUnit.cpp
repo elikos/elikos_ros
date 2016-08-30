@@ -5,29 +5,29 @@ TransformationUnit::TransformationUnit()
 	pub_ = nh_.advertise<elikos_ros::TargetRobotArray>("elikos_target_robot_array",1);
 	
 	//Parameters
-    if (!nh_.getParam("/elikos_detection/frame", cameraFrameID_))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/frame", cameraFrameID_))
   	{
   		cameraFrameID_ = "";
   	}
-    if (!nh_.getParam("/elikos_detection/cam_fov_h", cam_fov_h_))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/cam_fov_h", cam_fov_h_))
   	{
   		cam_fov_h_ = 89;
   	}
 	cam_fov_h_ *= PI/180.0;
-    if (!nh_.getParam("/elikos_detection/cam_fov_v", cam_fov_v_))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/cam_fov_v", cam_fov_v_))
   	{
   		cam_fov_v_ = 63;
   	}
 	cam_fov_v_ *= PI/180.0;
-    if (!nh_.getParam("/elikos_detection/cam_height", cam_height_))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/cam_height", cam_height_))
   	{
   		cam_height_ = 480;
   	}
-    if (!nh_.getParam("/elikos_detection/cam_width", cam_width_))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/cam_width", cam_width_))
   	{
   		cam_width_ = 640;
   	}
-    if (!nh_.getParam("/elikos_detection/tolerance_height", min_height_))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/min_height", min_height_))
   	{
   		min_height_ = 0.1;
   	}

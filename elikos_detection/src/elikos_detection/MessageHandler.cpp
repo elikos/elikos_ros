@@ -11,7 +11,7 @@ MessageHandler::MessageHandler(string calibrationFilename) :
     it_(nh_)
 {
     std::string inputTopic;
-    if (!nh_.getParam("/elikos_detection/topic", inputTopic))
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/topic", inputTopic))
   	{
   		inputTopic = "";
   	}
@@ -19,6 +19,7 @@ MessageHandler::MessageHandler(string calibrationFilename) :
 	  is_ = it_.subscribe(inputTopic, 1, &MessageHandler::dispatchMessage, this);
     pub_ = nh_.advertise<elikos_ros::RobotRawArray>("elikos_robot_raw_array", 1);
     pubImages_ = it_.advertise(inputTopic + "/debug", 1);//debug only
+    ROS_ERROR_STREAM(inputTopic + "/debug");
     //pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
     //pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
 
@@ -26,7 +27,7 @@ MessageHandler::MessageHandler(string calibrationFilename) :
 
     //Calibration trackbars
   	bool calibrationOn;
-    if (nh_.getParam("/elikos_detection/calibration", calibrationOn))
+    if (nh_.getParam("/"+ros::this_node::getName()+"/calibration", calibrationOn))
   	{
   		if(calibrationOn) detection_.createTrackbars();
   	}
