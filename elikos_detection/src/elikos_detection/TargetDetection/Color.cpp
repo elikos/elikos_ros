@@ -26,18 +26,19 @@ string Color::intToString(int number) {
 
 Mat Color::generateThreshold(const Mat& image)
 {
-    cvWrapper->cvtColor(image, hsv, COLOR_BGR2HSV);
+    //cvWrapper->
+    cvtColor(image, hsv, COLOR_BGR2HSV);
     BLUR_AMOUNT = PRE_BLUR + 1;
-    cvWrapper->blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
+    blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
     // No inRange implementation for gpu module.
     // This should not cause performance problems on the jetson.
 
     inRange(hsv, Scalar(*H_MIN, *S_MIN, *V_MIN), Scalar(*H_MAX, *S_MAX, *V_MAX), threshold);
     // Consolidate the colored parts into one big blob to delimit the robot
-    cvWrapper->erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
+    erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
           *PRE_EROSIONS);
-    cvWrapper->dilate(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), *DILATIONS);
-    cvWrapper->erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
+    dilate(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), *DILATIONS);
+    erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
           *POST_EROSIONS);
 
     return threshold;
