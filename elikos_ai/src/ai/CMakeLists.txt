@@ -14,9 +14,11 @@ set(BEHAVIOR_SRC
     Behavior/AggressiveBehavior.h
     Behavior/PreventiveBehavior.cpp
     Behavior/PreventiveBehavior.h
-    Behavior/TargetResearch.cpp
-    Behavior/TargetResearch.h
-    Behavior/BehaviorTypes.h)
+    Behavior/ResearchBehavior.cpp
+    Behavior/ResearchBehavior.h
+    Behavior/BehaviorTypes.h
+    Behavior/BehaviorManager.cpp
+    Behavior/BehaviorManager.h)
 
 set(COMMAND_SRC
     Command/CommandQueue.h
@@ -59,8 +61,8 @@ set(ROBOT_SRC
     Robot/RobotTypes.h)
 
 set(CONSIDERATION_SRC
-    Consideration/PriorityEvaluationPipeline.cpp
-    Consideration/PriorityEvaluationPipeline.h
+        Consideration/PriorityEvaluationManager.cpp
+        Consideration/PriorityEvaluationManager.h
     Consideration/AbstractConsideration.cpp
     Consideration/AbstractConsideration.h
     Consideration/QuadDistance.cpp
@@ -81,8 +83,8 @@ set(UTIL_SRC
 
 add_executable(elikos_ai
     Ai.cpp
-    CmdLineParser.h
-    CmdLineParser.cpp
+    Configuration.h
+    Configuration.cpp
     Agent.cpp
     Agent.h
     MessageHandler.h

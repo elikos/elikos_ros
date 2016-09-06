@@ -11,17 +11,21 @@ namespace ai
 {
 
 class TargetRobot;
+class Configuration;
 
 class ArenaA : public AbstractArena
 {
 public:
-    ArenaA();
+    ArenaA(Configuration* config);
     virtual ~ArenaA();
 
     virtual void evaluateTargetOrientation(TargetRobot& target);
     virtual int getNRotationsForOptimalDirection(const TargetRobot& target) const;
 
     virtual TargetRobot* findClosestTargetToGoodLine();
+
+private:
+    ArenaA();
 };
 
 }

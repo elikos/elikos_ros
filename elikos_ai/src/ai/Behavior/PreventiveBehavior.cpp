@@ -10,8 +10,8 @@
 
 namespace ai
 {
-PreventiveBehavior::PreventiveBehavior(AbstractArena* arena)
-        : AbstractBehavior(arena)
+PreventiveBehavior::PreventiveBehavior(bool isEnabled)
+    : AbstractBehavior(isEnabled)
 {
 }
 
@@ -19,11 +19,11 @@ PreventiveBehavior::~PreventiveBehavior()
 {
 }
 
-void PreventiveBehavior::generateCommands()
+void PreventiveBehavior::generateCommands(AbstractArena* arena)
 {
     q_.clear();
-    TargetRobot* target = arena_->findHighestPriorityTarget();
-    QuadRobot* quad = &arena_->getQuad();
+    TargetRobot* target = arena->findHighestPriorityTarget();
+    QuadRobot* quad = &arena->getQuad();
 
     if (target != nullptr) {
         q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, target)));
@@ -32,10 +32,10 @@ void PreventiveBehavior::generateCommands()
     }
 }
 
-int PreventiveBehavior::resolveCurrentStateLevel()
+int PreventiveBehavior::resolveCurrentStateLevelConcrete(AbstractArena* arena)
 {
-    TargetRobot* target = arena_->findHighestPriorityTarget();
     int stateLevel = 0;
+    TargetRobot* target = arena->findHighestPriorityTarget();
     if (target != nullptr) {
         double priority = target->getPriority();
         if (priority > MAX_ACCEPTABLE_PRIORITY) {

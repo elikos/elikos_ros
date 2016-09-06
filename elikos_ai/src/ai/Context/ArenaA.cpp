@@ -3,11 +3,12 @@
 //
 
 #include "ArenaA.h"
+#include "Configuration.h"
 
 namespace ai
 {
 
-ArenaA::ArenaA()
+ArenaA::ArenaA(Configuration* config)
 {
     lines_.push_back(std::unique_ptr<GreenLine>(new GreenLine(TOP_LEFT_CORNER, TOP_RIGHT_CORNER)));
     lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(BOTTOM_LEFT_CORNER, TOP_LEFT_CORNER)));

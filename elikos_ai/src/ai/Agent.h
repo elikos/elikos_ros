@@ -4,8 +4,9 @@
 #include <memory>
 
 #include "Timer.h"
-#include "PriorityEvaluationPipeline.h"
-#include "AbstractBehavior.h"
+#include "PriorityEvaluationManager.h"
+#include "BehaviorManager.h"
+#include "AbstractArena.h"
 #include <elikos_ros/TargetRobotArray.h>
 
 namespace ai
@@ -14,14 +15,8 @@ namespace ai
 class Agent
 {
 public:
-    enum EnumBehavior
-    {
-        PREVENTIVE,
-        AGGRESSIVE,
-        RESEARCH
-    };
 
-    enum Consideration
+    enum ConsiderationType
     {
         TARGET_DESTINATION,
         QUAD_DISTANCE,
@@ -31,22 +26,20 @@ public:
     static Agent* getInstance();
     static void freeInstance();
 
+    void init(Configuration* config);
+
     void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
     void updateQuadRobot(const tf::Pose& pose);
-    void addConsideration(Consideration consideration);
 
     void behave();
 
 private:
     static Agent* instance_;
 
+    std::unique_ptr<BehaviorManager> behaviorManager_;
+    std::unique_ptr<PriorityEvaluationManager> priorityManager_;
+    std::unique_ptr<AbstractArena> arena_;
 
-    std::unique_ptr<AbstractBehavior> behaviors_[3];
-    AbstractBehavior* currentBehavior_;
-    PriorityEvaluationPipeline pipeline_;
-    util::Timer updateTimer_;
-
-    AbstractBehavior* resolveCurrentBehavior();
     Agent();
     ~Agent() = default;
 };

@@ -16,16 +16,12 @@ public:
     static constexpr double MIN_ACCEPTABLE_LINE_DISTANCE { 1.0 };
     static constexpr double MAX_ACCEPTABLE_PRIORITY { 0.90 };
 
-    PreventiveBehavior(AbstractArena* arena);
+    PreventiveBehavior() = default;
+    PreventiveBehavior(bool isEnabled);
     virtual ~PreventiveBehavior();
 
-    virtual void generateCommands();
-    virtual int resolveCurrentStateLevel();
-
-private:
-    bool isAlreadyCritical = false;
-
-    PreventiveBehavior() = default;
+    virtual void generateCommands(AbstractArena* arena);
+    virtual int resolveCurrentStateLevelConcrete(AbstractArena* arena);
 };
 
 }

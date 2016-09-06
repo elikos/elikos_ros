@@ -6,7 +6,6 @@
 #define AI_ABSTRACT_ARENA_H
 
 #include <memory>
-#include <mutex>
 #include <vector>
 #include <unordered_map>
 
@@ -15,8 +14,6 @@
 #include "Timer.h"
 
 #include "AbstractLine.h"
-
-
 
 namespace ai
 {

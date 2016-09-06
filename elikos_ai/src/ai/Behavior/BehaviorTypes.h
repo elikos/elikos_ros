@@ -1,9 +1,9 @@
-#ifnef BEHAVIOR_TYPES
+#ifndef BEHAVIOR_TYPES
 #define BEHAVIOR_TYPES
 
 #include "AbstractBehavior.h"
-#include "AbstractBehavior.h"
+#include "AggressiveBehavior.h"
 #include "PreventiveBehavior.h"
-#include "TargetResearch.h"
+#include "ResearchBehavior.h"
 
 #endif // BEHAVIOR_TYPES

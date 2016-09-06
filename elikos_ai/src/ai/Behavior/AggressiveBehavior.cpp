@@ -10,26 +10,25 @@
 namespace ai
 {
 
-AggressiveBehavior::AggressiveBehavior(AbstractArena* arena)
-    : AbstractBehavior(arena)
+AggressiveBehavior::AggressiveBehavior(bool isEnabled)
+    : AbstractBehavior(isEnabled)
 {
 }
-
 
 AggressiveBehavior::~AggressiveBehavior()
 {
 }
 
-void AggressiveBehavior::generateCommands()
+void AggressiveBehavior::generateCommands(AbstractArena* arena)
 {
-    currentTarget_ = arena_->findClosestTargetToGoodLine();
+    currentTarget_ = arena->findClosestTargetToGoodLine();
     if (currentTarget_ == nullptr) return;
 
-    QuadRobot* quad = &arena_->getQuad();
+    QuadRobot* quad = &arena->getQuad();
     q_.clear();
 
     q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, currentTarget_)));
-    int nLeftRotations = arena_->getNRotationsForOptimalDirection(*currentTarget_);
+    int nLeftRotations = arena->getNRotationsForOptimalDirection(*currentTarget_);
     switch (nLeftRotations)
     {
         case 1:
@@ -57,9 +56,9 @@ void AggressiveBehavior::generateCommands()
     }
 }
 
-int AggressiveBehavior::resolveCurrentStateLevel()
+int AggressiveBehavior::resolveCurrentStateLevelConcrete(AbstractArena* arena)
 {
-    currentTarget_ = arena_->findClosestTargetToGoodLine();
+    currentTarget_ = arena->findClosestTargetToGoodLine();
 
     if (currentTarget_ == nullptr) {
         return 0;
@@ -72,7 +71,7 @@ int AggressiveBehavior::resolveCurrentStateLevel()
         // We need to clear the q if the target is going in the good direction or the ai will keep executing the
         // interaction commands that are still there.
         q_.clear();
-        q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(&arena_->getQuad(), currentTarget_)));
+        q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(&arena->getQuad(), currentTarget_)));
     } else {
         stateLevel = 1;
     }

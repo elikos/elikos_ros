@@ -15,23 +15,26 @@ class AbstractArena;
 class AbstractBehavior
 {
 public:
-    AbstractBehavior(AbstractArena* arena);
+    AbstractBehavior() = default;
+    AbstractBehavior(bool isEnabled);
     virtual ~AbstractBehavior() = 0;
-    void behave();
-    virtual void generateCommands() = 0;
-    virtual int resolveCurrentStateLevel() = 0;
+
+    void setIsEnabled(bool isEnabled);
+
+    void behave(AbstractArena* arena);
+    virtual void generateCommands(AbstractArena* arena) = 0;
+    int resolveCurrentStateLevel(AbstractArena* arena);
 
 protected:
     CommandQueue q_;
-    AbstractArena* arena_;
+    virtual int resolveCurrentStateLevelConcrete(AbstractArena* arena) = 0;
 
 private:
-    AbstractBehavior() = default;
+    bool isEnabled_{ true };
 };
 
 inline AbstractBehavior::~AbstractBehavior() {}
 
 }
-
 
 #endif // AI_ABSTRACT_BEHAVIOR_H

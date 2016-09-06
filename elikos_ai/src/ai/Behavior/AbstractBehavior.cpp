@@ -9,12 +9,17 @@
 
 namespace ai
 {
-AbstractBehavior::AbstractBehavior(AbstractArena* arena)
-    : arena_(arena)
+AbstractBehavior::AbstractBehavior(bool isEnabled)
+    : isEnabled_(isEnabled)
 {
 }
 
-void AbstractBehavior::behave()
+void AbstractBehavior::setIsEnabled(bool isEnabled)
+{
+    isEnabled_ = isEnabled;
+}
+
+void AbstractBehavior::behave(AbstractArena* arena)
 {
     if (!q_.empty()) {
         q_.front()->execute();
@@ -22,9 +27,18 @@ void AbstractBehavior::behave()
             q_.pop();
         }
     } else {
-        generateCommands();
+        generateCommands(arena);
     }
-    arena_->prepareUpdate();
+    arena->prepareUpdate();
+}
+
+int AbstractBehavior::resolveCurrentStateLevel(AbstractArena* arena)
+{
+    int currentStateLevel = 0;
+    if (isEnabled_) {
+        currentStateLevel = resolveCurrentStateLevelConcrete(arena);
+    }
+    return currentStateLevel;
 }
 
 }
