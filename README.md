@@ -9,7 +9,7 @@ Package ROS "Elikos_ROS" contenant les différents modules servant à la localis
 
 ##Wut is dis
 
-Le but ultime de ce repo est de pouvoir le cloner directement sur le board de dev et tout le code devraient compiler sans problème. Il est donc important de porter une attention particulière à ce qui ce ramasse ici, en portant une attention particulière au différent Makefile.
+Le but ultime de ce repo est de pouvoir le cloner directement sur le board de dev et tout le code devrait compiler sans problème. Il est donc important de porter une attention particulière à ce qui se ramasse ici, en portant une attention particulière au différent Makefile.
 
 
 ##Prérequis
@@ -24,11 +24,11 @@ Le but ultime de ce repo est de pouvoir le cloner directement sur le board de de
 		
 		`git remote add upstream git@github.com:elikos/elikos_ros.git`
   2. Travailler sur son fork
-  3. **Tester** son fork sur **Ninon** et sur le board
+  3. **Tester** son fork sur le **desktop dans le local** et sur le board
   4. Faire un **Pull request**
   
-Cette façons de faire est pour s'assurer que seul le code **nécessaire** se retrouve sur le quad.
+Cette façon de faire est pour s'assurer que seul le code **nécessaire** se retrouve sur le quad.
 
 ##Librairie externe et autre
 
-Il est important de discuter avec l'équipe avant d'utiliser une nouvelle librairie pour le projet. Il faut s'assurer que la librairie est bien compatible avec le board et le code existant. Des variables d'environnement doivent être utilisées dans les makefile pour éviter que chaque personne se retrouve avec un makefile propre à ça machine.
+Il est important de discuter avec l'équipe avant d'utiliser une nouvelle librairie pour le projet. Il faut s'assurer que la librairie est bien compatible avec le board et le code existant. Des variables d'environnement doivent être utilisées dans les makefile pour éviter que chaque personne se retrouve avec un makefile propre à sa machine.
