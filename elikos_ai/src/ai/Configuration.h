@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <yaml-cpp/yaml.h>
 
 namespace ai
 {
@@ -19,13 +20,15 @@ public:
 
     Configuration();
     void parse(int argc, char* argv[]);
-    void fetchParameters(const ros::NodeHandle& nh);
+    bool readFromYamlFile(const std::string& path);
 
 private:
     std::unordered_map<std::string, bool> enableFlags_;
+    void parseBehaviorsConfig(const YAML::Node& behaviorsConfig);
+    void parseCommandsConfig(const YAML::Node& commandsConfig);
+    void parseConsiderationsConfig(const YAML::Node& considerationsConfig);
+    void parseArenaConfig(const YAML::Node& arenaConfig);
 
-    int checkModeArg(int argc, char* argv[]);
-    void parseMode(int mode);
 };
 
 }

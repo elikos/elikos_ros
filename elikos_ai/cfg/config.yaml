@@ -1,0 +1,48 @@
+behaviors: {
+  research: {
+    enabled: true
+  },
+  aggressive: {
+    enabled: true
+  },
+  preventive: {
+    enabled: false
+  }
+}
+
+considerations: {
+  cluster_size: {
+    enabled: false
+  },
+  quad_distance: {
+    enabled: false
+  },
+  target_destination: {
+    enabled: false
+  }
+}
+
+commands: {
+  move: {
+    altitude: 2.0
+  },
+  follow: {
+    altitude: 3.0
+  },
+  front_interaction: {
+    altitude: 4.0
+  },
+  top_interaction: {
+    altitude: 5.0
+  },
+}
+
+arena: {
+  type: A,
+  dimensions: {
+    dx: 20,
+    dy: 20
+  }
+}
+
+

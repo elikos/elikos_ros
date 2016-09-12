@@ -61,8 +61,8 @@ set(ROBOT_SRC
     Robot/RobotTypes.h)
 
 set(CONSIDERATION_SRC
-        Consideration/PriorityEvaluationManager.cpp
-        Consideration/PriorityEvaluationManager.h
+    Consideration/PriorityEvaluationManager.cpp
+    Consideration/PriorityEvaluationManager.h
     Consideration/AbstractConsideration.cpp
     Consideration/AbstractConsideration.h
     Consideration/QuadDistance.cpp
@@ -96,5 +96,8 @@ add_executable(elikos_ai
 	${UTIL_SRC}
 	${BEHAVIOR_SRC})
 
+
+
 target_link_libraries(elikos_ai
-    ${catkin_LIBRARIES})
+    ${catkin_LIBRARIES}
+	yaml-cpp)

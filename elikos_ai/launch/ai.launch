@@ -1,4 +1,3 @@
 <launch>
-    <node name="elikos_ai" pkg="elikos_ai" type="elikos_ai"/>
-        <rosparam command="load" file="$(find elikos_ai)/cfg/config.yaml" />
+    <node name="elikos_ai" pkg="elikos_ai" type="elikos_ai" args="--config $(find elikos_ai)/cfg/config.yaml/>
 </launch>
