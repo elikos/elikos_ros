@@ -16,6 +16,19 @@ Configuration::Configuration()
 {
 }
 
+std::string Configuration::parseNodeArgs(int argc, char** argv)
+{
+    const std::string CONFIG_ARG = "--config";
+    for (int i = 0; i < argc; i++)
+    {
+        int j = i + 1;
+        if (!strcmp(CONFIG_ARG.c_str(), argv[i]) && j < argc)
+        {
+            readFromYamlFile(std::string(argv[j]));
+        }
+    }
+}
+
 bool Configuration::readFromYamlFile(const std::string &filePath)
 {
     YAML::Node config = YAML::LoadFile(filePath);

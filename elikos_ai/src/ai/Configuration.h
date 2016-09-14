@@ -19,7 +19,7 @@ public:
     static const char* ARG_MODE;
 
     Configuration();
-    void parse(int argc, char* argv[]);
+    std::string parseNodeArgs(int argc, char** argv);
     bool readFromYamlFile(const std::string& path);
 
 private:
