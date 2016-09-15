@@ -9,8 +9,8 @@
 namespace ai
 {
 
-const char *Configuration::SIM_LAUNCH_CMD{"roslaunch elikos_sim simulation.launch"};
-const char *Configuration::ARG_MODE{"--mode"};
+const char* Configuration::SIM_LAUNCH_CMD{"roslaunch elikos_sim simulation.launch"};
+const char* Configuration::ARG_MODE{"--mode"};
 
 Configuration::Configuration()
 {
