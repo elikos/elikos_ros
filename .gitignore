@@ -40,3 +40,6 @@
 # eclipse files
 .project
 .cproject
+
+# vscode files
+.browse.VC.*
