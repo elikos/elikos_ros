@@ -55,10 +55,10 @@ void Configuration::parseBehaviorsConfig(const YAML::Node &behaviorsConfig)
 
 void Configuration::parseCommandsConfig(const YAML::Node &commandsConfig)
 {
-    cmdConfig_.moveAltitude = commandsConfig["move"]["altitude"].as<int>();
-    cmdConfig_.followAltitude = commandsConfig["follow"]["altitude"].as<int>();
-    cmdConfig_.topInteractionAltitude = commandsConfig["top_interaction"]["altitude"].as<int>();
-    cmdConfig_.frontInteractionAltitude = commandsConfig["front_interaction"]["altitude"].as<int>();
+    cmdConfig_.moveAltitude = commandsConfig["move"]["altitude"].as<double>();
+    cmdConfig_.followAltitude = commandsConfig["follow"]["altitude"].as<double>();
+    cmdConfig_.topInteractionAltitude = commandsConfig["top_interaction"]["altitude"].as<double>();
+    cmdConfig_.frontInteractionAltitude = commandsConfig["front_interaction"]["altitude"].as<double>();
 }
 
 void Configuration::parseConsiderationsConfig(const YAML::Node &considerationsConfig)

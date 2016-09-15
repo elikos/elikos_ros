@@ -32,7 +32,6 @@ void Agent::freeInstance()
 
 void Agent::init(Configuration* config)
 {
-    // TODO: Use the configuration to create the arena and the managers.
     arena_ = std::unique_ptr<ArenaA>(new ArenaA(config));
     behaviorManager_ = std::unique_ptr<BehaviorManager>(new BehaviorManager(arena_.get(), config));
     priorityManager_ = std::unique_ptr<PriorityEvaluationManager>(new PriorityEvaluationManager(arena_.get(), config));
