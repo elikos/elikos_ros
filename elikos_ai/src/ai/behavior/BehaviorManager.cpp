@@ -11,6 +11,10 @@ namespace ai
 BehaviorManager::BehaviorManager(AbstractArena* arena, Configuration* config)
     : arena_(arena)
 {
+    BehaviorConfig* behaviorConfig = config->getBehaviorConfig();
+    aggressiveBehavior_.setIsEnabled(behaviorConfig->isAggressiveEnabled);
+    preventiveBehavior_.setIsEnabled(behaviorConfig->isPreventiveEnabled);
+    researchBehavior_.setIsEnabled(behaviorConfig->isResearchEnabled);
 }
 
 BehaviorManager::~BehaviorManager()

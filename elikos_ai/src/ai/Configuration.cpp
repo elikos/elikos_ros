@@ -48,31 +48,31 @@ bool Configuration::readFromYamlFile(const std::string &filePath)
 
 void Configuration::parseBehaviorsConfig(const YAML::Node &behaviorsConfig)
 {
-    bool hasResearch =   behaviorsConfig["research"]["enabled"].as<bool>();
-    bool hasAggressive = behaviorsConfig["aggressive"]["enabled"].as<bool>();
-    bool hasPreventive = behaviorsConfig["preventive"]["enabled"].as<bool>();
+    behaviorConfig_.isResearchEnabled = behaviorsConfig["research"]["enabled"].as<bool>();
+    behaviorConfig_.isAggressiveEnabled = behaviorsConfig["aggressive"]["enabled"].as<bool>();
+    behaviorConfig_.isPreventiveEnabled = behaviorsConfig["preventive"]["enabled"].as<bool>();
 }
 
 void Configuration::parseCommandsConfig(const YAML::Node &commandsConfig)
 {
-    int moveHeight =   commandsConfig["move"]["altitude"].as<int>();
-    int followHeight = commandsConfig["follow"]["altitude"].as<int>();
-    int topHeight =    commandsConfig["top_interaction"]["altitude"].as<int>();
-    int frontHeight =  commandsConfig["front_interaction"]["altitude"].as<int>();
+    cmdConfig_.moveAltitude = commandsConfig["move"]["altitude"].as<int>();
+    cmdConfig_.followAltitude = commandsConfig["follow"]["altitude"].as<int>();
+    cmdConfig_.topInteractionAltitude = commandsConfig["top_interaction"]["altitude"].as<int>();
+    cmdConfig_.frontInteractionAltitude = commandsConfig["front_interaction"]["altitude"].as<int>();
 }
 
 void Configuration::parseConsiderationsConfig(const YAML::Node &considerationsConfig)
 {
-    bool isUsingClusterSize = considerationsConfig["cluster_size"]["enabled"].as<bool>();
-    bool isUsingQuadDistance = considerationsConfig["quad_distance"]["enabled"].as<bool>();
-    bool isUsingTargetDestination = considerationsConfig["target_destination"]["enabled"].as<bool>();
+    considerationConfig_.isClusterSizeEnabled = considerationsConfig["cluster_size"]["enabled"].as<bool>();
+    considerationConfig_.isQuadDistanceEnabled = considerationsConfig["quad_distance"]["enabled"].as<bool>();
+    considerationConfig_.isTargetDestinationEnabled = considerationsConfig["target_destination"]["enabled"].as<bool>();
 }
 
 void Configuration::parseArenaConfig(const YAML::Node &arenaConfig)
 {
-    char arenaType =  arenaConfig["type"].as<char>();
-    int dx = arenaConfig["dimensions"]["dx"].as<int>();
-    int dy = arenaConfig["dimensions"]["dy"].as<int>();
+    arenaConfig_.arenaType = arenaConfig["type"].as<char>();
+    arenaConfig_.dimensions.setX(arenaConfig["dimensions"]["dx"].as<int>());
+    arenaConfig_.dimensions.setY(arenaConfig["dimensions"]["dy"].as<int>());
 }
 
 }

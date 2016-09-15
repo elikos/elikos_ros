@@ -10,6 +10,8 @@ namespace ai
 
 ArenaA::ArenaA(Configuration* config)
 {
+    ArenaConfig* arenaConfig = config->getArenaConfig();
+    // TODO: use the arena config;
     lines_.push_back(std::unique_ptr<GreenLine>(new GreenLine(TOP_LEFT_CORNER, TOP_RIGHT_CORNER)));
     lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(BOTTOM_LEFT_CORNER, TOP_LEFT_CORNER)));
     lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(BOTTOM_RIGHT_CORNER, BOTTOM_LEFT_CORNER)));
