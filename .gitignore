@@ -42,4 +42,4 @@
 .cproject
 
 # vscode files
-.browse.VC.*
+.vscode/*
