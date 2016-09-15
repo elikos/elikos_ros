@@ -35,7 +35,8 @@ void AbstractBehavior::behave(AbstractArena* arena)
 int AbstractBehavior::resolveCurrentStateLevel(AbstractArena* arena)
 {
     int currentStateLevel = 0;
-    if (isEnabled_) {
+    if (isEnabled_)
+    {
         currentStateLevel = resolveCurrentStateLevelConcrete(arena);
     }
     return currentStateLevel;

@@ -24,25 +24,36 @@ BehaviorManager::~BehaviorManager()
 void BehaviorManager::behave()
 {
     AbstractBehavior* currentBehavior = resolveCurrentBehavior();
-    currentBehavior->behave(arena_);
+    if (currentBehavior != nullptr)
+    {
+        currentBehavior->behave(arena_);
+    }
 }
 
 AbstractBehavior* BehaviorManager::resolveCurrentBehavior()
 {
-    AbstractBehavior* currentBehavior = &researchBehavior_;
-
+    AbstractBehavior* currentBehavior = nullptr;
     int researchStateLevel = researchBehavior_.resolveCurrentStateLevel(arena_);
-    if (researchStateLevel == 0) {
+    // Research behavior is either fine of disabled
+    if (researchStateLevel < 2)
+    {
         int preventiveStateLevel = preventiveBehavior_.resolveCurrentStateLevel(arena_);
         int aggressiveStateLevel = aggressiveBehavior_.resolveCurrentStateLevel(arena_);
 
-        if (preventiveStateLevel > aggressiveStateLevel) {
+        if (preventiveStateLevel > aggressiveStateLevel && preventiveStateLevel > 0)
+        {
             currentBehavior = &preventiveBehavior_;
-        } else {
+        }
+        else if (aggressiveStateLevel > 0)
+        {
             currentBehavior = &aggressiveBehavior_;
         }
     }
-
+    // researchStatelevel == 2: No targets detected for a while.
+    else
+    {
+        currentBehavior = &researchBehavior_;
+    }
     return currentBehavior;
 }
 

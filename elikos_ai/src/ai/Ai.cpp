@@ -6,6 +6,7 @@ int main(int argc, char* argv[])
 {
     // ROS Init
     ros::init(argc, argv, "elikos_ai");
+    ros::NodeHandle nh;
 
     ai::Configuration config;
     config.parseNodeArgs(argc, argv);

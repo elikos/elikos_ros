@@ -13,7 +13,6 @@ namespace ai
 class PreventiveBehavior : public AbstractBehavior
 {
 public:
-    static constexpr double MIN_ACCEPTABLE_LINE_DISTANCE { 1.0 };
     static constexpr double MAX_ACCEPTABLE_PRIORITY { 0.90 };
 
     PreventiveBehavior() = default;

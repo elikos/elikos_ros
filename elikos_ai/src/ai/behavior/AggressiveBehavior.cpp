@@ -60,12 +60,13 @@ int AggressiveBehavior::resolveCurrentStateLevelConcrete(AbstractArena* arena)
 {
     currentTarget_ = arena->findClosestTargetToGoodLine();
 
-    if (currentTarget_ == nullptr) {
+    if (currentTarget_ == nullptr)
+    {
         return 0;
     }
 
     OrientationEvaluation* evaluation = currentTarget_->getOrientationEvaluation();
-    int stateLevel = 0;
+    int stateLevel = 1;
     if (evaluation->isGoodIntersection_) {
         // TODO: Something better should be done here
         // We need to clear the q if the target is going in the good direction or the ai will keep executing the
@@ -73,7 +74,7 @@ int AggressiveBehavior::resolveCurrentStateLevelConcrete(AbstractArena* arena)
         q_.clear();
         q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(&arena->getQuad(), currentTarget_)));
     } else {
-        stateLevel = 1;
+        stateLevel = 2;
     }
     return stateLevel;
 }

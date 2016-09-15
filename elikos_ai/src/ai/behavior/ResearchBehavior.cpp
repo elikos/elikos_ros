@@ -35,9 +35,9 @@ void ResearchBehavior::generateCommands(AbstractArena* arena)
 
 int ResearchBehavior::resolveCurrentStateLevelConcrete(AbstractArena* arena)
 {
-    int stateLevel = 1;
+    int stateLevel = 2;
     if (arena->getNbrOfUpdatedTargets() > 0) {
-        stateLevel = 0;
+        stateLevel = 1;
     }
     return stateLevel;
 }

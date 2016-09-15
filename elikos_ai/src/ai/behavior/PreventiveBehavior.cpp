@@ -34,14 +34,18 @@ void PreventiveBehavior::generateCommands(AbstractArena* arena)
 
 int PreventiveBehavior::resolveCurrentStateLevelConcrete(AbstractArena* arena)
 {
-    int stateLevel = 0;
+    int stateLevel = 1;
     TargetRobot* target = arena->findHighestPriorityTarget();
-    if (target != nullptr) {
+    if (target != nullptr)
+    {
         double priority = target->getPriority();
-        if (priority > MAX_ACCEPTABLE_PRIORITY) {
+        if (priority > MAX_ACCEPTABLE_PRIORITY)
+        {
+            stateLevel = 3;
+        }
+        else if (priority > 0.0)
+        {
             stateLevel = 2;
-        } else if (priority > 0.0) {
-            stateLevel = 1;
         }
     }
     return stateLevel;

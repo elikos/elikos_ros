@@ -18,7 +18,7 @@ Configuration::Configuration()
 
 std::string Configuration::parseNodeArgs(int argc, char** argv)
 {
-    const std::string CONFIG_ARG = "--config";
+    std::string CONFIG_ARG = "--config";
     for (int i = 0; i < argc; i++)
     {
         int j = i + 1;
@@ -31,19 +31,23 @@ std::string Configuration::parseNodeArgs(int argc, char** argv)
 
 bool Configuration::readFromYamlFile(const std::string &filePath)
 {
-    YAML::Node config = YAML::LoadFile(filePath);
+    try {
+        YAML::Node config = YAML::LoadFile(filePath);
 
-    YAML::Node behaviors = config["behaviors"];
-    parseBehaviorsConfig(behaviors);
+        YAML::Node behaviors = config["behaviors"];
+        parseBehaviorsConfig(behaviors);
 
-    YAML::Node commands = config["commands"];
-    parseCommandsConfig(commands);
+        YAML::Node commands = config["commands"];
+        parseCommandsConfig(commands);
 
-    YAML::Node considerations = config["considerations"];
-    parseConsiderationsConfig(considerations);
+        YAML::Node considerations = config["considerations"];
+        parseConsiderationsConfig(considerations);
 
-    YAML::Node arena = config["arena"];
-    parseArenaConfig(arena);
+        YAML::Node arena = config["arena"];
+        parseArenaConfig(arena);
+    } catch (YAML::Exception& e) {
+        ROS_ERROR(("Error while parsing config file at " + filePath).c_str(), e.what());
+    }
 }
 
 void Configuration::parseBehaviorsConfig(const YAML::Node &behaviorsConfig)
@@ -71,8 +75,8 @@ void Configuration::parseConsiderationsConfig(const YAML::Node &considerationsCo
 void Configuration::parseArenaConfig(const YAML::Node &arenaConfig)
 {
     arenaConfig_.arenaType = arenaConfig["type"].as<char>();
-    arenaConfig_.dimensions.setX(arenaConfig["dimensions"]["dx"].as<int>());
-    arenaConfig_.dimensions.setY(arenaConfig["dimensions"]["dy"].as<int>());
+    arenaConfig_.dimensions.setX(arenaConfig["dimensions"]["dx"].as<double>());
+    arenaConfig_.dimensions.setY(arenaConfig["dimensions"]["dy"].as<double>());
 }
 
 }

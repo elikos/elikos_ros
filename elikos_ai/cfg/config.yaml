@@ -40,8 +40,8 @@ commands: {
 arena: {
   type: A,
   dimensions: {
-    dx: 20,
-    dy: 20
+    dx: 20.0,
+    dy: 20.0
   }
 }
 
