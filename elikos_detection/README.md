@@ -9,9 +9,19 @@
 
 ## Launch files  
 * `elikos_detection.launch`  
+*Description*  
+    * Lance une instance du package de détection.  
 *Paramètres*  
     * `camera_name` : nom de la camera utilisée.  
     * `cfg` : nom du fichier de configuration utilisé.  
+* `handquad_test.launch`
+*Paramètres*  
+    * `rviz_cfg` : nom de la configuration rviz utilisé.  
+*Description*  
+    * Lance ce qu'il faut pour tester la détection avec le handquad.  
+* `multicam_test.launch`
+*Description*  
+    * Lance plusieurs instances du package de détection avec le handquad et une intel realsense r200.  
     
 ## Configuration   
 * *Paramètres*  
