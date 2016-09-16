@@ -4,8 +4,8 @@
 	<include file="$(find elikos_ros)/launch/camera1394_3.launch" />
 
 	<include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch" >
-	<arg name="camera" value="r200" />
-	<arg name="serial_no" value="2411013612"/>
+		<arg name="camera" value="r200" />
+		<arg name="serial_no" value="2411013612"/>
 	</include>
 
   	<include file="$(find elikos_ros)/launch/px4.launch" />

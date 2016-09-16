@@ -1,0 +1,14 @@
+<launch>
+    <include file="$(find elikos_detection)/launch/handquad_test.launch">
+        <arg name="rviz_cfg" value="multicam"/>
+    </include>
+
+    <include file="$(find realsense)/realsense_r200_launch.launch"/>
+
+    <include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="realsense_cam" />
+      <arg name="cfg" value="elikos_realsense"/>
+    </include>
+
+    <node pkg="tf" type="static_transform_publisher" name="realsense_broadcaster" args="0.3 0.0 0.0 -0.5 0.5 -0.5 0.5 elikos_fcu realsense_frame 100" />
+</launch>
