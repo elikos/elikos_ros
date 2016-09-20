@@ -15,7 +15,7 @@
 	<include file="$(find elikos_ai)/launch/ai.launch"/>
 
 	<!-- Path planning and navigation -->
-  <include file="$(find elikos_nav)/launch/nav.launch"/>
+  <include file="$(find elikos_path_planning)/launch/nav.launch"/>
 
 	<!-- Static transforms -->
 	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />

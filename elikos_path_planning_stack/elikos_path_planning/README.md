@@ -1,13 +1,13 @@
-# ELIKOS_NAV 
+# ELIKOS_PATH_PLANNING 
 ## Buts  
-* Package principal de la navigation stack. 
+* Package principal du path planning. 
 * Recevoir les commandes de l'AI et les envoyer dans le planning pipeline de moveit.
 * Obtenir la trajectoire à exécuter de moveit et envoyer une commande de position à mavros.
 
 ## Launch files  
-* `nav.launch`  
+* `path_planning.launch`  
 *Description*  
-    * Sert à lancer tous les éléments de la navigation stack.  
+    * Sert à lancer tous les éléments du path planning.  
 
 ## Nodes  
 * **elikos_moveit_move_group** : Node central pour utiliser moveit. 

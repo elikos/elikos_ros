@@ -14,8 +14,8 @@
   <!-- AI -->
 	<include file="$(find elikos_ai)/launch/ai.launch"/>
 
-  <!-- Path planning and navigation -->
-  <include file="$(find elikos_nav)/launch/nav.launch"/>
+  <!-- Path planning -->
+  <include file="$(find elikos_path_planning)/launch/path_planning.launch"/>
 
   <!-- Static transforms -->
   <node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />

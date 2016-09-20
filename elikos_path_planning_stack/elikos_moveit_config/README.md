@@ -9,7 +9,7 @@
     * Sert à lancer les différents packages de moveit.  
 * `setup_assistant.launch`  
 *Description*  
-    * Lance l'outil de configuration de moveit. Le fichier (flying_box.urdf.xacro) sur lequel les configurations actuelles sont basées se trouve dans elikos_nav/cfg.  
+    * Lance l'outil de configuration de moveit. Le fichier (flying_box.urdf.xacro) sur lequel les configurations actuelles sont basées se trouve dans elikos_path_planning/cfg.  
 * Plusieurs autres sans importance.
 
 ## Configurations
@@ -24,4 +24,4 @@
 * Plusieurs autres sans importance.
 
 ## À savoir!
-* Le principal launch file (`moveit_master.launch`) est lancé dans `nav.launch` du package **elikos_nav**. 
+* Le principal launch file (`moveit_master.launch`) est lancé dans `path_planning.launch` du package **elikos_path_planning**. 

@@ -1,6 +1,6 @@
 moveit_setup_assistant_config:
   URDF:
-    package: elikos_nav
+    package: elikos_path_planning
     relative_path: cfg/flying_box.urdf.xacro
   SRDF:
     relative_path: config/flying_box.srdf
