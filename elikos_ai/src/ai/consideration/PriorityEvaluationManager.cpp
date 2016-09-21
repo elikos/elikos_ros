@@ -16,6 +16,7 @@ namespace ai
 PriorityEvaluationManager::PriorityEvaluationManager(AbstractArena* arena, Configuration* config)
     : arena_(arena)
 {
+    //TODO: use the config here.
 }
 
 void PriorityEvaluationManager::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
@@ -24,7 +25,6 @@ void PriorityEvaluationManager::updateTargets(const elikos_ros::TargetRobotArray
     size_t n = input->targets.size();
     //std::thread th[n];
 
-    arena_->prepareUpdate();
     for (int i = 0; i < n; ++i)
     {
         updateTarget(targets[i]);
@@ -35,11 +35,11 @@ void PriorityEvaluationManager::updateTargets(const elikos_ros::TargetRobotArray
 
 void PriorityEvaluationManager::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
 {
-    TargetRobot* target = arena_->updateTarget(targetUpdate);
+    /*TargetRobot* target = arena_->updateTarget(targetUpdate);
     if (target != nullptr) {
         arena_->evaluateTargetOrientation(*target);
         evaluatePriority(*target);
-    }
+    } */
 }
 
 void PriorityEvaluationManager::evaluatePriority(TargetRobot& target)

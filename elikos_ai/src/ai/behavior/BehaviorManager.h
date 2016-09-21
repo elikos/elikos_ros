@@ -28,8 +28,6 @@ private:
     PreventiveBehavior preventiveBehavior_;
     ResearchBehavior researchBehavior_;
 
-    AbstractArena* arena_;
-
     BehaviorManager() = default;
 };
 

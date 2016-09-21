@@ -16,11 +16,11 @@ class ResearchBehavior : public AbstractBehavior
 {
 public:
     ResearchBehavior() = default;
-    ResearchBehavior(bool isEnabled);
+    ResearchBehavior(AbstractArena* arena);
     virtual ~ResearchBehavior();
 
-    virtual void generateCommands(AbstractArena* arena);
-    virtual int  resolveCurrentStateLevelConcrete(AbstractArena* arena);
+    virtual void generateCommands();
+    virtual int  resolveCurrentStateLevelConcrete();
 };
 
 }

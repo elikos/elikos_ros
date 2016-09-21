@@ -44,7 +44,7 @@ void Agent::behave()
 
 void Agent::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
 {
-    priorityManager_->updateTargets(input);
+    arena_->updateTargets(input);
 }
 
 void Agent::updateQuadRobot(const tf::Pose& pose)

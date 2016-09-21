@@ -5,6 +5,7 @@
 #ifndef AI_ABSTRACT_BEHAVIOR_H
 #define AI_ABSTRACT_BEHAVIOR_H
 
+#include <context/AbstractArena.h>
 #include "CommandQueue.h"
 
 namespace ai
@@ -15,22 +16,23 @@ class AbstractArena;
 class AbstractBehavior
 {
 public:
-    AbstractBehavior() = default;
-    AbstractBehavior(bool isEnabled);
+    AbstractBehavior(AbstractArena* arena);
     virtual ~AbstractBehavior() = 0;
 
     void setIsEnabled(bool isEnabled);
 
-    void behave(AbstractArena* arena);
-    virtual void generateCommands(AbstractArena* arena) = 0;
-    int resolveCurrentStateLevel(AbstractArena* arena);
+    void behave();
+    virtual void generateCommands() = 0;
+    int resolveCurrentStateLevel();
 
 protected:
     CommandQueue q_;
-    virtual int resolveCurrentStateLevelConcrete(AbstractArena* arena) = 0;
+    AbstractArena* arena_;
+    virtual int resolveCurrentStateLevelConcrete() = 0;
 
 private:
     bool isEnabled_{ true };
+    AbstractBehavior() = default;
 };
 
 inline AbstractBehavior::~AbstractBehavior() {}

@@ -37,7 +37,9 @@ public:
     inline QuadRobot& getQuad();
 
     void prepareUpdate();
-    TargetRobot* updateTarget(const elikos_ros::TargetRobot& targetUpdate);
+    void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
+    void updateQuadRobot(const tf::Pose& pose);
+
 
     virtual void evaluateTargetOrientation(TargetRobot& target) = 0;
     virtual int getNRotationsForOptimalDirection(const TargetRobot& target) const = 0;
@@ -50,6 +52,7 @@ public:
     int getNbrOfUpdatedTargets();
 
 protected:
+
     std::vector<std::unique_ptr<AbstractLine>> lines_;
     std::vector<TargetRobot> targets_;
     std::unordered_map<int, TargetRobot*> targetsId_;
@@ -57,6 +60,7 @@ protected:
     QuadRobot quad_;
     util::Timer timer_;
 
+    TargetRobot* updateTarget(const elikos_ros::TargetRobot& targetUpdate);
     TargetRobot* findMostLikelyUpdateCondidate(const elikos_ros::TargetRobot& targetUpdate);
     void evaluateOutOfBound(TargetRobot& target);
 };

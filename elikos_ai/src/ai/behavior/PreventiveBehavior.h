@@ -6,21 +6,27 @@
 #define AI_PREVENTIVE_BEHAVIOR_H
 
 #include "AbstractBehavior.h"
+#include "PriorityEvaluationManager.h"
 
 namespace ai
 {
 
+class Configuration;
 class PreventiveBehavior : public AbstractBehavior
 {
 public:
     static constexpr double MAX_ACCEPTABLE_PRIORITY { 0.90 };
 
-    PreventiveBehavior() = default;
-    PreventiveBehavior(bool isEnabled);
+    PreventiveBehavior(AbstractArena* arena, Configuration* config);
     virtual ~PreventiveBehavior();
 
-    virtual void generateCommands(AbstractArena* arena);
-    virtual int resolveCurrentStateLevelConcrete(AbstractArena* arena);
+    virtual void generateCommands();
+    virtual int resolveCurrentStateLevelConcrete();
+
+private:
+    PriorityEvaluationManager priorityManager_;
+
+    PreventiveBehavior() = default;
 };
 
 }

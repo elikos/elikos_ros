@@ -13,10 +13,10 @@ namespace ai
 const double AbstractArena::MIN_EDGE = -9.5;
 const double AbstractArena::MAX_EDGE =  9.5;
 
-const tf::Point AbstractArena::TOP_RIGHT_CORNER{ 10.0, 10.0, 0.0 };
-const tf::Point AbstractArena::TOP_LEFT_CORNER{ -10.0, 10.0, 0.0 };
-const tf::Point AbstractArena::BOTTOM_LEFT_CORNER{ -10.0, -10.0, 0.0 };
-const tf::Point AbstractArena::BOTTOM_RIGHT_CORNER{ 10.0, -10.0, 0.0 };
+const tf::Point AbstractArena::TOP_RIGHT_CORNER    { 10.0,  10.0, 0.0 };
+const tf::Point AbstractArena::TOP_LEFT_CORNER     {-10.0,  10.0, 0.0 };
+const tf::Point AbstractArena::BOTTOM_LEFT_CORNER  {-10.0, -10.0, 0.0 };
+const tf::Point AbstractArena::BOTTOM_RIGHT_CORNER { 10.0, -10.0, 0.0 };
 
 AbstractArena::AbstractArena()
 {
@@ -53,6 +53,18 @@ void AbstractArena::prepareUpdate()
     }
 }
 
+void AbstractArena::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
+{
+    const elikos_ros::TargetRobot* inputTargets = input->targets.data();
+    size_t n = input->targets.size();
+
+    prepareUpdate();
+    for (size_t i = 0; i < n; ++i)
+    {
+        updateTarget(inputTargets[i]);
+    }
+}
+
 TargetRobot* AbstractArena::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
 {
     tf::Pose pose;
@@ -66,6 +78,11 @@ TargetRobot* AbstractArena::updateTarget(const elikos_ros::TargetRobot& targetUp
         }
     }
     return target;
+}
+
+void AbstractArena::updateQuadRobot(const tf::Pose& pose)
+{
+    quad_.setPose(pose);
 }
 
 TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::TargetRobot& targetUpdate)

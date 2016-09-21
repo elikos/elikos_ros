@@ -5,13 +5,14 @@
 #include "AbstractArena.h"
 #include "CommandTypes.h"
 #include "FollowCommand.h"
+#include "Configuration.h"
 
 #include "PreventiveBehavior.h"
 
 namespace ai
 {
-PreventiveBehavior::PreventiveBehavior(bool isEnabled)
-    : AbstractBehavior(isEnabled)
+PreventiveBehavior::PreventiveBehavior(AbstractArena* arena, Configuration* config)
+    : AbstractBehavior(arena), priorityManager_(arena, config)
 {
 }
 
@@ -19,11 +20,11 @@ PreventiveBehavior::~PreventiveBehavior()
 {
 }
 
-void PreventiveBehavior::generateCommands(AbstractArena* arena)
+void PreventiveBehavior::generateCommands()
 {
     q_.clear();
-    TargetRobot* target = arena->findHighestPriorityTarget();
-    QuadRobot* quad = &arena->getQuad();
+    TargetRobot* target = arena_->findHighestPriorityTarget();
+    QuadRobot* quad = &arena_->getQuad();
 
     if (target != nullptr) {
         q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, target)));
@@ -32,10 +33,10 @@ void PreventiveBehavior::generateCommands(AbstractArena* arena)
     }
 }
 
-int PreventiveBehavior::resolveCurrentStateLevelConcrete(AbstractArena* arena)
+int PreventiveBehavior::resolveCurrentStateLevelConcrete()
 {
     int stateLevel = 1;
-    TargetRobot* target = arena->findHighestPriorityTarget();
+    TargetRobot* target = arena_->findHighestPriorityTarget();
     if (target != nullptr)
     {
         double priority = target->getPriority();

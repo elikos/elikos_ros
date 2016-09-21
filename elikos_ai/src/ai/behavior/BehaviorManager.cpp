@@ -9,7 +9,7 @@ namespace ai
 {
 
 BehaviorManager::BehaviorManager(AbstractArena* arena, Configuration* config)
-    : arena_(arena)
+    : aggressiveBehavior_(arena), preventiveBehavior_(arena, config), researchBehavior_(arena)
 {
     BehaviorConfig* behaviorConfig = config->getBehaviorConfig();
     aggressiveBehavior_.setIsEnabled(behaviorConfig->isAggressiveEnabled);
@@ -26,19 +26,19 @@ void BehaviorManager::behave()
     AbstractBehavior* currentBehavior = resolveCurrentBehavior();
     if (currentBehavior != nullptr)
     {
-        currentBehavior->behave(arena_);
+        currentBehavior->behave();
     }
 }
 
 AbstractBehavior* BehaviorManager::resolveCurrentBehavior()
 {
     AbstractBehavior* currentBehavior = nullptr;
-    int researchStateLevel = researchBehavior_.resolveCurrentStateLevel(arena_);
+    int researchStateLevel = researchBehavior_.resolveCurrentStateLevel();
     // Research behavior is either fine of disabled
     if (researchStateLevel < 2)
     {
-        int preventiveStateLevel = preventiveBehavior_.resolveCurrentStateLevel(arena_);
-        int aggressiveStateLevel = aggressiveBehavior_.resolveCurrentStateLevel(arena_);
+        int preventiveStateLevel = preventiveBehavior_.resolveCurrentStateLevel();
+        int aggressiveStateLevel = aggressiveBehavior_.resolveCurrentStateLevel();
 
         if (preventiveStateLevel > aggressiveStateLevel && preventiveStateLevel > 0)
         {
