@@ -12,12 +12,12 @@ namespace ai
 
 class AbstractArena;
 
-class TargetDestination : public AbstractConsideration
+class DestinationConsideration : public AbstractConsideration
 {
 public:
-    TargetDestination() = default;
-    virtual ~TargetDestination();
-    virtual void evaluatePriority(TargetRobot& targetRobot, AbstractArena* arena);
+    DestinationConsideration() = default;
+    virtual ~DestinationConsideration();
+    virtual void evaluatePriority(AbstractArena* arena);
 };
 
 }

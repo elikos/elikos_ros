@@ -32,7 +32,7 @@ void GreenLine::concreteEvaluate(TargetRobot& target)
     for (i = 0; i < 4 && !directionFound; ++i)
     {
         util::Line line(target.getPose().getOrigin(), possibleOrientations[i]);
-        directionFound = segment_.isIntersecting(line);
+        directionFound = isIntersecting(line);
     }
 }
 

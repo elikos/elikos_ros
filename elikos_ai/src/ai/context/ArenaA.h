@@ -25,6 +25,9 @@ public:
     virtual TargetRobot* findClosestTargetToGoodLine();
 
 private:
+    WhiteLine whiteLines_[3];
+    GreenLine greenLine_;
+
     ArenaA();
 };
 

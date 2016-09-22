@@ -12,7 +12,7 @@
 namespace ai
 {
 PreventiveBehavior::PreventiveBehavior(AbstractArena* arena, Configuration* config)
-    : AbstractBehavior(arena), priorityManager_(arena, config)
+    : AbstractBehavior(arena)
 {
 }
 
@@ -40,7 +40,7 @@ int PreventiveBehavior::resolveCurrentStateLevelConcrete()
     if (target != nullptr)
     {
         double priority = target->getPriority();
-        if (priority > MAX_ACCEPTABLE_PRIORITY)
+        if (priority > MIN_ACCEPTABLE_PRIORITY)
         {
             stateLevel = 3;
         }

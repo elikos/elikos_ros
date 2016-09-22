@@ -13,7 +13,7 @@ namespace ai
 
 class TargetRobot;
 
-class AbstractLine
+class AbstractLine : public util::Segment
 {
 public:
     AbstractLine();
@@ -24,9 +24,6 @@ public:
     void evaluate(TargetRobot& robot);
 
     virtual ~AbstractLine() = 0;
-
-protected:
-    util::Segment segment_;
 };
 
 }

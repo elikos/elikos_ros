@@ -3,23 +3,34 @@
 //
 
 #include "ArenaA.h"
+
 #include "Configuration.h"
+#include <iterator>
 
 namespace ai
 {
 
 ArenaA::ArenaA(Configuration* config)
+    : greenLine_  { GreenLine(TOP_LEFT_CORNER,     TOP_RIGHT_CORNER)},
+      whiteLines_ { WhiteLine(BOTTOM_LEFT_CORNER,  TOP_LEFT_CORNER),
+                    WhiteLine(BOTTOM_RIGHT_CORNER, BOTTOM_LEFT_CORNER),
+                    WhiteLine(TOP_RIGHT_CORNER,    BOTTOM_RIGHT_CORNER)}
 {
     ArenaConfig* arenaConfig = config->getArenaConfig();
-    // TODO: use the arena config;
-    lines_.push_back(std::unique_ptr<GreenLine>(new GreenLine(TOP_LEFT_CORNER, TOP_RIGHT_CORNER)));
-    lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(BOTTOM_LEFT_CORNER, TOP_LEFT_CORNER)));
-    lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(BOTTOM_RIGHT_CORNER, BOTTOM_LEFT_CORNER)));
-    lines_.push_back(std::unique_ptr<WhiteLine>(new WhiteLine(TOP_RIGHT_CORNER, BOTTOM_RIGHT_CORNER)));
+    lines_.push_back(&greenLine_);
+    for (int i = 0; i < 3; i++)
+    {
+        lines_.push_back(&whiteLines_[i]);
+    }
 }
 
 ArenaA::~ArenaA()
 {
+    for (int i = 0; i < lines_.size(); ++i)
+    {
+        delete lines_[i];
+        lines_[i] = nullptr;
+    }
 }
 
 void ArenaA::evaluateTargetOrientation(TargetRobot& robot)
@@ -35,8 +46,6 @@ void ArenaA::evaluateTargetOrientation(TargetRobot& robot)
         evaluateOutOfBound(robot);
     }
 }
-
-
 
 int ArenaA::getNRotationsForOptimalDirection(const TargetRobot& target) const
 {

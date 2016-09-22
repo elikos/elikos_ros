@@ -6,6 +6,7 @@
 
 #include "AbstractBehavior.h"
 #include "AbstractArena.h"
+#include "AbstractConsideration.h"
 
 namespace ai
 {
@@ -39,6 +40,15 @@ int AbstractBehavior::resolveCurrentStateLevel()
         currentStateLevel = resolveCurrentStateLevelConcrete();
     }
     return currentStateLevel;
+}
+
+
+void AbstractBehavior::updateTargetsPriority()
+{
+    for (size_t i = 0; i < considerations_.size(); i++)
+    {
+        considerations_[i]->evaluatePriority(arena_);
+    }
 }
 
 }

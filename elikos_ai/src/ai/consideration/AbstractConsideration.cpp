@@ -7,6 +7,11 @@
 namespace ai
 {
 
+AbstractConsideration::AbstractConsideration(double weight)
+    : weight_(weight)
+{
+}
+
 AbstractConsideration::~AbstractConsideration()
 {
 }

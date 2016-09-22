@@ -13,12 +13,12 @@ namespace ai
 {
 
 AbstractLine::AbstractLine()
-    : segment_(tf::Point(), tf::Point())
+    : util::Segment(tf::Point(), tf::Point())
 {
 }
 
 AbstractLine::AbstractLine(const tf::Point& cornerA, const tf::Point& cornerB)
-    : segment_(cornerA, cornerB)
+    : util::Segment(cornerA, cornerB)
 {
 }
 
@@ -29,7 +29,7 @@ AbstractLine::~AbstractLine()
 bool AbstractLine::isInThePath(const TargetRobot& robot) const
 {
     util::Line line(robot.getPose().getOrigin(), robot.getDirection());
-    return segment_.isIntersecting(line);
+    return isIntersecting(line);
 }
 
 void AbstractLine::evaluate(TargetRobot& robot)
@@ -37,7 +37,7 @@ void AbstractLine::evaluate(TargetRobot& robot)
     OrientationEvaluation* evaluation = robot.getOrientationEvaluation();
     util::Line line(robot.getPose().getOrigin(), robot.getDirection());
     tf::Point point;
-    bool success = segment_.getIntersectionPoint(line, point);
+    bool success = getIntersectionPoint(line, point);
     if (success) {
         evaluation->intersectionPoint_ = point;
         evaluation->lineIntersectionDistance_ = point.distance(robot.getPose().getOrigin());

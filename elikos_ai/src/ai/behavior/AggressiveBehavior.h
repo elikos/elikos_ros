@@ -6,7 +6,7 @@
 #define AI_AGGRESSIVE_BEHAVIOR_H
 
 #include "AbstractBehavior.h"
-#include "TargetDestination.h"
+#include "DestinationConsideration.h"
 
 namespace ai
 {
@@ -22,6 +22,7 @@ public:
 
 private:
     TargetRobot* currentTarget_;
+
 
     AggressiveBehavior() = default;
 };

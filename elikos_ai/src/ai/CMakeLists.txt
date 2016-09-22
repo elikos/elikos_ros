@@ -58,7 +58,7 @@ set(ROBOT_SRC
     robot/QuadRobot.cpp
     robot/TargetRobot.h
     robot/TargetRobot.cpp
-    robot/RobotTypes.h)
+    robot/RobotTypes.h robot/GreenTargetRobot.cpp robot/GreenTargetRobot.h robot/RedTargetRobot.cpp robot/RedTargetRobot.h)
 
 set(CONSIDERATION_SRC
     consideration/PriorityEvaluationManager.cpp
@@ -67,8 +67,8 @@ set(CONSIDERATION_SRC
     consideration/AbstractConsideration.h
     consideration/QuadDistance.cpp
     consideration/QuadDistance.h
-    consideration/TargetDestination.cpp
-    consideration/TargetDestination.h
+		consideration/DestinationConsideration.cpp
+		consideration/DestinationConsideration.h
     consideration/ConsiderationTypes.h
     consideration/ClusterSize.cpp
     consideration/ClusterSize.h)

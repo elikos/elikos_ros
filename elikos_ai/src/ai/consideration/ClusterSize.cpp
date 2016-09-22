@@ -12,7 +12,7 @@ ClusterSize::~ClusterSize()
 
 }
 
-void ClusterSize::evaluatePriority(TargetRobot& robot, AbstractArena* arena)
+void ClusterSize::evaluatePriority(AbstractArena* arena)
 {
 
 }

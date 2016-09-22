@@ -15,7 +15,7 @@ class Configuration;
 class PreventiveBehavior : public AbstractBehavior
 {
 public:
-    static constexpr double MAX_ACCEPTABLE_PRIORITY { 0.90 };
+    static constexpr double MIN_ACCEPTABLE_PRIORITY { 0.90 };
 
     PreventiveBehavior(AbstractArena* arena, Configuration* config);
     virtual ~PreventiveBehavior();
@@ -24,8 +24,7 @@ public:
     virtual int resolveCurrentStateLevelConcrete();
 
 private:
-    PriorityEvaluationManager priorityManager_;
-
+    std::vector<AbstractConsideration*> considerations_;
     PreventiveBehavior() = default;
 };
 

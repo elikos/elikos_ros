@@ -46,7 +46,7 @@ void PriorityEvaluationManager::evaluatePriority(TargetRobot& target)
 {
     for (int i = 0; i < considerations_.size(); i++)
     {
-        considerations_[i]->evaluatePriority(target, arena_);
+        considerations_[i]->evaluatePriority(arena_);
     }
 }
 

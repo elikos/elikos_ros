@@ -18,8 +18,9 @@ RedLine::~RedLine()
 {
 }
 
-bool RedLine::isGoodLineIntersection(const TargetRobot& robot)
+bool RedLine::isGoodLineIntersection(const TargetRobot& target)
 {
+    // TODO: check target color
     return false;
 }
 

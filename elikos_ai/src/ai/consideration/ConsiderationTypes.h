@@ -7,7 +7,7 @@
 
 #include "AbstractConsideration.h"
 #include "QuadDistance.h"
-#include "TargetDestination.h"
+#include "DestinationConsideration.h"
 #include "ClusterSize.h"
 
 #endif // AI_CONSIDERATION_TYPES_H

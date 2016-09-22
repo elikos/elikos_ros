@@ -25,4 +25,4 @@ public:
 
 }
 
-#endif //ELIKOS_AI_TARGETRESEARCH_H
+#endif // AI_TARGET_RESEARCH_H

@@ -15,7 +15,7 @@ class ClusterSize : public AbstractConsideration
 public:
     ClusterSize() = default;
     virtual ~ClusterSize();
-    virtual void evaluatePriority(TargetRobot& robot, AbstractArena* arena);
+    virtual void evaluatePriority(AbstractArena* arena);
 };
 
 }

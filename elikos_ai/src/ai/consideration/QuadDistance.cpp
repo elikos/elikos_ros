@@ -12,7 +12,7 @@ QuadDistance::~QuadDistance()
 
 }
 
-void QuadDistance::evaluatePriority(TargetRobot& robot, AbstractArena* arena)
+void QuadDistance::evaluatePriority(AbstractArena* arena)
 {
 }
 

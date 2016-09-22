@@ -19,6 +19,7 @@ namespace ai
 {
 
 class TargetRobot;
+class AbstractConsideration;
 
 class AbstractArena
 {
@@ -35,11 +36,12 @@ public:
     virtual ~AbstractArena() = 0;
 
     inline QuadRobot& getQuad();
+    inline const std::unordered_map<int, TargetRobot*>& getTargets() const;
+    inline const std::vector<AbstractLine*>& getLines() const;
 
     void prepareUpdate();
     void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
     void updateQuadRobot(const tf::Pose& pose);
-
 
     virtual void evaluateTargetOrientation(TargetRobot& target) = 0;
     virtual int getNRotationsForOptimalDirection(const TargetRobot& target) const = 0;
@@ -52,8 +54,7 @@ public:
     int getNbrOfUpdatedTargets();
 
 protected:
-
-    std::vector<std::unique_ptr<AbstractLine>> lines_;
+    std::vector<AbstractLine*> lines_;
     std::vector<TargetRobot> targets_;
     std::unordered_map<int, TargetRobot*> targetsId_;
 
@@ -70,6 +71,15 @@ inline QuadRobot& AbstractArena::getQuad()
    return quad_;
 }
 
+inline const std::unordered_map<int, TargetRobot*>& AbstractArena::getTargets() const
+{
+    return targetsId_;
+}
+
+inline const std::vector<AbstractLine*>& AbstractArena::getLines() const
+{
+    return lines_;
+}
 
 }
 

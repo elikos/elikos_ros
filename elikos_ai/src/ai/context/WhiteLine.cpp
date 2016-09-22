@@ -19,8 +19,9 @@ WhiteLine::~WhiteLine()
 {
 }
 
-bool WhiteLine::isGoodLineIntersection(const TargetRobot& robot)
+bool WhiteLine::isGoodLineIntersection(const TargetRobot& target)
 {
+    // TODO: check target color
     return false;
 }
 

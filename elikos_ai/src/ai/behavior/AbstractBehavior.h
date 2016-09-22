@@ -7,6 +7,7 @@
 
 #include <context/AbstractArena.h>
 #include "CommandQueue.h"
+#include "AbstractBehavior.h"
 
 namespace ai
 {
@@ -28,10 +29,14 @@ public:
 protected:
     CommandQueue q_;
     AbstractArena* arena_;
+    std::vector<AbstractConsideration*> considerations_;
+
     virtual int resolveCurrentStateLevelConcrete() = 0;
 
 private:
     bool isEnabled_{ true };
+
+    void updateTargetsPriority();
     AbstractBehavior() = default;
 };
 

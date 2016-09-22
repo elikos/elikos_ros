@@ -16,7 +16,7 @@ class Segment
 {
 public:
     Segment(const tf::Point& A, const tf::Point& B);
-    ~Segment() = default;
+    virtual ~Segment() = default;
 
     inline void setA(tf::Point A);
     inline const tf::Point& getA() const;
