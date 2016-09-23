@@ -1,8 +1,0 @@
-moveit_setup_assistant_config:
-  URDF:
-    package: elikos_nav
-    relative_path: cfg/flying_box.urdf.xacro
-  SRDF:
-    relative_path: config/flying_box.srdf
-  CONFIG:
-    generated_timestamp: 1466467295

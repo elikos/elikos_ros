@@ -1,0 +1,11 @@
+topic: "/camera/color/image_raw"
+frame: "realsense_frame"
+calibration: false
+file_in: "calib_poly"
+file_out: "new_calibration"
+dir: "$(find elikos_detection)/cfg/calibrations"
+cam_height: 480
+cam_width: 640
+cam_fov_v: 63
+cam_fov_h: 89
+min_height: 0.1

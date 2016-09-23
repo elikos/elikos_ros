@@ -6,7 +6,7 @@
   <arg name="calib_in" default="calibration_initial" />
   <arg name="calib_out" default="new_calibration" />
   <arg name="calib_dir" default="$(find elikos_detection)/cfg/" />
-  <include file="$(find elikos_detection)/launch/detection.launch"/>
+  <include file="$(find elikos_detection)/launch/elikos_detection.launch"/>
 
   <!-- Target tracking -->
   <include file="$(find elikos_tracking)/launch/tracking.launch"/>
@@ -14,8 +14,8 @@
   <!-- AI -->
 	<include file="$(find elikos_ai)/launch/ai.launch"/>
 
-  <!-- Path planning and navigation -->
-  <include file="$(find elikos_nav)/launch/nav.launch"/>
+  <!-- Path planning -->
+  <include file="$(find elikos_path_planning)/launch/path_planning.launch"/>
 
   <!-- Static transforms -->
   <node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />

@@ -1,5 +1,0 @@
-<launch>
-  <node name="elikos_moveit_move_group" pkg="elikos_nav" type="elikos_moveit_move_group"/>
-  <include file="$(find elikos_moveit_config)/launch/moveit_master.launch"/>
-  <node name="elikos_action_controller" pkg="elikos_action_controller" type="elikos_action_controller"/>
-</launch>

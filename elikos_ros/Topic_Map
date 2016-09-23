@@ -13,6 +13,6 @@ elikos_ai:
           mavros/local_position
   output: elikos_ai_target
 
-elikos_navigation_stack:
+elikos_path_planning:
   input:  elikos_ai_target
   output: /move_group/display_planned_path (debug only)

@@ -23,14 +23,3 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
-
-add_executable( elikos_tracking
-   src/tracking/tracking_abs.cpp
-   src/tracking/MessageHandler_abs.h
-   src/tracking/MessageHandler_abs.cpp
-   src/tracking/TransformationUnit.h
-   src/tracking/TransformationUnit.cpp)
-
-target_link_libraries(elikos_tracking
-  ${catkin_LIBRARIES}
-)

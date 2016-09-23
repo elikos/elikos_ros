@@ -1,0 +1,23 @@
+<launch>
+    <arg name="rviz_cfg" default="dnt"/>
+
+    <include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="handquad_cam" />
+      <arg name="cfg" value="elikos_hand_quad"/>
+    </include>
+
+  	<include file="$(find elikos_ros)/launch/px4.launch" />
+
+    <node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="0.1 0.0 0.0 -0.5 0.5 -0.5 0.5 elikos_fcu elikos_hand_quad 100" />
+    <node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_local_origin elikos_arena_origin 100" />
+
+    <node pkg="camera1394" type="camera1394_node" name="elikos_hand_quad">
+      <param name="guid" value="00b09d0100db6e43" />
+      <param name="video_mode" value="640x480_mono8" />
+      <param name="frame_rate" value="30" />
+      <param name="bayer_pattern" value="rggb" />
+      <param name="bayer_mode" value="AHD" />
+    </node>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find elikos_detection)/cfg/$(arg rviz_cfg).rviz"/>
+</launch>
