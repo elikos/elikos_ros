@@ -4,22 +4,20 @@
 * Calcul de leur position.  
 
 ## Stratégies  
-* [Blob detection](https://www.google.ca/).  
+* [Thresholding](http://docs.opencv.org/2.4/doc/tutorials/imgproc/threshold/threshold.html) et [Morphological transforms](http://docs.opencv.org/2.4/doc/tutorials/imgproc/erosion_dilatation/erosion_dilatation.html).  
 * [TF transforms](http://wiki.ros.org/tf).  
 
 ## Launch files  
 * `elikos_detection.launch`  
 *Description*  
     * Lance une instance du package de détection.  
-*Paramètres*  
     * `camera_name` : nom de la camera utilisée.  
     * `cfg` : nom du fichier de configuration utilisé.  
-* `handquad_test.launch`
-*Paramètres*  
+* `handquad_test.launch`   
+*Description*   
     * `rviz_cfg` : nom de la configuration rviz utilisé.  
-*Description*  
     * Lance ce qu'il faut pour tester la détection avec le handquad.  
-* `multicam_test.launch`
+* `multicam_test.launch`  
 *Description*  
     * Lance plusieurs instances du package de détection avec le handquad et une intel realsense r200.  
     
