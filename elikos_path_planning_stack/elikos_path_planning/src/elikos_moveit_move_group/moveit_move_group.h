@@ -10,8 +10,10 @@
 
 #include <moveit_msgs/DisplayRobotState.h>
 #include <moveit_msgs/DisplayTrajectory.h>
-#include <trajectory_msgs/MultiDOFJointTrajectory.h>
+#include <moveit_msgs/RobotTrajectory.h>
 #include <moveit_msgs/MoveItErrorCodes.h>
+#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include <geometry_msgs/PoseArray.h>
 

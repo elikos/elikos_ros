@@ -74,14 +74,37 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
       if(err.val == moveit_msgs::MoveItErrorCodes::SUCCESS)
       {
         ROS_ERROR_STREAM("New trajectory!");
-        //Execute first point in trajectory.
-        trajectory_msgs::MultiDOFJointTrajectory trajectoryToExecute = plan.trajectory_.multi_dof_joint_trajectory;
+
+        moveit_msgs::RobotTrajectory trajectory_msg = plan.trajectory_;
+        
+        robot_trajectory::RobotTrajectory rt(group_.getCurrentState()->getRobotModel(), "elikos_moveit_quadrotor_group");
+
+        rt.setRobotTrajectoryMsg(*group_.getCurrentState(), trajectory_msg);
+        
+        trajectory_processing::IterativeParabolicTimeParameterization iptp;
+
+        int success = iptp.computeTimeStamps(rt);
+        ROS_ERROR("Computed time stamp %s",success?"SUCCEDED":"FAILED");
+
+        rt.getRobotTrajectoryMsg(trajectory_msg);
+
+        trajectory_msgs::MultiDOFJointTrajectory trajectoryToExecute = trajectory_msg.multi_dof_joint_trajectory;
+        trajectory_msgs::JointTrajectory jointTrajectory = trajectory_msg.joint_trajectory;
+
         listener.lookupTransform(parent_frame_, "elikos_base_link",
                                 ros::Time(0), currentPosition);
         int i = 0;
         while(i < trajectoryToExecute.points.size()-1)
         {
             geometry_msgs::Vector3 targetTranslation = trajectoryToExecute.points[i].transforms[0].translation;
+            ROS_ERROR_STREAM("Transforms size: "<<trajectoryToExecute.points[i].transforms.size());
+            ROS_ERROR_STREAM("Velocities size: "<<trajectoryToExecute.points[i].velocities.size());
+            ROS_ERROR_STREAM("Accelerations size: "<<trajectoryToExecute.points[i].accelerations.size());
+
+            ROS_ERROR_STREAM("Transforms JOINT size: "<<trajectoryToExecute.points[i].transforms.size());
+            ROS_ERROR_STREAM("Velocities JOINT size: "<<trajectoryToExecute.points[i].velocities.size());
+            ROS_ERROR_STREAM("Accelerations JOINT size: "<<trajectoryToExecute.points[i].accelerations.size());
+
             if(pow(targetTranslation.x-currentPosition.getOrigin().x(), 2)+
                 pow(targetTranslation.y-currentPosition.getOrigin().y(), 2)+
                 pow(targetTranslation.z-currentPosition.getOrigin().z(), 2) > pow(toleranceNextGoal_,2))
