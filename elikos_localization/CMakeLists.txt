@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(iarc7_localization)
+project(elikos_localization)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
@@ -121,7 +121,7 @@ add_library(DBSCAN src/DBSCAN.cpp)
 # add_dependencies(iarc7_localization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(iarc7_localization_node
+add_executable(elikos_localization
         src/iarc7_localization_node.cpp
         src/ArenaTracking.cpp
         src/PosePublisher.cpp
@@ -133,10 +133,10 @@ add_executable(iarc7_localization_node
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(iarc7_localization_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(elikos_localization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(iarc7_localization_node DBSCAN ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(elikos_localization DBSCAN ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##

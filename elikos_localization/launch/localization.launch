@@ -2,13 +2,13 @@
 
 <launch>
 
-    <!--node pkg="iarc7_localization" type="iarc7_localization_node" name="iarc7_localization"/-->
+    <!--node pkg="elikos_localization" type="elikos_localization" name="elikos_localization"/-->
 
     <!-- This node will take in measurements from odometry, IMU, stamped pose, and stamped twist messages. It tracks
          the state of the robot, with the state vector being defined as X position, Y position, Z position,
          roll, pitch, yaw, their respective velocites, and linear acceleration. Units for all measurements are assumed
          to conform to the SI standard as specified in REP-103. -->
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true">
+    <node pkg="elikos_localization" type="elikos_localization" name="elikos_localization" clear_params="true">
 
       <!-- ======== STANDARD PARAMETERS ======== -->
 

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>iarc7_localization</name>
+  <name>elikos_localization</name>
   <version>0.0.1</version>
   <description>Localization package for the IARC mission 7 arena</description>
 
