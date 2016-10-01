@@ -24,4 +24,5 @@
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_path_planning)/cfg/test_moveit.rviz"/>
 
+  <node name="elikos_control" pkg="elikos_control" type="elikos_control"/>
 </launch>

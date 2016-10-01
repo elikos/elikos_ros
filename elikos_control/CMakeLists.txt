@@ -14,13 +14,14 @@ find_package(catkin REQUIRED COMPONENTS
    pluginlib
    cmake_modules
    std_srvs
+   cv_bridge
 )
 find_package(OpenCV REQUIRED)
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES elikos_tracking
- CATKIN_DEPENDS elikos_ros roscpp std_msgs tf
+ CATKIN_DEPENDS elikos_ros roscpp std_msgs tf cv_bridge
 #  DEPENDS system_lib
 CATKIN_DEPENDS
 )
