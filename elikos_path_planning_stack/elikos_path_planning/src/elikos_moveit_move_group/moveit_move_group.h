@@ -26,6 +26,8 @@
 #include <std_srvs/Empty.h>
 #include <ctime>
 
+#include <elikos_ros/TrajectoryCmd.h>
+
 #ifndef PI
 #define PI 3.14159265
 #endif
@@ -52,6 +54,9 @@ private:
     geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint_;
 
     double safetyTime_;
+
+    ros::NodeHandle nh_;
+    ros::Publisher pub_;
 };
 
 #endif

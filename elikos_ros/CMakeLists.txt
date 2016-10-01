@@ -20,6 +20,7 @@ find_package( catkin REQUIRED COMPONENTS
    cv_bridge
    geometry_msgs
    std_srvs
+   trajectory_msgs
 )
 find_package(OpenCV REQUIRED)
 
@@ -89,6 +90,7 @@ generate_messages(
   geometry_msgs
   mavros_msgs
   sensor_msgs
+  trajectory_msgs
 )
 
 ###################################

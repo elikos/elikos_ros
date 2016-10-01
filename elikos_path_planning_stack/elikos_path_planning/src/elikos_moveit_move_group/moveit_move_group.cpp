@@ -18,6 +18,9 @@ Moveit_move_group::Moveit_move_group():
   group_.allowReplanning(true);
 
   group_.setNumPlanningAttempts(20);
+
+
+  pub_ = nh_.advertise<elikos_ros::TrajectoryCmd>("elikos_trajectory", 1);
 }
 
 Moveit_move_group::~Moveit_move_group()
@@ -83,27 +86,25 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
         
         trajectory_processing::IterativeParabolicTimeParameterization iptp;
 
-        int success = iptp.computeTimeStamps(rt);
+        bool success = iptp.computeTimeStamps(rt);
         ROS_ERROR("Computed time stamp %s",success?"SUCCEDED":"FAILED");
 
         rt.getRobotTrajectoryMsg(trajectory_msg);
 
         trajectory_msgs::MultiDOFJointTrajectory trajectoryToExecute = trajectory_msg.multi_dof_joint_trajectory;
-        trajectory_msgs::JointTrajectory jointTrajectory = trajectory_msg.joint_trajectory;
 
+        elikos_ros::TrajectoryCmd cmd;
+        cmd.cmdCode = 0;
+        cmd.trajectory = trajectoryToExecute;
+
+        pub_.publish(cmd);
+              
         listener.lookupTransform(parent_frame_, "elikos_base_link",
                                 ros::Time(0), currentPosition);
         int i = 0;
         while(i < trajectoryToExecute.points.size()-1)
         {
             geometry_msgs::Vector3 targetTranslation = trajectoryToExecute.points[i].transforms[0].translation;
-            ROS_ERROR_STREAM("Transforms size: "<<trajectoryToExecute.points[i].transforms.size());
-            ROS_ERROR_STREAM("Velocities size: "<<trajectoryToExecute.points[i].velocities.size());
-            ROS_ERROR_STREAM("Accelerations size: "<<trajectoryToExecute.points[i].accelerations.size());
-
-            ROS_ERROR_STREAM("Transforms JOINT size: "<<trajectoryToExecute.points[i].transforms.size());
-            ROS_ERROR_STREAM("Velocities JOINT size: "<<trajectoryToExecute.points[i].velocities.size());
-            ROS_ERROR_STREAM("Accelerations JOINT size: "<<trajectoryToExecute.points[i].accelerations.size());
 
             if(pow(targetTranslation.x-currentPosition.getOrigin().x(), 2)+
                 pow(targetTranslation.y-currentPosition.getOrigin().y(), 2)+
