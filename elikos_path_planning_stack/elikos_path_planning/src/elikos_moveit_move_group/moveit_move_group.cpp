@@ -18,7 +18,6 @@ Moveit_move_group::Moveit_move_group():
 
   group_.setNumPlanningAttempts(20);
 
-
   pub_ = nh_.advertise<elikos_ros::TrajectoryCmd>("elikos_trajectory", 1);
 }
 
@@ -45,27 +44,29 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
   //Plan the goal pose
   group_.setJointValueTarget(quad_variable_values);
 
-  //Plan the trajectory
+  //Plan creation
   moveit::planning_interface::MoveGroup::Plan plan;
 
   try
   {
+    //Current position
     tf::StampedTransform currentPosition;
     tf_listener_.lookupTransform(parent_frame_, "elikos_base_link",
                               ros::Time(0), currentPosition);
-    
+    //If the drone is far enough of his position 
     if( pow(target.pose.position.x-currentPosition.getOrigin().x(), 2)+
         pow(target.pose.position.y-currentPosition.getOrigin().y(), 2)+
         pow(target.pose.position.z-currentPosition.getOrigin().z(), 2) > pow(toleranceAchieveGoal_, 2))
     {
 
       group_.setStartStateToCurrentState();
+
+      //Planning
       moveit_msgs::MoveItErrorCodes err = group_.plan(plan);
 
       if(err.val == moveit_msgs::MoveItErrorCodes::SUCCESS)
       {
-        ROS_ERROR_STREAM("New trajectory!");
-
+        //Computation of time stamp and population of the velocities in the trajectory.
         moveit_msgs::RobotTrajectory trajectory_msg = plan.trajectory_;
         
         robot_trajectory::RobotTrajectory rt(group_.getCurrentState()->getRobotModel(), "elikos_moveit_quadrotor_group");
@@ -75,18 +76,17 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
         trajectory_processing::IterativeParabolicTimeParameterization iptp;
 
         bool success = iptp.computeTimeStamps(rt);
-        ROS_ERROR("Computed time stamp %s",success?"SUCCEDED":"FAILED");
+        ROS_ERROR("Computed time stamp on trajectory %s",success?"SUCCEDED":"FAILED");
 
         rt.getRobotTrajectoryMsg(trajectory_msg);
+        trajectory_msgs::MultiDOFJointTrajectory trajectory = trajectory_msg.multi_dof_joint_trajectory;
 
-        trajectory_msgs::MultiDOFJointTrajectory trajectoryToExecute = trajectory_msg.multi_dof_joint_trajectory;
-
+        //Publish TrajectoryCmd message on "elikos_trajectory".
         elikos_ros::TrajectoryCmd cmd;
         cmd.cmdCode = 0;
-        cmd.trajectory = trajectoryToExecute;
+        cmd.trajectory = trajectory;
 
         pub_.publish(cmd);
-       
       }
       else
       {
