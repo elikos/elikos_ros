@@ -10,23 +10,21 @@
 
 #include <moveit_msgs/DisplayRobotState.h>
 #include <moveit_msgs/DisplayTrajectory.h>
-#include <trajectory_msgs/MultiDOFJointTrajectory.h>
+#include <moveit_msgs/RobotTrajectory.h>
 #include <moveit_msgs/MoveItErrorCodes.h>
+#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include <geometry_msgs/PoseArray.h>
 
 #include <tf/transform_listener.h>
-#include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
-
-#include <opencv2/opencv.hpp>
 
 #include <std_srvs/Empty.h>
 #include <ctime>
 
-#ifndef PI
-#define PI 3.14159265
-#endif
+#include <elikos_ros/TrajectoryCmd.h>
+
 class Moveit_move_group
 {
 public:
@@ -39,17 +37,17 @@ public:
 private:
     moveit::planning_interface::MoveGroup group_ = moveit::planning_interface::MoveGroup("elikos_moveit_quadrotor_group");
 
-    tf::TransformBroadcaster tf_broadcaster_;
-    tf::TransformListener listener;
+    tf::TransformListener tf_listener_;
 
     std::string parent_frame_;
   	std::string child_frame_;
-  	double toleranceNextGoal_;
   	double toleranceFreeOctomap_;
   	double toleranceAchieveGoal_;
-    geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint_;
 
     double safetyTime_;
+
+    ros::NodeHandle nh_;
+    ros::Publisher pub_;
 };
 
 #endif

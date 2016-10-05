@@ -16,6 +16,7 @@ find_package(catkin COMPONENTS
   roscpp
   control_msgs
   REQUIRED)
+find_package(elikos_action_controller)
 
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})

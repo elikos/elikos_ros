@@ -5,4 +5,6 @@ moveit_setup_assistant_config:
   SRDF:
     relative_path: config/flying_box.srdf
   CONFIG:
-    generated_timestamp: 1466467295
+    author_name: Pierre-Yves Lajoie
+    author_email: lajoie.py@gmail.com
+    generated_timestamp: 1475174351
