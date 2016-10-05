@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(elikos_controller_manager)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)

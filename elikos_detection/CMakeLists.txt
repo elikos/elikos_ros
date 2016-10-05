@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
 )
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 2 REQUIRED)
 
 catkin_package(
 #   INCLUDE_DIRS include
@@ -24,6 +24,7 @@ catkin_package(
 include_directories(
 	${catkin_INCLUDE_DIRS}
   src/elikos_detection/TargetDetection/CVWrapper
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 add_executable( elikos_detection
@@ -52,6 +53,7 @@ add_executable( elikos_detection
 
 target_link_libraries(elikos_detection
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 )
 
 add_executable( elikos_transformation
@@ -63,4 +65,5 @@ add_executable( elikos_transformation
 
 target_link_libraries(elikos_transformation
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 )
