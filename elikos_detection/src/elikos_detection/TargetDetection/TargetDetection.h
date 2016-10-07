@@ -15,6 +15,9 @@ public:
     void detect(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
     //Method to detect blobs of color on frames
     void detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
+    
+    //Method to detect circles on frames
+    void detectCircles(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
 
     void displayID(RobotDesc robot, cv::Mat &output);
 

@@ -11,19 +11,21 @@
 
 class MessageHandler
 {
-public:
+  public:
     MessageHandler(string calibrationFilename);
     ~MessageHandler();
     void dispatchMessage(const sensor_msgs::ImageConstPtr &input);
-	void saveCalibration(string filename);
-private:
+    void saveCalibration(string filename);
+
+  private:
     ros::NodeHandle nh_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber is_;
+    // ros::Subscriber subPos_;
     ros::Publisher pub_;
     TargetDetection detection_;
 
-    image_transport::Publisher pubImages_;//debug only
+    image_transport::Publisher pubImages_; //debug only
     //image_transport::Publisher pubRed_;//debug only
     //image_transport::Publisher pubGreen_;//debug only
 };
