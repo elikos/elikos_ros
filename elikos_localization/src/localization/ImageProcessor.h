@@ -10,6 +10,8 @@
 
 namespace localization {
 
+class LineGroup;
+
 class ImageProcessor
 {
 public:
@@ -31,9 +33,10 @@ private:
     void preProcess(const cv::Mat& raw, cv::Mat& preProcessed);
     void findEdges(const cv::Mat& src, cv::Mat& edges);
     void findLines(const cv::Mat& edges, cv::Mat& lines);
-    void analyzeLineCluster(std::vector<cv::Vec2f>& lineCluster);
+    void analyzeLineCluster(cv::Mat& vLines, cv::Mat& hLines, std::vector<cv::Vec2f>& lineCluster);
 
-    void drawRawLines(cv::Mat &dst, const std::vector<cv::Vec2f> &raw_lines) const;
+    void drawRawLines(cv::Mat& dst, const std::vector<cv::Vec2f> &raw_lines) const;
+    void drawLineGroup(cv::Mat& dst, const LineGroup& group);
 
     ImageProcessor();
     ~ImageProcessor() = default;
