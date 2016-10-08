@@ -10,30 +10,32 @@
 namespace localization
 {
 
+class Line;
+
 class LineGroup
 {
 public:
-    LineGroup(cv::Vec2f& v);
-    void add(cv::Vec2f& v);
+    LineGroup(Line& v);
+    void add(Line& v);
 
-    inline const std::vector<cv::Vec2f*> &getLines() const;
-    inline const cv::Vec2f& getAvgLine() const;
+    inline const std::vector<Line*>& getLines() const;
+    inline const cv::Vec2f& getAvgOrientation() const;
 
 private :
-    cv::Vec2f avg_;
-    std::vector<cv::Vec2f*> lines_;
+    cv::Vec2f avgOrientation_;
+    std::vector<Line*> lines_;
 
     LineGroup() = default;
 };
 
-inline const std::vector<cv::Vec2f*>& LineGroup::getLines() const
+inline const std::vector<Line*>& LineGroup::getLines() const
 {
    return lines_;
 }
 
-inline const cv::Vec2f& LineGroup::getAvgLine() const
+inline const cv::Vec2f& LineGroup::getAvgOrientation() const
 {
-   return avg_;
+   return avgOrientation_;
 }
 
 }
