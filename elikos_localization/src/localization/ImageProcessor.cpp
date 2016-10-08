@@ -86,8 +86,13 @@ void ImageProcessor::processImage(cv::Mat input)
     findEdges(preProcessed, edges);
 
     cv::Mat lines = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
+    vLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
+    hLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
+
     findLines(edges, lines);
 
+    cv::imshow("vertical", vLines_);
+    cv::imshow("horizontal", hLines_);
     cv::imshow("input", input);
     cv::imshow("lines", lines);
     cv::waitKey(30);
@@ -116,11 +121,11 @@ void ImageProcessor::drawRawLines(cv::Mat &dst, const std::vector<cv::Vec2f> &ra
 
 void ImageProcessor::drawLineGroup(cv::Mat& dst, const LineGroup& group)
 {
-    std::vector<cv::Vec2f*> lines = group.getLines();
+    std::vector<Line*> lines = group.getLines();
     for( size_t i = 0; i < lines.size() && i < 100; ++i )
     {
-        float rho = lines[i]->val[0];
-        float theta = lines[i]->val[1];
+        float rho = lines[i]->getRho();
+        float theta = lines[i]->getTheta();
 
         cv::Point pt1, pt2;
         double a = cos(theta), b = sin(theta);
@@ -139,18 +144,15 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
     cv::HoughLines(edges, rawLines, 1, CV_PI/180, 100, 0, 0 );
     drawRawLines(lines, rawLines);
 
-    cv::Mat vLines = cv::Mat(edges.size(), CV_8UC3, cv::Scalar(0, 0, 0));
-    cv::Mat hLines = cv::Mat(edges.size(), CV_8UC3, cv::Scalar(0, 0, 0));
 
-    analyzeLineCluster(vLines, hLines, rawLines);
+    buildLineArray(rawLines);
+    analyzeLineCluster();
 
-    cv::imshow("vertical", vLines);
-    cv::imshow("horizontal", hLines);
 }
 
-void ImageProcessor::analyzeLineCluster(cv::Mat& vLines, cv::Mat& hLines, std::vector<cv::Vec2f>& lineCluster)
+void ImageProcessor::analyzeLineCluster()
 {
-    if (lineCluster.size() == 0)
+    if (lineCluster_.size() == 0)
     {
         return;
     }
@@ -158,24 +160,39 @@ void ImageProcessor::analyzeLineCluster(cv::Mat& vLines, cv::Mat& hLines, std::v
     const int RHO = 0;
     const int THETA = 1;
 
-    cv::Vec2f u = { cosf(lineCluster[0][THETA]), sinf(lineCluster[0][THETA]) };
-    LineGroup U(u);
+    Line uLine(lineCluster_[0]);
+    LineGroup U(uLine);
 
-    cv::Vec2f v = { -u[1], u[0] };
-    LineGroup V(v);
+    Line vLine = uLine;
+    vLine.rotate(CV_PI / 2);
+    LineGroup V(vLine);
 
-    for (size_t i = 0; i < lineCluster.size(); ++i)
+    for (size_t i = 0; i < lineCluster_.size(); ++i)
     {
-        cv::Vec2f w = {cosf(lineCluster[i][THETA]), sinf(lineCluster[i][THETA])};
-        float udotw = std::abs(U.getAvgLine().dot(w));
-        float vdotw = std::abs(V.getAvgLine().dot(w));
-        LineGroup* group = udotw > vdotw ? &U : &V;
-        group->add(w);
+        cv::Vec2f w = lineCluster_[i].getOrientation();
+
+        float udotw = std::abs(U.getAvgOrientation().dot(w));
+
+        float vdotw = std::abs(V.getAvgOrientation().dot(w));
+
+        if (udotw > vdotw ) {
+            U.add(lineCluster_[i]);
+        } else {
+            V.add(lineCluster_[i]);
+        }
     }
 
-    drawLineGroup(vLines, U);
-    drawLineGroup(hLines, V);
+    drawLineGroup(vLines_, U);
+    drawLineGroup(hLines_, V);
+}
 
+void ImageProcessor::buildLineArray(const std::vector<cv::Vec2f>& lineCluster)
+{
+    lineCluster_.clear();
+    for (int i = 0; i < lineCluster.size(); ++i)
+    {
+        lineCluster_.push_back(Line(lineCluster[i][0], lineCluster[i][1]));
+    }
 }
 
 

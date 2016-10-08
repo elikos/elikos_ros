@@ -28,12 +28,16 @@ private:
     cv::Mat distortionMap1_;
     cv::Mat distortionMap2_;
 
-    std::vector<Line> lines_;
+    std::vector<Line> lineCluster_;
+
+    cv::Mat vLines_, hLines_;
 
     void preProcess(const cv::Mat& raw, cv::Mat& preProcessed);
     void findEdges(const cv::Mat& src, cv::Mat& edges);
     void findLines(const cv::Mat& edges, cv::Mat& lines);
-    void analyzeLineCluster(cv::Mat& vLines, cv::Mat& hLines, std::vector<cv::Vec2f>& lineCluster);
+    void analyzeLineCluster();
+    void buildLineArray(const std::vector<cv::Vec2f>& lineCluster);
+
 
     void drawRawLines(cv::Mat& dst, const std::vector<cv::Vec2f> &raw_lines) const;
     void drawLineGroup(cv::Mat& dst, const LineGroup& group);
