@@ -2,6 +2,7 @@
 #define CV_WRAPPER_INTERFACE
 
 #include <opencv2/opencv.hpp>
+using namespace std;
 
 class CVWrapperInterface
 {
