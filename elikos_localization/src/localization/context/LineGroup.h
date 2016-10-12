@@ -18,11 +18,17 @@ public:
     LineGroup(Line& v);
     void add(Line& v);
 
+    Line convertToLine() const;
+
     inline const std::vector<Line*>& getLines() const;
     inline const cv::Vec2f& getAvgOrientation() const;
+    inline double getAvgRho() const;
 
 private :
     cv::Vec2f avgOrientation_;
+    double avgRho_;
+    double avgTheta_;
+
     std::vector<Line*> lines_;
 
     LineGroup() = default;
@@ -36,6 +42,11 @@ inline const std::vector<Line*>& LineGroup::getLines() const
 inline const cv::Vec2f& LineGroup::getAvgOrientation() const
 {
    return avgOrientation_;
+}
+
+inline double LineGroup::getAvgRho() const
+{
+   return avgRho_;
 }
 
 }
