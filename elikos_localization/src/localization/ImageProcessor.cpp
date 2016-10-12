@@ -88,18 +88,45 @@ void ImageProcessor::processImage(cv::Mat input)
     cv::Mat lines = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     vLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     hLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
+    lineGroups_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
+    mLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
+    intersectionGroup_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
 
     findLines(edges, lines);
+    drawLines(mLines_, lineCluster_);
 
-    cv::imshow("vertical", vLines_);
-    cv::imshow("horizontal", hLines_);
-    cv::imshow("input", input);
+    cv::imshow("input", preProcessed);
+    cv::imshow("intersection", intersectionGroup_);
+    cv::imshow("mLines", mLines_);
+    cv::imshow("groups", lineGroups_);
     cv::imshow("lines", lines);
-    cv::waitKey(30);
+    cv::waitKey(0);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
     cv::Canny(src, edges, 1, 30, 3);
+}
+
+
+void ImageProcessor::drawLines(cv::Mat& dst, const std::vector<Line>& lines) const
+{
+    for (int i = 0; i < lines.size(); ++i)
+    {
+        drawLine(dst, lines[i], cv::Scalar(100, 100, 100));
+    }
+}
+
+void ImageProcessor::drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& color) const
+{
+    cv::Point2f centroid = line.getCentroid();
+    cv::Vec2f orientation = line.getOrientation();
+
+    cv::Point2f pt1, pt2;
+    pt1.x = cvRound(centroid.x + 1000*(-orientation[0]));
+    pt1.y = cvRound(centroid.y + 1000*(orientation[1]));
+    pt2.x = cvRound(centroid.x - 1000*(-orientation[0]));
+    pt2.y = cvRound(centroid.y - 1000*(orientation[1]));
+    cv::line(dst, pt1, pt2, color, 3, CV_AA);
 }
 
 void ImageProcessor::drawRawLines(cv::Mat &dst, const std::vector<cv::Vec2f> &raw_lines) const {
@@ -119,22 +146,12 @@ void ImageProcessor::drawRawLines(cv::Mat &dst, const std::vector<cv::Vec2f> &ra
     }
 }
 
-void ImageProcessor::drawLineGroup(cv::Mat& dst, const LineGroup& group)
+void ImageProcessor::drawLineGroup(cv::Mat& dst, const LineGroup& group, const cv::Scalar& color)
 {
     std::vector<Line*> lines = group.getLines();
     for( size_t i = 0; i < lines.size() && i < 100; ++i )
     {
-        float rho = lines[i]->getRho();
-        float theta = lines[i]->getTheta();
-
-        cv::Point pt1, pt2;
-        double a = cos(theta), b = sin(theta);
-        double x0 = a*rho, y0 = b*rho;
-        pt1.x = cvRound(x0 + 1000*(-b));
-        pt1.y = cvRound(y0 + 1000*(a));
-        pt2.x = cvRound(x0 - 1000*(-b));
-        pt2.y = cvRound(y0 - 1000*(a));
-        line(dst, pt1, pt2, cv::Scalar(100,100,100), 3, CV_AA);
+        drawLine(dst, *lines[i], color);
     }
 }
 
@@ -144,7 +161,6 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
     cv::HoughLines(edges, rawLines, 1, CV_PI/180, 100, 0, 0 );
     drawRawLines(lines, rawLines);
 
-
     buildLineArray(rawLines);
     analyzeLineCluster();
 
@@ -152,38 +168,151 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
 
 void ImageProcessor::analyzeLineCluster()
 {
-    if (lineCluster_.size() == 0)
-    {
+    if (lineCluster_.size() == 0) {
         return;
     }
 
-    const int RHO = 0;
-    const int THETA = 1;
+    std::vector<LineGroup> orientationGroup;
+    groupByOrientation(orientationGroup, lineCluster_);
 
-    Line uLine(lineCluster_[0]);
-    LineGroup U(uLine);
+    std::vector<LineGroup> intersectionGroup;
+    groupByIntersection(intersectionGroup, orientationGroup);
 
-    Line vLine = uLine;
-    vLine.rotate(CV_PI / 2);
-    LineGroup V(vLine);
+    std::vector<LineGroup> distanceGroup;
+    groupByDistance(distanceGroup, intersectionGroup);
 
-    for (size_t i = 0; i < lineCluster_.size(); ++i)
+    for (int i = 0; i < orientationGroup.size(); ++i)
     {
-        cv::Vec2f w = lineCluster_[i].getOrientation();
+        int r = (i % 3 == 0) ? 100 : 0;
+        int g = (i % 3 == 1) ? 100 : 0;
+        int b = (i % 3 == 2) ? 100 : 0;
 
-        float udotw = std::abs(U.getAvgOrientation().dot(w));
+        drawLineGroup(lineGroups_, orientationGroup[i], cv::Scalar(r, g, b));
+    }
 
-        float vdotw = std::abs(V.getAvgOrientation().dot(w));
+    for(int i = 0; i < intersectionGroup.size(); ++i) {
+        drawLineGroup(intersectionGroup_, intersectionGroup[i], cv::Scalar(100, 100, 100));
+    }
 
-        if (udotw > vdotw ) {
-            U.add(lineCluster_[i]);
-        } else {
-            V.add(lineCluster_[i]);
+    std::vector<LineGroup> totalDistanceGroup;
+    for (int i = 0; i < distanceGroup.size(); ++i)
+    {
+        std::vector<LineGroup> distanceGroup;
+        totalDistanceGroup.insert(totalDistanceGroup.end(), distanceGroup.begin(), distanceGroup.end());
+    }
+
+    detectedLines_.clear();
+    for (int i = 0; i < totalDistanceGroup.size(); ++i)
+    {
+        detectedLines_.push_back(totalDistanceGroup[i].convertToLine());
+    }
+}
+
+void ImageProcessor::groupByOrientation(std::vector<LineGroup>& orientationGroup, const std::vector<Line>& lines)
+{
+    for (size_t i = 0; i < lineCluster_.size(); ++i) {
+        groupByOrientation(orientationGroup, lineCluster_[i]);
+    }
+}
+
+void ImageProcessor::groupByOrientation(std::vector<LineGroup>& group, Line& line)
+{
+    const double PRECISION_TRESHOLD = 0.9;
+    double bestPrecision = 0.0;
+    LineGroup*  bestGroup = nullptr;
+
+    bool groupFound = false;
+    for (int i = 0; i < group.size(); i++) {
+        double precision = std::abs(group[i].getAvgOrientation().dot(line.getOrientation()));
+        if (precision > PRECISION_TRESHOLD && precision > bestPrecision)
+        {
+            bestGroup = &group[i];
+            bestPrecision = precision;
+            groupFound = true;
         }
     }
 
-    drawLineGroup(vLines_, U);
-    drawLineGroup(hLines_, V);
+    if(groupFound) {
+        bestGroup->add(line);
+    } else {
+        group.push_back(LineGroup(line));
+    }
+}
+
+void ImageProcessor::groupByIntersection(std::vector<LineGroup>& intersectingGroup,
+        const std::vector<LineGroup>& orientationGroup)
+{
+    for (int i = 0; i < orientationGroup.size(); ++i) {
+        const std::vector<Line*>& lines = orientationGroup[i].getLines();
+        for (int j = 0; j < lines.size(); ++j)
+        {
+            groupByIntersection(intersectingGroup, *lines[j]);
+        }
+    }
+}
+
+void ImageProcessor::groupByIntersection(std::vector<LineGroup>& intersectionGroup, Line& line)
+{
+    bool groupFound = false;
+    for (int i = 0; i < intersectionGroup.size(); ++i) {
+        cv::Point2f intersection;
+        if (intersectionGroup[i].convertToLine().findIntersection(line, intersection)) {
+            if (isInsideRect(intersection, cv::Rect(0, 0, 640 ,480))) {
+                intersectionGroup[i].add(line);
+                groupFound = true;
+            }
+        }
+    }
+    if(!groupFound) {
+        intersectionGroup.push_back(LineGroup(line));
+    }
+}
+
+bool ImageProcessor::isInsideRect(const cv::Point2f& point, const cv::Rect& rect)
+{
+    double xMin = rect.x;
+    double xMax = rect.x + rect.width;
+    double yMin = rect.y;
+    double yMax = rect.y + rect.height;
+
+    return (xMin <= point.x && point.x <= xMax &&
+            yMin <= point.y && point.y <= yMax);
+}
+
+void ImageProcessor::groupByDistance(std::vector<LineGroup>& distanceGroup, const std::vector<LineGroup>& orientationGroup)
+{
+    for (int i = 0; i < orientationGroup.size(); ++i) {
+        const std::vector<Line*>& lines = orientationGroup[i].getLines();
+        for (int j = 0; j < lines.size(); ++j) {
+            groupByDistance(distanceGroup, *lines[j]);
+        }
+    }
+}
+
+void ImageProcessor::groupByDistance(std::vector<LineGroup>& distanceGroup, Line& line)
+{
+    const double ERROR_TRESHOLD = 0.25;
+    double bestError = 1.0;
+    LineGroup* bestGroup = nullptr;
+
+    bool groupFound = false;
+    for (int i = 0; i < distanceGroup.size(); ++i) {
+        double dotProduct = line.getOrientation().dot(distanceGroup[i].getAvgOrientation());
+        double rectifiedAvgRho = distanceGroup[i].getAvgRho() * dotProduct;
+        double error = std::abs((rectifiedAvgRho - line.getRho()) / 800.0);
+        if (error < ERROR_TRESHOLD && error < bestError)
+        {
+            bestGroup = &distanceGroup[i];
+            bestError = error;
+            groupFound = true;
+        }
+    }
+
+    if(groupFound) {
+        bestGroup->add(line);
+    } else {
+       distanceGroup.push_back(LineGroup(line));
+    }
 }
 
 void ImageProcessor::buildLineArray(const std::vector<cv::Vec2f>& lineCluster)
