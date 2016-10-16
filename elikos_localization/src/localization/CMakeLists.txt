@@ -9,11 +9,16 @@ add_executable(elikos_localization
     context/Arena.cpp
     context/Arena.h
     context/Intersection.cpp
-    context/Intersection.h context/LineGroup.cpp context/LineGroup.h)
+    context/Intersection.h
+    context/LineGroup.cpp
+    context/LineGroup.h
+    algorithm/DBSCAN.cpp)
+
 
 include_directories(${catkin_INCLUDE_DIRS}
                     ${OpenCV_LIBS}
-                    context)
+                    context
+                    algorithm)
 
 target_link_libraries(elikos_localization ${catkin_LIBRARIES} ${OpenCV_LIBS})
 

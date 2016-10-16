@@ -21,13 +21,12 @@ public:
     Line convertToLine() const;
 
     inline const std::vector<Line*>& getLines() const;
-    inline const cv::Vec2f& getAvgOrientation() const;
+    inline const cv::Vec2d& getAvgOrientation() const;
     inline double getAvgRho() const;
 
 private :
-    cv::Vec2f avgOrientation_;
+    cv::Vec2d avgOrientation_;
     double avgRho_;
-    double avgTheta_;
 
     std::vector<Line*> lines_;
 
@@ -39,7 +38,7 @@ inline const std::vector<Line*>& LineGroup::getLines() const
    return lines_;
 }
 
-inline const cv::Vec2f& LineGroup::getAvgOrientation() const
+inline const cv::Vec2d& LineGroup::getAvgOrientation() const
 {
    return avgOrientation_;
 }
