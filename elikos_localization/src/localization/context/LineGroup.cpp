@@ -11,8 +11,7 @@ namespace localization
 
 LineGroup::LineGroup(Line& line)
     : avgOrientation_(line.getOrientation()),
-      avgRho_(line.getRho()),
-      avgTheta_(line.getTheta())
+      avgRho_(line.getRho())
 {
     lines_.push_back(&line);
 }
@@ -27,22 +26,19 @@ void LineGroup::add(Line& line)
 
     avgOrientation_ *= (double)(lines_.size());
     avgRho_ *= (double)(lines_.size());
-    avgTheta_ *= (double)(lines_.size());
 
     lines_.push_back(&line);
 
     avgOrientation_ += line.getOrientation();
     avgRho_ += line.getRho();
-    avgTheta_ += line.getTheta();
 
     avgOrientation_ /= (double)(lines_.size());
     avgRho_ /= (double)(lines_.size());
-    avgTheta_ /= (double)(lines_.size());
 }
 
 Line LineGroup::convertToLine() const
 {
-    return Line(avgRho_, std::atan(avgOrientation_[1] / avgOrientation_[0]));
+    return Line(avgRho_, avgOrientation_);
 }
 
 }

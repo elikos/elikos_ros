@@ -8,49 +8,66 @@ namespace localization
 {
 
 Line::Line(float rho, float theta)
-    : rho_(rho), theta_(theta)
+    : rho_(std::abs(rho))
 {
-    orientation_ = cv::Vec2f(sinf(theta), cosf(theta));
-    centroid_ = cv::Point2f(rho * orientation_[1], rho * orientation_[0]);
+    orientation_ = cv::Vec2d(sinf(theta), cosf(theta));
+    centroid_ = cv::Point2d(rho * orientation_[1], rho * orientation_[0]);
+}
+
+Line::Line(float rho, const cv::Vec2d& orientation)
+    : rho_(std::abs(rho)), orientation_(orientation)
+{
+    centroid_ = cv::Point2d(rho * orientation_[1], rho * orientation_[0]);
 }
 
 void Line::rotate(double rotation)
 {
-    theta_ += rotation;
-    orientation_ = { sinf(theta_), cosf(theta_) };
+    double x = orientation_[0];
+    double y = orientation_[1];
+
+    orientation_[0] = x * cos(rotation) - y * sin(rotation);
+    orientation_[1] = x * sin(rotation) + y * cos(rotation);
 }
 
 void Line::inverseOrientation()
 {
-    theta_ += CV_PI;
-    orientation_ = { sinf(theta_), cosf(theta_) };
+    rotate(CV_PI);
 }
 
 
-bool Line::findIntersection(const Line& otherLine, cv::Point2f& intersection) const
+bool Line::findIntersection(const Line& otherLine, cv::Point2d& intersection) const
 {
     const int x = 0;
     const int y = 1;
 
-    //cv::Vec2f dc = { 2.0, 0.0 };
-    //cv::Point2f A = { 0.0, 0.0 };
-    //cv::Vec2f u = {1.0, 1.0};
-    //cv::Vec2f v = {-1.0, 1.0};
 
-    cv::Point2f A = centroid_;
-    cv::Vec2f dc = otherLine.centroid_ - centroid_;
-    cv::Vec2f u = orientation_;
-    cv::Vec2f v = otherLine.orientation_;
+    //cv::Point2f A = { 100.0, 100.0 };
+    //cv::Point2f B = { 200.0, 200.0};
+
+    cv::Point2d A = centroid_;
+    cv::Point2d B = otherLine.centroid_;
+
+    cv::Vec2d dc = B - A;
+
+    //cv::Vec2f u = { 2.0, 1.0 };
+    //cv::Vec2f v = { -1.0, -2.0 };
+
+    cv::Vec2d u = orientation_;
+    cv::Vec2d v = otherLine.orientation_;
 
     u = cv::normalize(u);
     v = cv::normalize(v);
+
+    // Convert the coordinate system (origin -> top-left to bottom-left)
+    u[1] = -u[1];
+    v[1] = -v[1];
 
     double det =  u[x] * v[y] - u[y] * v[x];
 
     if (det != 0.0) {
 
         double d = (dc[x] * v[y] - dc[y] * v[x]) / det;
-        intersection = A + (cv::Point2f)(d * u);
+        intersection = A + (cv::Point2d)(d * u);
 
     } else {
         return false;

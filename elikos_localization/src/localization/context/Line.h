@@ -14,21 +14,20 @@ class Line
 {
 public:
     Line(float rho, float theta);
+    Line(float rho, const cv::Vec2d& orientation);
 
     void inverseOrientation();
     void rotate(double rotation);
-    bool findIntersection(const Line& line, cv::Point2f& intersection) const;
+    bool findIntersection(const Line& line, cv::Point2d& intersection) const;
 
     inline float getRho() const;
-    inline float getTheta() const;
-    inline cv::Vec2f getOrientation() const;
-    inline cv::Point2f getCentroid() const;
+    inline cv::Vec2d getOrientation() const;
+    inline cv::Point2d getCentroid() const;
 
 private:
     float rho_;
-    float theta_;
-    cv::Vec2f orientation_;
-    cv::Point2f centroid_;
+    cv::Vec2d orientation_;
+    cv::Point2d centroid_;
 
     Line() = default;
 };
@@ -38,17 +37,12 @@ inline float Line::getRho() const
    return rho_;
 }
 
-inline float Line::getTheta() const
-{
-      return theta_;
-}
-
-inline cv::Vec2f Line::getOrientation() const
+inline cv::Vec2d Line::getOrientation() const
 {
     return orientation_;
 };
 
-inline cv::Point2f Line::getCentroid() const
+inline cv::Point2d Line::getCentroid() const
 {
     return centroid_;
 }
