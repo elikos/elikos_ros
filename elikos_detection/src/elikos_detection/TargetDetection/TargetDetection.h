@@ -21,6 +21,8 @@ public:
 	void createTrackbars(){detection.createTrackbars();}
 	void saveCalibration(string filename){detection.saveCalibration(filename);}
 	void loadCalibration(string filename){detection.loadCalibration(filename);}
+
+    void updateHSV(int color, int h, int s, int v, int delta);
 	
     //Getters for the output vector of the algorithm
     vector<RobotDesc> getRobots();

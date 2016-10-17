@@ -1,0 +1,3 @@
+RClistenTopic: "/elikos_remotecalib/input"
+# RClistenTopic: "/camera/image_raw"
+RCpublishTopic: "/elikos_remotecalib/output"
