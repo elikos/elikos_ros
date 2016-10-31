@@ -3,14 +3,28 @@
 //
 
 #include <iostream>
+
 #include "DBSCAN.h"
 
 #include "Intersection.h"
+#include <opencv2/core/core.hpp>
 
 namespace DBSCAN
 {
 
-void DBSCAN (const std::vector<cv::Point2d> &dataset, double epsilon, int minPts, std::vector<int>& clusterMemberships) {
+void DBSCAN (const std::vector<cv::Point2f> &dataset, double epsilon, int minPts, std::vector<int>& clusterMemberships) 
+{
+    if (dataset.empty()) return;
+
+    cv::Mat data(dataset.size(), 2, CV_32F);
+    for (int i = 0; i < dataset.size(); ++i) 
+    {
+        data.at<float>(i, 0) = dataset[i].x;
+        data.at<float>(i, 1) = dataset[i].y;
+    }
+
+    //cv::KDTree tree(data, false);
+    
     Eigen::MatrixXd distanceMap = calculateDistMap(dataset);
     int clusterID = 0;
     std::vector<int> neighborIndexes;
@@ -19,6 +33,18 @@ void DBSCAN (const std::vector<cv::Point2d> &dataset, double epsilon, int minPts
     for (int i = 0; i < dataset.size(); i++) {
         if (visited[i]) continue;
         visited[i] = true;
+
+        std::vector<int> test;
+        cv::Mat point(2, 1, CV_32F);
+        point.at<float>(0, 0) = dataset[i].x;
+        point.at<float>(1, 0) = dataset[i].y;
+
+        bool continuous = point.isContinuous();
+        int type = point.type(); 
+        int total = point.total();
+        int dataT = data.cols;
+
+        //tree.findNearest(point, INT_MAX, epsilon, test);
 
         neighborIndexes = regionQuery(distanceMap, epsilon, i);
         if (neighborIndexes.size() < minPts) {
@@ -42,7 +68,7 @@ void DBSCAN (const std::vector<cv::Point2d> &dataset, double epsilon, int minPts
     }
 }
 
-Eigen::MatrixXd calculateDistMap (const std::vector<cv::Point2d> &dataset) {
+Eigen::MatrixXd calculateDistMap (const std::vector<cv::Point2f> &dataset) {
     Eigen::MatrixXd distanceMap(dataset.size(), dataset.size());
     for (int i = 0; i < dataset.size(); i++){
         for (int j = i; j < dataset.size(); j++) {
@@ -53,7 +79,7 @@ Eigen::MatrixXd calculateDistMap (const std::vector<cv::Point2d> &dataset) {
     return distanceMap;
 }
 
-Eigen::MatrixXd calculateDistMap (const std::vector<cv::Point2d> &dataset1, const std::vector<cv::Point2d> &dataset2) {
+Eigen::MatrixXd calculateDistMap (const std::vector<cv::Point2f> &dataset1, const std::vector<cv::Point2f> &dataset2) {
     Eigen::MatrixXd distanceMap(dataset1.size(), dataset2.size());
     for (int i = 0; i < dataset1.size(); i++){
         for (int j = 0; j < dataset2.size(); j++) {
@@ -63,13 +89,13 @@ Eigen::MatrixXd calculateDistMap (const std::vector<cv::Point2d> &dataset1, cons
     return distanceMap;
 }
 
-double calculateDistance (const std::vector<cv::Point2d> &dataset, int i, int j) {
-    cv::Point2d difference = dataset[i] - dataset[j];
+double calculateDistance (const std::vector<cv::Point2f> &dataset, int i, int j) {
+    cv::Point2f difference = dataset[i] - dataset[j];
     return ((difference.x * difference.x) + (difference.y * difference.y));
 }
 
-double calculateDistance (const std::vector<cv::Point2d> &dataset1, const std::vector<cv::Point2d> &dataset2, int i, int j) {
-    cv::Point2d difference = dataset1[i] - dataset2[j];
+double calculateDistance (const std::vector<cv::Point2f> &dataset1, const std::vector<cv::Point2f> &dataset2, int i, int j) {
+    cv::Point2f difference = dataset1[i] - dataset2[j];
     return ((difference.x * difference.x) + (difference.y * difference.y));
 }
 

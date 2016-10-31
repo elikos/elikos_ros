@@ -43,3 +43,6 @@
 
 # vscode files
 .vscode/*
+elikos_localization/.vscode/*
+elikos_localization/build/*
+
