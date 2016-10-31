@@ -47,6 +47,16 @@ ImageProcessor::ImageProcessor()
 
     cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
                                 cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
+
+    cv::namedWindow("trackers", 1);
+    cvCreateTrackbar("p1x", "trackers", &corners[0].x, 640);
+    cvCreateTrackbar("p1y", "trackers", &corners[0].y, 480);
+    cvCreateTrackbar("p2x", "trackers", &corners[1].x, 640);
+    cvCreateTrackbar("p2y", "trackers", &corners[1].y, 480);
+    cvCreateTrackbar("p3x", "trackers", &corners[2].x, 640);
+    cvCreateTrackbar("p3y", "trackers", &corners[2].y, 480);
+    cvCreateTrackbar("p4x", "trackers", &corners[3].x, 640);
+    cvCreateTrackbar("p4y", "trackers", &corners[3].y, 480);
 }
 
 void undistort(const cv::Mat& src, cv::Mat& undistorted)
@@ -68,12 +78,52 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
     cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
 
 
-    cv::Mat dilated;
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-    cv::dilate(undistorted, dilated, element, cv::Point(0), 8);
 
     cv::Mat blured;
-    cv::GaussianBlur(dilated, blured, cv::Size(7,7), 8, 8);
+    cv::GaussianBlur(undistorted, blured, cv::Size(7,7), 8, 8);
+
+    cv::Point2f corners2[4];
+    double distance = std::abs(corners[0].x - corners[3].x);
+    for (int i = 0; i < 4; ++i) {
+        corners2[i] = corners[0];
+    }
+    corners2[1].y += distance;
+    corners2[3].x += distance;
+    corners2[2].x += distance;
+    corners2[2].y += distance;
+
+    cv::Point2f src[4] {{0.0, 0.0}, {1.0, 1.0}, {2.0, 1.0}, {3.0, 0.0}};
+    cv::Point2f dst[4] {{0.0, 0.0}, {0.0, 3.0}, {3.0, 3.0}, {3.0, 0.0}};
+
+    /*
+    for (int i = 0; i < 4; i++)
+    {
+        src[i] = corners[i];
+        dst[i] = corners2[i];
+    }
+
+    cv::circle(undistorted, src[0], 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, src[1], 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, src[2], 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, src[3], 5, cv::Scalar(0, 0 ,0), -1);
+
+    cv::circle(undistorted, dst[0], 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, dst[1], 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, dst[2], 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, dst[3], 5, cv::Scalar(0, 200 ,0), -1);
+
+    */
+
+    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(src, dst);
+    cv::Mat perspective;
+
+    cv::warpPerspective(undistorted, perspective, perspectiveTransform, undistorted.size());
+    cv::imshow("undistorted", undistorted);
+    cv::imshow("perspective", perspective);
+
+    cv::Mat eroded;
+    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+    cv::erode(blured, eroded, element, cv::Point(0), 8);
 
     cv::Mat thresholded;
     cv::adaptiveThreshold(blured, thresholded, 200, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 551, 2);
@@ -98,11 +148,9 @@ void ImageProcessor::processImage(cv::Mat input)
     findLines(edges, lines_);
 
     cv::imshow("input", preProcessed);
-    cv::imshow("intersection", intersectionGroup_);
     cv::imshow("mLines", mLines_);
-    cv::imshow("groups", lineGroups_);
     cv::imshow("lines", lines_);
-    cv::waitKey(0);
+    cv::waitKey(30);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -120,10 +168,10 @@ void ImageProcessor::drawLines(cv::Mat& dst, const std::vector<Line>& lines) con
 
 void ImageProcessor::drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& color) const
 {
-    cv::Point2d centroid = line.getCentroid();
+    cv::Point2f centroid = line.getCentroid();
     cv::Vec2d orientation = line.getOrientation();
 
-    cv::Point2d pt1, pt2;
+    cv::Point2f pt1, pt2;
     pt1.x = cvRound(centroid.x + 1000*(-orientation[0]));
     pt1.y = cvRound(centroid.y + 1000*(orientation[1]));
     pt2.x = cvRound(centroid.x - 1000*(-orientation[0]));
@@ -185,17 +233,13 @@ void ImageProcessor::analyzeLineCluster()
     std::vector<int> clusterMemberships;
     DBSCAN::DBSCAN(intersections_, 2000, 2, clusterMemberships);
 
-    std::vector<cv::Point2d> intersections;
+    std::vector<cv::Point2f> intersections;
     parseClusterMemberships(clusterMemberships, intersections);
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
     drawIntersection(intersections, cv::Scalar(0, 0, 150));
 
-    std::vector<LineGroup> intersectionGroup;
-    groupByIntersection(intersectionGroup, orientationGroup);
-
-    std::vector<LineGroup> distanceGroup;
-    groupByDistance(distanceGroup, orientationGroup);
+    /*
 
     for (int i = 0; i < orientationGroup.size(); ++i)
     {
@@ -205,18 +249,18 @@ void ImageProcessor::analyzeLineCluster()
 
         drawLineGroup(lineGroups_, orientationGroup[i], cv::Scalar(r, g, b));
     }
+     */
 }
 
-
-void ImageProcessor::parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<cv::Point2d>& intersections)
+void ImageProcessor::parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<cv::Point2f>& intersections)
 {
     if (clusterMemberships.size() != intersections_.size()) return;
 
-    std::unordered_map<int, std::pair<cv::Point2d, int>> groups;
+    std::unordered_map<int, std::pair<cv::Point2f, int>> groups;
 
     for (int i = 0; i < clusterMemberships.size(); ++i) {
         int groupId = clusterMemberships[i];
-        std::unordered_map<int, std::pair<cv::Point2d, int>>::iterator it = groups.find(groupId);
+        std::unordered_map<int, std::pair<cv::Point2f, int>>::iterator it = groups.find(groupId);
         if (it != groups.end()) {
             it->second.first *= it->second.second;
             it->second.first += intersections_[i];
@@ -228,7 +272,7 @@ void ImageProcessor::parseClusterMemberships(const std::vector<int>& clusterMemb
         }
     }
 
-    std::unordered_map<int, std::pair<cv::Point2d, int>>::iterator it;
+    std::unordered_map<int, std::pair<cv::Point2f, int>>::iterator it;
     for(it = groups.begin(); it != groups.end(); it++) {
         intersections.push_back(it->second.first);
     }
@@ -255,7 +299,7 @@ void ImageProcessor::findLineIntersections(const LineGroup& firstGroup, const Li
     {
         for (int j = 0; j < otherLines.size(); j++)
         {
-            cv::Point2d intersection;
+            cv::Point2f intersection;
             if (firstLines[i]->findIntersection(*otherLines[j], intersection)) {
                 if (intersection.inside({0, 0, 640, 480})) {
                     intersections_.push_back(intersection);
@@ -271,7 +315,7 @@ void ImageProcessor::findLineIntersections()
     for (size_t i = 0; i < lineCluster_.size(); ++i) {
         const Line& line = lineCluster_[i];
         for (size_t j = i + 1; j < lineCluster_.size() - 1; j = ((j + 1) % lineCluster_.size())) {
-            cv::Point2d intersection;
+            cv::Point2f intersection;
             if (line.findIntersection(lineCluster_[j], intersection)) {
                 if (intersection.inside({0, 0, 640, 480})) {
                     intersections_.push_back(intersection);
@@ -281,7 +325,7 @@ void ImageProcessor::findLineIntersections()
     }
 }
 
-void ImageProcessor::drawIntersection(const std::vector<cv::Point2d>& intersections, const cv::Scalar& color)
+void ImageProcessor::drawIntersection(const std::vector<cv::Point2f>& intersections, const cv::Scalar& color)
 {
     for (int i = 0; i < intersections.size(); ++i) {
         cv::circle(mLines_, intersections[i], 5, color, -1 );
@@ -291,7 +335,7 @@ void ImageProcessor::drawIntersection(const std::vector<cv::Point2d>& intersecti
 void ImageProcessor::drawIntersection(const std::vector<Intersection>& intersections, const cv::Scalar& color)
 {
     for (int i = 0; i < intersections.size(); ++i) {
-        cv::circle(mLines_, cv::Point2d(intersections[i].x, intersections[i].y), 5, color, -1 );
+        cv::circle(mLines_, cv::Point2f(intersections[i].x, intersections[i].y), 5, color, -1 );
     }
 }
 
@@ -357,7 +401,6 @@ void ImageProcessor::fitLinesInGrid(std::vector<LineGroup>& fittingGroup, LineGr
         if (gridFittingAccuracy > bestGridFittingAccuracy) {
 
         }
-
     }
 }
 
@@ -378,7 +421,7 @@ void ImageProcessor::groupByIntersection(std::vector<LineGroup>& intersectionGro
 {
     bool groupFound = false;
     for (int i = 0; i < intersectionGroup.size(); ++i) {
-        cv::Point2d intersection;
+        cv::Point2f intersection;
         if (intersectionGroup[i].convertToLine().findIntersection(line, intersection)) {
             if (isInsideRect(intersection, cv::Rect(0, 0, 640 ,480))) {
                 intersectionGroup[i].add(line);
@@ -391,7 +434,7 @@ void ImageProcessor::groupByIntersection(std::vector<LineGroup>& intersectionGro
     }
 }
 
-bool ImageProcessor::isInsideRect(const cv::Point2d& point, const cv::Rect& rect)
+bool ImageProcessor::isInsideRect(const cv::Point2f& point, const cv::Rect& rect)
 {
     double xMin = rect.x;
     double xMax = rect.x + rect.width;
@@ -425,7 +468,7 @@ void ImageProcessor::groupByDistance(std::vector<LineGroup>& distanceGroup, Line
         double error = std::abs((distanceGroup[i].getAvgRho() - line.getRho()) / 800.0);
 
         bool isIntersectingOnScreen = false;
-        cv::Point2d intersection;
+        cv::Point2f intersection;
         if (distanceGroup[i].convertToLine().findIntersection(line, intersection)) {
             isIntersectingOnScreen = isInsideRect(intersection, cv::Rect(0, 0, 640, 480));
         }

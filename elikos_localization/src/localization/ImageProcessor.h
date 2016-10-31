@@ -22,8 +22,14 @@ public:
 
     void processImage(cv::Mat input);
 
+    void perspectiveToOrtho(double theta);
+
+    double theta_;
+
 private:
     static ImageProcessor* instance_;
+
+
     cv::Mat image_;
 
     cv::Mat distortionMap1_;
@@ -34,7 +40,9 @@ private:
 
     cv::Mat lines_, lineGroups_, mLines_, intersectionGroup_;
 
-    std::vector<cv::Point2d> intersections_;
+    std::vector<cv::Point2f> intersections_;
+
+    cv::Point corners[4];
 
     void preProcess(const cv::Mat& raw, cv::Mat& preProcessed);
     void findEdges(const cv::Mat& src, cv::Mat& edges);
@@ -55,17 +63,17 @@ private:
     void groupByDistance(std::vector<LineGroup>& distanceGroup, Line& line);
     void groupByDistance(std::vector<LineGroup>& distanceGroup, const std::vector<LineGroup>& intersectionGroup);
 
-    bool isInsideRect(const cv::Point2d& point, const cv::Rect& rect);
+    bool isInsideRect(const cv::Point2f& point, const cv::Rect& rect);
 
 
-    void parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<cv::Point2d>& intersections);
+    void parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<cv::Point2f>& intersections);
     void findLineIntersections(const std::vector<LineGroup>& orientationGroups);
     void findLineIntersections(const LineGroup& firstGroup, const LineGroup otherGroup);
 
     void findLineIntersections();
-    void drawIntersection(const std::vector<cv::Point2d>& intersections, const cv::Scalar& color);
-    void drawIntersection(const std::vector<Intersection>& intersections, const cv::Scalar& color);
 
+    void drawIntersection(const std::vector<cv::Point2f>& intersections, const cv::Scalar& color);
+    void drawIntersection(const std::vector<Intersection>& intersections, const cv::Scalar& color);
     void drawRawLines(cv::Mat& dst, const std::vector<cv::Vec2f> &raw_lines) const;
     void drawLines(cv::Mat& dst, const std::vector<Line>& lines) const;
     void drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& color) const;
@@ -76,6 +84,5 @@ private:
 };
 
 }
-
 
 #endif // LOCALIZATION_IMAGE_PROCESSOR_H
