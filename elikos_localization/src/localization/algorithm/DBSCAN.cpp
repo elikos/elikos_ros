@@ -20,25 +20,27 @@ void DBSCAN (const std::vector<cv::Point2f> &dataset, double epsilon, int minPts
     if (dataset.empty()) return;
 
     // copy dataset into pointcloud.
-    pcl::PointCloud<pcl::PointXY> pc;
+    pcl::PointCloud<pcl::PointXY>::Ptr pc(new pcl::PointCloud<pcl::PointXY>());
     for (int i = 0; i < dataset.size(); ++i) {
-        pc.push_back({ dataset[i].x, dataset[i].y });
+        pc->push_back({ dataset[i].x, dataset[i].y });
     } 
 
-    pcl::PointCloud<pcl::PointXY>::Ptr ptr = pc.makeShared();
     pcl::KdTreeFLANN<pcl::PointXY> tree;
-    tree.setInputCloud(ptr);
+    tree.setInputCloud(pc);
 
     int clusterID = 0;
     clusterMemberships.resize(dataset.size(), 0);
     std::vector<bool> visited(dataset.size(), false);
-    for (int i = 0; i < pc.size(); i++) {
+    std::vector<pcl::PointXY, Eigen::aligned_allocator<pcl::PointXY>>& points = pc->points;
+
+    for (int i = 0; i < points.size(); i++) {
         if (visited[i]) continue;
         visited[i] = true;
 
+        
         std::vector<int> neighborIndices;
         std::vector<float> distances;
-        tree.radiusSearch(pc[i], epsilon, neighborIndices, distances);
+        tree.radiusSearch(points[i], epsilon, neighborIndices, distances);
 
         if (neighborIndices.size() < minPts) {
             clusterMemberships[i] = -1;
@@ -48,10 +50,11 @@ void DBSCAN (const std::vector<cv::Point2f> &dataset, double epsilon, int minPts
             for (int j = 0; j < neighborIndices.size(); ++j) {
                 if (!visited[neighborIndices[j]]) {
                     visited[neighborIndices[j]] = true;
-                    
+
+                     
                     std::vector<int> nestedNeighborIndices;
                     std::vector<float> nestedDistances;
-                    tree.radiusSearch(pc[neighborIndices[j]], epsilon, nestedNeighborIndices, nestedDistances);
+                    tree.radiusSearch(points[neighborIndices[j]], epsilon, nestedNeighborIndices, nestedDistances);
 
                     if (nestedNeighborIndices.size() >= minPts){
                         neighborIndices.insert(neighborIndices.end(), nestedNeighborIndices.begin(), nestedNeighborIndices.end());
