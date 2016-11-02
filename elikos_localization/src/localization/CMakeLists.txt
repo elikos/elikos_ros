@@ -13,6 +13,9 @@ add_executable(elikos_localization
     context/LineGroup.cpp
     context/LineGroup.h
     algorithm/DBSCAN.cpp 
+    algorithm/DBSCAN.h
+    algorithm/PerspectiveRANSAC.h
+    algorithm/PerspectiveRANSAC.cpp
     context/Grid.cpp 
     context/Grid.h)
 

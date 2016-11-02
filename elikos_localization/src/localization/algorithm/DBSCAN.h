@@ -8,7 +8,6 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include <eigen3/Eigen/Dense>
-#include <Intersection.h>
 
 namespace DBSCAN
 {
@@ -23,10 +22,6 @@ double calculateDistance (const std::vector<cv::Point2f> &dataset, int i, int j)
 double calculateDistance (const std::vector<cv::Point2f> &dataset1, const std::vector<cv::Point2f> &dataset2, int i, int j);
 
 std::vector<int> regionQuery (Eigen::MatrixXd distMap, double epsilon, int i);
-
-void parseClusterMemberShips(const std::vector<int>& clusterMemberShips,
-                                                 const std::vector<cv::Point2f>& intersections,
-                                                 std::vector<localization::Intersection>& parsedClusters);
 
 }
 
