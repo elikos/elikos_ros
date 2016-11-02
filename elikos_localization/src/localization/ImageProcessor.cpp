@@ -231,7 +231,7 @@ void ImageProcessor::analyzeLineCluster()
 
     findLineIntersections(orientationGroup);
     std::vector<int> clusterMemberships;
-    DBSCAN::DBSCAN(intersections_, 1000, 2, clusterMemberships);
+    DBSCAN::DBSCAN(intersections_, 50, 2, clusterMemberships);
 
     std::vector<cv::Point2f> intersections;
     parseClusterMemberships(clusterMemberships, intersections);
