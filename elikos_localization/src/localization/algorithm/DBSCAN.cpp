@@ -28,22 +28,17 @@ void DBSCAN (const std::vector<cv::Point2f> &dataset, double epsilon, int minPts
     pcl::PointCloud<pcl::PointXY>::Ptr ptr = pc.makeShared();
     pcl::KdTreeFLANN<pcl::PointXY> tree;
     tree.setInputCloud(ptr);
-    tree.setEpsilon(epsilon);
-
-    //Eigen::MatrixXd distanceMap = calculateDistMap(dataset);
 
     int clusterID = 0;
-    //std::vector<int> neighborIndexes;
     clusterMemberships.resize(dataset.size(), 0);
     std::vector<bool> visited(dataset.size(), false);
-    for (int i = 0; i < dataset.size(); i++) {
+    for (int i = 0; i < pc.size(); i++) {
         if (visited[i]) continue;
         visited[i] = true;
 
-        //neighborIndexes = regionQuery(distanceMap, epsilon, i);
         std::vector<int> neighborIndices;
         std::vector<float> distances;
-        tree.radiusSearch(pc, i, epsilon, neighborIndices, distances);
+        tree.radiusSearch(pc[i], epsilon, neighborIndices, distances);
 
         if (neighborIndices.size() < minPts) {
             clusterMemberships[i] = -1;
@@ -53,9 +48,10 @@ void DBSCAN (const std::vector<cv::Point2f> &dataset, double epsilon, int minPts
             for (int j = 0; j < neighborIndices.size(); ++j) {
                 if (!visited[neighborIndices[j]]) {
                     visited[neighborIndices[j]] = true;
-                    //std::vector<int> nestedNeighborIndexes = regionQuery(distanceMap, epsilon, neighborIndexes[j]);
+                    
                     std::vector<int> nestedNeighborIndices;
-                    tree.radiusSearch(pc, neighborIndices[j], epsilon, nestedNeighborIndices, distances);
+                    std::vector<float> nestedDistances;
+                    tree.radiusSearch(pc[neighborIndices[j]], epsilon, nestedNeighborIndices, nestedDistances);
 
                     if (nestedNeighborIndices.size() >= minPts){
                         neighborIndices.insert(neighborIndices.end(), nestedNeighborIndices.begin(), nestedNeighborIndices.end());
