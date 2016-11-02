@@ -12,7 +12,9 @@ add_executable(elikos_localization
     context/Intersection.h
     context/LineGroup.cpp
     context/LineGroup.h
-    algorithm/DBSCAN.cpp context/Grid.cpp context/Grid.h)
+    algorithm/DBSCAN.cpp 
+    context/Grid.cpp 
+    context/Grid.h)
 
 
 include_directories(${catkin_INCLUDE_DIRS}
