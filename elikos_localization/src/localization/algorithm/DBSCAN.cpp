@@ -8,6 +8,9 @@
 
 #include "Intersection.h"
 #include <opencv2/core/core.hpp>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 
 namespace DBSCAN
 {
@@ -16,52 +19,50 @@ void DBSCAN (const std::vector<cv::Point2f> &dataset, double epsilon, int minPts
 {
     if (dataset.empty()) return;
 
-    cv::Mat data(dataset.size(), 2, CV_32F);
-    for (int i = 0; i < dataset.size(); ++i) 
-    {
-        data.at<float>(i, 0) = dataset[i].x;
-        data.at<float>(i, 1) = dataset[i].y;
-    }
+    // copy dataset into pointcloud.
+    pcl::PointCloud<pcl::PointXY> pc;
+    for (int i = 0; i < dataset.size(); ++i) {
+        pc.push_back({ dataset[i].x, dataset[i].y });
+    } 
 
-    //cv::KDTree tree(data, false);
-    
-    Eigen::MatrixXd distanceMap = calculateDistMap(dataset);
+    pcl::PointCloud<pcl::PointXY>::Ptr ptr = pc.makeShared();
+    pcl::KdTreeFLANN<pcl::PointXY> tree;
+    tree.setInputCloud(ptr);
+    tree.setEpsilon(epsilon);
+
+    //Eigen::MatrixXd distanceMap = calculateDistMap(dataset);
+
     int clusterID = 0;
-    std::vector<int> neighborIndexes;
+    //std::vector<int> neighborIndexes;
     clusterMemberships.resize(dataset.size(), 0);
     std::vector<bool> visited(dataset.size(), false);
     for (int i = 0; i < dataset.size(); i++) {
         if (visited[i]) continue;
         visited[i] = true;
 
-        std::vector<int> test;
-        cv::Mat point(2, 1, CV_32F);
-        point.at<float>(0, 0) = dataset[i].x;
-        point.at<float>(1, 0) = dataset[i].y;
+        //neighborIndexes = regionQuery(distanceMap, epsilon, i);
+        std::vector<int> neighborIndices;
+        std::vector<float> distances;
+        tree.radiusSearch(pc, i, epsilon, neighborIndices, distances);
 
-        bool continuous = point.isContinuous();
-        int type = point.type(); 
-        int total = point.total();
-        int dataT = data.cols;
-
-        //tree.findNearest(point, INT_MAX, epsilon, test);
-
-        neighborIndexes = regionQuery(distanceMap, epsilon, i);
-        if (neighborIndexes.size() < minPts) {
+        if (neighborIndices.size() < minPts) {
             clusterMemberships[i] = -1;
         } else {
             clusterID++;
             clusterMemberships[i] = clusterID;
-            for (int j = 0; j < neighborIndexes.size(); ++j) {
-                if (!visited[neighborIndexes[j]]) {
-                    visited[neighborIndexes[j]] = true;
-                    std::vector<int> nestedNeighborIndexes = regionQuery(distanceMap, epsilon, neighborIndexes[j]);
-                    if (nestedNeighborIndexes.size() >= minPts){
-                        neighborIndexes.insert(neighborIndexes.end(), nestedNeighborIndexes.begin(), nestedNeighborIndexes.end());
+            for (int j = 0; j < neighborIndices.size(); ++j) {
+                if (!visited[neighborIndices[j]]) {
+                    visited[neighborIndices[j]] = true;
+                    //std::vector<int> nestedNeighborIndexes = regionQuery(distanceMap, epsilon, neighborIndexes[j]);
+                    std::vector<int> nestedNeighborIndices;
+                    tree.radiusSearch(pc, neighborIndices[j], epsilon, nestedNeighborIndices, distances);
+
+                    if (nestedNeighborIndices.size() >= minPts){
+                        neighborIndices.insert(neighborIndices.end(), nestedNeighborIndices.begin(), nestedNeighborIndices.end());
                     }
                 }
-                if (clusterMemberships[neighborIndexes[j]] == 0) {
-                    clusterMemberships[neighborIndexes[j]] = clusterID;
+                if (clusterMemberships[neighborIndices[j]] == 0) {
+                    clusterMemberships[neighborIndices[j]] = clusterID;
                 }
             }
         }

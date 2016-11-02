@@ -150,7 +150,7 @@ void ImageProcessor::processImage(cv::Mat input)
     cv::imshow("input", preProcessed);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(30);
+    cv::waitKey(0);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -231,7 +231,7 @@ void ImageProcessor::analyzeLineCluster()
 
     findLineIntersections(orientationGroup);
     std::vector<int> clusterMemberships;
-    DBSCAN::DBSCAN(intersections_, 2000, 2, clusterMemberships);
+    DBSCAN::DBSCAN(intersections_, 1000, 2, clusterMemberships);
 
     std::vector<cv::Point2f> intersections;
     parseClusterMemberships(clusterMemberships, intersections);
