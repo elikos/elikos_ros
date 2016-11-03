@@ -8,6 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include "Line.h"
 #include "Intersection.h"
+#include "PerspectiveTransform.h"
 
 namespace localization {
 
@@ -43,6 +44,8 @@ private:
     std::vector<cv::Point2f> intersections_;
 
     cv::Point corners[4];
+
+    PerspectiveTransform transform_;
 
     void preProcess(const cv::Mat& raw, cv::Mat& preProcessed);
     void findEdges(const cv::Mat& src, cv::Mat& edges);

@@ -12,6 +12,5 @@ int main(int argc, char* argv[])
 
     localization::MessageHandler::getInstance()->lookForMessages();
 
-
     return 0;
 }
