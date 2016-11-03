@@ -40,7 +40,7 @@ void MessageHandler::freeInstance()
 void MessageHandler::lookForMessages()
 {
     cv::VideoCapture vc;
-    vc.open("/home/olivier/Videos/cam_bas.mp4");
+    vc.open("/home/olivier/Videos/cam_gauche.mp4");
     if (!vc.isOpened())
     {
         exit(-1);

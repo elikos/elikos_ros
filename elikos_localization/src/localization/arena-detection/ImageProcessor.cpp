@@ -212,6 +212,7 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
     drawRawLines(lines, rawLines);
 
     buildLineArray(rawLines);
+    transform_.perspectiveTransformFromLines(lines_);
     analyzeLineCluster();
 
 }
