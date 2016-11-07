@@ -10,16 +10,21 @@ namespace localization
 using Vector = Eigen::Vector2f;
 
 Line::Line(float rho, float theta)
-    : rho_(std::abs(rho))
+    : rho_(std::abs(rho)), theta_(theta)
 {
-    orientation_ = Vector(sinf(theta), cosf(theta));
-    centroid_ = Vector(rho * orientation_[1], rho * orientation_[0]);
+    orientation_ = Vector(sinf(theta), -cosf(theta));
+    centroid_ = Vector(rho * cos(theta), rho * sin(theta));
 }
 
 Line::Line(float rho, const Vector& orientation)
-    : rho_(std::abs(rho)), orientation_(orientation)
+    : rho_(std::abs(rho)), orientation_(orientation.normalized())
 {
     centroid_ = Vector(rho * orientation_[1], rho * orientation_[0]);
+}
+
+Line::Line(const Vector& centroid, const Vector& orientation)
+    : centroid_(centroid), orientation_(orientation.normalized())
+{
 }
 
 void Line::rotate(float rotation)
@@ -52,10 +57,6 @@ bool Line::findIntersection(const Line& otherLine, Vector& intersection) const
 
     u.normalize();
     v.normalize();
-
-    // Convert the coordinate system (origin -> top-left to bottom-left)
-    u[y] = -u[y];
-    v[y] = -v[y];
 
     double det =  u[x] * v[y] - u[y] * v[x];
 

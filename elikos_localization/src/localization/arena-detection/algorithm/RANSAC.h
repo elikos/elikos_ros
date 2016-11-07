@@ -1,5 +1,5 @@
-#ifndef PERSPECTIVE_RANSAC
-#define PERSPECTIVE_RANSAC
+#ifndef RANSAC_H
+#define RANSAC_H
 
 #include <vector>
 #include <Eigen/Dense>
@@ -12,9 +12,8 @@ namespace RANSAC
 {
 
 Eigen::Vector2f findBestConvergencePoint(const std::vector<localization::Line>& lines, int k);
-double sumIntersectDistToPivotLine(const std::vector<localization::Line>& lines, localization::Line pivot, Eigen::Vector2f convergencePoint);
- 
+float summConvergeDistance(const std::vector<localization::Line>& lines, const localization::Line& pivot, const Eigen::Vector2f& convergencePoint);
 
 }
 
-#endif
+#endif // RANSAC_H
