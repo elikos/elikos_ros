@@ -2,7 +2,7 @@
 #define PERSPECTIVE_RANSAC
 
 #include <vector>
-#include <pcl/point_types.h>
+#include <Eigen/Dense>
 
 namespace localization {
     class Line;
@@ -11,8 +11,8 @@ namespace localization {
 namespace RANSAC
 {
 
-pcl::PointXY findBestConvergencePoint(const std::vector<localization::Line>& lines, int k);
-double sumIntersectDistToPivotLine(const std::vector<localization::Line>& lines, Line pivot, pcl::PointXY convergencePoint)
+Eigen::Vector2f findBestConvergencePoint(const std::vector<localization::Line>& lines, int k);
+double sumIntersectDistToPivotLine(const std::vector<localization::Line>& lines, localization::Line pivot, Eigen::Vector2f convergencePoint);
  
 
 }
