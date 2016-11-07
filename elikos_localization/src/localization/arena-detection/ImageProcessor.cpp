@@ -6,7 +6,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <iostream>
-#include "Intersection.h"
 #include <unordered_map>
 
 #include "LineGroup.h"
@@ -330,13 +329,6 @@ void ImageProcessor::drawIntersection(const std::vector<cv::Point2f>& intersecti
 {
     for (int i = 0; i < intersections.size(); ++i) {
         cv::circle(mLines_, intersections[i], 5, color, -1 );
-    }
-}
-
-void ImageProcessor::drawIntersection(const std::vector<Intersection>& intersections, const cv::Scalar& color)
-{
-    for (int i = 0; i < intersections.size(); ++i) {
-        cv::circle(mLines_, cv::Point2f(intersections[i].x, intersections[i].y), 5, color, -1 );
     }
 }
 

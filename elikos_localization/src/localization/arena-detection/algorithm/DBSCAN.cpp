@@ -6,7 +6,6 @@
 
 #include "DBSCAN.h"
 
-#include "Intersection.h"
 #include <opencv2/core/core.hpp>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
