@@ -11,7 +11,7 @@
 
 namespace DBSCAN
 {
-void DBSCAN(const std::vector<cv::Point2f> &dataset, double epsilon, int minPts, std::vector<int>& clusterMemberships);
+void DBSCAN(const std::vector<Eigen::Vector2f> &dataset, double epsilon, int minPts, std::vector<int>& clusterMemberships);
 
 Eigen::MatrixXd calculateDistMap (const std::vector<cv::Point2f> &dataset);
 

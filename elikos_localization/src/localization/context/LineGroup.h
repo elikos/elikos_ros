@@ -5,7 +5,7 @@
 #ifndef LOCALIZATION_LINEGROUP_H
 #define LOCALIZATION_LINEGROUP_H
 
-#include <opencv2/core/core.hpp>
+#include <Eigen/Core>
 
 namespace localization
 {
@@ -21,11 +21,11 @@ public:
     Line convertToLine() const;
 
     inline const std::vector<Line*>& getLines() const;
-    inline const cv::Vec2f& getAvgOrientation() const;
+    inline const Eigen::Vector2f& getAvgOrientation() const;
     inline double getAvgRho() const;
 
 private :
-    cv::Vec2f avgOrientation_;
+    Eigen::Vector2f avgOrientation_;
     float avgRho_;
 
     std::vector<Line*> lines_;
@@ -38,7 +38,7 @@ inline const std::vector<Line*>& LineGroup::getLines() const
    return lines_;
 }
 
-inline const cv::Vec2f& LineGroup::getAvgOrientation() const
+inline const Eigen::Vector2f& LineGroup::getAvgOrientation() const
 {
    return avgOrientation_;
 }

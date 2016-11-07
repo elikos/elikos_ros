@@ -14,14 +14,14 @@
 namespace DBSCAN
 {
 
-void DBSCAN (const std::vector<cv::Point2f> &dataset, double epsilon, int minPts, std::vector<int>& clusterMemberships) 
+void DBSCAN (const std::vector<Eigen::Vector2f> &dataset, double epsilon, int minPts, std::vector<int>& clusterMemberships) 
 {
     if (dataset.empty()) return;
 
     // copy dataset into pointcloud.
     pcl::PointCloud<pcl::PointXY>::Ptr pc(new pcl::PointCloud<pcl::PointXY>());
     for (int i = 0; i < dataset.size(); ++i) {
-        pc->push_back({ dataset[i].x, dataset[i].y });
+        pc->push_back({ dataset[i].x(), dataset[i].y() });
     } 
 
     pcl::KdTreeFLANN<pcl::PointXY> tree;

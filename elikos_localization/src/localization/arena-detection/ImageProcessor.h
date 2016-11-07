@@ -7,6 +7,7 @@
 
 #include <opencv2/core/core.hpp>
 #include "Line.h"
+#include <Eigen/Core>
 #include "PerspectiveTransform.h"
 
 namespace localization 
@@ -41,7 +42,7 @@ private:
 
     cv::Mat lines_, lineGroups_, mLines_, intersectionGroup_;
 
-    std::vector<cv::Point2f> intersections_;
+    std::vector<Eigen::Vector2f> intersections_;
 
     cv::Point corners[4];
 
@@ -57,25 +58,13 @@ private:
     void groupByOrientation(std::vector<LineGroup>& orientationGroup, const std::vector<Line>& lines);
     void groupByOrientation(std::vector<LineGroup>& group, Line& line);
 
-    void fitLinesInGrid(std::vector<LineGroup>& fittingGroup, std::vector<LineGroup>& orientationGroup);
-    void fitLinesInGrid(std::vector<LineGroup>& fittingGroup, LineGroup, Line& line);
-
-    void groupByIntersection(std::vector<LineGroup>& intersectingGroup, const std::vector<LineGroup>& orientationGroup);
-    void groupByIntersection(std::vector<LineGroup>& intersectingGroup, Line& line);
-
-    void groupByDistance(std::vector<LineGroup>& distanceGroup, Line& line);
-    void groupByDistance(std::vector<LineGroup>& distanceGroup, const std::vector<LineGroup>& intersectionGroup);
-
-    bool isInsideRect(const cv::Point2f& point, const cv::Rect& rect);
-
-
-    void parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<cv::Point2f>& intersections);
+    void parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<Eigen::Vector2f>& intersections);
     void findLineIntersections(const std::vector<LineGroup>& orientationGroups);
     void findLineIntersections(const LineGroup& firstGroup, const LineGroup otherGroup);
 
     void findLineIntersections();
 
-    void drawIntersection(const std::vector<cv::Point2f>& intersections, const cv::Scalar& color);
+    void drawIntersection(const std::vector<Eigen::Vector2f>& intersections, const cv::Scalar& color);
     void drawRawLines(cv::Mat& dst, const std::vector<cv::Vec2f> &raw_lines) const;
     void drawLines(cv::Mat& dst, const std::vector<Line>& lines) const;
     void drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& color) const;
