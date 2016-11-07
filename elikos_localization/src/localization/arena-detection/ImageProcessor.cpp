@@ -174,10 +174,10 @@ void ImageProcessor::drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& 
     Vector orientation = line.getOrientation();
 
     cv::Point2f pt1, pt2;
-    pt1.x = cvRound(centroid.x() + 1000*(-orientation.x()));
-    pt1.y = cvRound(centroid.y() + 1000*(orientation.y()));
-    pt2.x = cvRound(centroid.x() - 1000*(-orientation.x()));
-    pt2.y = cvRound(centroid.y() - 1000*(orientation.y()));
+    pt1.x = cvRound(centroid.x() + 1000 * (orientation.x()));
+    pt1.y = cvRound(centroid.y() + 1000 * (orientation.y()));
+    pt2.x = cvRound(centroid.x() - 1000 * (orientation.x()));
+    pt2.y = cvRound(centroid.y() - 1000 * (orientation.y()));
     cv::line(dst, pt1, pt2, color, 1, CV_AA);
 }
 
@@ -189,11 +189,11 @@ void ImageProcessor::drawRawLines(cv::Mat &dst, const std::vector<cv::Vec2f> &ra
 
         cv::Point pt1, pt2;
         double a = cos(theta), b = sin(theta);
-        double x0 = a*rho, y0 = b*rho;
-        pt1.x = cvRound(x0 + 1000*(-b));
-        pt1.y = cvRound(y0 + 1000*(a));
-        pt2.x = cvRound(x0 - 1000*(-b));
-        pt2.y = cvRound(y0 - 1000*(a));
+        double x0 = a * rho, y0 = b * rho;
+        pt1.x = cvRound(x0 + 1000 * (-b));
+        pt1.y = cvRound(y0 + 1000 * (a));
+        pt2.x = cvRound(x0 - 1000 * (-b));
+        pt2.y = cvRound(y0 - 1000 * (a));
         line(dst, pt1, pt2, cv::Scalar(100,100,100), 3, CV_AA);
     }
 }
@@ -214,7 +214,7 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
     drawRawLines(lines, rawLines);
 
     buildLineArray(rawLines);
-    //transform_.perspectiveTransformFromLines(lines_);
+    transform_.perspectiveTransformFromLines(lineCluster_);
     analyzeLineCluster();
 
 }
