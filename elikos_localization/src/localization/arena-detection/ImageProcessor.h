@@ -7,10 +7,10 @@
 
 #include <opencv2/core/core.hpp>
 #include "Line.h"
-#include "Intersection.h"
 #include "PerspectiveTransform.h"
 
-namespace localization {
+namespace localization 
+{
 
 class LineGroup;
 
@@ -76,7 +76,6 @@ private:
     void findLineIntersections();
 
     void drawIntersection(const std::vector<cv::Point2f>& intersections, const cv::Scalar& color);
-    void drawIntersection(const std::vector<Intersection>& intersections, const cv::Scalar& color);
     void drawRawLines(cv::Mat& dst, const std::vector<cv::Vec2f> &raw_lines) const;
     void drawLines(cv::Mat& dst, const std::vector<Line>& lines) const;
     void drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& color) const;
