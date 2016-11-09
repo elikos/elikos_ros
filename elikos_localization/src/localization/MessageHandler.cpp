@@ -40,7 +40,7 @@ void MessageHandler::freeInstance()
 void MessageHandler::lookForMessages()
 {
     cv::VideoCapture vc;
-    vc.open("/home/olivier/Videos/cam_bas.mp4");
+    vc.open("/home/olivier/Videos/cam_gauche.mp4");
     if (!vc.isOpened())
     {
         exit(-1);
@@ -48,7 +48,6 @@ void MessageHandler::lookForMessages()
     ros::Rate rate(30);
     while(ros::ok())
     {
-
         cv::Mat frame;
         vc >> frame;
         ImageProcessor::getInstance()->processImage(frame);
@@ -61,7 +60,7 @@ void MessageHandler::lookForMessages()
 void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 {
     cv::Mat input = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8)->image;
-    //ImageProcessor::getInstance()->processImage(input);
+    ImageProcessor::getInstance()->processImage(input);
 }
 
 void MessageHandler::imuCallback(const sensor_msgs::ImuConstPtr msg)
