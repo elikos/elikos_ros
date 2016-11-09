@@ -49,4 +49,41 @@ float summConvergeDistance(const std::vector<Line>& lines, const Line& pivot, co
     return distance;
 }
 
+bool findBestOrientationSplit(const std::vector<localization::Line>& lines, int k, Vector bestOrientations[2])
+{
+    std::srand(std::time(NULL));
+    float bestFitWeight = 0.0;
+    for (int i = 0; i < k; ++i) {
+        const Line& line = lines[std::rand() % lines.size()];
+        Vector orientation = line.getOrientation();
+
+        Vector orientations[2] = { orientation, 
+                                   { orientation.y(),
+                                    -orientation.x() }};
+        float fitWeight = evaluateOrientationModel(lines, orientations);
+        if (fitWeight > bestFitWeight) {
+            bestFitWeight = fitWeight;
+            bestOrientations[0] = orientations[0];
+            bestOrientations[1] = orientations[1];
+        }
+    }
+    return true;
+}
+
+float evaluateOrientationModel(const std::vector<localization::Line>& lines, Eigen::Vector2f orientations[2])
+{
+    double dotSumm = 0.0;
+    for (int i = 0; i < lines.size(); ++i) {
+        Vector u = lines[i].getOrientation();
+
+        double udotv = std::abs(u.dot(orientations[0]));
+        double udotw = std::abs(u.dot(orientations[1]));
+
+        bool isCloserToV = udotv > udotw;
+        dotSumm += (isCloserToV) ? udotv : udotw;
+        int iOrientation = (isCloserToV) ? 0 : 1;
+    }
+    return dotSumm;
+}
+
 }

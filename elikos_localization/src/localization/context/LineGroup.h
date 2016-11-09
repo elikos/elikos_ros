@@ -16,11 +16,11 @@ class LineGroup
 {
 public:
     LineGroup(Line& v);
-    void add(Line& v);
+    void add(const Line& v);
 
     Line convertToLine() const;
 
-    inline const std::vector<Line*>& getLines() const;
+    inline const std::vector<const Line*>& getLines() const;
     inline const Eigen::Vector2f& getAvgOrientation() const;
     inline double getAvgRho() const;
 
@@ -28,12 +28,12 @@ private :
     Eigen::Vector2f avgOrientation_;
     float avgRho_;
 
-    std::vector<Line*> lines_;
+    std::vector<const Line*> lines_;
 
     LineGroup() = default;
 };
 
-inline const std::vector<Line*>& LineGroup::getLines() const
+inline const std::vector<const Line*>& LineGroup::getLines() const
 {
    return lines_;
 }

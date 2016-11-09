@@ -16,12 +16,12 @@ LineGroup::LineGroup(Line& line)
     lines_.push_back(&line);
 }
 
-void LineGroup::add(Line& line)
+void LineGroup::add(const Line& line)
 {
     float product = line.getOrientation().dot(avgOrientation_);
     if (product < 0)
     {
-        line.inverseOrientation();
+        //line.inverseOrientation();
     }
 
     avgOrientation_ *= (double)(lines_.size());
