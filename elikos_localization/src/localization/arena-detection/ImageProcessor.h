@@ -26,11 +26,13 @@ public:
 
     void perspectiveToOrtho(double theta);
 
-    double theta_;
+    double theta_ = 0.0;
+
+    Eigen::Vector3f imuOrientation_ = { 1.0, 0.0, 0.0 };
 
 private:
-    static ImageProcessor* instance_;
 
+    static ImageProcessor* instance_;
 
     cv::Mat image_;
 
@@ -47,6 +49,8 @@ private:
     cv::Point corners[4];
 
     PerspectiveTransform transform_;
+    int C_W;
+    int C_H;
 
     void preProcess(const cv::Mat& raw, cv::Mat& preProcessed);
     void findEdges(const cv::Mat& src, cv::Mat& edges);

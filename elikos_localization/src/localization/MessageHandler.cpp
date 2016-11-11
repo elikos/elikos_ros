@@ -16,7 +16,7 @@ MessageHandler* MessageHandler::instance_ = nullptr;
 MessageHandler::MessageHandler()
     : it_(nh_)
 {
-    //imageSub_ = it_.subscribe("/camera/image_raw", 1, &MessageHandler::cameraCallback, this);
+    imageSub_ = it_.subscribe("/camera/image_raw", 1, &MessageHandler::cameraCallback, this);
     imuSub_ = nh_.subscribe("/mavros/imu/data", 1, &MessageHandler::imuCallback, this);
 }
 
@@ -48,9 +48,9 @@ void MessageHandler::lookForMessages()
     ros::Rate rate(30);
     while(ros::ok())
     {
-        cv::Mat frame;
-        vc >> frame;
-        ImageProcessor::getInstance()->processImage(frame);
+        //cv::Mat frame;
+        //vc >> frame;
+        //ImageProcessor::getInstance()->processImage(frame);
 
         ros::spinOnce();
         rate.sleep();
@@ -69,8 +69,8 @@ void MessageHandler::imuCallback(const sensor_msgs::ImuConstPtr msg)
     tf::Vector3 v;
     tf::vector3MsgToTF(msg->linear_acceleration, v);
     v.normalize();
-
-    ImageProcessor::getInstance()->theta_ = atan(v.z() / -v.x());
+    std::cout << v << std::endl;
+    ImageProcessor::getInstance()->imuOrientation_ = {v.x(), v.y(), v.z()};
 }
 
 }

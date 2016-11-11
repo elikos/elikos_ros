@@ -17,9 +17,9 @@ public:
 
     void perspectiveTransformFromLines(const std::vector<Line>& lines);
 
-private:
-
     void splitLinesByOrientation(const std::vector<Line>& lines, Eigen::Vector2f orientations[2], LineGroup groups[2]);
+    Eigen::Vector2f translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation);
+    Eigen::Vector2f rotate(const Eigen::Vector2f& v, double theta);
 
 };
 
