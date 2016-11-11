@@ -51,6 +51,9 @@ ImageProcessor::ImageProcessor()
                                 cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
 
     cv::namedWindow("trackers", 1);
+    cvCreateTrackbar("C_W", "trackers", &C_W, 1000);
+    cvCreateTrackbar("C_H", "trackers", &C_H, 1000);
+    /*
     cvCreateTrackbar("p1x", "trackers", &corners[0].x, 640);
     cvCreateTrackbar("p1y", "trackers", &corners[0].y, 480);
     cvCreateTrackbar("p2x", "trackers", &corners[1].x, 640);
@@ -59,6 +62,7 @@ ImageProcessor::ImageProcessor()
     cvCreateTrackbar("p3y", "trackers", &corners[2].y, 480);
     cvCreateTrackbar("p4x", "trackers", &corners[3].x, 640);
     cvCreateTrackbar("p4y", "trackers", &corners[3].y, 480);
+    */
 }
 
 void undistort(const cv::Mat& src, cv::Mat& undistorted)
@@ -79,44 +83,63 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
     cv::Mat undistorted;
     cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
 
-
-
     cv::Mat blured;
     cv::GaussianBlur(undistorted, blured, cv::Size(7,7), 8, 8);
+    
 
-    cv::Point2f corners2[4];
-    double distance = std::abs(corners[0].x - corners[3].x);
+    double xy = Eigen::Vector2f(imuOrientation_.x(), imuOrientation_.y()).norm();
+    double theta = std::abs(atanf(xy / imuOrientation_.z())); 
+    std::cout << theta << std::endl;
+
+    Eigen::Vector2f src[4] {{0.0, 0.0}, {0.0, 480.0}, {640.0, 480.0}, {640.0, 0.0}};
+    Eigen::Vector2f dst[4] {{0.0, 0.0}, {0.0, 480.0}, {640.0, 480.0}, {640.0, 0.0}};
+
+    Eigen::Vector2f leftRotationPoint = { 0.0, 240.0 };
+    Eigen::Vector2f rightRotationPoint = { 640.0, 240.0 };
+    Eigen::Vector2f center = { 320.0, 240.0 };
+
     for (int i = 0; i < 4; ++i) {
-        corners2[i] = corners[0];
-    }
-    corners2[1].y += distance;
-    corners2[3].x += distance;
-    corners2[2].x += distance;
-    corners2[2].y += distance;
 
-    cv::Point2f src[4] {{0.0, 0.0}, {1.0, 1.0}, {2.0, 1.0}, {3.0, 0.0}};
-    cv::Point2f dst[4] {{0.0, 0.0}, {0.0, 3.0}, {3.0, 3.0}, {3.0, 0.0}};
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        Eigen::Vector2f translated = transform_.translate(dst[i], -leftRotationPoint);
+        Eigen::Vector2f rotated = transform_.rotate(translated, theta);
+        src[i] = transform_.translate(rotated, leftRotationPoint);
+    }
+
+    for (int i = 2; i < 4; ++i) {
+        Eigen::Vector2f translated = transform_.translate(dst[i], -rightRotationPoint);
+        Eigen::Vector2f rotated = transform_.rotate(translated, -theta);
+        src[i] = transform_.translate(rotated, rightRotationPoint);
+    }
 
     /*
-    for (int i = 0; i < 4; i++)
-    {
-        src[i] = corners[i];
-        dst[i] = corners2[i];
-    }
+    src[0].x += n_W * 320.0 * tanf(theta_) / 2.0;
+    src[3].x -= n_W * 320.0 * tanf(theta_) / 2.0;
 
-    cv::circle(undistorted, src[0], 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, src[1], 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, src[2], 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, src[3], 5, cv::Scalar(0, 0 ,0), -1);
-
-    cv::circle(undistorted, dst[0], 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, dst[1], 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, dst[2], 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, dst[3], 5, cv::Scalar(0, 200 ,0), -1);
-
+    src[0].y += n_H * 240.0 * tanf(theta_) / 2.0;
+    src[3].y += n_H * 240.0 * tanf(theta_) / 2.0;
     */
 
-    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(src, dst);
+    cv::circle(undistorted, { src[0].x(), src[0].y() }, 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, { src[1].x(), src[1].y() }, 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, { src[2].x(), src[2].y() }, 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, { src[3].x(), src[3].y() }, 5, cv::Scalar(0, 0 ,0), -1);
+
+    cv::circle(undistorted, { dst[0].x(), dst[0].y() }, 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, { dst[1].x(), dst[1].y() }, 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, { dst[2].x(), dst[2].y() }, 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, { dst[3].x(), dst[3].y() }, 5, cv::Scalar(0, 200 ,0), -1);
+
+    cv::Point2f tSrc[4], tDst[4];
+    for ( int i = 0; i < 4; ++i) {
+        tSrc[i] = { src[i].x(), src[i].y() };
+        tDst[i] = { dst[i].x(), dst[i].y() };
+    }
+
+
+    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
     cv::Mat perspective;
 
     cv::warpPerspective(undistorted, perspective, perspectiveTransform, undistorted.size());
@@ -147,12 +170,12 @@ void ImageProcessor::processImage(cv::Mat input)
     mLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     intersectionGroup_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
 
-    findLines(edges, lines_);
+    //findLines(edges, lines_);
 
     cv::imshow("input", preProcessed);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(0);
+    cv::waitKey(30);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -200,7 +223,7 @@ void ImageProcessor::drawRawLines(cv::Mat &dst, const std::vector<cv::Vec2f> &ra
 
 void ImageProcessor::drawLineGroup(cv::Mat& dst, const LineGroup& group, const cv::Scalar& color)
 {
-    std::vector<Line*> lines = group.getLines();
+    std::vector<const Line*> lines = group.getLines();
     for( size_t i = 0; i < lines.size() && i < 100; ++i )
     {
         drawLine(dst, *lines[i], color);
@@ -210,7 +233,7 @@ void ImageProcessor::drawLineGroup(cv::Mat& dst, const LineGroup& group, const c
 void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
 {
     std::vector<cv::Vec2f> rawLines;
-    cv::HoughLines(edges, rawLines, 1, CV_PI/180, 100, 0, 0 );
+    cv::HoughLines(edges, rawLines, 1, CV_PI / 180, 100, 0, 0 );
     drawRawLines(lines, rawLines);
 
     buildLineArray(rawLines);
@@ -295,8 +318,8 @@ void ImageProcessor::findLineIntersections(const std::vector<LineGroup>& orienta
 
 void ImageProcessor::findLineIntersections(const LineGroup& firstGroup, const LineGroup otherGroup)
 {
-    const std::vector<Line*> firstLines = firstGroup.getLines();
-    const std::vector<Line*> otherLines = otherGroup.getLines();
+    const std::vector<const Line*> firstLines = firstGroup.getLines();
+    const std::vector<const Line*> otherLines = otherGroup.getLines();
 
     for (int i = 0; i < firstLines.size(); ++i)
     {
