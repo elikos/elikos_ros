@@ -17,7 +17,8 @@ MessageHandler::MessageHandler()
     : it_(nh_)
 {
     imageSub_ = it_.subscribe("/camera/image_raw", 1, &MessageHandler::cameraCallback, this);
-    imuSub_ = nh_.subscribe("/mavros/imu/data", 1, &MessageHandler::imuCallback, this);
+    //imuSub_ = nh_.subscribe("/mavros/imu/data", 1, &MessageHandler::imuCallback, this);
+    poseSub_ = nh_.subscribe("/mavros/local_position/pose", 1, &MessageHandler::poseCallback, this);
 }
 
 MessageHandler::~MessageHandler()
@@ -65,12 +66,24 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
 void MessageHandler::imuCallback(const sensor_msgs::ImuConstPtr msg)
 {
-    tf::Quaternion q;
     tf::Vector3 v;
     tf::vector3MsgToTF(msg->linear_acceleration, v);
     v.normalize();
     std::cout << v << std::endl;
     ImageProcessor::getInstance()->imuOrientation_ = {v.x(), v.y(), v.z()};
+}
+
+void MessageHandler::poseCallback(const geometry_msgs::PoseStampedConstPtr& msg)
+{
+    tf::Vector3 v(1.0, 0.0, 0.0);
+    tf::Quaternion q;
+    tf::quaternionMsgToTF(msg->pose.orientation, q);
+    tf::Matrix3x3 m(q);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+
+    ImageProcessor::getInstance()->roll_ = roll;
+    ImageProcessor::getInstance()->pitch_ = pitch;
 }
 
 }

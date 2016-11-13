@@ -9,6 +9,7 @@
 
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/Imu.h>
+#include <geometry_msgs/PoseStamped.h>
 
 namespace localization {
 
@@ -26,12 +27,14 @@ private:
 
     void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
     void imuCallback(const sensor_msgs::ImuConstPtr msg);
+    void poseCallback(const geometry_msgs::PoseStampedConstPtr& msg);
 
     static MessageHandler* instance_;
     ros::NodeHandle nh_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber imageSub_;
     ros::Subscriber imuSub_;
+    ros::Subscriber poseSub_;
 };
 
 }
