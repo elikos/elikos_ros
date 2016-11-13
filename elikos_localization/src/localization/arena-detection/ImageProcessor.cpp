@@ -86,31 +86,43 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
     cv::Mat blured;
     cv::GaussianBlur(undistorted, blured, cv::Size(7,7), 8, 8);
     
-
     double xy = Eigen::Vector2f(imuOrientation_.x(), imuOrientation_.y()).norm();
     double theta = std::abs(atanf(xy / imuOrientation_.z())); 
     std::cout << theta << std::endl;
 
-    Eigen::Vector2f src[4] {{0.0, 0.0}, {0.0, 480.0}, {640.0, 480.0}, {640.0, 0.0}};
-    Eigen::Vector2f dst[4] {{0.0, 0.0}, {0.0, 480.0}, {640.0, 480.0}, {640.0, 0.0}};
+    double height = 480.0;
+    double width = 640.0;
 
-    Eigen::Vector2f leftRotationPoint = { 0.0, 240.0 };
-    Eigen::Vector2f rightRotationPoint = { 640.0, 240.0 };
-    Eigen::Vector2f center = { 320.0, 240.0 };
+    Eigen::Vector2f src[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
+    Eigen::Vector2f dst[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
+    
+    Eigen::Vector2f leftRotationPoint = { 0.0, height / 2.0 };
+    Eigen::Vector2f rightRotationPoint = { width, height / 2.0 };
+    Eigen::Vector2f center = { width / 2.0, height / 2.0 };
+
+    Eigen::Vector2f t = transform_.translate(leftRotationPoint, -center);
+    Eigen::Vector2f r = transform_.rotate(t, -roll_);
+    leftRotationPoint = transform_.translate(r, center);
+
+    t = transform_.translate(rightRotationPoint, -center);
+    r = transform_.rotate(t, -roll_);
+    rightRotationPoint = transform_.translate(r, center);
 
     for (int i = 0; i < 4; ++i) {
-
+        Eigen::Vector2f translated = transform_.translate(dst[i], -center);
+        Eigen::Vector2f rotated = transform_.rotate(translated, -roll_);
+        dst[i] = transform_.translate(rotated, center);
     }
 
     for (int i = 0; i < 2; ++i) {
         Eigen::Vector2f translated = transform_.translate(dst[i], -leftRotationPoint);
-        Eigen::Vector2f rotated = transform_.rotate(translated, theta);
+        Eigen::Vector2f rotated = transform_.rotate(translated, -pitch_);
         src[i] = transform_.translate(rotated, leftRotationPoint);
     }
 
     for (int i = 2; i < 4; ++i) {
         Eigen::Vector2f translated = transform_.translate(dst[i], -rightRotationPoint);
-        Eigen::Vector2f rotated = transform_.rotate(translated, -theta);
+        Eigen::Vector2f rotated = transform_.rotate(translated, pitch_);
         src[i] = transform_.translate(rotated, rightRotationPoint);
     }
 

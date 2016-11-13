@@ -26,7 +26,8 @@ public:
 
     void perspectiveToOrtho(double theta);
 
-    double theta_ = 0.0;
+    double roll_ = 0.0;
+    double pitch_ = 0.0;
 
     Eigen::Vector3f imuOrientation_ = { 1.0, 0.0, 0.0 };
 
