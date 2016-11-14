@@ -1,5 +1,6 @@
-#topic: "/cam1/camera/image_raw"
-topic: "/camera/image_raw"
+#topic: "/cam1/camera/image_raw" #Real Stuff
+topic: "/camera/image_raw" #RosBag
+#topic: "/elikos_ffmv_bottom_camera/image_raw" #Simulation Gazebo
 frame: "elikos_ffmv_bottom"
 calibration: false
 file_in: "calibration_initial"

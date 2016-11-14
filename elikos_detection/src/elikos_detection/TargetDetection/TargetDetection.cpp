@@ -36,22 +36,55 @@ void TargetDetection::updateHSV(int color, int h, int s, int v, int delta)
     case 1: //GREEN
         *(detection.getGreen()->H_MIN) = (int)(h - 0.15 * delta);
         *(detection.getGreen()->H_MAX) = (int)(h + 0.15 * delta);
-        
+
         *(detection.getGreen()->S_MIN) = (int)(s - 1.1 * delta);
         *(detection.getGreen()->S_MAX) = (int)(s + 1.1 * delta);
-        
+
         *(detection.getGreen()->V_MIN) = v - 2 * delta;
         *(detection.getGreen()->V_MAX) = v + 2 * delta;
         break;
     case 2: //WHITE
         *(detection.getWhite()->H_MIN) = (int)(h - 0.15 * delta);
         *(detection.getWhite()->H_MAX) = (int)(h + 0.15 * delta);
-        
+
         *(detection.getWhite()->S_MIN) = (int)(s - 1.1 * delta);
         *(detection.getWhite()->S_MAX) = (int)(s + 1.1 * delta);
-        
+
         *(detection.getWhite()->V_MIN) = v - 2 * delta;
         *(detection.getWhite()->V_MAX) = v + 2 * delta;
+        break;
+    }
+}
+
+void TargetDetection::updateHSV(int color, int h_max, int h_min, int s_max, int s_min, int v_max, int v_min)
+{
+    switch (color)
+    {
+    case 0: //RED
+        *(detection.getRed()->H_MIN) = h_min;
+        *(detection.getRed()->H_MAX) = h_max;
+
+        *(detection.getRed()->S_MIN) = s_min;
+        *(detection.getRed()->S_MAX) = s_max;
+
+        *(detection.getRed()->V_MIN) = v_min;
+        *(detection.getRed()->V_MAX) = v_max;
+        break;
+    case 1: //GREEN
+        *(detection.getGreen()->H_MIN) = h_min;
+        *(detection.getGreen()->H_MAX) = h_max;
+        *(detection.getGreen()->S_MIN) = s_min;
+        *(detection.getGreen()->S_MAX) = s_max;
+        *(detection.getGreen()->V_MIN) = v_min;
+        *(detection.getGreen()->V_MAX) = v_max;
+        break;
+    case 2: //WHITE
+        *(detection.getWhite()->H_MIN) = h_min;
+        *(detection.getWhite()->H_MAX) = h_max;
+        *(detection.getWhite()->S_MIN) = s_min;
+        *(detection.getWhite()->S_MAX) = s_max;
+        *(detection.getWhite()->V_MIN) = v_min;
+        *(detection.getWhite()->V_MAX) = v_max;
         break;
     }
 }

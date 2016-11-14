@@ -31,8 +31,8 @@ MessageHandler::MessageHandler(string calibrationFilename) : it_(nh_)
   pub_ = nh_.advertise<elikos_ros::RobotRawArray>("elikos_robot_raw_array", 1);
   // pubImages_ = it_.advertise(inputTopic + "/debug", 1); //debug only
   pubImages_ = it_.advertise(RCdebugTopic, 1); //debug only
-                                                        //pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
-                                                        //pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
+                                               //pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
+                                               //pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
 
   detection_.loadCalibration(calibrationFilename);
 
@@ -44,7 +44,6 @@ MessageHandler::MessageHandler(string calibrationFilename) : it_(nh_)
       detection_.createTrackbars();
   }
 }
-
 MessageHandler::~MessageHandler()
 {
 }
@@ -75,6 +74,12 @@ void MessageHandler::dispatchCommand(const std_msgs::String::ConstPtr &input)
     int color, h, s, v, delta;
     iss >> color >> h >> s >> v >> delta;
     detection_.updateHSV(color, h, s, v, delta);
+  }
+  else if (command == "updHSV")
+  {
+    int color, h_max, h_min, s_max, s_min, v_max, v_min;
+    iss >> color >> h_max >> h_min >> s_max >> s_min >> v_max >> v_min;
+    detection_.updateHSV(color, h_max, h_min, s_max, s_min, v_max, v_min);
   }
 }
 

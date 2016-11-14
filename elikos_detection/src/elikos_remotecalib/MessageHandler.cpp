@@ -8,12 +8,17 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 
-MessageHandler::MessageHandler(WindowCV &calibWindow) : it_(nh_), calibWindow_(calibWindow)
+MessageHandler::MessageHandler(CalibrationWindow &calibWindow, ControlWindow &controlWindow) : imgTransport_(nh_), 
+calibWindow_(calibWindow), controlWindow_(controlWindow)
 {
-    std::string inputTopic, outputTopic;
-    if (!nh_.getParam("/" + ros::this_node::getName() + "/RClistenTopic", inputTopic))
+    std::string inputTopic, outputTopic, debugInputTopic;
+    if (!nh_.getParam("/" + ros::this_node::getName() + "/topic", inputTopic))
     {
-        inputTopic = "elikos_remotecalib_listenTopic";
+        inputTopic = "";
+    }
+    if (!nh_.getParam("/" + ros::this_node::getName() + "/RClistenTopic", debugInputTopic))
+    {
+        debugInputTopic = "elikos_remotecalib_listenTopic";
     }
 
     if (!nh_.getParam("/" + ros::this_node::getName() + "/RCpublishTopic", outputTopic))
@@ -21,20 +26,37 @@ MessageHandler::MessageHandler(WindowCV &calibWindow) : it_(nh_), calibWindow_(c
         outputTopic = "elikos_remotecalib_publishTopic";
     }
 
-    is_ = it_.subscribe(inputTopic, 1, &MessageHandler::dispatchMessage, this);
+    imgSubscriber_ = imgTransport_.subscribe(inputTopic, 1, &MessageHandler::dispatchMessage, this);
+    debugimgSubscriber_ = imgTransport_.subscribe(debugInputTopic, 1, &MessageHandler::dispatchDebugImage, this);
+
     pub_ = nh_.advertise<std_msgs::String>(outputTopic, 1);
-    pubImages_ = it_.advertise(outputTopic + "/debug", 1); //debug only
+    pubImages_ = imgTransport_.advertise(outputTopic + "/debug", 1); //debug only
 }
 
 MessageHandler::~MessageHandler()
 {
 }
 
+void MessageHandler::dispatchDebugImage(const sensor_msgs::ImageConstPtr &input)
+{
+    cv::Mat currentImage = cv_bridge::toCvCopy(input, sensor_msgs::image_encodings::BGR8)->image;
+
+    // cv::Mat outputImage;
+    std::string outputCommand;
+
+    //DO DATA PARSING AND COMMAND OUTPUT
+    if (controlWindow_.update(currentImage, outputCommand))
+    {
+        std_msgs::String msg; //OutputCommand to be sent
+        msg.data = outputCommand;
+        pub_.publish(msg);
+    }
+}
 void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
 {
     cv::Mat currentImage = cv_bridge::toCvCopy(input, sensor_msgs::image_encodings::BGR8)->image;
 
-    cv::Mat outputImage;
+    // cv::Mat outputImage;
     std::string outputCommand;
 
     //DO DATA PARSING AND COMMAND OUTPUT
@@ -46,8 +68,8 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
     }
 
     //debug images
-    sensor_msgs::ImagePtr msgDebug = cv_bridge::CvImage(std_msgs::Header(), "bgr8", outputImage).toImageMsg();
-    pubImages_.publish(msgDebug);
+    // sensor_msgs::ImagePtr msgDebug = cv_bridge::CvImage(std_msgs::Header(), "bgr8", outputImage).toImageMsg();
+    // pubImages_.publish(msgDebug);
     //publishing data
 }
 
