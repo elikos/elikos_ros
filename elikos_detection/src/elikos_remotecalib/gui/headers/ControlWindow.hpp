@@ -5,18 +5,16 @@
 
 #include "WindowCV.hpp"
 
-
 class ControlWindow : public WindowCV
 {
 private:
-  static const int VALUES_SIZE = 6;
-  const std::string keys_[VALUES_SIZE] = {"H+", "H-", "S+", "S-", "V+", "V-"};
-  const int maxValues_[VALUES_SIZE] = {180, 180, 255, 255, 255, 255};
+  static const int VALUES_SIZE = 9;
+  const std::string keys_[VALUES_SIZE] = {"H+", "H-", "S+", "S-", "V+", "V-", "Pre-Erode", "Dilations", "Post-Erode"};
+  const int maxValues_[VALUES_SIZE] = {180, 180, 255, 255, 255, 255, 255, 255, 255};
 
   int values_[VALUES_SIZE] = {};
   bool shouldUpdeteNextFrame = false;
   int *selectedColor_ = 0;
-
 
 public:
   ControlWindow(std::string);
@@ -35,8 +33,6 @@ public:
       cv::setTrackbarPos(keys_[i], windowName_, values_[i]);
     }
   }
-
-
 
   void setValues(const int &h, const int &s, const int &v, const int &delta)
   {
