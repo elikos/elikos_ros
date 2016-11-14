@@ -75,11 +75,11 @@ void MessageHandler::dispatchCommand(const std_msgs::String::ConstPtr &input)
     iss >> color >> h >> s >> v >> delta;
     detection_.updateHSV(color, h, s, v, delta);
   }
-  else if (command == "updHSV")
+  else if (command == "updHSV")//Met a jour le HSV et les pre_erode, dilate et post_erode
   {
-    int color, h_max, h_min, s_max, s_min, v_max, v_min;
-    iss >> color >> h_max >> h_min >> s_max >> s_min >> v_max >> v_min;
-    detection_.updateHSV(color, h_max, h_min, s_max, s_min, v_max, v_min);
+    int color, h_max, h_min, s_max, s_min, v_max, v_min,preErode, dilate, postErode;
+    iss >> color >> h_max >> h_min >> s_max >> s_min >> v_max >> v_min >> preErode >> dilate >> postErode;
+    detection_.fetchRemoteParams(color, h_max, h_min, s_max, s_min, v_max, v_min, preErode, dilate, postErode);
   }
 }
 

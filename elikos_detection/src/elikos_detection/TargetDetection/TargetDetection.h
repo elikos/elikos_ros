@@ -24,7 +24,7 @@ class TargetDetection
     void loadCalibration(string filename) { detection.loadCalibration(filename); }
 
     void updateHSV(int color, int h, int s, int v, int delta);
-    void updateHSV(int color, int h_max, int h_min, int s_max, int s_min, int v_max, int v_min);
+    void fetchRemoteParams(int color, int h_max, int h_min, int s_max, int s_min, int v_max, int v_min,int preErode, int dilate, int postErode);
 
     //Getters for the output vector of the algorithm
     vector<RobotDesc> getRobots();

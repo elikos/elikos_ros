@@ -56,7 +56,7 @@ void TargetDetection::updateHSV(int color, int h, int s, int v, int delta)
     }
 }
 
-void TargetDetection::updateHSV(int color, int h_max, int h_min, int s_max, int s_min, int v_max, int v_min)
+void TargetDetection::fetchRemoteParams(int color, int h_max, int h_min, int s_max, int s_min, int v_max, int v_min, int preErode, int dilate, int postErode)
 {
     switch (color)
     {
@@ -69,22 +69,38 @@ void TargetDetection::updateHSV(int color, int h_max, int h_min, int s_max, int 
 
         *(detection.getRed()->V_MIN) = v_min;
         *(detection.getRed()->V_MAX) = v_max;
+
+        *(detection.getRed()->PRE_EROSIONS) = preErode;
+        *(detection.getRed()->DILATIONS) = dilate;
+        *(detection.getRed()->POST_EROSIONS) = postErode;
         break;
     case 1: //GREEN
         *(detection.getGreen()->H_MIN) = h_min;
         *(detection.getGreen()->H_MAX) = h_max;
+
         *(detection.getGreen()->S_MIN) = s_min;
         *(detection.getGreen()->S_MAX) = s_max;
+
         *(detection.getGreen()->V_MIN) = v_min;
         *(detection.getGreen()->V_MAX) = v_max;
+
+        *(detection.getGreen()->PRE_EROSIONS) = preErode;
+        *(detection.getGreen()->DILATIONS) = dilate;
+        *(detection.getGreen()->POST_EROSIONS) = postErode;
         break;
     case 2: //WHITE
         *(detection.getWhite()->H_MIN) = h_min;
         *(detection.getWhite()->H_MAX) = h_max;
+
         *(detection.getWhite()->S_MIN) = s_min;
         *(detection.getWhite()->S_MAX) = s_max;
+
         *(detection.getWhite()->V_MIN) = v_min;
         *(detection.getWhite()->V_MAX) = v_max;
+
+        *(detection.getWhite()->PRE_EROSIONS) = preErode;
+        *(detection.getWhite()->DILATIONS) = dilate;
+        *(detection.getWhite()->POST_EROSIONS) = postErode;
         break;
     }
 }
