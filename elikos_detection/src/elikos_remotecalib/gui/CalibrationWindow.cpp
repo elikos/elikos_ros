@@ -72,9 +72,7 @@ void CalibrationWindow::mouseCallBack(int event, int x, int y, int flags)
 
         cv::Mat testHSV;
         cv::cvtColor(currentFrame_, testHSV, CV_BGR2HSV);
-        cv::Mat subImgHSV = (testHSV)(cv::Rect(testHSV.size().width - x, y, 5, 5));
-
-        cv::Vec3b &ColHSVTest = testHSV.at<cv::Vec3b>(y, testHSV.size().width - x);
+        cv::Mat subImgHSV = (testHSV)(cv::Rect( x, y, 5, 5));
 
         ////////////////////////////////////////////////////////////////////////////////
         int tS = 0, tV = 0;
@@ -84,7 +82,7 @@ void CalibrationWindow::mouseCallBack(int event, int x, int y, int flags)
             for (int j = 0; j < 5; ++j)
             {
                 cv::Vec3b &tC = subImgHSV.at<cv::Vec3b>(j, subImgHSV.size().width - i);
-                const ValeurPolaire &valH = valeursH[(int)(tC(0))];
+                const ValeurPolaire &valH = PolarCoordTable::get()[(int)(tC(0))];
                 tHCos += valH.cosinus;
                 tHSin += valH.sinus;
                 tS += (int)(tC(1));
@@ -94,7 +92,7 @@ void CalibrationWindow::mouseCallBack(int event, int x, int y, int flags)
         tHCos /= 25.0;
         tHSin /= 25.0;
 
-        H_ = getAngle(tHCos, tHSin);
+        H_ = PolarCoordTable::get().getAngle(tHCos, tHSin);
         S_ = tS / 25;
         V_ = tV / 25;
         ////////////////////////////////////////////////////////////////////////////////

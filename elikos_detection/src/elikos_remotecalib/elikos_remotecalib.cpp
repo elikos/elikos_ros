@@ -1,4 +1,3 @@
-#include <memory>
 #include "MessageHandler.h"
 #include "gui/headers/CalibrationWindow.hpp"
 #include "gui/headers/ControlWindow.hpp"
@@ -12,7 +11,6 @@ int main(int argc, char *argv[])
     ControlWindow controlWindow("Control Window");
     
     calibWindow.setControlWindow(&controlWindow);
-    calibWindow.initValeursH();
 
     MessageHandler messageHandler(calibWindow, controlWindow);
 

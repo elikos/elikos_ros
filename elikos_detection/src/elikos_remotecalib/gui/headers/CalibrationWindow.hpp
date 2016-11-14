@@ -21,6 +21,68 @@ struct ValeurPolaire
   }
 };
 
+/**
+ * Classe qui gere les coordonés polaires et les angles. Évite de calculer des sin et des cos 
+ */
+class PolarCoordTable
+{
+private:
+  static const size_t MAX_ANGLE = 180;
+  const double MUL_TO_RAD = M_PI / 90.0;
+  const double MUL_FROM_RAD = 1 / MUL_TO_RAD;
+  ValeurPolaire valeurs[MAX_ANGLE];
+
+  PolarCoordTable()
+  {
+    for (size_t i = 0; i < MAX_ANGLE; ++i)
+    {
+      valeurs[i] = {std::cos(i * MUL_TO_RAD), std::sin(i * MUL_TO_RAD)};
+    }
+  }
+
+public:
+    /**
+     * Retourne une valeur polaire de l'angle fourni.
+     *
+     * \param angle [in] Un angle compris entre [0, 180[ (180 = 2*PI)
+     * \return la valeur polaire de l'angle
+     */
+    const ValeurPolaire& operator[](unsigned char angle)
+    {
+      return valeurs[angle];
+    }
+
+    /**
+     * Retourne la table de coordonés polaires avec laquelle travailler
+     *
+     * \return l'instance de la table de coordonés polaire
+     */
+    static PolarCoordTable& get()
+    {
+      static PolarCoordTable sinTable;
+      return sinTable;
+    }
+
+    /**
+     * Retourne l'angle depuis son sin et son cos
+     * 
+     * \param cos [in] le cosinus de l'angle (en radians)
+     * \param sin [in] le sinus de l'angle (en radians)
+     * 
+     * \return l'angle qui correspond au sinus et cosinus, entre 0 et 180 (pour OpenCV)
+     */
+    unsigned char getAngle(const double &cos, const double &sin)
+    {
+      double atan = std::atan2(sin, cos);
+      if (atan < 0)
+      {
+        atan += 2 * M_PI;
+      }
+      unsigned char angle = (unsigned char)(atan * MUL_FROM_RAD);
+      return angle;
+    }
+};
+
 class CalibrationWindow : public WindowCV
 {
 public:
@@ -33,13 +95,6 @@ public:
   };
 
   void setControlWindow(ControlWindow *);
-  void initValeursH()
-  {
-    for (int i = 0; i < 180; ++i)
-    {
-      valeursH[i] = {std::cos(i * 3.14159265359 / 90.0), std::sin(i * 3.14159265359 / 90.0)};
-    }
-  }
 
 private:
   int DELTA = 35;
@@ -50,17 +105,6 @@ private:
   bool needToUpdate = false;
   bool paused = false;
   ControlWindow *ctrlWindow_ = 0;
-  ValeurPolaire valeursH[180];
-  
-  /* Utility used for getting the right Hue value */
-  unsigned char getAngle(const double &cos, const double &sin)
-  {
-    double atan = std::atan2(sin, cos);
-    atan += (atan < 0) ? 2 * 3.1415926535897 : 0;
-    unsigned char angle = (unsigned char)(atan * 90 / 3.1415926535897);
-    //    double angle = (atan * 90 / 3.14159265359);
-    return angle;
-  }
 
 public:
   virtual void mouseCallBack(int event, int x, int y, int flags);
