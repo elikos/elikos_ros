@@ -6,6 +6,7 @@ void ControlWindow::onTrackBar(int a, void *param)
 {
     ControlWindow *win = reinterpret_cast<ControlWindow *>(param);
     win->shouldUpdeteNextFrame = true;
+    win->calibWindow_->updatePreviewColors();
 }
 
 ControlWindow::ControlWindow(std::string windowName) : WindowCV(windowName)
