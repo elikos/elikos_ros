@@ -2,6 +2,8 @@
 #define CALIBRATION_WINDOW
 
 #include "WindowCV.hpp"
+
+class CalibrationWindow;
 #include "ControlWindow.hpp"
 #include <cmath>
 
@@ -87,6 +89,7 @@ class CalibrationWindow : public WindowCV
 {
 public:
   CalibrationWindow(std::string);
+  ~CalibrationWindow();
   virtual bool update(cv::Mat &input, std::string &outputCommand);
   virtual void keyPressed(char key);
   void forceUpdate()
@@ -97,16 +100,24 @@ public:
   void setControlWindow(ControlWindow *);
 
 private:
+  static const int MAX_COLOR_NUM = 3;
+
   int DELTA = 35;
-  int H_;
-  int S_;
-  int V_;
+  int H_[MAX_COLOR_NUM] = {};
+  int S_[MAX_COLOR_NUM] = {};
+  int V_[MAX_COLOR_NUM] = {};
   int selectedColor_ = 0;
+
+  int selectedColorSquareWidth_ = 50;
+  cv::Mat* outputImage = 0;
+
   bool needToUpdate = false;
   bool paused = false;
+  
   ControlWindow *ctrlWindow_ = 0;
 
-public:
-  virtual void mouseCallBack(int event, int x, int y, int flags);
+  public:
+    virtual void mouseCallBack(int event, int x, int y, int flags);
+    void updatePreviewColors();
 };
 #endif

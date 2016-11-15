@@ -4,6 +4,8 @@
 #include <string>
 
 #include "WindowCV.hpp"
+class ControlWindow;
+#include "CalibrationWindow.hpp"
 
 class ControlWindow : public WindowCV
 {
@@ -15,6 +17,8 @@ private:
   int values_[VALUES_SIZE] = {};
   bool shouldUpdeteNextFrame = false;
   int *selectedColor_ = 0;
+
+  CalibrationWindow* calibWindow_ = 0;
 
 public:
   ControlWindow(std::string);
@@ -44,6 +48,9 @@ public:
     values_[5] = v - 2 * delta;
     updateTrackBars();
   }
+
+  int* getValues(){return values_;}
+  void setCalibWindow(CalibrationWindow* calibWindow_){this->calibWindow_ = calibWindow_;}
 
 public:
   virtual void mouseCallBack(int event, int x, int y, int flags);

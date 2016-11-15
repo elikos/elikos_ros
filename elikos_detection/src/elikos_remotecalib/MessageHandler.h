@@ -1,9 +1,11 @@
 #ifndef MESSAGE_HANDLER_REMOTECALIB
 #define MESSAGE_HANDLER_REMOTECALIB
+
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
+
 #include "gui/headers/CalibrationWindow.hpp"
 #include "gui/headers/ControlWindow.hpp"
 
@@ -16,7 +18,10 @@ public:
     void dispatchDebugImage(const sensor_msgs::ImageConstPtr &input);
     void saveCalibration();
 
+    
+    const std::string& IO_IMG_ENCODING_TYPE = sensor_msgs::image_encodings::BGR8;
 private:
+
     ros::NodeHandle nh_;
     image_transport::ImageTransport imgTransport_;
 

@@ -39,7 +39,7 @@ MessageHandler::~MessageHandler()
 
 void MessageHandler::dispatchDebugImage(const sensor_msgs::ImageConstPtr &input)
 {
-    cv::Mat currentImage = cv_bridge::toCvCopy(input, sensor_msgs::image_encodings::BGR8)->image;
+    cv::Mat currentImage = cv_bridge::toCvCopy(input, IO_IMG_ENCODING_TYPE)->image;
 
     // cv::Mat outputImage;
     std::string outputCommand;
@@ -54,7 +54,7 @@ void MessageHandler::dispatchDebugImage(const sensor_msgs::ImageConstPtr &input)
 }
 void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
 {
-    cv::Mat currentImage = cv_bridge::toCvCopy(input, sensor_msgs::image_encodings::BGR8)->image;
+    cv::Mat currentImage = cv_bridge::toCvCopy(input, IO_IMG_ENCODING_TYPE)->image;
 
     // cv::Mat outputImage;
     std::string outputCommand;
