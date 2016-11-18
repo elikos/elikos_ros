@@ -1,9 +1,11 @@
 <launch>
   <arg name="camera_name" default="elikos_ffmv_bottom"/>  
   <arg name="cfg" default="elikos_ffmv_bottom"/>
-  <arg name="cfgRC" default="remotecalib"/>
+  <arg name="cfgRC" default="remotecalib"/>-	
+  <arg name="calib_dir" default="$(find elikos_detection)/cfg/calibrations/" />
 
   <node name="$(arg camera_name)_detection" pkg="elikos_detection" type="elikos_detection">
+      <param name="dir" value="$(arg calib_dir)" />
       <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg cfg).yaml" />
       <rosparam command="load" file="$(find elikos_detection)/cfg/$(arg cfgRC).yaml" />
   </node>
