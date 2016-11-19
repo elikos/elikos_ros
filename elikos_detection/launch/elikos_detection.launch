@@ -3,7 +3,7 @@
   <arg name="cfg" default="elikos_ffmv_bottom"/>
   <arg name="cfgRC" default="remotecalib"/>
 
-  <node name="$(arg camera_name)_detection" pkg="elikos_detection" type="elikos_detection">
+  <node name="$(arg camera_name)_detection" pkg="elikos_detection" type="elikos_detection" output="screen">
       <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg cfg).yaml" />
       <rosparam command="load" file="$(find elikos_detection)/cfg/$(arg cfgRC).yaml" />
   </node>

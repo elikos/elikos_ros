@@ -2,7 +2,7 @@
 topic: "/camera/image_raw" #RosBag
 #topic: "/elikos_ffmv_bottom_camera/image_raw" #Simulation Gazebo
 frame: "elikos_ffmv_bottom"
-calibration: false
+calibration: true
 file_in: "calibration_initial"
 file_out: "new_calibration"
 dir: "$(find elikos_detection)/cfg/calibrations"

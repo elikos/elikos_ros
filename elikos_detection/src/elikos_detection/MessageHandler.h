@@ -22,7 +22,9 @@ private:
     ros::NodeHandle nh_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber is_;
+    
     ros::Publisher pub_;
+    ros::Publisher pubCommandOutput_;
     ros::Subscriber subRC_;
     TargetDetection detection_;
 

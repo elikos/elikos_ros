@@ -33,6 +33,8 @@ public:
 
     void saveCalibration(string filename);
     void loadCalibration(string filename);
+    std::string getAllParams();
+    
 private:
     // ATTRIBUTES
     //Data used in computation
@@ -46,10 +48,12 @@ private:
     vector<RobotDesc> redObjects;
     vector<Vec3f> circles;
     vector<Mat> thresholds;
+
     WhiteColor whiteColor_;
     RedColor redColor_;
     GreenColor greenColor_;
-	int maxID;
+	
+    int maxID;
     //Final data (can be fetched by other classes through the getters)
     vector<RobotDesc> foundRobots;
     vector<RobotDesc> foundObstacles;

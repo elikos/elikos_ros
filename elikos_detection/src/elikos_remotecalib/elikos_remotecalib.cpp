@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
         else if (key == 's')
         {
             messageHandler.saveCalibration();
+        }else if (key == 'r'){
+            messageHandler.sendRefreshCommand();
         }
         r.sleep();
     }

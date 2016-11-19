@@ -30,6 +30,11 @@ public:
     selectedColor_ = &selectedColor;
   }
 
+  const int getSelectedColor() const
+  {
+    return *selectedColor_;
+  }
+
   void updateTrackBars()
   {
     for (int i = 0; i < VALUES_SIZE; ++i)

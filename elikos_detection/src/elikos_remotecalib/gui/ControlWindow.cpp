@@ -15,6 +15,8 @@ ControlWindow::ControlWindow(std::string windowName) : WindowCV(windowName)
     {
         cv::createTrackbar(keys_[i], windowName_, &values_[i], maxValues_[i], onTrackBar, this);
     }
+
+    cv::moveWindow(windowName_, 100, 100);
 }
 
 bool ControlWindow::update(cv::Mat &input, std::string &outputCommand)
@@ -50,6 +52,7 @@ bool ControlWindow::update(cv::Mat &input, std::string &outputCommand)
 }
 void ControlWindow::keyPressed(char key)
 {
+   
 }
 void ControlWindow::mouseCallBack(int event, int x, int y, int flags)
 {
