@@ -5,7 +5,6 @@ frame: "elikos_ffmv_bottom"
 calibration: true
 file_in: "calibration_initial"
 file_out: "new_calibration"
-dir: "$(find elikos_detection)/cfg/calibrations"
 cam_height: 480
 cam_width: 640
 cam_fov_v: 63
