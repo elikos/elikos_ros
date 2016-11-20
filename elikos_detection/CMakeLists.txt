@@ -72,6 +72,7 @@ add_executable( elikos_remotecalib
    src/elikos_remotecalib/elikos_remotecalib.cpp
    src/elikos_remotecalib/MessageHandler.h
    src/elikos_remotecalib/MessageHandler.cpp
+   src/elikos_remotecalib/Colors.hpp
    src/elikos_remotecalib/gui/headers/WindowCV.hpp
    src/elikos_remotecalib/gui/headers/CalibrationWindow.hpp
    src/elikos_remotecalib/gui/headers/ControlWindow.hpp

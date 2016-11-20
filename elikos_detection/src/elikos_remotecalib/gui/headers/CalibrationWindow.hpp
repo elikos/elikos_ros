@@ -1,12 +1,18 @@
 #ifndef CALIBRATION_WINDOW
 #define CALIBRATION_WINDOW
 
+#include <cmath>
+#include <string>
+
+#include "../../Colors.hpp"
 #include "WindowCV.hpp"
 
 class CalibrationWindow;
 #include "ControlWindow.hpp"
-#include <cmath>
 
+/**
+ * Une structure qui contient des valeurs polaires, c'est-à-dire le sinus et le cosinius d'un angle
+ */
 struct ValeurPolaire
 {
   double cosinus = 0.0;
@@ -100,15 +106,16 @@ public:
   void setControlWindow(ControlWindow *);
 
 private:
-  static const int MAX_COLOR_NUM = 3;
 
-  int DELTA = 35;
-  int H_[MAX_COLOR_NUM] = {};
-  int S_[MAX_COLOR_NUM] = {};
-  int V_[MAX_COLOR_NUM] = {};
-  int selectedColor_ = 0;
+  int DELTA_ = 35;
+  int H_[NUMBER_OF_COLORS] = {};
+  int S_[NUMBER_OF_COLORS] = {};
+  int V_[NUMBER_OF_COLORS] = {};
+  Color selectedColor_ = RED;
 
-  int selectedColorSquareWidth_ = 50;
+  int prewiewWidth_ = 50;
+  const std::string COLOR_PREVIEW_NAME_[NUMBER_OF_COLORS] = {"R","G","W"};
+
   cv::Mat* outputImage = 0;
 
   bool needToUpdate = false;
