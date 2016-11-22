@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     MessageHandler messageHandler(calibWindow, controlWindow);
 
-    ros::Rate r(30);
+    ros::Rate refreshRate(30);
 
     // Endless loop
     while (ros::ok())
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         calibWindow.keyPressed(key);
         controlWindow.keyPressed(key);
 
-        if (key == 27)
+        if (key == 27)//Escape
         {
             ros::shutdown();
         }
@@ -36,6 +36,6 @@ int main(int argc, char *argv[])
         }else if (key == 'r'){
             messageHandler.sendRefreshCommand();
         }
-        r.sleep();
+        refreshRate.sleep();
     }
 }

@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "../../Colors.hpp"
 #include "WindowCV.hpp"
 class ControlWindow;
 #include "CalibrationWindow.hpp"
@@ -15,8 +16,8 @@ private:
   const int maxValues_[VALUES_SIZE] = {180, 180, 255, 255, 255, 255, 255, 255, 255};
 
   int values_[VALUES_SIZE] = {};
-  bool shouldUpdeteNextFrame = false;
-  int *selectedColor_ = 0;
+  bool shouldUpdeteNextFrame_ = false;
+  Color *selectedColor_ = 0;
 
   CalibrationWindow* calibWindow_ = 0;
 
@@ -25,12 +26,12 @@ public:
   virtual bool update(cv::Mat &input, std::string &outputCommand);
   virtual void keyPressed(char key);
 
-  void setSelectedColor(int &selectedColor)
+  void setSelectedColor(Color &selectedColor)
   {
     selectedColor_ = &selectedColor;
   }
 
-  const int getSelectedColor() const
+  const Color getSelectedColor() const
   {
     return *selectedColor_;
   }

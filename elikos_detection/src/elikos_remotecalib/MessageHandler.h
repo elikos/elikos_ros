@@ -31,7 +31,7 @@ public:
   const std::string &IO_IMG_ENCODING_TYPE = sensor_msgs::image_encodings::BGR8;
 
 private:
-  ros::NodeHandle nh_;
+  ros::NodeHandle nodeHandle_;
   image_transport::ImageTransport imgTransport_;
 
   image_transport::Subscriber imgSubscriber_;
@@ -43,7 +43,6 @@ private:
   CalibrationWindow &calibWindow_;
   ControlWindow &controlWindow_;
 
-  image_transport::Publisher pubImages_; //debug only
 };
 
 #endif /// MESSAGE_HANDLER_REMOTECALIB

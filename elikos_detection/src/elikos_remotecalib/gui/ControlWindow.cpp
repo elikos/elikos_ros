@@ -5,7 +5,7 @@ static const std::string strSelectedColor = "Selected Color: ";
 void ControlWindow::onTrackBar(int a, void *param)
 {
     ControlWindow *win = reinterpret_cast<ControlWindow *>(param);
-    win->shouldUpdeteNextFrame = true;
+    win->shouldUpdeteNextFrame_ = true;
     win->calibWindow_->updatePreviewColors();
 }
 
@@ -23,19 +23,19 @@ bool ControlWindow::update(cv::Mat &input, std::string &outputCommand)
 {
     switch (*selectedColor_)
     {
-    case 0: //Red
+    case RED:
         cv::putText(input, strSelectedColor + "RED", cv::Point(10, 50), cv::FONT_HERSHEY_PLAIN, 1.0, CV_RGB(255, 0, 0), 2.0);
         break;
-    case 1: //Green
+    case GREEN:
         cv::putText(input, strSelectedColor + "GREEN", cv::Point(10, 50), cv::FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);
         break;
-    case 2: //White
+    case WHITE:
         cv::putText(input, strSelectedColor + "WHITE", cv::Point(10, 50), cv::FONT_HERSHEY_PLAIN, 1.0, CV_RGB(255, 255, 255), 2.0);
         break;
     }
     cv::imshow(windowName_, input);
 
-    if (shouldUpdeteNextFrame)
+    if (shouldUpdeteNextFrame_)
     {
         std::stringstream ss;
         ss << "updHSV\t" << *selectedColor_;
@@ -44,7 +44,7 @@ bool ControlWindow::update(cv::Mat &input, std::string &outputCommand)
             ss << "\t" << values_[i];
         }
         outputCommand = ss.str();
-        shouldUpdeteNextFrame = false;
+        shouldUpdeteNextFrame_ = false;
         return true;
     }
 
