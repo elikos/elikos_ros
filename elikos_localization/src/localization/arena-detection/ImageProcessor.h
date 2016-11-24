@@ -29,7 +29,7 @@ public:
     double roll_ = 0.0;
     double pitch_ = 0.0;
 
-    Eigen::Vector3f imuOrientation_ = { 1.0, 0.0, 0.0 };
+    Eigen::Vector3d imuOrientation_ = { 1.0, 0.0, 0.0 };
 
 private:
 

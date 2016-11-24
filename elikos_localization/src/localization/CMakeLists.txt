@@ -1,5 +1,3 @@
-
-
 add_executable(elikos_localization
     Localizaton.cpp
     MessageHandler.h
@@ -7,9 +5,7 @@ add_executable(elikos_localization
     context/Line.cpp
     context/Line.h
     context/LineGroup.cpp
-    context/LineGroup.h)
-
-add_library(arena-detection 
+    context/LineGroup.h
     arena-detection/ImageProcessor.h 
     arena-detection/ImageProcessor.cpp 
     arena-detection/PerspectiveTransform.h 
@@ -20,13 +16,10 @@ add_library(arena-detection
     arena-detection/algorithm/RANSAC.cpp)
 
 include_directories(${catkin_INCLUDE_DIRS}
-                    ${OpenCV_LIBS}
                     context
                     arena-detection
                     arena-detection/algorithm)
 
 target_link_libraries(elikos_localization 
-    arena-detection
     ${catkin_LIBRARIES} 
     ${OpenCV_LIBS})
-
