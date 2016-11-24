@@ -22,8 +22,6 @@ catkin_package(
   CATKIN_DEPENDS image_transport cv_bridge geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros
 )
 
-
-
 add_subdirectory(src/localization)
 
 

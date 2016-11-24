@@ -70,7 +70,7 @@ void MessageHandler::imuCallback(const sensor_msgs::ImuConstPtr msg)
     tf::vector3MsgToTF(msg->linear_acceleration, v);
     v.normalize();
     std::cout << v << std::endl;
-    ImageProcessor::getInstance()->imuOrientation_ = {v.x(), v.y(), v.z()};
+    ImageProcessor::getInstance()->imuOrientation_ = { v.x(), v.y(), v.z() };
 }
 
 void MessageHandler::poseCallback(const geometry_msgs::PoseStampedConstPtr& msg)

@@ -53,16 +53,7 @@ ImageProcessor::ImageProcessor()
     cv::namedWindow("trackers", 1);
     cvCreateTrackbar("C_W", "trackers", &C_W, 1000);
     cvCreateTrackbar("C_H", "trackers", &C_H, 1000);
-    /*
-    cvCreateTrackbar("p1x", "trackers", &corners[0].x, 640);
-    cvCreateTrackbar("p1y", "trackers", &corners[0].y, 480);
-    cvCreateTrackbar("p2x", "trackers", &corners[1].x, 640);
-    cvCreateTrackbar("p2y", "trackers", &corners[1].y, 480);
-    cvCreateTrackbar("p3x", "trackers", &corners[2].x, 640);
-    cvCreateTrackbar("p3y", "trackers", &corners[2].y, 480);
-    cvCreateTrackbar("p4x", "trackers", &corners[3].x, 640);
-    cvCreateTrackbar("p4y", "trackers", &corners[3].y, 480);
-    */
+    
 }
 
 void undistort(const cv::Mat& src, cv::Mat& undistorted)
@@ -126,23 +117,15 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
         src[i] = transform_.translate(rotated, rightRotationPoint);
     }
 
-    /*
-    src[0].x += n_W * 320.0 * tanf(theta_) / 2.0;
-    src[3].x -= n_W * 320.0 * tanf(theta_) / 2.0;
+    cv::circle(undistorted, { (int)(src[0].x()), (int)(src[0].y()) }, 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, { (int)(src[1].x()), (int)(src[1].y()) }, 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, { (int)(src[2].x()), (int)(src[2].y()) }, 5, cv::Scalar(0, 0 ,0), -1);
+    cv::circle(undistorted, { (int)(src[3].x()), (int)(src[3].y()) }, 5, cv::Scalar(0, 0 ,0), -1);
 
-    src[0].y += n_H * 240.0 * tanf(theta_) / 2.0;
-    src[3].y += n_H * 240.0 * tanf(theta_) / 2.0;
-    */
-
-    cv::circle(undistorted, { src[0].x(), src[0].y() }, 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, { src[1].x(), src[1].y() }, 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, { src[2].x(), src[2].y() }, 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, { src[3].x(), src[3].y() }, 5, cv::Scalar(0, 0 ,0), -1);
-
-    cv::circle(undistorted, { dst[0].x(), dst[0].y() }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, { dst[1].x(), dst[1].y() }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, { dst[2].x(), dst[2].y() }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, { dst[3].x(), dst[3].y() }, 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, { (int)(dst[0].x()), (int)(dst[0].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, { (int)(dst[1].x()), (int)(dst[1].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, { (int)(dst[2].x()), (int)(dst[2].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
+    cv::circle(undistorted, { (int)(dst[3].x()), (int)(dst[3].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
 
     cv::Point2f tSrc[4], tDst[4];
     for ( int i = 0; i < 4; ++i) {
