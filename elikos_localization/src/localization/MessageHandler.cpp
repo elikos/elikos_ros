@@ -41,17 +41,19 @@ void MessageHandler::freeInstance()
 void MessageHandler::lookForMessages()
 {
     cv::VideoCapture vc;
-    vc.open("/home/olivier/Videos/cam_gauche.mp4");
+    std::string videoPath = "/home/olivier/Videos/cam_bas.mp4";
+    vc.open(videoPath.c_str());
     if (!vc.isOpened())
     {
+        std::cerr << "Could not open " << videoPath << std::endl;
         exit(-1);
     }
     ros::Rate rate(30);
     while(ros::ok())
     {
-        //cv::Mat frame;
-        //vc >> frame;
-        //ImageProcessor::getInstance()->processImage(frame);
+        cv::Mat frame;
+        vc >> frame;
+        ImageProcessor::getInstance()->processImage(frame);
 
         ros::spinOnce();
         rate.sleep();
