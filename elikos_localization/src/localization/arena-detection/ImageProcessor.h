@@ -9,6 +9,7 @@
 #include "Line.h"
 #include <Eigen/Core>
 #include "PerspectiveTransform.h"
+#include "GridFitting.h"
 
 namespace localization 
 {
@@ -50,6 +51,8 @@ private:
     cv::Point corners[4];
 
     PerspectiveTransform transform_;
+    GridFitting gridFitting_;
+
     int C_W;
     int C_H;
 

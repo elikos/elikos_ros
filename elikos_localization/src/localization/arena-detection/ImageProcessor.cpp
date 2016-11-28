@@ -9,6 +9,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "GridFitting.h"
 #include "LineGroup.h"
 #include "DBSCAN.h"
 
@@ -165,7 +166,7 @@ void ImageProcessor::processImage(cv::Mat input)
     mLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     intersectionGroup_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
 
-    //findLines(edges, lines_);
+    findLines(edges, lines_);
 
     cv::imshow("input", preProcessed);
     cv::imshow("mLines", mLines_);
@@ -232,9 +233,7 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
     drawRawLines(lines, rawLines);
 
     buildLineArray(rawLines);
-    transform_.perspectiveTransformFromLines(lineCluster_);
     analyzeLineCluster();
-
 }
 
 void ImageProcessor::analyzeLineCluster()
@@ -257,8 +256,12 @@ void ImageProcessor::analyzeLineCluster()
     std::vector<Vector> intersections;
     parseClusterMemberships(clusterMemberships, intersections);
 
+    gridFitting_.findBestGridModel(intersections);
+
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
     drawIntersection(intersections, cv::Scalar(0, 0, 150));
+
+
 
     /*
 

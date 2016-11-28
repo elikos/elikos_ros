@@ -2,18 +2,22 @@ add_executable(elikos_localization
     Localizaton.cpp
     MessageHandler.h
     MessageHandler.cpp
-    context/Line.cpp
-    context/Line.h
-    context/LineGroup.cpp
-    context/LineGroup.h
     arena-detection/ImageProcessor.h 
     arena-detection/ImageProcessor.cpp 
     arena-detection/PerspectiveTransform.h 
     arena-detection/PerspectiveTransform.cpp
-    arena-detection/algorithm/DBSCAN.cpp
+    arena-detection/GridFitting.h
+    arena-detection/GridFitting.cpp
     arena-detection/algorithm/DBSCAN.h
+    arena-detection/algorithm/DBSCAN.cpp
     arena-detection/algorithm/RANSAC.h
-    arena-detection/algorithm/RANSAC.cpp)
+    arena-detection/algorithm/RANSAC.cpp
+    context/Line.cpp
+    context/Line.h
+    context/LineGroup.cpp
+    context/LineGroup.h
+    context/Grid.h
+    context/Grid.cpp)
 
 include_directories(${catkin_INCLUDE_DIRS}
                     context
