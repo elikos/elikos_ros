@@ -7,6 +7,7 @@
 
 #include <opencv2/highgui/highgui.hpp>
 #include <Eigen/Core>
+#include <opencv2/core/core.hpp>
 
 namespace localization
 {
@@ -18,14 +19,17 @@ public:
     Line(float rho, const Eigen::Vector2f& orientation);
     Line(const Eigen::Vector2f& centroid, const Eigen::Vector2f& orientation);
 
-    void inverseOrientation();
-    void rotate(float rotation);
-    bool findIntersection(const Line& line, Eigen::Vector2f& intersection) const;
-
     inline float getRho() const;
     inline float getTheta() const;
     inline Eigen::Vector2f getOrientation() const;
     inline Eigen::Vector2f getCentroid() const;
+
+    void inverseOrientation();
+    void rotate(float rotation);
+    bool findIntersection(const Line& line, Eigen::Vector2f& intersection) const;
+
+
+    void draw(cv::Mat& image) const;
 
 private:
     float rho_;

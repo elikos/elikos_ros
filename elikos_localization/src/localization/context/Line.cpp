@@ -71,4 +71,14 @@ bool Line::findIntersection(const Line& otherLine, Vector& intersection) const
     return true;
 }
 
+void Line::draw(cv::Mat& image) const
+{
+    cv::Point2f pt1, pt2;
+    pt1.x = cvRound(centroid_.x() + 1000 * (orientation_.x()));
+    pt1.y = cvRound(centroid_.y() + 1000 * (orientation_.y()));
+    pt2.x = cvRound(centroid_.x() - 1000 * (orientation_.x()));
+    pt2.y = cvRound(centroid_.y() - 1000 * (orientation_.y()));
+    cv::line(image, pt1, pt2, cv::Scalar(100, 100, 100), 1, CV_AA);
+}
+
 };
