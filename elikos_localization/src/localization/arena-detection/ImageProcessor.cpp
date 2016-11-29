@@ -80,7 +80,6 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
     
     double xy = Eigen::Vector2f(imuOrientation_.x(), imuOrientation_.y()).norm();
     double theta = std::abs(atanf(xy / imuOrientation_.z())); 
-    std::cout << theta << std::endl;
 
     double height = 480.0;
     double width = 640.0;
@@ -171,7 +170,7 @@ void ImageProcessor::processImage(cv::Mat input)
     cv::imshow("input", preProcessed);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(30);
+    cv::waitKey(0);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -230,7 +229,7 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
 {
     std::vector<cv::Vec2f> rawLines;
     cv::HoughLines(edges, rawLines, 1, CV_PI / 180, 100, 0, 0 );
-    drawRawLines(lines, rawLines);
+    //drawRawLines(lines, rawLines);
 
     buildLineArray(rawLines);
     analyzeLineCluster();
@@ -256,7 +255,9 @@ void ImageProcessor::analyzeLineCluster()
     std::vector<Vector> intersections;
     parseClusterMemberships(clusterMemberships, intersections);
 
-    gridFitting_.findBestGridModel(intersections);
+    Grid grid = gridFitting_.findBestGridModel(intersections);
+    grid.draw(lines_);
+    std::cout << grid.getDistance() << std::endl;
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
     drawIntersection(intersections, cv::Scalar(0, 0, 150));
