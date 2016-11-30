@@ -44,7 +44,7 @@ private:
     std::vector<Line> lineCluster_;
     std::vector<Line> detectedLines_;
 
-    cv::Mat lines_, lineGroups_, mLines_, intersectionGroup_;
+    cv::Mat lines_, mLines_, preProcessed_;
 
     std::vector<Eigen::Vector2f> intersections_;
 

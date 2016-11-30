@@ -154,23 +154,20 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
 void ImageProcessor::processImage(cv::Mat input)
 {
     image_ = input;
-    cv::Mat preProcessed;
-    preProcess(input, preProcessed);
+    preProcess(input, preProcessed_);
 
     cv::Mat edges;
-    findEdges(preProcessed, edges);
+    findEdges(preProcessed_, edges);
 
     lines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
-    lineGroups_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     mLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
-    intersectionGroup_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
 
     findLines(edges, lines_);
 
-    cv::imshow("input", preProcessed);
+    cv::imshow("input", preProcessed_);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(0);
+    cv::waitKey(30);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -256,25 +253,10 @@ void ImageProcessor::analyzeLineCluster()
     parseClusterMemberships(clusterMemberships, intersections);
 
     Grid grid = gridFitting_.findBestGridModel(intersections);
-    grid.draw(lines_);
-    std::cout << grid.getDistance() << std::endl;
+    grid.draw(preProcessed_);
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
     drawIntersection(intersections, cv::Scalar(0, 0, 150));
-
-
-
-    /*
-
-    for (int i = 0; i < orientationGroup.size(); ++i)
-    {
-        int r = (i % 3 == 0) ? 100 : 0;
-        int g = (i % 3 == 1) ? 100 : 0;
-        int b = (i % 3 == 2) ? 100 : 0;
-
-        drawLineGroup(lineGroups_, orientationGroup[i], cv::Scalar(r, g, b));
-    }
-     */
 }
 
 void ImageProcessor::parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<Vector>& intersections)
