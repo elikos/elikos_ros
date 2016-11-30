@@ -167,7 +167,7 @@ void ImageProcessor::processImage(cv::Mat input)
     cv::imshow("input", preProcessed_);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(30);
+    cv::waitKey(0);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -304,8 +304,14 @@ void ImageProcessor::findLineIntersections(const LineGroup& firstGroup, const Li
 
     for (int i = 0; i < firstLines.size(); ++i)
     {
+        const Line* firstLine = firstLines[i];
         for (int j = 0; j < otherLines.size(); j++)
         {
+            const Line* otherLine = otherLines[j];
+            if (std::abs(otherLine->getOrientation().dot(firstLine->getOrientation())) > 0.8)
+            {
+                continue;
+            }
             Vector intersection;
             if (firstLines[i]->findIntersection(*otherLines[j], intersection)) {
                 Eigen::AlignedBox<float, 2> box(Vector(0.0, 0.0), Vector(640.0, 480.0));
@@ -321,12 +327,20 @@ void ImageProcessor::findLineIntersections()
 {
     intersections_.clear();
     for (size_t i = 0; i < lineCluster_.size(); ++i) {
-        const Line& line = lineCluster_[i];
-        for (size_t j = i + 1; j < lineCluster_.size() - 1; j = ((j + 1) % lineCluster_.size())) {
+        const Line& firstLine = lineCluster_[i];
+        for (size_t j = i + 1; j < lineCluster_.size() - 1; j = ((j + 1) % lineCluster_.size())) 
+        {
+            const Line& otherLine = lineCluster_[j];
+            if (std::abs(otherLine.getOrientation().dot(firstLine.getOrientation())) < 0.2)
+            {
+                continue;
+            }
             Vector intersection;
-            if (line.findIntersection(lineCluster_[j], intersection)) {
+            if (firstLine.findIntersection(lineCluster_[j], intersection)) 
+            {
                 Eigen::AlignedBox<float, 2> box(Vector(0.0, 0.0), Vector(640.0, 480.0));
-                if (box.contains(intersection)) {
+                if (box.contains(intersection)) 
+                {
                     intersections_.push_back(intersection);
                 }
             }
