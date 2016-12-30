@@ -38,6 +38,7 @@ ImageProcessor::ImageProcessor()
     // Init undistortion map
     start_ = ros::Time::now();
 
+    file_.open("altitude.txt");
     cv::Mat distortedCamera = (cv::Mat_<float>(3,3) << 422.918640,    0.000000,    350.119451,
             0.000000,  423.121112,    236.380265,
             0.000000,    0.000000,      1.000000);
@@ -52,9 +53,12 @@ ImageProcessor::ImageProcessor()
     cv::namedWindow("trackers", 1);
     cvCreateTrackbar("C_W", "trackers", &C_W, 1000);
     cvCreateTrackbar("C_H", "trackers", &C_H, 1000);
-    
 }
 
+ImageProcessor::~ImageProcessor()
+{
+    file_.close();
+}
 void undistort(const cv::Mat& src, cv::Mat& undistorted)
 {
 }
@@ -166,7 +170,7 @@ void ImageProcessor::processImage(const cv::Mat& input, ros::Time stamp)
     cv::imshow("input", preProcessed_);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(30);
+    cv::waitKey(1);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -258,6 +262,7 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
         grid.draw(preProcessed_);
         double height = 423.0 / grid.getDistance();
         std::cout << stamp - start_ << " " << height << std::endl;
+        file_ << stamp - start_ << " " << height << std::endl;
     }
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
