@@ -10,12 +10,12 @@ namespace localization
 
 using Vector = Eigen::Vector2f;
 
-Grid GridFitting::findBestGridModel(const std::vector<Eigen::Vector2f>& intersections)
+bool GridFitting::findBestGridModel(const std::vector<Eigen::Vector2f>& intersections, Grid& bestGrid)
 {
-    debug++;
-    if (debug == 16) {
-        int t = 0;
+    if (intersections.size() < 2) {
+        return false;
     }
+
     // copy dataset into pointcloud.
     pcl::PointCloud<pcl::PointXY>::Ptr pc(new pcl::PointCloud<pcl::PointXY>());
     for (int i = 0; i < intersections.size(); ++i) 
@@ -28,7 +28,6 @@ Grid GridFitting::findBestGridModel(const std::vector<Eigen::Vector2f>& intersec
     std::vector<pcl::PointXY, Eigen::aligned_allocator<pcl::PointXY>>& points = pc->points;
 
     double bestWeight = 10000000;
-    Grid bestGrid;
     for (int i = 0; i < intersections.size(); ++i) 
     {
         // Search for a model;
@@ -46,7 +45,7 @@ Grid GridFitting::findBestGridModel(const std::vector<Eigen::Vector2f>& intersec
             bestGrid = grid;
         }
     }
-    return bestGrid;
+    return true;
 }
 
 }

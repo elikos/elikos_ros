@@ -36,6 +36,8 @@ ImageProcessor::ImageProcessor()
 {
     srand(time(NULL));
     // Init undistortion map
+    start_ = ros::Time::now();
+
     cv::Mat distortedCamera = (cv::Mat_<float>(3,3) << 422.918640,    0.000000,    350.119451,
             0.000000,  423.121112,    236.380265,
             0.000000,    0.000000,      1.000000);
@@ -147,7 +149,7 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
     preProcessed = thresholded;
 }
 
-void ImageProcessor::processImage(cv::Mat input)
+void ImageProcessor::processImage(const cv::Mat& input, ros::Time stamp)
 {
     image_ = input;
     preProcess(input, preProcessed_);
@@ -159,11 +161,12 @@ void ImageProcessor::processImage(cv::Mat input)
     mLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
 
     findLines(edges, lines_);
+    analyzeLineCluster(stamp);
 
     cv::imshow("input", preProcessed_);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(0);
+    cv::waitKey(30);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -225,16 +228,17 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
     //drawRawLines(lines, rawLines);
 
     buildLineArray(rawLines);
-    analyzeLineCluster();
 }
 
-void ImageProcessor::analyzeLineCluster()
+void ImageProcessor::analyzeLineCluster(ros::Time stamp)
 {
-    if (lineCluster_.size() == 0) {
+    if (lineCluster_.size() == 0) 
+    {
         return;
     }
 
-    for (int i = 0; i < lineCluster_.size(); ++i) {
+    for (int i = 0; i < lineCluster_.size(); ++i) 
+    {
         drawLine(mLines_, lineCluster_[i], cv::Scalar(100, 100, 100));
     }
 
@@ -248,8 +252,13 @@ void ImageProcessor::analyzeLineCluster()
     std::vector<Vector> intersections;
     parseClusterMemberships(clusterMemberships, intersections);
 
-    Grid grid = gridFitting_.findBestGridModel(intersections);
-    grid.draw(preProcessed_);
+    Grid grid;
+    bool gridFound = gridFitting_.findBestGridModel(intersections, grid);
+    if (gridFound) {
+        grid.draw(preProcessed_);
+        double height = 423.0 / grid.getDistance();
+        std::cout << stamp - start_ << " " << height << std::endl;
+    }
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
     drawIntersection(intersections, cv::Scalar(0, 0, 150));

@@ -6,6 +6,7 @@
 #define LOCALIZATION_IMAGE_PROCESSOR_H
 
 #include <opencv2/core/core.hpp>
+#include <ros/time.h>
 #include "Line.h"
 #include <Eigen/Core>
 #include "PerspectiveTransform.h"
@@ -23,7 +24,7 @@ public:
     static ImageProcessor* getInstance();
     static void freeInstance();
 
-    void processImage(cv::Mat input);
+    void processImage(const cv::Mat& input, ros::Time stamp);
 
     void perspectiveToOrtho(double theta);
 
@@ -56,11 +57,14 @@ private:
     int C_W;
     int C_H;
 
+    ros::Time start_;
+    
+
     void preProcess(const cv::Mat& raw, cv::Mat& preProcessed);
     void findEdges(const cv::Mat& src, cv::Mat& edges);
     void findLines(const cv::Mat& edges, cv::Mat& line);
 
-    void analyzeLineCluster();
+    void analyzeLineCluster(ros::Time stamp);
     void buildLineArray(const std::vector<cv::Vec2f>& lineCluster);
 
     void groupByOrientation(std::vector<LineGroup>& orientationGroup, const std::vector<Line>& lines);

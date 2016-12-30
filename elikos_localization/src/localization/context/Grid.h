@@ -18,7 +18,6 @@ public:
 
     double weightIntersectionsFitness(const std::vector<Eigen::Vector2f>& intersections,
                                       const Eigen::Vector2f& imageCenter);
-
     void draw(cv::Mat& image) const;
 
 private:
@@ -31,7 +30,7 @@ private:
 
 inline double Grid::getDistance() const
 {
-    return distance_;
+return distance_;
 }
 
 }

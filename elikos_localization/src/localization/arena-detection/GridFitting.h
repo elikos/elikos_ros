@@ -12,7 +12,8 @@ public:
     GridFitting() = default;
     ~GridFitting() = default;
 
-    Grid findBestGridModel(const std::vector<Eigen::Vector2f>& intersections);
+    bool findBestGridModel(const std::vector<Eigen::Vector2f>& intersections, Grid& grid);
+
 private:
     int debug = 0;
 };
