@@ -11,6 +11,7 @@
 #include <Eigen/Core>
 #include "PerspectiveTransform.h"
 #include "GridFitting.h"
+#include <fstream>
 
 namespace localization 
 {
@@ -58,7 +59,7 @@ private:
     int C_H;
 
     ros::Time start_;
-    
+    std::ofstream file_;
 
     void preProcess(const cv::Mat& raw, cv::Mat& preProcessed);
     void findEdges(const cv::Mat& src, cv::Mat& edges);
@@ -83,7 +84,7 @@ private:
     void drawLineGroup(cv::Mat& dst, const LineGroup& group, const cv::Scalar& color);
 
     ImageProcessor();
-    ~ImageProcessor() = default;
+    ~ImageProcessor();
 };
 
 }
