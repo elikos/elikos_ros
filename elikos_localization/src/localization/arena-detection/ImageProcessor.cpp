@@ -197,6 +197,7 @@ void ImageProcessor::drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& 
     pt2.x = cvRound(centroid.x() - 1000 * (orientation.x()));
     pt2.y = cvRound(centroid.y() - 1000 * (orientation.y()));
     cv::line(dst, pt1, pt2, color, 1, CV_AA);
+    cv::circle(dst, cv::Point2f(centroid.x(), centroid.y()), 5, cv::Scalar(150, 0, 150), -1);
 }
 
 void ImageProcessor::drawRawLines(cv::Mat &dst, const std::vector<cv::Vec2f> &raw_lines) const {
@@ -229,7 +230,6 @@ void ImageProcessor::findLines(const cv::Mat& edges, cv::Mat& lines)
 {
     std::vector<cv::Vec2f> rawLines;
     cv::HoughLines(edges, rawLines, 1, CV_PI / 180, 100, 0, 0 );
-    //drawRawLines(lines, rawLines);
 
     buildLineArray(rawLines);
 }
@@ -246,8 +246,16 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
         drawLine(mLines_, lineCluster_[i], cv::Scalar(100, 100, 100));
     }
 
+    lineDetection_.filterLineCluster(lineCluster_);
+    const std::vector<Line>& filteredLines = lineDetection_.getFilteredLines();
+    for (int i = 0; i < filteredLines.size(); ++i) 
+    {
+        drawLine(mLines_, filteredLines[i], cv::Scalar(150, 0, 150));
+    }
+
     std::vector<LineGroup> orientationGroup;
     groupByOrientation(orientationGroup, lineCluster_);
+
 
     findLineIntersections(orientationGroup);
     std::vector<int> clusterMemberships;
@@ -262,7 +270,6 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
         grid.draw(preProcessed_);
         double height = 423.0 / grid.getDistance();
         std::cout << stamp - start_ << " " << height << std::endl;
-        file_ << stamp - start_ << " " << height << std::endl;
     }
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
@@ -399,10 +406,11 @@ void ImageProcessor::groupByOrientation(std::vector<LineGroup>& group, Line& lin
 
 void ImageProcessor::buildLineArray(const std::vector<cv::Vec2f>& lineCluster)
 {
+    Eigen::AlignedBox<float, 2> frame(Vector(0.0, 0.0), Vector(640.0, 480.0));
     lineCluster_.clear();
     for (int i = 0; i < lineCluster.size(); ++i)
     {
-        lineCluster_.push_back(Line(lineCluster[i][0], lineCluster[i][1]));
+        lineCluster_.push_back(Line(lineCluster[i][0], lineCluster[i][1], frame));
     }
 }
 

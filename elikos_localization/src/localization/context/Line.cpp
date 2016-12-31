@@ -16,6 +16,19 @@ Line::Line(float rho, float theta)
     centroid_ = Vector(rho * cos(theta), rho * sin(theta));
 }
 
+Line::Line(float rho, float theta, const Eigen::AlignedBox<float, 2>& frame)
+    : Line(rho, theta)
+{
+
+    Eigen::Vector2f center = { (frame.min().x() + frame.max().x()) / 2.0,
+                               (frame.min().y() + frame.max().y()) / 2.0 };
+
+    Eigen::Vector2f dc = center - centroid_;
+
+    double proj = dc.dot(orientation_);
+    centroid_ += proj * orientation_;
+}
+
 Line::Line(float rho, const Vector& orientation)
     : rho_(std::abs(rho)), orientation_(orientation.normalized())
 {
@@ -69,6 +82,11 @@ bool Line::findIntersection(const Line& otherLine, Vector& intersection) const
         return false;
     }
     return true;
+}
+
+bool Line::isCollateral(const Line& line, double threshold) const
+{
+    return std::abs(line.getOrientation().dot(orientation_)) < threshold;
 }
 
 void Line::draw(cv::Mat& image) const
