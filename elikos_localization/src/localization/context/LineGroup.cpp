@@ -9,36 +9,47 @@
 namespace localization
 {
 
-LineGroup::LineGroup(Line& line)
+LineGroup::LineGroup(const Line& line)
     : avgOrientation_(line.getOrientation()),
-      avgRho_(line.getRho())
+      avgRho_(line.getRho()),
+      avgCentroid_(line.getCentroid())
 {
     lines_.push_back(&line);
 }
 
 void LineGroup::add(const Line& line)
 {
-    float product = line.getOrientation().dot(avgOrientation_);
+    Eigen::Vector2f orientation = line.getOrientation();
+    float product = orientation.dot(avgOrientation_);
     if (product < 0)
     {
-        //line.inverseOrientation();
+        orientation = -orientation;
     }
 
     avgOrientation_ *= (double)(lines_.size());
     avgRho_ *= (double)(lines_.size());
+    avgCentroid_ *= (double)(lines_.size());
 
     lines_.push_back(&line);
 
-    avgOrientation_ += line.getOrientation();
+    avgOrientation_ += orientation;
     avgRho_ += line.getRho();
+    avgCentroid_ += line.getCentroid();
 
     avgOrientation_ /= (double)(lines_.size());
     avgRho_ /= (double)(lines_.size());
+    avgCentroid_ /= (double)(lines_.size());
+
+}
+
+bool LineGroup::isCollateral(const Line& line, double threshold)
+{
+    return std::abs(line.getOrientation().dot(avgOrientation_)) > threshold;
 }
 
 Line LineGroup::convertToLine() const
 {
-    return Line(avgRho_, avgOrientation_);
+    return Line(avgCentroid_, avgOrientation_);
 }
 
 }

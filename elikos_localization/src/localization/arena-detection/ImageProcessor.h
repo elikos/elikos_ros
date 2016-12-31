@@ -5,13 +5,16 @@
 #ifndef LOCALIZATION_IMAGE_PROCESSOR_H
 #define LOCALIZATION_IMAGE_PROCESSOR_H
 
-#include <opencv2/core/core.hpp>
+#include <fstream>
 #include <ros/time.h>
-#include "Line.h"
+#include <opencv2/core/core.hpp>
 #include <Eigen/Core>
+
 #include "PerspectiveTransform.h"
 #include "GridFitting.h"
-#include <fstream>
+#include "LineDetection.h"
+
+#include "Line.h"
 
 namespace localization 
 {
@@ -53,6 +56,7 @@ private:
     cv::Point corners[4];
 
     PerspectiveTransform transform_;
+    LineDetection lineDetection_;
     GridFitting gridFitting_;
 
     int C_W;

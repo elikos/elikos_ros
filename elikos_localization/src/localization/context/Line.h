@@ -5,9 +5,13 @@
 #ifndef LOCALIZATION_ARENA_LINE_H
 #define LOCALIZATION_ARENA_LINE_H
 
+#include <array>
+
 #include <opencv2/highgui/highgui.hpp>
-#include <Eigen/Core>
 #include <opencv2/core/core.hpp>
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 namespace localization
 {
@@ -16,6 +20,7 @@ class Line
 {
 public:
     Line(float rho, float theta);
+    Line(float rho, float theta, const Eigen::AlignedBox<float, 2>& frame);
     Line(float rho, const Eigen::Vector2f& orientation);
     Line(const Eigen::Vector2f& centroid, const Eigen::Vector2f& orientation);
 
@@ -27,7 +32,7 @@ public:
     void inverseOrientation();
     void rotate(float rotation);
     bool findIntersection(const Line& line, Eigen::Vector2f& intersection) const;
-
+    bool isCollateral(const Line& line, double threshold) const;
 
     void draw(cv::Mat& image) const;
 
@@ -36,6 +41,7 @@ private:
     float theta_;
     Eigen::Vector2f orientation_;
     Eigen::Vector2f centroid_;
+    std::array<Eigen::Vector2f, 2> endings_;
 
     Line() = default;
 };
@@ -62,4 +68,4 @@ inline Eigen::Vector2f Line::getCentroid() const
 
 }
 
-#endif //ELIKOS_LOCALIZATION_ARENALINE_H
+#endif // ELIKOS_LOCALIZATION_ARENA_LINE_H

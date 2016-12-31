@@ -6,6 +6,8 @@ add_executable(elikos_localization
     arena-detection/ImageProcessor.cpp 
     arena-detection/PreProcessing.h
     arena-detection/PreProcessing.cpp
+    arena-detection/LineDetection.h
+    arena-detection/LineDetection.cpp
     arena-detection/PerspectiveTransform.h 
     arena-detection/PerspectiveTransform.cpp
     arena-detection/GridFitting.h

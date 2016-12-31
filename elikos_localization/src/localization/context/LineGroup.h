@@ -15,7 +15,7 @@ class Line;
 class LineGroup
 {
 public:
-    LineGroup(Line& v);
+    LineGroup(const Line& v);
     void add(const Line& v);
 
     Line convertToLine() const;
@@ -24,9 +24,13 @@ public:
     inline const Eigen::Vector2f& getAvgOrientation() const;
     inline double getAvgRho() const;
 
+    bool isCollateral(const Line& line, double threshold);
+
 private :
     Eigen::Vector2f avgOrientation_;
     float avgRho_;
+    Eigen::Vector2f avgCentroid_;
+    float avgTheta_;
 
     std::vector<const Line*> lines_;
 
