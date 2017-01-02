@@ -15,6 +15,7 @@
 #include "LineDetection.h"
 
 #include "Line.h"
+#include "AbstractKalmanFilter.h"
 
 namespace localization 
 {

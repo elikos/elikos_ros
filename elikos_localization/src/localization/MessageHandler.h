@@ -26,8 +26,8 @@ private:
     ~MessageHandler();
 
     void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
-    void imuCallback(const sensor_msgs::ImuConstPtr msg);
-    void poseCallback(const geometry_msgs::PoseStampedConstPtr& msg);
+    void imuCallback(const sensor_msgs::Imu& msg);
+    void poseCallback(const geometry_msgs::PoseStamped& msg);
 
     static MessageHandler* instance_;
     ros::NodeHandle nh_;

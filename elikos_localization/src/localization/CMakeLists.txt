@@ -16,18 +16,26 @@ add_executable(elikos_localization
     arena-detection/algorithm/DBSCAN.cpp
     arena-detection/algorithm/RANSAC.h
     arena-detection/algorithm/RANSAC.cpp
-    context/Line.cpp
-    context/Line.h
-    context/LineGroup.cpp
-    context/LineGroup.h
+    arena-tracking/filter/KalmanFilter.h
+    arena-tracking/filter/AbstractKalmanFilter.h
+    context/intersection/DetectedIntersection.cpp
+    context/intersection/DetectedIntersection.h
+    context/line/Line.cpp
+    context/line/Line.h
+    context/line/LineGroup.cpp
+    context/line/LineGroup.h
     context/Grid.h
     context/Grid.cpp)
 
 include_directories(${catkin_INCLUDE_DIRS}
-                    context
                     arena-detection
-                    arena-detection/algorithm)
+                    arena-detection/algorithm
+                    context
+                    context/intersection
+                    context/line
+                    arena-tracking
+                    arena-tracking/filter)
 
 target_link_libraries(elikos_localization 
-    ${catkin_LIBRARIES} 
-    ${OpenCV_LIBS})
+                      ${catkin_LIBRARIES} 
+                      ${OpenCV_LIBS})

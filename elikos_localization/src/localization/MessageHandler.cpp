@@ -18,8 +18,8 @@ MessageHandler::MessageHandler()
     : it_(nh_)
 {
     imageSub_ = it_.subscribe("/camera/image_raw", 1, &MessageHandler::cameraCallback, this);
-    //imuSub_ = nh_.subscribe("/mavros/imu/data", 1, &MessageHandler::imuCallback, this);
-    poseSub_ = nh_.subscribe("/mavros/local_position/pose", 1, &MessageHandler::poseCallback, this);
+    imuSub_ = nh_.subscribe("mavros/imu/data", 1, &MessageHandler::imuCallback, this);
+    poseSub_ = nh_.subscribe("mavros/local_position/pose", 1, &MessageHandler::poseCallback, this);
 }
 
 MessageHandler::~MessageHandler()
@@ -52,9 +52,9 @@ void MessageHandler::lookForMessages()
     ros::Rate rate(30);
     while(ros::ok())
     {
-        cv::Mat frame;
-        vc >> frame;
-        ImageProcessor::getInstance()->processImage(frame, ros::Time::now());
+        //cv::Mat frame;
+        //vc >> frame;
+        //ImageProcessor::getInstance()->processImage(frame, ros::Time::now());
 
         ros::spinOnce();
         rate.sleep();
@@ -67,26 +67,27 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     ImageProcessor::getInstance()->processImage(input, msg->header.stamp);
 }
 
-void MessageHandler::imuCallback(const sensor_msgs::ImuConstPtr msg)
+void MessageHandler::imuCallback(const sensor_msgs::Imu& msg)
 {
     tf::Vector3 v;
-    tf::vector3MsgToTF(msg->linear_acceleration, v);
+    tf::vector3MsgToTF(msg.linear_acceleration, v);
     v.normalize();
-    std::cout << v << std::endl;
     ImageProcessor::getInstance()->imuOrientation_ = { v.x(), v.y(), v.z() };
+    std::cout << "imu" << std::endl;
 }
 
-void MessageHandler::poseCallback(const geometry_msgs::PoseStampedConstPtr& msg)
+void MessageHandler::poseCallback(const geometry_msgs::PoseStamped& msg)
 {
     tf::Vector3 v(1.0, 0.0, 0.0);
     tf::Quaternion q;
-    tf::quaternionMsgToTF(msg->pose.orientation, q);
+    tf::quaternionMsgToTF(msg.pose.orientation, q);
     tf::Matrix3x3 m(q);
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
 
     ImageProcessor::getInstance()->roll_ = roll;
     ImageProcessor::getInstance()->pitch_ = pitch;
+    std::cout << "pose" << std::endl;
 }
 
 }
