@@ -34,14 +34,9 @@
 
 ## Launch files 
 * `simulation.launch`
-
-*Descritpion*  
     * Lance une simulation rviz
  
- 
 * `gazebo_sim.launch`
-
-*Description*  
     * Lance une simulation gazebo, le firmware du pixhawk et mavros
     * `world` : Le chemin vers le fichier .world qui décrit l'environnement
     * `sdf` : Le chemin vers le fichier .sdf qui décrit le véhicule simulé
