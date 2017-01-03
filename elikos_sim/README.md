@@ -34,19 +34,26 @@
 
 ## Launch files 
 * `simulation.launch`
+
 *Descritpion*
+
     * Lance une simulation rviz
         
 * `gazebo_sim.launch`
+
 *Description*
+
     * Lance une simulation gazebo, le firmware du pixhawk et mavros
     * `world` : Le chemin vers le fichier .world qui décrit l'environnement
     * `sdf` : Le chemin vers le fichier .sdf qui décrit le véhicule simulé
 
 ## Initilaliser la simulation gazebo
 Après avoir lancé le launch file pour la simulation gazebo, envoyer un setpoint à une position dans les airs
+
 `rostopic pub /mavros/setpoint_position/local geometry_msgs/PoseStamped (*Peser tab et remplir le message*) -r 10`
+
 `rosservice call /mavros/cms/arming 1`
+
 `rosservice call /mavros/set_mode 216 OFFBOARD`
 
 
