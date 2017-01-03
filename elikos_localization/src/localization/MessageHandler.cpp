@@ -18,8 +18,8 @@ MessageHandler::MessageHandler()
     : it_(nh_)
 {
     imageSub_ = it_.subscribe("/camera/image_raw", 1, &MessageHandler::cameraCallback, this);
-    imuSub_ = nh_.subscribe("mavros/imu/data", 1, &MessageHandler::imuCallback, this);
-    poseSub_ = nh_.subscribe("mavros/local_position/pose", 1, &MessageHandler::poseCallback, this);
+    imuSub_ = nh_.subscribe("/mavros/imu/data", 1, &MessageHandler::imuCallback, this);
+    poseSub_ = nh_.subscribe("/mavros/local_position/pose", 1, &MessageHandler::poseCallback, this);
 }
 
 MessageHandler::~MessageHandler()
@@ -73,7 +73,6 @@ void MessageHandler::imuCallback(const sensor_msgs::Imu& msg)
     tf::vector3MsgToTF(msg.linear_acceleration, v);
     v.normalize();
     ImageProcessor::getInstance()->imuOrientation_ = { v.x(), v.y(), v.z() };
-    std::cout << "imu" << std::endl;
 }
 
 void MessageHandler::poseCallback(const geometry_msgs::PoseStamped& msg)
@@ -87,7 +86,6 @@ void MessageHandler::poseCallback(const geometry_msgs::PoseStamped& msg)
 
     ImageProcessor::getInstance()->roll_ = roll;
     ImageProcessor::getInstance()->pitch_ = pitch;
-    std::cout << "pose" << std::endl;
 }
 
 }
