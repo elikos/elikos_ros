@@ -1,0 +1,6 @@
+[submodule "elikos_sim/src/gazebo_sim/Firmware"]
+	path = elikos_sim/src/gazebo_sim/Firmware
+	url = https://github.com/PX4/Firmware
+[submodule "elikos_sim/src/gazebo_sim/elikos_gazebo_models"]
+	path = elikos_sim/src/gazebo_sim/elikos_gazebo_models
+	url = https://github.com/elikos/elikos_gazebo_models.git
