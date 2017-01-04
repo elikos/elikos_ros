@@ -14,6 +14,9 @@
 
 3. Initialiser les variables d'environnement pour gazebo
 
+    Note: Assurez-vous qu'un différent package px4 n'a pas déjà été sourcé avec `rospack find px4`
+          Le package px4 ne devrait pas exister.
+
         source setup.bash
 
     Ce script est à éxécuter pour chaque nouvelle console.
@@ -21,16 +24,26 @@
     (Optionnel) Ajouter la commande à votre ~/.bashrc pour ne pas avoir 
     à réexécuter le script.
 
-        echo "source $(pwd)/setup.sh" >> ~/.bashrc
+        `echo "source $(pwd)/setup.sh" >> ~/.bashrc`
 
 4. Builder le code du Firmware
 
-    Suivre les instructions pour installer les dépendances requises : http://dev.px4.io/starting-building.html
+    Suivre les instructions pour installer les dépendances requises : http://dev.px4.io/starting-installing-linux.html
 
-        cd Firmware
-        make posix_sitl_default gazebo
+    Ajouter les packages de osrfoundation.org pour gazebo : http://gazebosim.org/tutorials?tut=install_ubuntu
+
+    Installer gazebo 7 pour ros
+
+        `sudo apt-get install ros-$(ROS_DISTRO)-gazebo7-ros-pkgs`
+
+    Builder le firmware pour gazebo
+
+        `cd Firmware`
+        `make posix_sitl_default gazebo`
 
     Si tout fonctionne, Gazebo devrait se lancer en affichant le modèle iris par défaut.
+
+    Fermer la simulation pour les étapes suivantes.
 
 ## Launch files 
 * `simulation.launch`

@@ -1,5 +1,5 @@
 <launch>
-    <include file="$(find px4)/launch/mavros_posix_sitl.launch">
+    <include file="$(find elikos_sim)/src/gazebo_sim/Firmware/launch/mavros_posix_sitl.launch">
         <arg name="world" value="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/worlds/stadium.world"/>
         <arg name="sdf" value="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/iris_realsense/iris_opt_flow.sdf"/>
     </include>
