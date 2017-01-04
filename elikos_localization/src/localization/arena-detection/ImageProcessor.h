@@ -10,6 +10,7 @@
 #include <opencv2/core/core.hpp>
 #include <Eigen/Core>
 
+#include "PreProcessing.h"
 #include "PerspectiveTransform.h"
 #include "GridFitting.h"
 #include "LineDetection.h"
@@ -32,6 +33,8 @@ public:
     void processImage(const cv::Mat& input, ros::Time stamp);
 
     void perspectiveToOrtho(double theta);
+
+    void updateQuadImu();
 
     double roll_ = 0.0;
     double pitch_ = 0.0;
@@ -57,6 +60,7 @@ private:
     cv::Point corners[4];
 
     PerspectiveTransform transform_;
+    PreProcessing preProcessing_;
     LineDetection lineDetection_;
     GridFitting gridFitting_;
 

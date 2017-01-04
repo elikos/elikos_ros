@@ -17,7 +17,7 @@ MessageHandler* MessageHandler::instance_ = nullptr;
 MessageHandler::MessageHandler()
     : it_(nh_)
 {
-    imageSub_ = it_.subscribe("/camera/image_raw", 1, &MessageHandler::cameraCallback, this);
+    imageSub_ = it_.subscribe("/elikos_ffmv_bottom_camera/image_raw", 1, &MessageHandler::cameraCallback, this);
     imuSub_ = nh_.subscribe("/mavros/imu/data", 1, &MessageHandler::imuCallback, this);
     poseSub_ = nh_.subscribe("/mavros/local_position/pose", 1, &MessageHandler::poseCallback, this);
 }

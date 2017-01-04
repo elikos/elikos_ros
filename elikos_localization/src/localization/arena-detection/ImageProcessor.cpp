@@ -59,9 +59,9 @@ ImageProcessor::~ImageProcessor()
 {
     file_.close();
 }
-void undistort(const cv::Mat& src, cv::Mat& undistorted)
-{
-}
+
+void updateQuadPose();
+void updateQuadImu();
 
 void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
 {
@@ -135,7 +135,6 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
         tDst[i] = { dst[i].x(), dst[i].y() };
     }
 
-
     cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
     cv::Mat perspective;
 
@@ -156,7 +155,8 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
 void ImageProcessor::processImage(const cv::Mat& input, ros::Time stamp)
 {
     image_ = input;
-    preProcess(input, preProcessed_);
+    preProcessing_.preProcessImage(input, preProcessed_);
+    //preProcess(input, preProcessed_);
 
     cv::Mat edges;
     findEdges(preProcessed_, edges);
@@ -164,13 +164,13 @@ void ImageProcessor::processImage(const cv::Mat& input, ros::Time stamp)
     lines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     mLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
 
-    findLines(edges, lines_);
-    analyzeLineCluster(stamp);
+    //findLines(edges, lines_);
+    //analyzeLineCluster(stamp);
 
-    cv::imshow("input", preProcessed_);
+    //cv::imshow("PreProcessed", preProcessed_);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(1);
+    cv::waitKey(30);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {

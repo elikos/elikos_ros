@@ -16,6 +16,7 @@ public:
     ~PreProcessing() = default;
 
     void preProcessImage(const cv::Mat& raw, cv::Mat& preProcessed) const;
+    void removePerspective(const cv::Mat& input, cv::Mat& rectified) const;
     void showCalibTrackBars();
 
     Eigen::Vector2f translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const;
@@ -25,6 +26,8 @@ public:
 
 private:
     double blurSigma = 0.0;
+    int whiteThreshold_ = 149;
+    int undistortType_ = 1;
 
     cv::Mat distortionMap1_;
     cv::Mat distortionMap2_;

@@ -1,6 +1,8 @@
 
 #include "PreProcessing.h"
 
+#include <iostream>
+
 namespace localization 
 {
 
@@ -16,6 +18,10 @@ PreProcessing::PreProcessing()
 
     cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
                                 cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
+
+    cv::namedWindow("PreProcessed", 1);
+    cv::createTrackbar("white threshold", "PreProcessed", &whiteThreshold_, 255);
+    cv::createTrackbar("undistort type", "PreProcessed", &undistortType_, 1);
 }
 
 void PreProcessing::preProcessImage(const cv::Mat& raw, cv::Mat& preProcessed) const
@@ -29,8 +35,10 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, cv::Mat& preProcessed) c
         raw.copyTo(typeConverted);
     }
 
-    cv::Mat undistorted;
-    cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
+    cv::Mat undistorted = typeConverted;
+    if (!undistortType_) {
+        cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
+    }
 
     cv::Mat blured;
     cv::GaussianBlur(undistorted, blured, cv::Size(7,7), 8, 8);
@@ -91,7 +99,6 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, cv::Mat& preProcessed) c
         tDst[i] = { dst[i].x(), dst[i].y() };
     }
 
-
     cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
     cv::Mat perspective;
 
@@ -104,9 +111,11 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, cv::Mat& preProcessed) c
     cv::erode(blured, eroded, element, cv::Point(0), 8);
 
     cv::Mat thresholded;
-    cv::adaptiveThreshold(blured, thresholded, 200, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 551, 2);
+    cv::threshold(blured, thresholded, whiteThreshold_, 255, CV_THRESH_BINARY);
 
     preProcessed = thresholded;
+
+    cv::imshow("PreProcessed", preProcessed);
 }
 
 void PreProcessing::showCalibTrackBars()
