@@ -24,7 +24,7 @@
     (Optionnel) Ajouter la commande à votre ~/.bashrc pour ne pas avoir 
     à réexécuter le script.
 
-        `echo "source $(pwd)/setup.sh" >> ~/.bashrc`
+        echo "source $(pwd)/setup.sh" >> ~/.bashrc
 
 4. Builder le code du Firmware
 
@@ -34,12 +34,12 @@
 
     Installer gazebo 7 pour ros
 
-        `sudo apt-get install ros-$(ROS_DISTRO)-gazebo7-ros-pkgs`
+        sudo apt-get install ros-$(ROS_DISTRO)-gazebo7-ros-pkgs
 
     Builder le firmware pour gazebo
 
-        `cd Firmware`
-        `make posix_sitl_default gazebo`
+        cd Firmware
+        make posix_sitl_default gazebo
 
     Si tout fonctionne, Gazebo devrait se lancer en affichant le modèle iris par défaut.
 
@@ -59,8 +59,15 @@ Après avoir lancé le launch file pour la simulation gazebo, envoyer un setpoin
 
 `rostopic pub /mavros/setpoint_position/local geometry_msgs/PoseStamped (*Peser tab et remplir le message*) -r 10`
 
-`rosservice call /mavros/cms/arming 1`
+Si `/mavros/setpoint_position/tf/listen` est à `true` faire plutôt : 
+
+`rosrun tf static_transform_publisher 0 0 2 0 0 0 1 elikos_arena_origin elikos_setpoint 100`
+
+Ensuite, il suffit d'armer le quad:
+
+`rosservice call /mavros/cmd/arming 1`
 
 `rosservice call /mavros/set_mode 216 OFFBOARD`
 
+Voir le [tutoriel de simulation](https://elikos.gitbooks.io/wiki-elikos/content/Navigation/lancer_une_simulation_avec_gazebo.html) pour plus de détails.
 
