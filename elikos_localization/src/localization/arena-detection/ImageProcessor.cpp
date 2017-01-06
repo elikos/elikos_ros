@@ -152,10 +152,10 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
     preProcessed = thresholded;
 }
 
-void ImageProcessor::processImage(const cv::Mat& input, ros::Time stamp)
+void ImageProcessor::processImage(const cv::Mat& input, const ros::Time& stamp)
 {
     image_ = input;
-    preProcessing_.preProcessImage(input, preProcessed_);
+    preProcessing_.preProcessImage(input, stamp,  preProcessed_);
     //preProcess(input, preProcessed_);
 
     cv::Mat edges;
@@ -164,10 +164,10 @@ void ImageProcessor::processImage(const cv::Mat& input, ros::Time stamp)
     lines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     mLines_ = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
 
-    //findLines(edges, lines_);
-    //analyzeLineCluster(stamp);
+    findLines(edges, lines_);
+    analyzeLineCluster(stamp);
 
-    //cv::imshow("PreProcessed", preProcessed_);
+    cv::imshow("PreProcessed", preProcessed_);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
     cv::waitKey(30);
@@ -269,7 +269,7 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
     if (gridFound) {
         grid.draw(preProcessed_);
         double height = 423.0 / grid.getDistance();
-        std::cout << stamp - start_ << " " << height << std::endl;
+        //std::cout << stamp - start_ << " " << height << std::endl;
     }
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));

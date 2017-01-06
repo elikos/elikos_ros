@@ -30,7 +30,7 @@ public:
     static ImageProcessor* getInstance();
     static void freeInstance();
 
-    void processImage(const cv::Mat& input, ros::Time stamp);
+    void processImage(const cv::Mat& input, const ros::Time& stamp);
 
     void perspectiveToOrtho(double theta);
 
