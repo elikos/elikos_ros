@@ -269,7 +269,7 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
     if (gridFound) {
         grid.draw(preProcessed_);
         double height = 423.0 / grid.getDistance();
-        //std::cout << stamp - start_ << " " << height << std::endl;
+        std::cout << stamp - start_ << " " << height << std::endl;
     }
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
