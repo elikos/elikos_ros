@@ -53,6 +53,7 @@
     * Lance une simulation gazebo, le firmware du pixhawk et mavros
     * `world` : Le chemin vers le fichier .world qui décrit l'environnement
     * `sdf` : Le chemin vers le fichier .sdf qui décrit le véhicule simulé
+    * `config_yaml` : Le chemin vers le fichier .yaml qui contient les configurations pour mavros.
 
 ## Positionner le drône
 Après avoir lancé le launch file pour la simulation gazebo, envoyer un setpoint à une position dans les airs
