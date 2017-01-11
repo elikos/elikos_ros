@@ -39,3 +39,10 @@ add_executable(elikos_sim
 target_link_libraries(elikos_sim
   ${catkin_LIBRARIES}
 )
+
+add_executable(gazebo_tf_fix
+    src/gazebo_sim/gazebo_tf_fix/gazebo_tf_fix.cpp)
+
+target_link_libraries(gazebo_tf_fix
+  ${catkin_LIBRARIES}
+)
