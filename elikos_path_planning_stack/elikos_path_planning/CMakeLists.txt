@@ -3,6 +3,7 @@ project(elikos_path_planning)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
+   elikos_ros
    message_generation
    roscpp
    tf
