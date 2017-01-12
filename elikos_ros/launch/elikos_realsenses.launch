@@ -1,0 +1,38 @@
+<launch>
+  <arg name="camera1"              default="r200_left" />
+  <arg name="camera1_camera_type"  default="R200"    /> <!-- Type of camera -->
+  <arg name="camera1_serial_no"    default="2401001385" /> <!-- Note: Replace with actual serial number -->
+  <arg name="camera1_enable_color"      default="true" />
+  <arg name="camera1_enable_pointcloud" default="true" />
+  <arg name="camera1_enable_tf"         default="true" />
+
+  <arg name="camera2"              default="r200_right" />
+  <arg name="camera2_camera_type"  default="R200"    /> <!-- Type of camera -->
+  <arg name="camera2_serial_no"    default="2411010741" /> <!-- Note: Replace with actual serial number -->
+  <arg name="camera2_enable_color"      default="true" />
+  <arg name="camera2_enable_pointcloud" default="true" />
+  <arg name="camera2_enable_tf"         default="true" />
+  
+  <arg name="manager" value="camera_nodelet_manager" /> <!-- Single nodelet manager for all cameras -->
+  <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen"/>
+
+  <include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch">
+      <arg name="manager"      value="$(arg manager)" />
+      <arg name="camera"       value="$(arg camera1)" />
+      <arg name="camera_type"  value="$(arg camera1_camera_type)" />
+      <arg name="serial_no"    value="$(arg camera1_serial_no)" />
+      <arg name="enable_color"      default="$(arg camera1_enable_color)" />
+      <arg name="enable_pointcloud" default="$(arg camera1_enable_pointcloud)" />
+      <arg name="enable_tf"         default="$(arg camera1_enable_tf)" />
+  </include>
+    
+  <include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch">
+      <arg name="manager"      value="$(arg manager)" />
+      <arg name="camera"       value="$(arg camera2)" />
+      <arg name="camera_type"  value="$(arg camera2_camera_type)" />
+      <arg name="serial_no"    value="$(arg camera2_serial_no)" />
+      <arg name="enable_color"      default="$(arg camera2_enable_color)" />
+      <arg name="enable_pointcloud" default="$(arg camera2_enable_pointcloud)" />
+      <arg name="enable_tf"         default="$(arg camera2_enable_tf)" />
+  </include>
+</launch>
