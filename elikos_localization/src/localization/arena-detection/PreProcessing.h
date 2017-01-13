@@ -30,6 +30,8 @@ public:
 
 private:
 
+    Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength, double height, double length) const;
+
     tf::TransformListener tfListener_;
 
     double blurSigma = 0.0;

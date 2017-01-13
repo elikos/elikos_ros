@@ -2,13 +2,16 @@
 // Created by olivier on 9/29/16.
 //
 
-#include "MessageHandler.h"
+#include <Eigen/Geometry>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <tf/tf.h>
 
+#include "QuadState.h"
 #include "ImageProcessor.h"
+
+#include "MessageHandler.h"
 
 namespace localization {
 
@@ -69,23 +72,26 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
 void MessageHandler::imuCallback(const sensor_msgs::Imu& msg)
 {
-    tf::Vector3 v;
-    tf::vector3MsgToTF(msg.linear_acceleration, v);
-    v.normalize();
-    ImageProcessor::getInstance()->imuOrientation_ = { v.x(), v.y(), v.z() };
+    QuadState* state = QuadState::getInstance();
+
+    tf::Vector3 a, w;
+    tf::vector3MsgToTF(msg.linear_acceleration, a);
+    tf::vector3MsgToTF(msg.angular_velocity, w);
+
+    state->linearAcceleration_ = Eigen::Vector3f(a.x(), a.y(), a.z());
+    state->angularVelocity_ =    Eigen::Vector3f(w.x(), w.y(), w.z());
+
+    tf::Quaternion q;
+    tf::quaternionMsgToTF(msg.orientation, q);
+
+    state->orientation_ = Eigen::Quaternionf(q.x(), q.y(), q.z(), q.w());
 }
 
 void MessageHandler::poseCallback(const geometry_msgs::PoseStamped& msg)
 {
-    tf::Vector3 v(1.0, 0.0, 0.0);
-    tf::Quaternion q;
-    tf::quaternionMsgToTF(msg.pose.orientation, q);
-    tf::Matrix3x3 m(q);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
-
-    ImageProcessor::getInstance()->roll_ = roll;
-    ImageProcessor::getInstance()->pitch_ = pitch;
+    tf::Vector3 p(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z);
+    QuadState* state = QuadState::getInstance();
+    state->position_ = Eigen::Vector3f(p.x(), p.y(), p.z());
 }
 
 }

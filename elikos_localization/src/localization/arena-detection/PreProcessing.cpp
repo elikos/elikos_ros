@@ -2,6 +2,7 @@
 #include "PreProcessing.h"
 
 #include <Eigen/Geometry>
+#include <Eigen/Core>
 
 #include <iostream>
 
@@ -83,13 +84,15 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
 
 void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) const
 {
-    double roll, pitch, yaw;
+    double roll, pitch, yaw = 0.0;
     Eigen::Vector3f direction;
     try {
         tf::StampedTransform tf;
         tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
+
         tf::Matrix3x3 m(tf.getRotation());
         m.getRPY(roll, pitch, yaw);
+
         tf::Vector3 v = m * tf::Vector3(0.0, 0.0, 1.0);
         direction.x() = v.x();
         direction.y() = v.y();
@@ -99,15 +102,78 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
          ROS_ERROR("%s", e.what());
     }
 
+    Eigen::Matrix3f r = (Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitX()) * 
+                         Eigen::AngleAxisf(roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
+                            
+    Eigen::Matrix4f R = Eigen::Matrix4f::Zero();
+    R(3, 3) = 1;
+    for (int i = 0; i < 3; ++i) 
+    {
+        for (int j = 0; j < 3; j++) 
+        {
+            R(i, j) = r(i, j);
+        }
+    }
+
     double height = input.size().height;
     double width = input.size().width;
-
-    Eigen::Vector2f src[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
-    Eigen::Vector2f dst[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
-    
     double f = 423.0;
     double HFOV = std::atan( width / (2 * f));
     double VFOV = std::atan( height / (2 * f));
+
+    Eigen::Vector4f src[4] { Eigen::Vector4f( 1.0,  1.0, 0.0, 1.0), 
+                             Eigen::Vector4f(-1.0,  1.0, 0.0, 1.0), 
+                             Eigen::Vector4f(-1.0, -1.0, 0.0, 1.0), 
+                             Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
+
+    Eigen::Vector4f dst[4] { Eigen::Vector4f( 1.0,  1.0, 0.0, 1.0), 
+                             Eigen::Vector4f(-1.0,  1.0, 0.0, 1.0), 
+                             Eigen::Vector4f(-1.0, -1.0, 0.0, 1.0), 
+                             Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
+   
+    Eigen::Matrix4f P = getPerspectiveProjectionTransform(f, width, height); 
+    Eigen::Translation<float, 4> T(Eigen::Vector4f(0.0, 0.0, -1.0, 0.0));
+
+    for (int i = 0; i < 4; ++i) 
+    {
+        dst[i] = T * dst[i];
+        dst[i] = P * dst[i];
+        dst[i] /= dst[i][3];
+
+        src[i] = R * src[i];
+        src[i] = T * src[i];
+        src[i] = P * src[i];
+        //src[i] = P * T * R * dst[i];
+        src[i] /= src[i][3];
+    }
+
+    cv::Point2f tSrc[4], tDst[4];
+    for (int i = 0; i < 4; ++i) 
+    {
+        tSrc[i] = cv::Point2f(src[i].x() * width / 2.0 + width / 2.0, src[i].y() * height / 2.0 + height / 2.0);
+        tDst[i] = cv::Point2f(dst[i].x() * width / 2.0 + width / 2.0, dst[i].y() * height / 2.0 + height / 2.0);
+    }
+
+    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
+    cv::warpPerspective(input, rectified, perspectiveTransform, input.size());
+
+    //rectified = input.clone();
+    for (int i = 0; i < 4; ++i) 
+    {
+        cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
+        cv::circle(rectified, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
+    }
+
+    //float y = src[1];
+    //float z = src[2];
+
+    //src[1] = y * std::sin(pitch) + z * std::cos(pitch);
+    //src[2] = y * std::cos(pitch) - z * std::
+
+    /*
+    Eigen::Vector2f src[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
+    Eigen::Vector2f dst[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
+    
     
     Eigen::Vector2f leftRotationPoint = src[0] + (src[1] - src[0]) / 2.0;
     Eigen::Vector2f rightRotationPoint = src[3] + (src[2] - src[3]) / 2.0;;
@@ -136,26 +202,18 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
     src[2] = R * (dst[2] - rightRotationPoint) + rightRotationPoint;
     src[3] = R * (dst[3] - rightRotationPoint) + rightRotationPoint;
 
-    cv::Point2f tSrc[4], tDst[4];
-    for ( int i = 0; i < 4; ++i) 
-    {
-        tSrc[i] = { src[i].x(), src[i].y() };
-        tDst[i] = { dst[i].x(), dst[i].y() };
-    }
+    */
 
-    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
+}
 
-    cv::warpPerspective(input, rectified, perspectiveTransform, input.size());
+Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLength, double width, double height) const
+{
+    Eigen::Matrix4f m = Eigen::Matrix4f::Zero();
+    m(0, 0) = 2 * focalLength / width;
+    m(1, 1) = 2 * focalLength / height;
+    m(3, 2) = -1;
 
-    cv::circle(rectified, { (int)(src[0].x()), (int)(src[0].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(rectified, { (int)(src[1].x()), (int)(src[1].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(rectified, { (int)(src[2].x()), (int)(src[2].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(rectified, { (int)(src[3].x()), (int)(src[3].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
-
-    cv::circle(rectified, { (int)(dst[0].x()), (int)(dst[0].y()) }, 5, cv::Scalar(0, 100 ,0), -1);
-    cv::circle(rectified, { (int)(dst[1].x()), (int)(dst[1].y()) }, 5, cv::Scalar(0, 100 ,0), -1);
-    cv::circle(rectified, { (int)(dst[2].x()), (int)(dst[2].y()) }, 5, cv::Scalar(0, 100 ,0), -1);
-    cv::circle(rectified, { (int)(dst[3].x()), (int)(dst[3].y()) }, 5, cv::Scalar(0, 100 ,0), -1);
+    return m;
 }
 
 void PreProcessing::showCalibTrackBars()
