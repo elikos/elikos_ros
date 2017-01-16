@@ -96,7 +96,9 @@ void Line::draw(cv::Mat& image) const
     pt1.y = cvRound(centroid_.y() + 1000 * (orientation_.y()));
     pt2.x = cvRound(centroid_.x() - 1000 * (orientation_.x()));
     pt2.y = cvRound(centroid_.y() - 1000 * (orientation_.y()));
-    cv::line(image, pt1, pt2, cv::Scalar(100, 100, 100), 1, CV_AA);
+    // cv::line(image, pt1, pt2, cv::Scalar(100, 100, 100), 1, CV_AA);
+    cvLine((IplImage*)(&image), pt1, pt2, cv::Scalar(100, 100, 100), 1, CV_AA,0);
+    //void cvLine(CvArr*, CvPoint, CvPoint, CvScalar, int, int, int)
 }
 
 };
