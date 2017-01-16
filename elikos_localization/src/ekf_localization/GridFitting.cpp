@@ -60,10 +60,8 @@ std::vector<cv::Vec2f> GridFitting::FitToGrid(std::vector<cv::Vec2f> lines, geom
             MinAngleDiff(theta + M_PI_2, optimal_angle) < 15 * M_PI / 180.0 ) {
             pruned_lines.push_back(lines[i]);
         }
-
     }
     return pruned_lines;
-
 }
 
 void GridFitting::ComputePerspective(const geometry_msgs::PoseStamped &pose) {

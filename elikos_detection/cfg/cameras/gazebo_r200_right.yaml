@@ -1,0 +1,10 @@
+topic: "/r200_right/image_raw"
+frame: "r200_right"
+calibration: false
+file_in: "calib_poly"
+file_out: "new_calibration"
+cam_height: 480
+cam_width: 640
+cam_fov_v: 60
+cam_fov_h: 80
+min_height: 0.1
