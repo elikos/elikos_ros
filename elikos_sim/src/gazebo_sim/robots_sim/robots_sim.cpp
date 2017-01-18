@@ -29,6 +29,11 @@ int main(int argc, char* argv[])
   Robot target9 = Robot("target9", -1.73, 1, 0.25, updateRate, client);
   Robot target10 = Robot("target10", -1, 1.73, 0.25, updateRate, client);
 
+  Obstacle obstacle1 = Obstacle("obstacle1", 0, 5, 0.25, updateRate, client);
+  Obstacle obstacle2 = Obstacle("obstacle2", 5, 0, 0.25, updateRate, client);
+  Obstacle obstacle3 = Obstacle("obstacle3", 0, -5, 0.25, updateRate, client);
+  Obstacle obstacle4 = Obstacle("obstacle4", -5, 0, 0.25, updateRate, client);
+
   srand(time(NULL));
 
   ros::Rate r(updateRate);
@@ -44,6 +49,11 @@ int main(int argc, char* argv[])
     target8.move();
     target9.move();
     target10.move();
+
+    obstacle1.move();
+    obstacle2.move();
+    obstacle3.move();
+    obstacle4.move();
 
     ros::spinOnce();
     r.sleep();

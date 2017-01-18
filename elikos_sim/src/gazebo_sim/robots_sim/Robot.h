@@ -20,7 +20,7 @@ public:
 
     virtual void move();
 
-private:
+protected:
     double _speed;
     int _updateRate;
     double _angle;

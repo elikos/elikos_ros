@@ -19,8 +19,8 @@ Robot::Robot(std::string name, double x, double y, double speed, double updateRa
     twist.angular.y = 0.0;
     twist.angular.z = 0.0;
 
-    _angle = 0;
-    if(!(x==0 && y==0))
+    _angle = PI;
+    if(!((sqrt(pow(x,2)+pow(y,2)) + x)==0))
         _angle = 2*atan(y/(sqrt(pow(x,2)+pow(y,2)) + x));
     
     pose.orientation = tf::createQuaternionMsgFromRollPitchYaw (0, 0, _angle);
