@@ -46,3 +46,14 @@ add_executable(gazebo_tf_fix
 target_link_libraries(gazebo_tf_fix
   ${catkin_LIBRARIES}
 )
+
+add_executable(robots_sim
+    src/gazebo_sim/robots_sim/Obstacle.h
+    src/gazebo_sim/robots_sim/Obstacle.cpp
+    src/gazebo_sim/robots_sim/Robot.h
+    src/gazebo_sim/robots_sim/Robot.cpp
+    src/gazebo_sim/robots_sim/robots_sim.cpp)
+
+target_link_libraries(robots_sim
+  ${catkin_LIBRARIES} 
+)
