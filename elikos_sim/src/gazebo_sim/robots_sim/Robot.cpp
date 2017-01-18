@@ -39,7 +39,7 @@ Robot::Robot(std::string name, double x, double y, double speed, double updateRa
 
 void Robot::move()
 {
-    if((bool)(_timeCounter % (_updateRate*RANDOM_ANGLE_TIME_LAP)) || _isRotating)
+    if((_timeCounter % (_updateRate*RANDOM_ANGLE_TIME_LAP))==0 || _isRotating)
     {
         if(!_isRotating)
         {
@@ -47,7 +47,7 @@ void Robot::move()
             _beginRotationTimerCounter = _timeCounter;
             _isRotating = true;
         }
-        else if(_timeCounter-_beginRotationTimerCounter >= ROTATION_ANGLE/ROTATION_SPEED)
+        else if((_timeCounter-_beginRotationTimerCounter)/_updateRate >= ROTATION_ANGLE/ROTATION_SPEED)
         {
             _isRotating = false;
         }

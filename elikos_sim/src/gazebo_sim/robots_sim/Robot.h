@@ -6,8 +6,10 @@
 #include <tf/transform_datatypes.h>
 #include <gazebo_msgs/SetModelState.h>
 
-const int ROTATION_ANGLE = 15;
-const int ROTATION_SPEED = 5;
+#define PI 3.14159265
+
+const double ROTATION_ANGLE = PI/4;
+const double ROTATION_SPEED = PI/8;
 const int RANDOM_ANGLE_TIME_LAP = 5;
 const std::string REFERENCE_FRAME = "world";
 
