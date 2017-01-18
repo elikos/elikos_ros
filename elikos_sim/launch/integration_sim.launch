@@ -40,4 +40,8 @@
   <node pkg="tf" type="static_transform_publisher" name="r200_right_broadcaster" args="0 -0.15 0 -0.0 -0.8526 0.5225 0.0 elikos_base_link r200_right 100" />
   <node pkg="tf" type="static_transform_publisher" name="r200_back_broadcaster" args="-0.20 0 0 0.6029 0.6029 -0.3694 -0.3694 elikos_base_link r200_back 100" />
   <node pkg="tf" type="static_transform_publisher" name="elikos_ffmv_bottom_broadcaster" args="-0.15 0 0.02 0.7071 -0.7071 0.0 -0.0 elikos_base_link elikos_ffmv_bottom 100" />
+
+  <!-- Target and obstacle robots -->
+	<include file="$(find elikos_sim)/launch/robots_sim.launch"/>
+
 </launch>
