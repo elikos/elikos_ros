@@ -13,6 +13,10 @@
       <arg name="cfg" value="gazebo_r200_left"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="gazebo_r200_back" />
+      <arg name="cfg" value="gazebo_r200_back"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_ffmv_bottom" />
       <arg name="cfg" value="gazebo_ffmv_bottom"/>
   </include>
@@ -34,5 +38,6 @@
   <node pkg="tf" type="static_transform_publisher" name="r200_front_broadcaster" args="0.15 0 0 0.6029 -0.6029 0.3695 -0.3695 elikos_base_link r200_front 100" />
   <node pkg="tf" type="static_transform_publisher" name="r200_left_broadcaster" args="0 0.15 0 -0.8526 0.0 0.0 0.5225 elikos_base_link r200_left 100" />
   <node pkg="tf" type="static_transform_publisher" name="r200_right_broadcaster" args="0 -0.15 0 -0.0 -0.8526 0.5225 0.0 elikos_base_link r200_right 100" />
+  <node pkg="tf" type="static_transform_publisher" name="r200_back_broadcaster" args="-0.20 0 0 0.6029 0.6029 -0.3694 -0.3694 elikos_base_link r200_back 100" />
   <node pkg="tf" type="static_transform_publisher" name="elikos_ffmv_bottom_broadcaster" args="-0.15 0 0.02 0.7071 -0.7071 0.0 -0.0 elikos_base_link elikos_ffmv_bottom 100" />
 </launch>
