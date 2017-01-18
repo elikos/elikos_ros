@@ -18,23 +18,22 @@ int main(int argc, char* argv[])
   ros::ServiceClient client;
   client = n.serviceClient<gazebo_msgs::SetModelState>(SERVICE_NAME);
 
-  Robot target1 = Robot("target1", 0, 2, 1, updateRate, client);
-  Robot target2 = Robot("target2", 1, 1.73, 1, updateRate, client);
-  Robot target3 = Robot("target3", 1.73, 1, 1, updateRate, client);
-  Robot target4 = Robot("target4", 1.73, -1, 1, updateRate, client);
-  Robot target5 = Robot("target5", 1, -1.73, 1, updateRate, client);
-  Robot target6 = Robot("target6", 0, -2, 1, updateRate, client);
-  Robot target7 = Robot("target7", -1, -1.73, 1, updateRate, client);
-  Robot target8 = Robot("target8", -1.73, -1, 1, updateRate, client);
-  Robot target9 = Robot("target9", -1.73, 1, 1, updateRate, client);
-  Robot target10 = Robot("target10", -1, 1.73, 1, updateRate, client);
+  Robot target1 = Robot("target1", 0, 2, 0.5, updateRate, client);
+  Robot target2 = Robot("target2", 1, 1.73, 0.5, updateRate, client);
+  Robot target3 = Robot("target3", 1.73, 1, 0.5, updateRate, client);
+  Robot target4 = Robot("target4", 1.73, -1, 0.5, updateRate, client);
+  Robot target5 = Robot("target5", 1, -1.73, 0.5, updateRate, client);
+  Robot target6 = Robot("target6", 0, -2, 0.5, updateRate, client);
+  Robot target7 = Robot("target7", -1, -1.73, 0.5, updateRate, client);
+  Robot target8 = Robot("target8", -1.73, -1, 0.5, updateRate, client);
+  Robot target9 = Robot("target9", -1.73, 1, 0.5, updateRate, client);
+  Robot target10 = Robot("target10", -1, 1.73, 0.5, updateRate, client);
 
   srand(time(NULL));
 
   ros::Rate r(updateRate);
   while(ros::ok())
   {
-    
     target1.move();
     target2.move();
     target3.move();
@@ -47,6 +46,7 @@ int main(int argc, char* argv[])
     target10.move();
 
     ros::spinOnce();
+    r.sleep();
   }
 
   return 0;

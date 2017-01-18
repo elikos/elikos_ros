@@ -47,18 +47,18 @@ void Robot::move()
             _beginRotationTimerCounter = _timeCounter;
             _isRotating = true;
         }
-        else if(_timeCounter-_beginRotationTimerCounter >= (_updateRate/_speed)*ROTATION_ANGLE)
+        else if(_timeCounter-_beginRotationTimerCounter >= ROTATION_ANGLE/ROTATION_SPEED)
         {
             _isRotating = false;
         }
 
         if(_randomBit==1)
         {
-            _angle += (_speed/_updateRate)*ROTATION_ANGLE;
+            _angle += ROTATION_SPEED/_updateRate;
         }
         else
         {
-            _angle -= (_speed/_updateRate)*ROTATION_ANGLE;
+            _angle -= ROTATION_SPEED/_updateRate;
         }
     }
     _timeCounter++;
