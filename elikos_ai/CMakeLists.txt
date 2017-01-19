@@ -23,6 +23,3 @@ include_directories(
 
 add_subdirectory(src/ai)
 add_subdirectory(src/emulator)
-
-
-

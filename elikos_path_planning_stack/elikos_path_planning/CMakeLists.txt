@@ -3,6 +3,7 @@ project(elikos_path_planning)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
+   elikos_ros
    message_generation
    roscpp
    tf
@@ -13,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
    image_transport
    mavros_msgs
    sensor_msgs
-   cv_bridge
    geometry_msgs
    moveit_core
    moveit_ros_planning

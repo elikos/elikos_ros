@@ -17,10 +17,13 @@ ArenaTracking::ArenaTracking(ros::NodeHandle* nh)
     // Init output_ matrix
     output_ = cv::Mat(480, 640, CV_8UC3);
 
+
+    cv::Mat_<float> mat(3,3);
+
     // Init undistortion map
-    camera_matrix_ = (cv::Mat_<float>(3,3) << 422.918640,    0.000000,      350.119451,
-            0.000000,      423.121112,    236.380265,
-            0.000000,      0.000000,      1.000000);
+    camera_matrix_ = (cv::Mat_<float>(3,3) << 422.918640,    0.000000,    350.119451,
+                                                0.000000,  423.121112,    236.380265,
+                                                0.000000,    0.000000,      1.000000);
 
     camera_distortion_ = (cv::Mat_<float>(1,5) << -0.321590, 0.089597, 0.001090, -0.000489, 0.000000);
 
@@ -142,8 +145,8 @@ void ArenaTracking::ProcessFrame(const cv::Mat& src) {
         pose_pub_.PublishPose(*grid_fitting_.GetEstimatedPose());
     }
 
-//    pose_pub_.PublishPose(grid_fitting_.GetPose());
-//    pose_pub_.PublishPose2(grid_fitting_.GetPose2());
+    pose_pub_.PublishPose(grid_fitting_.GetPose());
+    pose_pub_.PublishPose2(grid_fitting_.GetPose2());
     pose_pub_.PublishPointCloud2(grid_fitting_.GetGlobalCloud());
     if (odometry_is_init_) {
         pose_pub_.PublishPointCloud(grid_fitting_.GetIntersectionCloud());

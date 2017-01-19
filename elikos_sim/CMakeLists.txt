@@ -23,19 +23,26 @@ include_directories(
 )
 
 add_executable(elikos_sim
-    src/simulation/GameManager.cpp
-    src/simulation/GameManager.hpp
-    src/simulation/MAV.cpp
-    src/simulation/MAV.h
-    src/simulation/ObstacleRobot.cpp
-    src/simulation/ObstacleRobot.hpp
-    src/simulation/Robot.cpp
-    src/simulation/Robot.hpp
-    src/simulation/simulation.cpp
-    src/simulation/Simulation.hpp
-    src/simulation/TargetRobot.cpp
-    src/simulation/TargetRobot.hpp)
+    src/rviz_sim/GameManager.cpp
+    src/rviz_sim/GameManager.hpp
+    src/rviz_sim/MAV.cpp
+    src/rviz_sim/MAV.h
+    src/rviz_sim/ObstacleRobot.cpp
+    src/rviz_sim/ObstacleRobot.hpp
+    src/rviz_sim/Robot.cpp
+    src/rviz_sim/Robot.hpp
+    src/rviz_sim/simulation.cpp
+    src/rviz_sim/Simulation.hpp
+    src/rviz_sim/TargetRobot.cpp
+    src/rviz_sim/TargetRobot.hpp)
 
 target_link_libraries(elikos_sim
+  ${catkin_LIBRARIES}
+)
+
+add_executable(gazebo_tf_fix
+    src/gazebo_sim/gazebo_tf_fix/gazebo_tf_fix.cpp)
+
+target_link_libraries(gazebo_tf_fix
   ${catkin_LIBRARIES}
 )
