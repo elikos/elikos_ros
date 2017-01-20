@@ -67,3 +67,20 @@ target_link_libraries(elikos_transformation
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
+
+add_executable( elikos_remotecalib
+   src/elikos_remotecalib/elikos_remotecalib.cpp
+   src/elikos_remotecalib/MessageHandler.h
+   src/elikos_remotecalib/MessageHandler.cpp
+   src/elikos_remotecalib/Colors.hpp
+   src/elikos_remotecalib/gui/headers/WindowCV.hpp
+   src/elikos_remotecalib/gui/headers/CalibrationWindow.hpp
+   src/elikos_remotecalib/gui/headers/ControlWindow.hpp
+   src/elikos_remotecalib/gui/CalibrationWindow.cpp
+   src/elikos_remotecalib/gui/ControlWindow.cpp
+   src/elikos_remotecalib/gui/WindowCV.cpp)
+
+target_link_libraries(elikos_remotecalib
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)

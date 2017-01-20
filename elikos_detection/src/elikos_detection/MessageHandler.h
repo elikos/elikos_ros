@@ -5,6 +5,7 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
+#include <std_msgs/String.h>
 #include <elikos_ros/RobotRaw.h>
 #include <elikos_ros/RobotRawArray.h>
 #include "TargetDetection/TargetDetection.h"
@@ -15,14 +16,16 @@ class MessageHandler
     MessageHandler(string calibrationFilename);
     ~MessageHandler();
     void dispatchMessage(const sensor_msgs::ImageConstPtr &input);
-    void saveCalibration(string filename);
-
-  private:
+    void dispatchCommand(const std_msgs::String::ConstPtr& input);
+	void saveCalibration(string filename);
+private:
     ros::NodeHandle nh_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber is_;
-    // ros::Subscriber subPos_;
+    
     ros::Publisher pub_;
+    ros::Publisher pubCommandOutput_;
+    ros::Subscriber subRC_;
     TargetDetection detection_;
 
     image_transport::Publisher pubImages_; //debug only

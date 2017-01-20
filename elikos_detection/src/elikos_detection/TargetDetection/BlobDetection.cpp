@@ -158,12 +158,10 @@ void BlobDetection::createTrackbars()
     imshow(RedTrackbars, trackbarsRedMat_);
     imshow(GreenTrackbars, trackbarsGreenMat_);
 }
-
 void BlobDetection::saveCalibration(string filename)
 {
     std::fstream fs;
     fs.open(filename, std::fstream::out | std::fstream::trunc);
-
     if (!fs.fail())
     {
         fs << *whiteColor_.H_MIN << endl;
@@ -238,4 +236,41 @@ void BlobDetection::loadCalibration(string filename)
 
         fs.close();
     }
+}
+
+std::string BlobDetection::getAllParams()
+{
+    std::stringstream ss;
+
+    ss << *redColor_.H_MAX << "\t"
+       << *redColor_.H_MIN << "\t"
+       << *redColor_.S_MAX << "\t"
+       << *redColor_.S_MIN << "\t"
+       << *redColor_.V_MAX << "\t"
+       << *redColor_.V_MIN << "\t"
+       << *redColor_.PRE_EROSIONS << "\t"
+       << *redColor_.DILATIONS << "\t"
+       << *redColor_.POST_EROSIONS << "\t"
+
+       << *greenColor_.H_MAX << "\t"
+       << *greenColor_.H_MIN << "\t"
+       << *greenColor_.S_MAX << "\t"
+       << *greenColor_.S_MIN << "\t"
+       << *greenColor_.V_MAX << "\t"
+       << *greenColor_.V_MIN << "\t"
+       << *greenColor_.PRE_EROSIONS << "\t"
+       << *greenColor_.DILATIONS << "\t"
+       << *greenColor_.POST_EROSIONS << "\t"
+
+       << *whiteColor_.H_MAX << "\t"
+       << *whiteColor_.H_MIN << "\t"
+       << *whiteColor_.S_MAX << "\t"
+       << *whiteColor_.S_MIN << "\t"
+       << *whiteColor_.V_MAX << "\t"
+       << *whiteColor_.V_MIN << "\t"
+       << *whiteColor_.PRE_EROSIONS << "\t"
+       << *whiteColor_.DILATIONS << "\t"
+       << *whiteColor_.POST_EROSIONS;
+
+    return ss.str();
 }
