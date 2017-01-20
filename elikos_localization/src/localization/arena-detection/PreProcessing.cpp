@@ -102,8 +102,8 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
          ROS_ERROR("%s", e.what());
     }
 
-    Eigen::Matrix3f r = (Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitX()) * 
-                         Eigen::AngleAxisf(roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
+    Eigen::Matrix3f r = (Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitX()) * 
+                         Eigen::AngleAxisf(-roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
                             
     Eigen::Matrix4f R = Eigen::Matrix4f::Zero();
     R(3, 3) = 1;

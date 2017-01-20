@@ -50,7 +50,7 @@ void MessageHandler::lookForMessages()
     if (!vc.isOpened())
     {
         std::cerr << "Could not open " << videoPath << std::endl;
-        exit(-1);
+        //exit(-1);
     }
     ros::Rate rate(30);
     while(ros::ok())
