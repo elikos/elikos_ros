@@ -15,7 +15,9 @@ void TargetDetection::detect(const cv::Mat &input, cv::Mat &output_w, cv::Mat &o
 
     //Color detection
     detectColor(input, output_w, output_r, output_g, output);
-
+    
+    //Circle detection
+    detectCircles(input, output_w, output_r, output_g, output);
     emplaceNewRobots(output);
 }
 
@@ -123,8 +125,11 @@ void TargetDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::M
     detection.detectColor(input, output_w, output_r, output_g, output);
 }
 
-vector<RobotDesc> TargetDetection::getRobots()
-{
+void TargetDetection::detectCircles(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output){
+    detection.detectCircles(input, output_w, output_r, output_g, output);
+}
+
+vector<RobotDesc> TargetDetection::getRobots(){
     return robots;
 }
 //Method to display the direction arrow (for tests usage only)

@@ -20,6 +20,7 @@ MessageHandler::MessageHandler(string calibrationFilename) : it_(nh_)
   {
     inputTopic = "";
   }
+
   if (!nh_.getParam("/" + ros::this_node::getName() + "/RCpublishTopic", RCinputTopic))
   {
     RCinputTopic = "elikos_remotecalib_publishTopic";
@@ -42,6 +43,7 @@ MessageHandler::MessageHandler(string calibrationFilename) : it_(nh_)
                                                //pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
                                                //pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
 
+
   detection_.loadCalibration(calibrationFilename);
 
   //Calibration trackbars
@@ -52,6 +54,7 @@ MessageHandler::MessageHandler(string calibrationFilename) : it_(nh_)
       detection_.createTrackbars();
   }
 }
+
 MessageHandler::~MessageHandler()
 {
 }

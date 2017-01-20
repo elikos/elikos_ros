@@ -1,6 +1,7 @@
 #include "BlobDetection.h"
 #include <opencv2/core/core.hpp>
-#include <cassert>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 BlobDetection::BlobDetection()
 {
@@ -99,6 +100,38 @@ void BlobDetection::detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat
     output = input;
 }
 
+//Circle detection algorithm
+void BlobDetection::detectCircles(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output)
+{
+    //Check if the input is empty
+    if (!input.data)
+        cerr << "Input of detecRobots is empty"; //TODO:throw an exception
+
+    //Initialisation
+    auto oldObjects = blobObjects;
+    blobObjects.erase(blobObjects.begin(), blobObjects.end());
+
+    cv::Mat src_gray;
+    cv::cvtColor(output, src_gray, CV_BGR2GRAY);
+
+    vector<Vec3f> circles;
+
+    // /mavros/px4flow/ground_distance
+    /// Apply the Hough Transform to find the circles
+    cv::HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8, 200, 70, 0, 0);
+
+    /// Draw the circles detected
+    for (size_t i = 0; i < circles.size(); i++)
+    {
+        cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+        int radius = cvRound(circles[i][2]);
+        // circle center
+        cv::circle(output, center, 3, cv::Scalar(0, 255, 0), -1, 8, 0);
+        // circle outline
+        cv::circle(output, center, radius, cv::Scalar(0, 0, 255), 3, 8, 0);
+    }
+}
+
 vector<RobotDesc> BlobDetection::getBlobObjects()
 {
     return blobObjects;
@@ -129,11 +162,7 @@ void BlobDetection::saveCalibration(string filename)
 {
     std::fstream fs;
     fs.open(filename, std::fstream::out | std::fstream::trunc);
-    bool failed = fs.fail();
-    // std::cout << "FILENAME: \t" << filename << endl;
-    std::cout << "FILENAME:\t"<<filename<<std::endl;
-    assert(!failed);
-    if (!failed)
+    if (!fs.fail())
     {
         fs << *whiteColor_.H_MIN << endl;
         fs << *whiteColor_.H_MAX << endl;
