@@ -1,0 +1,19 @@
+<launch>
+    <node name="spawn_sdf1" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_0_75/model.sdf -sdf -model obstacle1 -x 0 -y 5" />
+    <node name="spawn_sdf2" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_2_0/model.sdf -sdf -model obstacle2 -x 5 -y 0" />
+    <node name="spawn_sdf3" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_1_0/model.sdf -sdf -model obstacle3 -x 0 -y -5" />
+    <node name="spawn_sdf4" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_1_75/model.sdf -sdf -model obstacle4 -x -5 -y 0" />
+    
+    <node name="spawn_sdf5" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target1 -x 0 -y 2" />
+    <node name="spawn_sdf6" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target2 -x 1 -y 1.73" />
+    <node name="spawn_sdf7" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target3 -x 1.73 -y 1" />
+    <node name="spawn_sdf8" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target4 -x 1.73 -y -1" />
+    <node name="spawn_sdf9" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target5 -x 1 -y -1.73" />
+    <node name="spawn_sdf10" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target6 -x 0 -y -2" />
+    <node name="spawn_sdf11" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target7 -x -1 -y -1.73" />
+    <node name="spawn_sdf12" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target8 -x -1.73 -y -1" />
+    <node name="spawn_sdf13" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target9 -x -1.73 -y 1" />
+    <node name="spawn_sdf14" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target10 -x -1 -y 1.73" />
+    
+    <node name="robots_sim" pkg="elikos_sim" type="robots_sim" />
+</launch>
