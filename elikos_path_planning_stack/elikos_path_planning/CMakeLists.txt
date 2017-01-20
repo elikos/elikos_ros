@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
    image_transport
    mavros_msgs
    sensor_msgs
-   cv_bridge
    geometry_msgs
    moveit_core
    moveit_ros_planning

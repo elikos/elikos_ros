@@ -23,9 +23,10 @@
     * type : `geometry_msgs::PoseStamped`  
     * desc : commande de position envoyée par l'AI. 
 
-## Output tf frame  
-* `elikos_setpoint`    
-    * desc : Commande de position pour mavros.  
+## Output topic  
+* `elikos_trajectory`  
+    * type : `elikos_ros::TrajectoryCmd`    
+    * desc : Commande et trajectoire à destination du contrôle.  
 
 ## À savoir!
 * Plusieurs parties du code sont librement inspirées du repository suivant : [https://github.com/AlessioTonioni/Autonomous-Flight-ROS](https://github.com/AlessioTonioni/Autonomous-Flight-ROS)
