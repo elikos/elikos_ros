@@ -67,6 +67,13 @@ void Robot::move()
     {
         _setmodelstate.request.model_state.pose.position.x += (_speed/_updateRate)*cos(_angle);
         _setmodelstate.request.model_state.pose.position.y += (_speed/_updateRate)*sin(_angle);
+        _setmodelstate.request.model_state.twist.linear.x = _speed * cos(_angle);
+        _setmodelstate.request.model_state.twist.linear.y = _speed * sin(_angle);
+        _setmodelstate.request.model_state.twist.angular.z = 0;
+    } else {
+        _setmodelstate.request.model_state.twist.linear.x = 0;
+        _setmodelstate.request.model_state.twist.linear.y = 0;
+        _setmodelstate.request.model_state.twist.angular.z = _randomBit ? ROTATION_SPEED : -ROTATION_SPEED;
     }
 
     _setmodelstate.request.model_state.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw (0, 0, _angle);
