@@ -109,7 +109,8 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr &input)
   Mat threshold_g;
   Mat robotsMat;
 
-  detection_.detect(currentImage, threshold_w, threshold_r, threshold_g, robotsMat);
+  //vector<RobotDesc> array;
+  detection_.detect(currentImage, threshold_w, threshold_r, threshold_g, robotsMat/*, array*/);
 
   //debug images
   sensor_msgs::ImagePtr msgDebug = cv_bridge::CvImage(std_msgs::Header(), "bgr8", robotsMat).toImageMsg();
