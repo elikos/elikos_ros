@@ -10,6 +10,6 @@ class ShapeDetection {
     ShapeDetection();
     void detect(const cv::Mat& input, cv::Mat& output_w, cv::Mat& output_r,
                 cv::Mat& output_g, cv::Mat& output,
-                std::vector<RobotDesc>& robotsArray);
+                std::vector<RobotDesc>& outputRobotsArray);
 };
 #endif

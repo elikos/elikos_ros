@@ -5,14 +5,14 @@
 #ifndef DETECTION_AND_TRACKING_BLOBDETECTION_H
 #define DETECTION_AND_TRACKING_BLOBDETECTION_H
 
+#include <tf/transform_listener.h>
+#include <fstream>
+#include <opencv2/opencv.hpp>
+#include <string>
 #include "GreenColor.h"
 #include "RedColor.h"
 #include "RobotDesc.h"
 #include "WhiteColor.h"
-#include <fstream>
-#include <opencv2/opencv.hpp>
-#include <string>
-#include <tf/transform_listener.h>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -20,37 +20,34 @@
 using namespace std;
 using namespace cv;
 
-//This class implements the detection of robots
+// This class implements the detection of robots
 class BlobDetection {
-public:
-    //constructor
+   public:
+    // constructor
     BlobDetection();
 
-    //Trackbars
+    void detect(const cv::Mat& input, cv::Mat& output_w, cv::Mat& output_r,
+                cv::Mat& output_g, cv::Mat& output,
+                std::vector<RobotDesc>& robotsArray);
+
+    // Trackbars --> TODO: remove..
     void createTrackbars();
-
-    //Robot detection algorithm
-    //Color blobs detection algotrithm
-    void detectColor(const cv::Mat& input, cv::Mat& output_w, cv::Mat& output_r, cv::Mat& output_g, cv::Mat& output);
-    //Circle blobs detection algotrithm
-    void detectCircles(const cv::Mat& input, cv::Mat& output_w, cv::Mat& output_r, cv::Mat& output_g, cv::Mat& output);
-
-    //Getters
-    vector<RobotDesc> getBlobObjects();
 
     void saveCalibration(string filename);
     void loadCalibration(string filename);
 
     /* TODO: REMOVE */
     void removePerspective(const cv::Mat& input, cv::Mat& rectified);
-    Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength, double width, double height);
+    Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength,
+                                                      double width,
+                                                      double height);
     void preProcessImage(const cv::Mat& raw, cv::Mat& preProcessed);
 
     std::string getAllParams();
 
-private:
+   private:
     // ATTRIBUTES
-    //Data used in computation
+    // Data used in computation
     Mat currentImage;
     Mat trackbarsWhiteMat_;
     Mat trackbarsRedMat_;
@@ -67,7 +64,8 @@ private:
     GreenColor greenColor_;
 
     int maxID;
-    //Final data (can be fetched by other classes through the getters)
+    /* TODO: Remove this....*/
+    // Final data (can be fetched by other classes through the getters)
     vector<RobotDesc> foundRobots;
     vector<RobotDesc> foundObstacles;
     vector<RobotDesc> robotsNotConfirmed;
@@ -75,7 +73,16 @@ private:
 
     tf::TransformListener tfListener_;
 
-public: //Public constants, used in TrackingCircles
+    // Color blobs detection algotrithm
+    void detectColor(const cv::Mat& input, cv::Mat& output_w, cv::Mat& output_r,
+                     cv::Mat& output_g, cv::Mat& output,
+                     std::vector<RobotDesc>& robotsArray);
+    // Circle blobs detection algotrithm
+    void detectCircles(const cv::Mat& input, cv::Mat& output_w,
+                       cv::Mat& output_r, cv::Mat& output_g, cv::Mat& output,
+                       std::vector<RobotDesc>& robotsArray);
+
+   public:  // Public constants, used in TrackingCircles
     // CLASS CONSTANTS
     WhiteColor* getWhite() { return &whiteColor_; }
     RedColor* getRed() { return &redColor_; }
@@ -83,6 +90,6 @@ public: //Public constants, used in TrackingCircles
     const int FRAME_WIDTH = 640;
     const int FRAME_HEIGHT = 480;
 
-private:
+   private:
 };
-#endif //DETECTION_AND_TRACKING_BLOBDETECTION_H
+#endif  // DETECTION_AND_TRACKING_BLOBDETECTION_H

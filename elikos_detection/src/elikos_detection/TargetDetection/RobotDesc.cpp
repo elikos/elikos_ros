@@ -119,3 +119,7 @@ void  RobotDesc::setArea(double a){
     area = a;
 }
 
+
+ bool RobotDesc::operator==(const RobotDesc& otherDesc) const{
+     return otherDesc.getID() == id;
+ }
