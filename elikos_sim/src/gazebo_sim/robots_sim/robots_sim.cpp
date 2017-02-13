@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
   ros::ServiceClient client;
   client = n.serviceClient<gazebo_msgs::SetModelState>(SERVICE_NAME);
 
-  int speed;
+  double speed;
   n.getParam("/"+ros::this_node::getName()+"/speed", speed);
 
   std::vector<Robot> targets;

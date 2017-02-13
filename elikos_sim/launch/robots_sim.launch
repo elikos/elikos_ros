@@ -1,9 +1,12 @@
 <launch>
     <arg name="speed" default="0.5"/>
+    <arg name="rotation_speed" default="0.785"/>
+    <arg name="rotation_angle" default="0.785"/>
+    <arg name="random_angle_time_lap" default="5"/>
 
     <arg name="obstacle_05" default="false"/>
     <arg name="obstacle_10" default="false"/>
-    <arg name="obstacle_15" default="true"/>
+    <arg name="obstacle_15" default="false"/>
     <arg name="obstacle_20" default="false"/>
 
     <arg name="red_1" default="true"/>
@@ -13,7 +16,7 @@
     <arg name="red_3" default="false"/>
     <arg name="green_3" default="false"/>
     <arg name="red_4" default="false"/>
-    <arg name="green_4" default="true"/>
+    <arg name="green_4" default="false"/>
     <arg name="red_5" default="false"/>
     <arg name="green_5" default="false"/>
 
@@ -35,6 +38,9 @@
     
     <node name="robots_sim" pkg="elikos_sim" type="robots_sim">
         <param name="speed" value="$(arg speed)" />
+        <param name="rotation_speed" value="$(arg rotation_speed)" />
+        <param name="rotation_angle" value="$(arg rotation_angle)" />
+        <param name="random_angle_time_lap" value="$(arg random_angle_time_lap)" />
         <param name="obstacle_05" value="$(arg obstacle_05)" />
         <param name="obstacle_10" value="$(arg obstacle_10)" />
         <param name="obstacle_15" value="$(arg obstacle_15)" />
