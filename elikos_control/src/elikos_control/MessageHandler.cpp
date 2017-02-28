@@ -1,7 +1,12 @@
+#include <mavros_msgs/CommandBool.h>
+#include <mavros_msgs/SetMode.h>
+#include <mavros_msgs/State.h>
+
 #include "MessageHandler.h"
 
-MessageHandler::MessageHandler():
-  toleranceNextGoal_(0.5)
+
+
+MessageHandler::MessageHandler()
 {
 	sub_ = nh_.subscribe("elikos_trajectory", 1, &MessageHandler::dispatchMessage, this);
 }
@@ -14,11 +19,11 @@ MessageHandler::~MessageHandler()
 
 void MessageHandler::dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr& input)
 {
-	uint8_t code = input->cmdCode;
-	trajectory_msgs::MultiDOFJointTrajectory trajectory = input->trajectory;
+	lastReceivedCmd_.cmdCode_ = input->cmdCode;
+	lastReceivedCmd_.cmdTrajectory_ = input->trajectory;
 
 	//Ce qui suit est du code temporaire qui assure un contrôle par position.
-    tf::StampedTransform currentPosition;
+    /*tf::StampedTransform currentPosition;
 	tf_listener_.lookupTransform("elikos_arena_origin", "elikos_base_link",
 							ros::Time(0), currentPosition);
 	int i = 0;
@@ -42,11 +47,11 @@ void MessageHandler::dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr& 
 
 	tf::quaternionTFToMsg(rotation, trajectoryPoint_.rotation);
 
-	publishTrajectoryPosition(trajectoryPoint_);
+	publishTrajectoryPosition(trajectoryPoint_);*/
 }
 
 // Méthode temporaire pour le contrôle par position.
-void MessageHandler::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint)
+/*void MessageHandler::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint)
 {
   //Convert geometry_msgs::Transform to tf::Transform
   tf::Transform tfTrajectoryPoint;
@@ -54,4 +59,4 @@ void MessageHandler::publishTrajectoryPosition(geometry_msgs::Transform_<std::al
 
   //Broadcast command
   tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), "elikos_arena_origin", "elikos_setpoint"));
-}
+}*/
