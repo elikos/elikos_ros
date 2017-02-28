@@ -12,7 +12,6 @@ void CmdStandBy::execute()
 
 void CmdStandBy::abort()
 {
-
 }
 
 void CmdStandBy::ajustement()

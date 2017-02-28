@@ -21,17 +21,16 @@ public:
     inline int getId() const;
 
 protected:
-
     int id_;
+
     ros::NodeHandle* nh_;
 
     tf::TransformListener tf_listener_;
     tf::TransformBroadcaster tf_broadcaster_;
 
-
-
 private:
     CmdAbs() = delete;
+
 };
 
 inline int CmdAbs::getId() const

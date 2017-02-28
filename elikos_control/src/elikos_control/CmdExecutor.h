@@ -2,6 +2,7 @@
 #define CMD_EXECUTOR_H
 
 #include <memory>
+#include <thread>
 
 #include "MessageHandler.h"
 #include "CmdAbs.h"
@@ -21,8 +22,11 @@ private:
     std::unique_ptr<CmdAbs> pendingCmd_;
     std::unique_ptr<CmdAbs> currentCmd_;
 
+    void executeCurrentCmd();
     void checkForNewCommand();
-    std::unique_ptr<CmdAbs> createCommand(CmdConfig config);  
+
+    std::thread cmdExecutionThread_;
+    std::unique_ptr<CmdAbs> createCommand(const CmdConfig& config);  
 };
 
 #endif // CMD_EXECUTOR_H

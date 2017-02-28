@@ -45,7 +45,7 @@ void CmdOffBoard::execute()
 
 void CmdOffBoard::abort()
 {
-
+    
 }
 
 void CmdOffBoard::ajustement()
