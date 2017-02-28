@@ -8,6 +8,5 @@ int main(int argc, char* argv[])
     ros::init( argc, argv, "elikos_control" );
 
     CmdExecutor executor;
-
-
+    executor.run();
 }

@@ -1,6 +1,6 @@
 #include "CmdAbs.h"
 
-CmdAbs::CmdAbs(ros::NodeHandle* nh)
-    : nh_(nh)
+CmdAbs::CmdAbs(ros::NodeHandle* nh, int id)
+    : nh_(nh), id_(id)
 {
 }

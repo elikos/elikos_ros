@@ -11,15 +11,18 @@
 class CmdAbs
 {
 public:
-    CmdAbs(ros::NodeHandle* nh);
+    CmdAbs(ros::NodeHandle* nh, int id);
     virtual ~CmdAbs() = default;
 
     virtual void execute() = 0;
     virtual void abort() = 0;
     virtual void ajustement() = 0;
     
+    inline int getId() const;
 
 protected:
+
+    int id_;
     ros::NodeHandle* nh_;
 
     tf::TransformListener tf_listener_;
@@ -30,5 +33,10 @@ protected:
 private:
     CmdAbs() = delete;
 };
+
+inline int CmdAbs::getId() const
+{
+    return id_;
+}
 
 #endif /// CMD_ABS

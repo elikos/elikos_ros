@@ -6,9 +6,9 @@
 
 
 
-MessageHandler::MessageHandler()
+MessageHandler::MessageHandler(ros::NodeHandle* nh)
 {
-	sub_ = nh_.subscribe("elikos_trajectory", 1, &MessageHandler::dispatchMessage, this);
+	sub_ = nh->subscribe("elikos_trajectory", 1, &MessageHandler::dispatchMessage, this);
 }
 
 
@@ -21,6 +21,7 @@ void MessageHandler::dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr& 
 {
 	lastReceivedCmd_.cmdCode_ = input->cmdCode;
 	lastReceivedCmd_.cmdTrajectory_ = input->trajectory;
+	lastReceivedCmd_.id_ = lastCmdId_++;
 
 	//Ce qui suit est du code temporaire qui assure un contrôle par position.
     /*tf::StampedTransform currentPosition;

@@ -16,6 +16,7 @@
 
 struct CmdConfig
 {
+    int id_;
     uint8_t cmdCode_;
     trajectory_msgs::MultiDOFJointTrajectory cmdTrajectory_;
 };
@@ -25,17 +26,19 @@ class CmdExecutor;
 class MessageHandler
 {
 public:
-    MessageHandler();
+    MessageHandler(ros::NodeHandle* nh);
     ~MessageHandler();
     void dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr &input);
     void publishTrajectoryPosition(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint);
     inline CmdConfig getLastCmdConfig() const;
 
 private:
-    ros::NodeHandle nh_;
     ros::Subscriber sub_;
 
     CmdConfig lastReceivedCmd_;
+    int lastCmdId_ = 0;
+
+    MessageHandler() = delete;
 };
 
 inline CmdConfig MessageHandler::getLastCmdConfig() const

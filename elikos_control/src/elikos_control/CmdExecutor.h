@@ -1,11 +1,10 @@
-#ifndef CMD_EXECUTOR
-#define CMD_EXECUTOR
+#ifndef CMD_EXECUTOR_H
+#define CMD_EXECUTOR_H
 
 #include <memory>
 
 #include "MessageHandler.h"
 #include "CmdAbs.h"
-
 
 class CmdExecutor
 {
@@ -13,15 +12,17 @@ public:
     CmdExecutor();
     ~CmdExecutor();
 
-    std::unique_ptr<CmdAbs> createCommand(CmdConfig config);  
     void run(); 
 
 private:
+    ros::NodeHandle nh_;
     MessageHandler msgHndlr_;
 
-    void checkForNewCommand();
+    std::unique_ptr<CmdAbs> pendingCmd_;
+    std::unique_ptr<CmdAbs> currentCmd_;
 
+    void checkForNewCommand();
+    std::unique_ptr<CmdAbs> createCommand(CmdConfig config);  
 };
 
-
-#endif //CMD_EXECUTOR
+#endif // CMD_EXECUTOR_H

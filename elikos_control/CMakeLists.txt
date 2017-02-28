@@ -52,6 +52,8 @@ add_executable( elikos_control
     src/elikos_control/MessageHandler.h
     src/elikos_control/MessageHandler.cpp
     src/elikos_control/elikos_control.cpp
+    src/elikos_control/CmdExecutor.h
+    src/elikos_control/CmdExecutor.cpp
 )
 
 

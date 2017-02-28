@@ -1,7 +1,7 @@
 #include "CmdOffBoard.h"
 
-CmdOffBoard::CmdOffBoard(ros::NodeHandle* nh)
-    : CmdAbs(nh)    
+CmdOffBoard::CmdOffBoard(ros::NodeHandle* nh, int id)
+    : CmdAbs(nh, id)    
 {
     stateSub_ = nh_->subscribe<mavros_msgs::State>("mavros/state", 10, &CmdOffBoard::stateCallBack, this);
     armingClient_ = nh_->serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
