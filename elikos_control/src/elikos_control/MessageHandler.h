@@ -16,7 +16,7 @@
 
 struct CmdConfig
 {
-    int id_;
+    int id_ = -1;
     uint8_t cmdCode_;
     trajectory_msgs::MultiDOFJointTrajectory cmdTrajectory_;
 };

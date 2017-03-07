@@ -5,8 +5,14 @@ CmdStandBy::CmdStandBy(ros::NodeHandle* nh, int id)
 {
 }
 
+CmdStandBy::~CmdStandBy()
+{
+    int i = 0;
+}
+
 void CmdStandBy::execute()
 {
+    continue_ = true;
     // TODO: Essayer a nouveau si le lookup echoue.
     try {
         tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), currentPosition_);

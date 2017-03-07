@@ -12,7 +12,7 @@ class CmdStandBy : public CmdAbs
 {
 public:
     CmdStandBy(ros::NodeHandle* nh, int id);
-    virtual ~CmdStandBy() = default;
+    virtual ~CmdStandBy();
 
     virtual void execute();
     virtual void abort();
@@ -20,7 +20,7 @@ public:
 
 private:
 
-    bool continue_ = false;
+    bool continue_ = true;
 
     tf::StampedTransform currentPosition_;
 

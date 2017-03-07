@@ -12,7 +12,7 @@ class CmdOffBoard : public CmdAbs
 {
 public:
     CmdOffBoard(ros::NodeHandle* nh, int id);
-    virtual ~CmdOffBoard() = default;
+    virtual ~CmdOffBoard();
 
     virtual void execute();
     virtual void abort();

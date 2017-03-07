@@ -3,6 +3,9 @@
 
 #include <memory>
 #include <thread>
+#include <mutex>
+
+#include <unordered_map>
 
 #include "MessageHandler.h"
 #include "CmdAbs.h"
@@ -19,14 +22,17 @@ private:
     ros::NodeHandle nh_;
     MessageHandler msgHndlr_;
 
-    std::unique_ptr<CmdAbs> pendingCmd_;
-    std::unique_ptr<CmdAbs> currentCmd_;
+    CmdAbs* pendingCmd_;
+    CmdAbs* currentCmd_;
 
     void executeCurrentCmd();
     void checkForNewCommand();
 
+    std::unordered_map<int, std::unique_ptr<CmdAbs>> commands_;
+
+    std::mutex pendingCmdLock_;
     std::thread cmdExecutionThread_;
-    std::unique_ptr<CmdAbs> createCommand(const CmdConfig& config);  
+    void createCommand(const CmdConfig& config);  
 };
 
 #endif // CMD_EXECUTOR_H

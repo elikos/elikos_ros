@@ -12,6 +12,11 @@ CmdOffBoard::CmdOffBoard(ros::NodeHandle* nh, int id)
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 2.0 }));
 }
 
+CmdOffBoard::~CmdOffBoard()
+{
+    int i = 0;
+}
+
 void CmdOffBoard::stateCallBack(const mavros_msgs::State::ConstPtr& msg)
 {
     currentState_ = *msg;
@@ -59,7 +64,8 @@ void CmdOffBoard::execute()
 
         try {
             tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
-        } catch(tf::TransformException e) {
+        } catch (tf::TransformException e) {
+            std::cout << e << std::endl;
         }
 
         double distance = lastPosition_.getOrigin().distance(targetPosition_.getOrigin());

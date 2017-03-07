@@ -21,13 +21,15 @@ public:
     virtual void execute() = 0;
     virtual void abort() = 0;
     virtual void ajustement() = 0;
+
+    inline void setId(int id);
     inline int getId() const;
 
     const std::string MAV_FRAME = { "elikos_fcu" };
     const std::string WORLD_FRAME = { "elikos_arena_origin" };
 
 protected:
-    int id_;
+    int id_ = -1;
 
     ros::NodeHandle* nh_;
 
@@ -42,6 +44,11 @@ private:
 inline int CmdAbs::getId() const
 {
     return id_;
+}
+
+inline void CmdAbs::setId(int id)
+{
+    id_ = id;
 }
 
 #endif /// CMD_ABS

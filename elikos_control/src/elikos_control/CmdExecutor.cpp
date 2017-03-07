@@ -1,3 +1,5 @@
+#include <string>
+
 #include <ros/ros.h>
 #include "CmdStandBy.h"
 #include "CmdOffBoard.h"
@@ -7,8 +9,12 @@
 CmdExecutor::CmdExecutor()
     : msgHndlr_(&nh_)
 {
-    currentCmd_ = std::unique_ptr<CmdStandBy>(new CmdStandBy(&nh_, -1));            
-    pendingCmd_ = std::unique_ptr<CmdStandBy>(new CmdStandBy(&nh_, -1));            
+
+    commands_.insert(std::pair<int, std::unique_ptr<CmdOffBoard>>(0, std::unique_ptr<CmdOffBoard>(new CmdOffBoard(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdStandBy>>(5, std::unique_ptr<CmdStandBy>(new CmdStandBy(&nh_, -1))));
+    currentCmd_ = commands_[5].get();
+    pendingCmd_ = currentCmd_;
+
     cmdExecutionThread_ = std::thread(&CmdExecutor::executeCurrentCmd, this);
 }
 
@@ -20,40 +26,26 @@ CmdExecutor::~CmdExecutor()
 void CmdExecutor::checkForNewCommand()
 {
     CmdConfig lastConfig = msgHndlr_.getLastCmdConfig();
-    if(pendingCmd_->getId() != lastConfig.id_)
+    pendingCmdLock_.lock();
+    int pendingId = pendingCmd_->getId();
+    if(pendingId != lastConfig.id_)
     {
         createCommand(lastConfig);
         currentCmd_->abort();
     }
+    pendingCmdLock_.unlock();
 }
 
-std::unique_ptr<CmdAbs> CmdExecutor::createCommand(const CmdConfig& config)
+void CmdExecutor::createCommand(const CmdConfig& config)
 {
-    switch(config.cmdCode_)
+
+    std::unordered_map<int, std::unique_ptr<CmdAbs>>::iterator it;
+    it = commands_.find(config.cmdCode_);
+    if (it != commands_.end())
     {
-        case 0:
-            pendingCmd_ = std::unique_ptr<CmdOffBoard>(new CmdOffBoard(&nh_, config.id_));
-            break;
-
-        case 1:
-            break;
-
-        case 2:
-            break;
-
-        case 3:
-            break;
-
-        case 4:
-            break;
-
-        case 5:
-            pendingCmd_ = std::unique_ptr<CmdStandBy>(new CmdStandBy(&nh_, config.id_));
-            break;
-
-        case 6:
-            break;
-    } 
+        pendingCmd_ = it->second.get();
+        it->second->setId(config.id_); 
+    }
 }  
 
 void CmdExecutor::executeCurrentCmd()
@@ -61,12 +53,10 @@ void CmdExecutor::executeCurrentCmd()
     while (true) 
     {
         currentCmd_->execute();
-        currentCmd_.swap(pendingCmd_);
-        if (currentCmd_ == nullptr) 
-        {
-            currentCmd_ = std::unique_ptr<CmdStandBy>(new CmdStandBy(&nh_, -1));
-        }
-        pendingCmd_ = nullptr;
+        pendingCmdLock_.lock();
+        currentCmd_ = pendingCmd_;
+        pendingCmd_ = commands_[5].get();
+        pendingCmdLock_.unlock();
     }
 }
 
