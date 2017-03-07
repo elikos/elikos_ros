@@ -34,6 +34,10 @@ private:
 
     ros::Time lastRequest_;
 
+    tf::StampedTransform targetPosition_;
+    tf::StampedTransform lastPosition_;
+
+    double threshold_ = 0.2;
     
 };
 

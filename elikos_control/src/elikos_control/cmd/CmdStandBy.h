@@ -19,6 +19,11 @@ public:
     virtual void ajustement();
 
 private:
+
+    bool continue_ = false;
+
+    tf::StampedTransform currentPosition_;
+
     CmdStandBy() = delete;
 };
 
