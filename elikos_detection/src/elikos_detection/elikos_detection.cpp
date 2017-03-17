@@ -1,7 +1,18 @@
 #include <memory>
 #include <ros/ros.h>
 #include <ros/package.h>
+#include <iostream>
+#include <elikos_remote_calib_client/Calibrator.h>
+#include <elikos_remote_calib_client/Calibratable.h>
+#include <elikos_remote_calib_client/CalibPreprocessing.h>
 #include "MessageHandler.h"
+
+class Tmp : public remote_calib::Calibratable<elikos_remote_calib_client::CalibPreprocessing>{
+  virtual void calibrate(const elikos_remote_calib_client::CalibPreprocessing* const message)
+  {
+    std::cout << message << std::endl;
+  }
+};
 
 int main(int argc, char* argv[])
 {
@@ -10,6 +21,9 @@ int main(int argc, char* argv[])
 
   	string extension = ".calib";
   	string inputFile, outputFile;
+
+    Tmp tmp;
+    remote_calib::Calibrator<elikos_remote_calib_client::CalibPreprocessing> calibrateur(tmp);
 
     ros::NodeHandle nh_;
 

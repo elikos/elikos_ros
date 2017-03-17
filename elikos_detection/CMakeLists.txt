@@ -11,13 +11,14 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   tf
+  elikos_remote_calib_client
 )
 find_package(OpenCV 2 REQUIRED)
 
 catkin_package(
 #   INCLUDE_DIRS include
 #   LIBRARIES elikos_detection
-	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf
+	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf elikos_remote_calib_client
 #   DEPENDS system_lib
 )
 
