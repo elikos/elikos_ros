@@ -15,7 +15,8 @@ class Tmp : public remote_calib::Calibratable<elikos_remote_calib_client::CalibP
 
   virtual void loadCalibration(const YAML::Node& fileContent)
   {
-    //lol
+    std::cerr << "Loading calibration !" << std::endl;
+    std::cerr << fileContent["name"] << std::endl;
   }
 
   virtual void saveCalibration(YAML::Node& fileContent)

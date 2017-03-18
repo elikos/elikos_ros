@@ -15,6 +15,7 @@
 
 #include <elikos_remote_calib_client/SaveConfig.h>
 #include <elikos_remote_calib_client/GetConfigFiles.h>
+#include <elikos_remote_calib_client/LoadConfig.h>
 
 #include "elikos_remote_calib_client/Calibratable.h"
 
@@ -24,6 +25,7 @@ static const std::string REMOTE_CALIB_NAMESPCACE = "elikos_remote_calib";
 static const std::string MESSAGE_TOPIC_NAME = "calib";
 static const std::string SAVE_SERVICE_NAME = "save";
 static const std::string GET_FILE_NAME_SERVICE_NAME = "get_config_files";
+static const std::string LOAD_SERVICE_NAME = "load";
 
 static const std::string CONFIG_FILE_NAME = "calibrations";
 static const std::string CONFIG_FILE_EXTENTION = ".yaml";
@@ -39,9 +41,13 @@ public:
     //Charge la calibration en mémoire depuis un fichier
     bool saveCalibration(const std::string& fileName);
 private:
+    //Callback du message
     void calibrationCallback(const boost::shared_ptr<Msg const>& msgPtr);
+
+    //Callback des services
     bool saveCallback(elikos_remote_calib_client::SaveConfig::Request& req, elikos_remote_calib_client::SaveConfig::Response& res);
     bool confCallback(elikos_remote_calib_client::GetConfigFiles::Request& req, elikos_remote_calib_client::GetConfigFiles::Response& res);
+    bool loadCallback(elikos_remote_calib_client::LoadConfig::Request& req, elikos_remote_calib_client::LoadConfig::Response& res);
 
     //Ajoute un fichier au métafichier de configuration
     bool addToCalibrationMetafile(const std::string& filename);
@@ -54,7 +60,7 @@ private:
     ros::Subscriber calibrationSubscriber_;
 
     ros::ServiceServer saveService_;
-    //ros::ServiceServer loadService_;
+    ros::ServiceServer loadService_;
     ros::ServiceServer configService_;
 
     std::string configFileDir_;
@@ -90,6 +96,7 @@ Calibrator<Msg>::Calibrator(Calibratable<Msg>& calibrable, const std::string& co
 
     saveService_ = nodeHandle_.advertiseService(SAVE_SERVICE_NAME, &Calibrator<Msg>::saveCallback, this);
     configService_ = nodeHandle_.advertiseService(GET_FILE_NAME_SERVICE_NAME, &Calibrator<Msg>::confCallback, this);
+    loadService_ = nodeHandle_.advertiseService(LOAD_SERVICE_NAME, &Calibrator<Msg>::loadCallback, this);
 
 
     try {
@@ -125,7 +132,7 @@ bool Calibrator<Msg>::loadCalibration(const std::string& fileName)
         YAML::Node config = YAML::LoadFile(configFileDir_ + fileName);
         calibratable_.loadCalibration(config);
         return true;
-    } catch ( ... ) {//TODO remplacer par le bon truc
+    } catch ( YAML::BadFile exeption ) {
         std::cerr << "Il y a eu une exception lors du chargement de paramètres.\n"
             << "Le nom du ficher était : " << fileName << "\n" << std::endl;
         return false;
@@ -197,7 +204,8 @@ bool Calibrator<Msg>::saveCallback(elikos_remote_calib_client::SaveConfig::Reque
 
 /*******************************************************************************
 * Méthode de callback du service de sauvegarde de calibration. Appelée 
-* lorsqu'une instance de calibration à besoin de sauvegarder la calibration
+* lorsqu'une instance de calibration à besoin de connaitre les nom des fichiers
+* de calibration.
 *******************************************************************************/
 template<typename Msg>
 bool Calibrator<Msg>::confCallback(elikos_remote_calib_client::GetConfigFiles::Request& req, elikos_remote_calib_client::GetConfigFiles::Response& res)
@@ -206,6 +214,17 @@ bool Calibrator<Msg>::confCallback(elikos_remote_calib_client::GetConfigFiles::R
     for(auto it = fileList_.begin(); it != fileList_.end(); ++it) {
         res.fileNames.push_back(it->as<std::string>());
     }
+    return true;
+}
+
+/*******************************************************************************
+* Méthode de callback du service de sauvegarde de calibration. Appelée 
+* lorsqu'une instance de calibration à besoin de charger une configuration.
+*******************************************************************************/
+template<typename Msg>
+bool Calibrator<Msg>::loadCallback(elikos_remote_calib_client::LoadConfig::Request& req, elikos_remote_calib_client::LoadConfig::Response& res)
+{
+    res.sucess = loadCalibration(req.fileName);
     return true;
 }
 
