@@ -12,6 +12,18 @@ class Tmp : public remote_calib::Calibratable<elikos_remote_calib_client::CalibP
   {
     std::cout << message << std::endl;
   }
+
+  virtual void loadCalibration(const YAML::Node& fileContent)
+  {
+    //lol
+  }
+
+  virtual void saveCalibration(YAML::Node& fileContent)
+  {
+    fileContent["encoding"] = "CHTAFF";
+    fileContent["version"] = "6.6.7";
+    fileContent["name"] = "Outaf Hell";
+  }
 };
 
 int main(int argc, char* argv[])
@@ -22,8 +34,6 @@ int main(int argc, char* argv[])
   	string extension = ".calib";
   	string inputFile, outputFile;
 
-    Tmp tmp;
-    remote_calib::Calibrator<elikos_remote_calib_client::CalibPreprocessing> calibrateur(tmp);
 
     ros::NodeHandle nh_;
 
@@ -44,6 +54,9 @@ int main(int argc, char* argv[])
 
     bool calibrationOn;
     nh_.getParam("/"+ros::this_node::getName()+"/calibration", calibrationOn);
+
+    Tmp tmp;
+    remote_calib::Calibrator<elikos_remote_calib_client::CalibPreprocessing> calibrateur(tmp, calibFolderPath);
 
     ros::Rate r(30);
     // Endless loop
