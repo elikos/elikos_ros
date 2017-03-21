@@ -20,6 +20,7 @@ find_package( catkin REQUIRED COMPONENTS
    cv_bridge
    geometry_msgs
    std_srvs
+   trajectory_msgs
 )
 find_package(OpenCV REQUIRED)
 
@@ -65,6 +66,7 @@ add_message_files(
   RobotRawArray.msg
   TargetRobot.msg
   TargetRobotArray.msg
+  TrajectoryCmd.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -88,6 +90,7 @@ generate_messages(
   geometry_msgs
   mavros_msgs
   sensor_msgs
+  trajectory_msgs
 )
 
 ###################################

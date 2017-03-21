@@ -1,26 +1,47 @@
 <launch>
 	<!-- Target detection -->
-	<arg name="rviz" default="true" />
-	<arg name="image" default="false" />
-	<arg name="calib" default="false" />
-	<arg name="calib_in" default="calibration_initial" />
-	<arg name="calib_out" default="new_calibration" />
-	<arg name="calib_dir" default="$(find elikos_detection)/cfg/" />
-	<include file="$(find elikos_detection)/launch/detection.launch"/>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="gazebo_r200_front" />
+      <arg name="cfg" value="gazebo_r200_front"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="gazebo_r200_right" />
+      <arg name="cfg" value="gazebo_r200_right"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="gazebo_r200_left" />
+      <arg name="cfg" value="gazebo_r200_left"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="gazebo_r200_back" />
+      <arg name="cfg" value="gazebo_r200_back"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="gazebo_ffmv_bottom" />
+      <arg name="cfg" value="gazebo_ffmv_bottom"/>
+  </include>
 
 	<!-- Target tracking -->
-	<include file="$(find elikos_tracking)/launch/tracking.launch"/>
 
 	<!-- AI -->
 	<include file="$(find elikos_ai)/launch/ai.launch"/>
 
 	<!-- Path planning and navigation -->
-  <include file="$(find elikos_path_planning)/launch/nav.launch"/>
+  <include file="$(find elikos_path_planning)/launch/path_planning.launch"/>
+
+	<!-- Control -->
+	<include file="$(find elikos_control)/launch/elikos_control.launch"/>
 
 	<!-- Static transforms -->
 	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
 	<node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
-	<node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="-0.11 0.0 0.0 0.707107 -0.707107 0.0 0.0 elikos_base_link elikos_ffmv_bottom 100" />
-  <node pkg="tf" type="static_transform_publisher" name="r200_broadcaster" args="0.141 0 0 -0.59 0.59 -00.39 0.39 elikos_base_link r200 100" />
-	<node pkg="tf" type="static_transform_publisher" name="dummy_broadcaster" args="2.0 0.0 1.0 0.0 0.0 0.0 1.0 elikos_local_origin elikos_fcu 100" />
+  <node pkg="tf" type="static_transform_publisher" name="r200_front_broadcaster" args="0.15 0 0 0.6029 -0.6029 0.3695 -0.3695 elikos_base_link r200_front 100" />
+  <node pkg="tf" type="static_transform_publisher" name="r200_left_broadcaster" args="0 0.15 0 -0.8526 0.0 0.0 0.5225 elikos_base_link r200_left 100" />
+  <node pkg="tf" type="static_transform_publisher" name="r200_right_broadcaster" args="0 -0.15 0 -0.0 -0.8526 0.5225 0.0 elikos_base_link r200_right 100" />
+  <node pkg="tf" type="static_transform_publisher" name="r200_back_broadcaster" args="-0.20 0 0 0.6029 0.6029 -0.3694 -0.3694 elikos_base_link r200_back 100" />
+  <node pkg="tf" type="static_transform_publisher" name="elikos_ffmv_bottom_broadcaster" args="-0.15 0 0.02 0.7071 -0.7071 0.0 -0.0 elikos_base_link elikos_ffmv_bottom 100" />
+
+  <!-- Target and obstacle robots -->
+	<include file="$(find elikos_sim)/launch/robots_sim.launch"/>
+
 </launch>

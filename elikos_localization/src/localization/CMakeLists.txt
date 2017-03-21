@@ -1,3 +1,16 @@
+include_directories(
+    ${catkin_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    ${EIGEN_INCLUDE_DIR}
+    arena-detection
+    arena-detection/algorithm
+    context
+    context/intersection
+    context/line
+    arena-tracking
+    arena-tracking/filter
+)
+
 add_executable(elikos_localization
     Localizaton.cpp
     MessageHandler.h
@@ -29,15 +42,7 @@ add_executable(elikos_localization
     context/Grid.h
     context/Grid.cpp)
 
-include_directories(${catkin_INCLUDE_DIRS}
-                    arena-detection
-                    arena-detection/algorithm
-                    context
-                    context/intersection
-                    context/line
-                    arena-tracking
-                    arena-tracking/filter)
-
 target_link_libraries(elikos_localization 
                       ${catkin_LIBRARIES} 
-                      ${OpenCV_LIBS})
+                      ${OpenCV_LIBRARIES}
+)

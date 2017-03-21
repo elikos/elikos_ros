@@ -28,11 +28,16 @@ public:
     //Robot detection algorithm
     //Color blobs detection algotrithm
     void detectColor(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
+    //Circle blobs detection algotrithm
+    void detectCircles(const cv::Mat &input, cv::Mat &output_w, cv::Mat &output_r, cv::Mat &output_g, cv::Mat &output);
+    
     //Getters
     vector<RobotDesc> getBlobObjects();
 
     void saveCalibration(string filename);
     void loadCalibration(string filename);
+    std::string getAllParams();
+    
 private:
     // ATTRIBUTES
     //Data used in computation
@@ -46,10 +51,12 @@ private:
     vector<RobotDesc> redObjects;
     vector<Vec3f> circles;
     vector<Mat> thresholds;
+
     WhiteColor whiteColor_;
     RedColor redColor_;
     GreenColor greenColor_;
-	int maxID;
+	
+    int maxID;
     //Final data (can be fetched by other classes through the getters)
     vector<RobotDesc> foundRobots;
     vector<RobotDesc> foundObstacles;

@@ -1,0 +1,4 @@
+controller_list:
+  - name: fake_elikos_moveit_quadrotor_group_controller
+    joints:
+      - virtual_joint
