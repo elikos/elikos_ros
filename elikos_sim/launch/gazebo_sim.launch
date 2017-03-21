@@ -4,5 +4,7 @@
         <arg name="sdf" value="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/iris_realsense/iris_opt_flow.sdf"/>
         <arg name="config_yaml" value="$(find elikos_ros)/launch/px4_config_sim.yaml"/>
      </include>
+
      <node name="gazebo_tf_fix" pkg="elikos_sim" type="gazebo_tf_fix"/>
+
 </launch>

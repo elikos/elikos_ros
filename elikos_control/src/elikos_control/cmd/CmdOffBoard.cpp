@@ -10,6 +10,8 @@ CmdOffBoard::CmdOffBoard(ros::NodeHandle* nh, int id)
     offbSetMode_.request.custom_mode = "OFFBOARD";
     armCmd_.request.value = true;
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 2.0 }));
+    targetPosition_.child_frame_id_ = "elikos_setpoint";
+    targetPosition_.frame_id_ = WORLD_FRAME;
 }
 
 CmdOffBoard::~CmdOffBoard()
@@ -25,15 +27,11 @@ void CmdOffBoard::stateCallBack(const mavros_msgs::State::ConstPtr& msg)
 void CmdOffBoard::execute()
 {
     ros::Rate rate(30.0);
-    while(ros::ok() && currentState_.connected)
-    {
-        ros::spinOnce();
-        rate.sleep();
-    }
 
     //send a few setpoints before starting
     for(int i = 0; ros::ok() && i < 100; ++i)
     {
+        targetPosition_.stamp_ = ros::Time::now();
         tf_broadcaster_.sendTransform(targetPosition_);
         ros::spinOnce();
         rate.sleep();
@@ -44,20 +42,28 @@ void CmdOffBoard::execute()
     {
         ros::spinOnce();
         lastRequest_ = ros::Time::now();
-        if (currentState_.mode != "OFFBOARD" && (ros::Time::now() - lastRequest_ > ros::Duration(5.0)))
+        if (currentState_.mode != "OFFBOARD")
         {
             if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
             {
                 ROS_INFO("Offboard enabled");
+            } 
+            else 
+            {
+                ROS_INFO("Offboard request failed");
             }
             lastRequest_ = ros::Time::now();
         } 
-        else if (!currentState_.armed && (ros::Time::now() - lastRequest_ > ros::Duration(5.0)))
+        else if (!currentState_.armed)
         {
             if (armingClient_.call(armCmd_) &&
                 armCmd_.response.success)
             {
                 ROS_INFO("Vehicle armed");
+            }
+            else 
+            {
+                ROS_INFO("Vehicle armed request failed");
             }
             lastRequest_ = ros::Time::now();
         }
@@ -65,12 +71,13 @@ void CmdOffBoard::execute()
         try {
             tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
         } catch (tf::TransformException e) {
-            std::cout << e << std::endl;
+            ROS_ERROR("%s",e.what());
         }
 
         double distance = lastPosition_.getOrigin().distance(targetPosition_.getOrigin());
         if (distance > threshold_)
         {
+            targetPosition_.stamp_ = ros::Time::now();
             tf_broadcaster_.sendTransform(targetPosition_);
             rate.sleep();
         } 

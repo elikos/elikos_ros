@@ -3,11 +3,16 @@
 CmdStandBy::CmdStandBy(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)
 {
+    currentPosition_.frame_id_ = WORLD_FRAME;
+    currentPosition_.child_frame_id_ = MAV_FRAME;
+    tf::Transform initialTransform;
+    initialTransform.setOrigin({ 0.0, 0.0, 0.0 });
+    initialTransform.setRotation({ 0.0, 0.0, 0.0, 1.0 });
+    currentPosition_.setData(initialTransform);
 }
 
 CmdStandBy::~CmdStandBy()
 {
-    int i = 0;
 }
 
 void CmdStandBy::execute()
@@ -17,11 +22,13 @@ void CmdStandBy::execute()
     try {
         tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), currentPosition_);
     } catch(tf::TransformException e) {
+        ROS_ERROR("%s",e.what());
     }
 
     ros::Rate rate(30.0);
     while(ros::ok() && continue_)
     {
+        currentPosition_.stamp_ = ros::Time::now();
         tf_broadcaster_.sendTransform(currentPosition_);
         ros::spinOnce();
         rate.sleep();

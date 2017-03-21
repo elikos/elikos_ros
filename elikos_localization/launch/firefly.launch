@@ -1,8 +1,0 @@
-<launch>
-	<node pkg="camera1394" type="camera1394_node" name="camera1394">
-		<param name="guid" value="00b09d0100db6e43"/>
-		<param name="frame_rate" value="30"/>
-		<param name="bayer_pattern" value="rggb"/>
-		<param name="auto_exposure" value="0"/>
-	</node>
-</launch>
