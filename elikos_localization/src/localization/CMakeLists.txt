@@ -12,7 +12,7 @@ include_directories(
 )
 
 add_executable(elikos_localization
-    Localizaton.cpp
+    Localization.cpp
     MessageHandler.h
     MessageHandler.cpp
     arena-detection/ImageProcessor.h 
