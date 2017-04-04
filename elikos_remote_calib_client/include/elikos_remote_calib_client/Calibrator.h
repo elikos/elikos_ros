@@ -9,13 +9,13 @@
 #include <typeinfo>
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 
 #include <yaml-cpp/yaml.h>
 #include <ros/ros.h>
 
-#include <elikos_remote_calib_client/SaveConfig.h>
+#include <elikos_remote_calib_client/FileManipulation.h>
 #include <elikos_remote_calib_client/GetConfigFiles.h>
-#include <elikos_remote_calib_client/LoadConfig.h>
 
 #include "elikos_remote_calib_client/Calibratable.h"
 
@@ -26,6 +26,7 @@ static const std::string MESSAGE_TOPIC_NAME = "calib";
 static const std::string SAVE_SERVICE_NAME = "save";
 static const std::string GET_FILE_NAME_SERVICE_NAME = "get_config_files";
 static const std::string LOAD_SERVICE_NAME = "load";
+static const std::string DELETE_FILE_SERVICE_NAME = "delete_file";
 
 static const std::string CONFIG_FILE_NAME = "calibrations";
 static const std::string CONFIG_FILE_EXTENTION = ".yaml";
@@ -38,19 +39,24 @@ public:
 
     //Charge la calibration en mémoire depuis un fichier
     bool loadCalibration(const std::string& fileName);
-    //Charge la calibration en mémoire depuis un fichier
+    //Enregistre la calibration en mémoire dans un fichier
     bool saveCalibration(const std::string& fileName);
 private:
     //Callback du message
     void calibrationCallback(const boost::shared_ptr<Msg const>& msgPtr);
 
     //Callback des services
-    bool saveCallback(elikos_remote_calib_client::SaveConfig::Request& req, elikos_remote_calib_client::SaveConfig::Response& res);
+    bool saveCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res);
     bool confCallback(elikos_remote_calib_client::GetConfigFiles::Request& req, elikos_remote_calib_client::GetConfigFiles::Response& res);
-    bool loadCallback(elikos_remote_calib_client::LoadConfig::Request& req, elikos_remote_calib_client::LoadConfig::Response& res);
+    bool loadCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res);
+    bool deleteFileCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res);
 
     //Ajoute un fichier au métafichier de configuration
     bool addToCalibrationMetafile(const std::string& filename);
+    //Enlève un fichier du métafichier de configuration
+    bool removeFromCalibrationMetafile(const std::string& filename);
+    //Vérifie si un fichier est dans le métafichier de configuration
+    bool isInCalibrationMetafile(const std::string& filename);
     //Sauvegarde les paramètres dans le fichier de configuration
     void saveToCalibMetaFile();
 
@@ -62,6 +68,7 @@ private:
     ros::ServiceServer saveService_;
     ros::ServiceServer loadService_;
     ros::ServiceServer configService_;
+    ros::ServiceServer deleteFileService_;
 
     std::string configFileDir_;
 
@@ -97,6 +104,7 @@ Calibrator<Msg>::Calibrator(Calibratable<Msg>& calibrable, const std::string& co
     saveService_ = nodeHandle_.advertiseService(SAVE_SERVICE_NAME, &Calibrator<Msg>::saveCallback, this);
     configService_ = nodeHandle_.advertiseService(GET_FILE_NAME_SERVICE_NAME, &Calibrator<Msg>::confCallback, this);
     loadService_ = nodeHandle_.advertiseService(LOAD_SERVICE_NAME, &Calibrator<Msg>::loadCallback, this);
+    deleteFileService_ = nodeHandle_.advertiseService(DELETE_FILE_SERVICE_NAME, &Calibrator<Msg>::deleteFileCallback, this);
 
 
     try {
@@ -196,7 +204,7 @@ void Calibrator<Msg>::calibrationCallback(const boost::shared_ptr<Msg const>& ms
 * lorsqu'une instance de calibration à besoin de sauvegarder la calibration
 *******************************************************************************/
 template<typename Msg>
-bool Calibrator<Msg>::saveCallback(elikos_remote_calib_client::SaveConfig::Request& req, elikos_remote_calib_client::SaveConfig::Response& res)
+bool Calibrator<Msg>::saveCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res)
 {
     res.sucess = saveCalibration(req.fileName);
     return true;
@@ -222,9 +230,28 @@ bool Calibrator<Msg>::confCallback(elikos_remote_calib_client::GetConfigFiles::R
 * lorsqu'une instance de calibration à besoin de charger une configuration.
 *******************************************************************************/
 template<typename Msg>
-bool Calibrator<Msg>::loadCallback(elikos_remote_calib_client::LoadConfig::Request& req, elikos_remote_calib_client::LoadConfig::Response& res)
+bool Calibrator<Msg>::loadCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res)
 {
     res.sucess = loadCalibration(req.fileName);
+    return true;
+}
+
+/*******************************************************************************
+* Méthode de callback du service de sauvegarde de calibration. Appelée losqu'une
+* commande pour effacer un fichier a été envoyée.
+*******************************************************************************/
+template<typename Msg>
+bool Calibrator<Msg>::deleteFileCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res)
+{
+    std::string fileName = req.fileName;
+    if(isInCalibrationMetafile(fileName)){
+        res.sucess = (remove((configFileDir_ + fileName).c_str()) == 0);
+        if(res.sucess){
+            removeFromCalibrationMetafile(fileName);
+        }
+    }else{
+        res.sucess = false;
+    }
     return true;
 }
 
@@ -246,6 +273,52 @@ bool Calibrator<Msg>::addToCalibrationMetafile(const std::string& filename)
 
     fileList_.push_back(filename);
     saveToCalibMetaFile();
+    return true;
+}
+
+/*******************************************************************************
+* Enlève un fichier de calibration du méta-fichier de calibration.
+* 
+* @param filename   [in] le fichier à enlever au fichier de configuration
+*
+* @return vrai si le nom a réussi à être enlevé, faux sinon
+*******************************************************************************/
+template<typename Msg>
+bool Calibrator<Msg>::removeFromCalibrationMetafile(const std::string& filename)
+{
+    YAML::Node newNode(YAML::NodeType::value::Sequence);
+    bool removed = false;
+
+    for(int i = 0; i < fileList_.size(); ++i){
+        std::string name = fileList_[i].as<std::string>();
+        
+        if(name == filename){
+            removed = true;
+        }else{
+            newNode.push_back(name);
+        }
+    }
+    fileList_ = newNode;
+    saveToCalibMetaFile();
+    return removed;
+}
+
+/*******************************************************************************
+* Vérifie la présence d'un fichier dans le méta-fichier de calibration.
+* 
+* @param filename   [in] le fichier à chercher
+*
+* @return vrai si le nom a réussi à être trouvé, faux sinon
+*******************************************************************************/
+template<typename Msg>
+bool Calibrator<Msg>::isInCalibrationMetafile(const std::string& filename)
+{
+    for(auto it = fileList_.begin(); it != fileList_.end(); ++it){
+        if(it->as<std::string>() == filename){
+            return true;
+        }
+    }
+    return false;
 }
 
 /*******************************************************************************
