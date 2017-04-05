@@ -105,6 +105,7 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr& input) {
     Mat robotsMat;
 
     vector<RobotDesc> robotsArray;
+    assert(false);
     detection_.detect(currentImage, threshold_w, threshold_r, threshold_g,
                       robotsMat, robotsArray);
 

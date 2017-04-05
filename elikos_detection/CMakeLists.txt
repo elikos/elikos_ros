@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
 )
-find_package(OpenCV 2 REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 
 catkin_package(
 #   INCLUDE_DIRS include

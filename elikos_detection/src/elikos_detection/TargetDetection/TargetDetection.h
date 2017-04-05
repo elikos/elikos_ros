@@ -32,6 +32,7 @@ class TargetDetection {
                            int dilate, int postErode);
 
    private:
+   cv::Mat targetRobot_;
     void displayID(const RobotDesc& robot, cv::Mat& output) const;
     void displayRobots(const std::vector<RobotDesc>& robotsArray,
                        cv::Mat& output) const;
