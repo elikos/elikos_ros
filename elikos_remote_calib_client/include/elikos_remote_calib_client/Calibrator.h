@@ -59,11 +59,15 @@ private:
     bool isInCalibrationMetafile(const std::string& filename);
     //Sauvegarde les paramètres dans le fichier de configuration
     void saveToCalibMetaFile();
+    //Une sorte de timeout pour savoir si on est en train d'être calibré
+    void updateCalibratingStatus(const ros::TimerEvent &);
 
     YAML::Node fileList_;
 
     ros::NodeHandle nodeHandle_;
     ros::Subscriber calibrationSubscriber_;
+
+    ros::Timer updateCallback_;
 
     ros::ServiceServer saveService_;
     ros::ServiceServer loadService_;
@@ -73,6 +77,8 @@ private:
     std::string configFileDir_;
 
     Calibratable<Msg>& calibratable_;
+private:
+    static constexpr double PING_DELAY = 1.0;
 };
 
 
@@ -106,7 +112,7 @@ Calibrator<Msg>::Calibrator(Calibratable<Msg>& calibrable, const std::string& co
     loadService_ = nodeHandle_.advertiseService(LOAD_SERVICE_NAME, &Calibrator<Msg>::loadCallback, this);
     deleteFileService_ = nodeHandle_.advertiseService(DELETE_FILE_SERVICE_NAME, &Calibrator<Msg>::deleteFileCallback, this);
 
-
+    updateCallback_ = nodeHandle_.createTimer(ros::Duration(PING_DELAY), &Calibrator<Msg>::updateCalibratingStatus, this);
     try {
         fileList_ = YAML::LoadFile(configFileDir_ + CONFIG_FILE_NAME + CONFIG_FILE_EXTENTION);
     } catch ( YAML::BadFile exeption ) {
@@ -333,6 +339,48 @@ void Calibrator<Msg>::saveToCalibMetaFile()
     yamlOut << fileList_;
     file << yamlOut.c_str();
     file.close();
+
+}
+
+/*******************************************************************************
+* Appelée par un timer de ros. La méthode sert a des fins d'optimisation. Elle
+* permet de savoir (dans le calibrable) si un calibrateur y est connecté.
+*
+* @param event  [in] Un TimerEvent provenant de ros. Permet d'enregistrer la 
+*                       méthode comme callback
+*******************************************************************************/
+template<typename Msg>
+void Calibrator<Msg>::updateCalibratingStatus(const ros::TimerEvent & event)
+{
+    XmlRpc::XmlRpcValue args, result, payload;
+    args[0] = ros::this_node::getName();
+
+    bool sucess = ros::master::execute("getSystemState", args, result, payload, true);
+
+    if(!sucess){
+        return;
+    }
+
+
+    std::string ourTopicName = 
+        ros::names::append(
+            nodeHandle_.getNamespace(),
+            MESSAGE_TOPIC_NAME
+        );
+
+    
+
+    XmlRpc::XmlRpcValue publisherList = payload[0];
+    bool isCalibrating = false;
+    for(int i = 0; i < publisherList.size(); ++i){
+        std::string topicName = publisherList[i][0];
+        if(topicName == ourTopicName){
+            //Vrai si au moins un noeud nous calibre
+            isCalibrating = publisherList[i][1].size() > 0;
+            break;
+        }
+    }
+    calibratable_.isCalibrating = isCalibrating;
 
 }
 

@@ -20,7 +20,10 @@ public:
 
     //Méthode qui devrait enregistrer sa calibration dans le noeud fourni
     virtual void saveCalibration(YAML::Node& fileContent) = 0;
+
+    bool isCalibrating = false;
 };
+
 
 }
 

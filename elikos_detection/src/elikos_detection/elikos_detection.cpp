@@ -4,11 +4,11 @@
 #include <iostream>
 #include <elikos_remote_calib_client/Calibrator.h>
 #include <elikos_remote_calib_client/Calibratable.h>
-#include <elikos_remote_calib_client/CalibPreprocessing.h>
+#include <elikos_remote_calib_client/CalibDetection.h>
 #include "MessageHandler.h"
 
-class Tmp : public remote_calib::Calibratable<elikos_remote_calib_client::CalibPreprocessing>{
-  virtual void calibrate(const elikos_remote_calib_client::CalibPreprocessing* const message)
+class Tmp : public remote_calib::Calibratable<elikos_remote_calib_client::CalibDetection>{
+  virtual void calibrate(const elikos_remote_calib_client::CalibDetection* const message)
   {
     std::cout << message << std::endl;
   }
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     nh_.getParam("/"+ros::this_node::getName()+"/calibration", calibrationOn);
 
     Tmp tmp;
-    remote_calib::Calibrator<elikos_remote_calib_client::CalibPreprocessing> calibrateur(tmp, calibFolderPath);
+    remote_calib::Calibrator<elikos_remote_calib_client::CalibDetection> calibrateur(tmp, calibFolderPath);
 
     ros::Rate r(30);
     // Endless loop
