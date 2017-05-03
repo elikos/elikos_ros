@@ -2,6 +2,7 @@
 // Created by ta11e4rand on 10/02/16.
 //
 #include "TargetDetection.h"
+#include <functional>
 
 TargetDetection::TargetDetection()
 {
@@ -54,6 +55,32 @@ void TargetDetection::updateHSV(int color, int h, int s, int v, int delta)
         *(detection.getWhite()->V_MAX) = v + 2 * delta;
         break;
     }
+}
+
+void TargetDetection::getRemoteParams(int color, int& h_max, int& h_min, int& s_max, int& s_min, int& v_max, int& v_min,int& preErode, int& dilate, int& postErode)
+{
+    std::function<Color*()> fun;
+    switch (color)
+    {
+        case 0: //RED
+            fun = [this](){return this->detection.getRed();};
+            break;
+        case 1: //GREEN
+            fun = [this](){return this->detection.getGreen();};
+            break;
+        case 2: //WHITE
+            fun = [this](){return this->detection.getWhite();};
+            break;
+    }
+    h_min = *(fun()->H_MIN);
+    h_max = *(fun()->H_MAX);
+    s_min = *(fun()->S_MIN);
+    s_max = *(fun()->S_MAX);
+    v_min = *(fun()->V_MIN);
+    v_max = *(fun()->V_MAX);
+    preErode = *(fun()->PRE_EROSIONS);
+    dilate = *(fun()->DILATIONS);
+    postErode = *(fun()->POST_EROSIONS);
 }
 
 void TargetDetection::fetchRemoteParams(int color, int h_max, int h_min, int s_max, int s_min, int v_max, int v_min, int preErode, int dilate, int postErode)

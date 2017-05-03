@@ -7,6 +7,8 @@
 #include <yaml-cpp/yaml.h>
 
 namespace remote_calib{
+template<typename Msg>
+class Calibrator;
 
 template<typename Msg>
 class Calibratable{
@@ -22,9 +24,42 @@ public:
     virtual void saveCalibration(YAML::Node& fileContent) = 0;
 
     bool isCalibrating = false;
+
+    //Charge une calibration localement et à distance.
+    void loadRemoteCalibration(const Msg& calibration);
+protected:
+    //Référence vers le calibrateur
+    Calibrator<Msg>* calibrator_;
+    friend class Calibrator<Msg>;
 };
 
 
 }
 
+
+
+//==============================================================================
+//==============================================================================
+//                         Définition des templates
+//==============================================================================
+//==============================================================================
+#include "Calibrator.h"
+
+namespace remote_calib{
+
+/******************************************************************************
+* Charge la calibration sur ce noeud-ci et tout les noeuds qui écoutent. Utile 
+* a appeler dans loadCalibration. Va appeler calibrate() au prochain spin de 
+* ros.
+*
+* @param calibration    [in] la calibration a charger
+******************************************************************************/
+template<typename Msg>
+void Calibratable<Msg>::loadRemoteCalibration(const Msg& calibration)
+{
+    if (calibrator_ != nullptr) {
+        calibrator_->loadRemoteCalibration(calibration);
+    }
+}
+}
 #endif

@@ -7,26 +7,6 @@
 #include <elikos_remote_calib_client/CalibDetection.h>
 #include "MessageHandler.h"
 
-class Tmp : public remote_calib::Calibratable<elikos_remote_calib_client::CalibDetection>{
-  virtual void calibrate(const elikos_remote_calib_client::CalibDetection* const message)
-  {
-    std::cout << message << std::endl;
-  }
-
-  virtual void loadCalibration(const YAML::Node& fileContent)
-  {
-    std::cerr << "Loading calibration !" << std::endl;
-    std::cerr << fileContent["name"] << std::endl;
-  }
-
-  virtual void saveCalibration(YAML::Node& fileContent)
-  {
-    fileContent["encoding"] = "CHTAFF";
-    fileContent["version"] = "6.6.7";
-    fileContent["name"] = "Outaf Hell";
-  }
-};
-
 int main(int argc, char* argv[])
 {
     // ROS Init
@@ -56,8 +36,7 @@ int main(int argc, char* argv[])
     bool calibrationOn;
     nh_.getParam("/"+ros::this_node::getName()+"/calibration", calibrationOn);
 
-    Tmp tmp;
-    remote_calib::Calibrator<elikos_remote_calib_client::CalibDetection> calibrateur(tmp, calibFolderPath);
+    remote_calib::Calibrator<elikos_remote_calib_client::CalibDetection> calibrateur(messageHandler, calibFolderPath);
 
     ros::Rate r(30);
     // Endless loop

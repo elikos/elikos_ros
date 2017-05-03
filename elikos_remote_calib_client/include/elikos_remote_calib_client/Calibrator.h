@@ -41,6 +41,8 @@ public:
     bool loadCalibration(const std::string& fileName);
     //Enregistre la calibration en mémoire dans un fichier
     bool saveCalibration(const std::string& fileName);
+    //Charge une calibration localement et à distance.
+    void loadRemoteCalibration(const Msg& calibration);
 private:
     //Callback du message
     void calibrationCallback(const boost::shared_ptr<Msg const>& msgPtr);
@@ -66,6 +68,7 @@ private:
 
     ros::NodeHandle nodeHandle_;
     ros::Subscriber calibrationSubscriber_;
+    ros::Publisher calibrationRemoteLoaderPublisher_;
 
     ros::Timer updateCallback_;
 
@@ -106,11 +109,14 @@ Calibrator<Msg>::Calibrator(Calibratable<Msg>& calibrable, const std::string& co
 {
 
     calibrationSubscriber_ = nodeHandle_.subscribe(MESSAGE_TOPIC_NAME, 20, &Calibrator<Msg>::calibrationCallback, this);
+    calibrationRemoteLoaderPublisher_ = nodeHandle_.advertise<Msg>(MESSAGE_TOPIC_NAME, 4, true);
 
     saveService_ = nodeHandle_.advertiseService(SAVE_SERVICE_NAME, &Calibrator<Msg>::saveCallback, this);
     configService_ = nodeHandle_.advertiseService(GET_FILE_NAME_SERVICE_NAME, &Calibrator<Msg>::confCallback, this);
     loadService_ = nodeHandle_.advertiseService(LOAD_SERVICE_NAME, &Calibrator<Msg>::loadCallback, this);
     deleteFileService_ = nodeHandle_.advertiseService(DELETE_FILE_SERVICE_NAME, &Calibrator<Msg>::deleteFileCallback, this);
+
+    calibratable_.calibrator_ = this;
 
     updateCallback_ = nodeHandle_.createTimer(ros::Duration(PING_DELAY), &Calibrator<Msg>::updateCalibratingStatus, this);
     try {
@@ -193,6 +199,20 @@ bool Calibrator<Msg>::saveCalibration(const std::string& fileName)
             << "Le nom du ficher était : " << fileName << "\n" << std::endl;
         return false;
     }
+}
+
+/******************************************************************************
+* Charge une calibration sur le programme lui-même (en appelant 
+* Calibratable::calibrate lors du prochain spin), ainsi que dans les 
+* calibrateurs (si ils ne sont pas encore connectés, le message leurs sera 
+* envoyé lors de leur connection).
+*
+* @param calibration    [in] la calibration à charger.
+******************************************************************************/
+template<typename Msg>
+void Calibrator<Msg>::loadRemoteCalibration(const Msg& calibration)
+{
+    calibrationRemoteLoaderPublisher_.publish(calibration);
 }
 
 /*******************************************************************************
@@ -361,22 +381,15 @@ void Calibrator<Msg>::updateCalibratingStatus(const ros::TimerEvent & event)
         return;
     }
 
-
-    std::string ourTopicName = 
-        ros::names::append(
-            nodeHandle_.getNamespace(),
-            MESSAGE_TOPIC_NAME
-        );
-
-    
+    std::string ourTopicName = calibrationSubscriber_.getTopic();
 
     XmlRpc::XmlRpcValue publisherList = payload[0];
     bool isCalibrating = false;
     for(int i = 0; i < publisherList.size(); ++i){
         std::string topicName = publisherList[i][0];
         if(topicName == ourTopicName){
-            //Vrai si au moins un noeud nous calibre
-            isCalibrating = publisherList[i][1].size() > 0;
+            //Vrai si au moins un noeud nous calibre (en plus de nous mêmes)
+            isCalibrating = publisherList[i][1].size() > 1;
             break;
         }
     }
