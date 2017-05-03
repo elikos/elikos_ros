@@ -1,3 +1,16 @@
-version: 6.6.7
-encoding: CHTAFF
-name: Outaf Hell
+red_max_v: 255
+red_min_v: 112
+red_min_h: 106
+red_max_h: 119
+red_inflate: 0
+red_max_s: 184
+green_max_v: 255
+green_min_v: 116
+green_inflate: 0
+green_deflate: 0
+red_deflate: 0
+green_max_h: 6
+green_min_h: 174
+green_max_s: 47
+green_min_s: 0
+red_min_s: 89

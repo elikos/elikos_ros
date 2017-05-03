@@ -30,6 +30,14 @@ Mat Color::generateThreshold(const Mat& image)
     cvtColor(image, hsv, COLOR_BGR2HSV);
     BLUR_AMOUNT = PRE_BLUR + 1;
     blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
+
+    //TODO optimize
+    if(H_MIN > H_MAX){
+        Mat minCol, maxCol;
+        inRange(hsv, Scalar(*H_MIN, *S_MIN, *V_MIN), Scalar(180, *S_MAX, *V_MAX), minCol);
+        inRange(hsv, Scalar(0, *S_MIN, *V_MIN), Scalar(*H_MAX, *S_MAX, *V_MAX), maxCol);
+        threshold = minCol | maxCol;
+    }
     // No inRange implementation for gpu module.
     // This should not cause performance problems on the jetson.
 

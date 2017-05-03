@@ -1,0 +1,59 @@
+<launch>
+    <arg name="speed" default="0.5"/>
+    <arg name="rotation_speed" default="0.785"/>
+    <arg name="rotation_angle" default="0.785"/>
+    <arg name="random_angle_time_lap" default="5"/>
+
+    <arg name="obstacle_05" default="false"/>
+    <arg name="obstacle_10" default="false"/>
+    <arg name="obstacle_15" default="false"/>
+    <arg name="obstacle_20" default="false"/>
+
+    <arg name="red_1" default="true"/>
+    <arg name="green_1" default="false"/>
+    <arg name="red_2" default="false"/>
+    <arg name="green_2" default="false"/>
+    <arg name="red_3" default="false"/>
+    <arg name="green_3" default="false"/>
+    <arg name="red_4" default="false"/>
+    <arg name="green_4" default="false"/>
+    <arg name="red_5" default="false"/>
+    <arg name="green_5" default="false"/>
+
+    <node if="$(arg obstacle_05)" name="spawn_sdf1" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_0_75/model.sdf -sdf -model obstacle1 -x 0 -y 5" />
+    <node if="$(arg obstacle_10)" name="spawn_sdf3" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_1_0/model.sdf -sdf -model obstacle2 -x 0 -y -5" />
+    <node if="$(arg obstacle_15)" name="spawn_sdf4" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_1_75/model.sdf -sdf -model obstacle3 -x -5 -y 0" />
+    <node if="$(arg obstacle_20)" name="spawn_sdf2" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_2_0/model.sdf -sdf -model obstacle4 -x 5 -y 0" />
+    
+    <node if="$(arg red_1)" name="spawn_sdf5" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target1 -x 0 -y 2" />
+    <node if="$(arg green_1)" name="spawn_sdf6" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target2 -x 1 -y 1.73" />
+    <node if="$(arg red_2)" name="spawn_sdf7" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target3 -x 1.73 -y 1" />
+    <node if="$(arg green_2)" name="spawn_sdf8" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target4 -x 1.73 -y -1" />
+    <node if="$(arg red_3)" name="spawn_sdf9" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target5 -x 1 -y -1.73" />
+    <node if="$(arg green_3)" name="spawn_sdf10" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target6 -x 0 -y -2" />
+    <node if="$(arg red_4)" name="spawn_sdf11" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target7 -x -1 -y -1.73" />
+    <node if="$(arg green_4)" name="spawn_sdf12" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target8 -x -1.73 -y -1" />
+    <node if="$(arg red_5)" name="spawn_sdf13" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_red/model.sdf -sdf -model target9 -x -1.73 -y 1" />
+    <node if="$(arg green_5)" name="spawn_sdf14" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/circle_green/model.sdf -sdf -model target10 -x -1 -y 1.73" />
+    
+    <node name="robots_sim" pkg="elikos_sim" type="robots_sim">
+        <param name="speed" value="$(arg speed)" />
+        <param name="rotation_speed" value="$(arg rotation_speed)" />
+        <param name="rotation_angle" value="$(arg rotation_angle)" />
+        <param name="random_angle_time_lap" value="$(arg random_angle_time_lap)" />
+        <param name="obstacle_05" value="$(arg obstacle_05)" />
+        <param name="obstacle_10" value="$(arg obstacle_10)" />
+        <param name="obstacle_15" value="$(arg obstacle_15)" />
+        <param name="obstacle_20" value="$(arg obstacle_20)" />
+        <param name="red_1" value="$(arg red_1)" />
+        <param name="red_2" value="$(arg red_2)" />
+        <param name="red_3" value="$(arg red_3)" />
+        <param name="red_4" value="$(arg red_4)" />
+        <param name="red_5" value="$(arg red_5)" />
+        <param name="green_1" value="$(arg green_1)" />
+        <param name="green_2" value="$(arg green_2)" />
+        <param name="green_3" value="$(arg green_3)" />
+        <param name="green_4" value="$(arg green_4)" />
+        <param name="green_5" value="$(arg green_5)" />
+    </node>
+</launch>
