@@ -45,6 +45,8 @@ add_executable( elikos_detection
     src/elikos_detection/TargetDetection/BlobDetection.h
     src/elikos_detection/TargetDetection/TargetDetection.h
     src/elikos_detection/TargetDetection/TargetDetection.cpp
+    src/elikos_detection/TargetDetection/ShapeDetection.h
+    src/elikos_detection/TargetDetection/ShapeDetection.cpp
     src/elikos_detection/TargetDetection/CVWrapper/CVWrapperInterface.h
     src/elikos_detection/TargetDetection/CVWrapper/CpuCV.cpp
     src/elikos_detection/TargetDetection/CVWrapper/CpuCV.h

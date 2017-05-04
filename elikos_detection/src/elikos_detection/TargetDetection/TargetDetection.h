@@ -4,7 +4,9 @@
 
 #ifndef DETECTION_AND_TRACKING_TargetDetection_H
 #define DETECTION_AND_TRACKING_TargetDetection_H
+
 #include "BlobDetection.h"
+#include "ShapeDetection.h"
 
 #include <list>
 class TargetDetection {
@@ -32,13 +34,15 @@ class TargetDetection {
                            int dilate, int postErode);
 
    private:
-   cv::Mat targetRobot_;
+    cv::Mat targetRobot_;
     void displayID(const RobotDesc& robot, cv::Mat& output) const;
     void displayRobots(const std::vector<RobotDesc>& robotsArray,
                        cv::Mat& output) const;
 
-    /* Filters the duplicated RebotDesc from the vector and removes them. Use
-     * this method after running each detection type (after running at least 2
+    /* Filters the duplicated RebotDesc from the vector and removes them.
+     * Use
+     * this method after running each detection type (after running at least
+     * 2
      * detection types).
      *
      * Example sequence:
@@ -55,7 +59,7 @@ class TargetDetection {
     // Color
     BlobDetection blobDetection_;
     // Shape
-    //################ TODO #######
+    ShapeDetection shapeDetection_;
 };
 
 #endif  // DETECTION_AND_TRACKING_TargetDetection_H

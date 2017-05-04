@@ -6,7 +6,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-int MAX_CIRCLE_RADIUS = 20;
+int MAX_CIRCLE_RADIUS = 200;
 int MIN_CIRCLE_RADIUS = 1;
 
 /* PRE PROCESSING TEST*/
@@ -162,6 +162,7 @@ void BlobDetection::detectCircles(const cv::Mat& input, cv::Mat& output_w,
     if (!input.data)
         cerr << "Input of detecRobots is empty";  // TODO:throw an exception
 
+    //TODO: Remove from here and call code from PreProcessing.h (in elikos_localization)
     removePerspective(output, output);
 
     cv::Mat src_gray;

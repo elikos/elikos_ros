@@ -10,7 +10,8 @@
       <rosparam command="load" file="$(find elikos_detection)/cfg/$(arg cfgRC).yaml" />
   </node>
 
-  <node name="$(arg camera_name)_transformation" pkg="elikos_detection" type="elikos_transformation">
+<!--FIX ME (Why is this launched here? )-->
+  <!--<node name="$(arg camera_name)_transformation" pkg="elikos_detection" type="elikos_transformation">
       <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg cfg).yaml" />
-  </node>
+  </node>-->
 </launch>
