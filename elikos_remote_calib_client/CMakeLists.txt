@@ -52,6 +52,7 @@ add_message_files(
   CalibPreprocessing.msg
   ColorHSV.msg
   ColorHSVRange.msg
+  ColorDetectionInfo.msg
   CalibDetection.msg
 )
 

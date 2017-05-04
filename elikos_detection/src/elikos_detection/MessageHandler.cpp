@@ -42,7 +42,7 @@ MessageHandler::MessageHandler(string calibrationFilename)
     // pubImages_ = it_.advertise(inputTopic + "/debug", 1); //debug only
     pubImages_ = it_.advertise(RCdebugTopic, 1);  // debug only
     pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
-    // pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
+    pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
 
     detection_.loadCalibration(calibrationFilename);
 
@@ -86,7 +86,7 @@ void MessageHandler::dispatchCommand(const std_msgs::String::ConstPtr& input) {
         iss >> color >> h_max >> h_min >> s_max >> s_min >> v_max >> v_min >>
             preErode >> dilate >> postErode;
         detection_.fetchRemoteParams(color, h_max, h_min, s_max, s_min, v_max,
-                                     v_min, preErode, dilate, postErode);
+                                     v_min, preErode, dilate, postErode, 6);
     } else if (command == "getCurrentState") {
         std_msgs::String msg;  // OutputCommand to be sent
         msg.data = "getCurrentState\t" + detection_.getAllParams();
@@ -109,17 +109,15 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr& input) {
 
     //debug images
     if (isCalibrating) {
-        std::cerr << "sending" << std::endl;
         sensor_msgs::ImagePtr msgDebug = cv_bridge::CvImage(std_msgs::Header(), "bgr8", robotsMat).toImageMsg();
         pubImages_.publish(msgDebug);
 
         sensor_msgs::ImagePtr msgDebug2 = cv_bridge::CvImage(std_msgs::Header(), "mono8", threshold_r).toImageMsg();
         pubRed_.publish(msgDebug2);
 
-        //sensor_msgs::ImagePtr msgDebug3 = cv_bridge::CvImage(std_msgs::Header(), "bgr8", threshold_g).toImageMsg();
-        //pubGreen_.publish(msgDebug3);
+        sensor_msgs::ImagePtr msgDebug3 = cv_bridge::CvImage(std_msgs::Header(), "mono8", threshold_g).toImageMsg();
+        pubGreen_.publish(msgDebug3);
     }
-        std::cerr << "!sending" << std::endl;
 
     // publishing data
     elikos_ros::RobotRawArray output;
@@ -146,180 +144,122 @@ void MessageHandler::saveCalibration(string filename) {
 
 void MessageHandler::calibrate(const elikos_remote_calib_client::CalibDetection* const message)
 {
-  detection_.fetchRemoteParams(
-    0,
-    message->red.max.h, 
-    message->red.min.h, 
-    message->red.max.s, 
-    message->red.min.s, 
-    message->red.max.v, 
-    message->red.min.v, 
-    message->redInflate, 
-    message->redDeflate, 
-    message->redInflate);//FIXME ON A BESION D'UN AUTRE PARAMÈTRE
-  detection_.fetchRemoteParams(
-    1,
-    message->green.max.h, 
-    message->green.min.h, 
-    message->green.max.s, 
-    message->green.min.s, 
-    message->green.max.v, 
-    message->green.min.v, 
-    message->greenInflate, 
-    message->greenDeflate, 
-    message->greenInflate);//FIXME ON A BESION D'UN AUTRE PARAMÈTRE
-  detection_.fetchRemoteParams(
-    2,
-    message->white.max.h, 
-    message->white.min.h, 
-    message->white.max.s, 
-    message->white.min.s, 
-    message->white.max.v, 
-    message->white.min.v, 
-    message->whiteInflate, 
-    message->whiteDeflate, 
-    message->whiteInflate);//FIXME ON A BESION D'UN AUTRE PARAMÈTRE
+    const elikos_remote_calib_client::ColorDetectionInfo* colors[3] = {&message->red, &message->green, &message->white};
+    for(int i = 0; i < 3; ++i){
+        detection_.fetchRemoteParams(
+            i,
+            colors[i]->col.max.h, 
+            colors[i]->col.min.h, 
+            colors[i]->col.max.s, 
+            colors[i]->col.min.s, 
+            colors[i]->col.max.v, 
+            colors[i]->col.min.v, 
+            colors[i]->deflate, 
+            colors[i]->inflate, 
+            colors[i]->postDeflate,
+            colors[i]->blur
+        );
+    }
 }
 
 void MessageHandler::loadCalibration(const YAML::Node& fileContent)
 {
-  elikos_remote_calib_client::CalibDetection message;
-  //valeurs par défaut
-  message.red.max.h  = 170;
-  message.red.min.h  = 10;
-  message.red.max.s  = 170;
-  message.red.min.s  = 10;
-  message.red.max.v  = 170;
-  message.red.min.v  = 10;
-  message.redInflate = 170;
-  message.redDeflate = 10;
+    elikos_remote_calib_client::CalibDetection message;
+    //valeurs par défaut
+    message.red.col.max.h  = 170;
+    message.red.col.min.h  = 10;
+    message.red.col.max.s  = 170;
+    message.red.col.min.s  = 10;
+    message.red.col.max.v  = 170;
+    message.red.col.min.v  = 10;
+    message.red.deflate = 10;
+    message.red.inflate = 170;
+    message.red.postDeflate = 170;
+    message.red.blur = 6;
 
-  message.green.max.h  = 170;
-  message.green.min.h  = 10;
-  message.green.max.s  = 170;
-  message.green.min.s  = 10;
-  message.green.max.v  = 170;
-  message.green.min.v  = 10;
-  message.greenInflate = 170;
-  message.greenDeflate = 10;
+    message.green.col.max.h  = 170;
+    message.green.col.min.h  = 10;
+    message.green.col.max.s  = 170;
+    message.green.col.min.s  = 10;
+    message.green.col.max.v  = 170;
+    message.green.col.min.v  = 10;
+    message.green.deflate = 10;
+    message.green.inflate = 170;
+    message.green.postDeflate = 170;
+    message.green.blur = 6;
 
-  message.white.max.h  = 170;
-  message.white.min.h  = 10;
-  message.white.max.s  = 170;
-  message.white.min.s  = 10;
-  message.white.max.v  = 170;
-  message.white.min.v  = 10;
-  message.whiteInflate = 170;
-  message.whiteDeflate = 10;
+    message.white.col.max.h  = 170;
+    message.white.col.min.h  = 10;
+    message.white.col.max.s  = 170;
+    message.white.col.min.s  = 10;
+    message.white.col.max.v  = 170;
+    message.white.col.min.v  = 10;
+    message.white.deflate = 10;
+    message.white.inflate = 170;
+    message.white.postDeflate = 170;
+    message.white.blur = 6;
 
-  //chargement des valeurs
-  if(fileContent["red_max_h"])  message.red.max.h  = fileContent["red_max_h"].as<uint8_t>();
-  if(fileContent["red_min_h"])  message.red.min.h  = fileContent["red_min_h"].as<uint8_t>();
-  if(fileContent["red_max_s"])  message.red.max.s  = fileContent["red_max_s"].as<uint8_t>();
-  if(fileContent["red_min_s"])  message.red.min.s  = fileContent["red_min_s"].as<uint8_t>();
-  if(fileContent["red_max_v"])  message.red.max.v  = fileContent["red_max_v"].as<uint8_t>();
-  if(fileContent["red_min_v"])  message.red.min.v  = fileContent["red_min_v"].as<uint8_t>();
-  if(fileContent["red_inflate"])message.redInflate = fileContent["red_inflate"].as<uint8_t>();
-  if(fileContent["red_deflate"])message.redDeflate = fileContent["red_deflate"].as<uint8_t>();
 
-  if(fileContent["green_max_h"])  message.green.max.h  = fileContent["green_max_h"].as<uint8_t>();
-  if(fileContent["green_min_h"])  message.green.min.h  = fileContent["green_min_h"].as<uint8_t>();
-  if(fileContent["green_max_s"])  message.green.max.s  = fileContent["green_max_s"].as<uint8_t>();
-  if(fileContent["green_min_s"])  message.green.min.s  = fileContent["green_min_s"].as<uint8_t>();
-  if(fileContent["green_max_v"])  message.green.max.v  = fileContent["green_max_v"].as<uint8_t>();
-  if(fileContent["green_min_v"])  message.green.min.v  = fileContent["green_min_v"].as<uint8_t>();
-  if(fileContent["green_inflate"])message.greenInflate = fileContent["green_inflate"].as<uint8_t>();
-  if(fileContent["green_deflate"])message.greenDeflate = fileContent["green_deflate"].as<uint8_t>();
+    elikos_remote_calib_client::ColorDetectionInfo* colors[3] = {&message.red, &message.green, &message.white};
+    std::string names[3] = {"red","green","white"};
+    //chargement des valeurs
+    for(int i = 0; i < 3; ++i){
+        if(fileContent[ names[i]+"_max_h"])        colors[i]->col.max.h   = (uint8_t)fileContent[ names[i]+"_max_h"].as<int>();
+        if(fileContent[ names[i]+"_min_h"])        colors[i]->col.min.h   = (uint8_t)fileContent[ names[i]+"_min_h"].as<int>();
+        if(fileContent[ names[i]+"_max_s"])        colors[i]->col.max.s   = (uint8_t)fileContent[ names[i]+"_max_s"].as<int>();
+        if(fileContent[ names[i]+"_min_s"])        colors[i]->col.min.s   = (uint8_t)fileContent[ names[i]+"_min_s"].as<int>();
+        if(fileContent[ names[i]+"_max_v"])        colors[i]->col.max.v   = (uint8_t)fileContent[ names[i]+"_max_v"].as<int>();
+        if(fileContent[ names[i]+"_min_v"])        colors[i]->col.min.v   = (uint8_t)fileContent[ names[i]+"_min_v"].as<int>();
+        if(fileContent[ names[i]+"_deflate"])      colors[i]->deflate     = (uint8_t)fileContent[ names[i]+"_deflate"].as<int>();
+        if(fileContent[ names[i]+"_inflate"])      colors[i]->inflate     = (uint8_t)fileContent[ names[i]+"_inflate"].as<int>();
+        if(fileContent[ names[i]+"_post_deflate"]) colors[i]->postDeflate = (uint8_t)fileContent[ names[i]+"_post_deflate"].as<int>();
+        if(fileContent[ names[i]+"_blur"])         colors[i]->blur        = (uint8_t)fileContent[ names[i]+"_blur"].as<int>();
+    }
 
-  if(fileContent["white_max_h"])  message.white.max.h  = fileContent["white_max_h"].as<uint8_t>();
-  if(fileContent["white_min_h"])  message.white.min.h  = fileContent["white_min_h"].as<uint8_t>();
-  if(fileContent["white_max_s"])  message.white.max.s  = fileContent["white_max_s"].as<uint8_t>();
-  if(fileContent["white_min_s"])  message.white.min.s  = fileContent["white_min_s"].as<uint8_t>();
-  if(fileContent["white_max_v"])  message.white.max.v  = fileContent["white_max_v"].as<uint8_t>();
-  if(fileContent["white_min_v"])  message.white.min.v  = fileContent["white_min_v"].as<uint8_t>();
-  if(fileContent["white_inflate"])message.whiteInflate = fileContent["white_inflate"].as<uint8_t>();
-  if(fileContent["white_deflate"])message.whiteDeflate = fileContent["white_deflate"].as<uint8_t>();
-
-  //fire du event
-  loadRemoteCalibration(message);
+    //fire du event
+    loadRemoteCalibration(message);
 }
 
 
 void MessageHandler::saveCalibration(YAML::Node& fileContent)
 {
-  int max_h;
-  int min_h;
-  int max_s;
-  int min_s;
-  int max_v;
-  int min_v;
-  int inflate;
-  int deflate;
-  int postInflate;
+    int max_h;
+    int min_h;
+    int max_s;
+    int min_s;
+    int max_v;
+    int min_v;
+    int deflate;
+    int inflate;
+    int postDeflate;
+    int blur;
 
-  detection_.getRemoteParams(
-    0,
-    max_h,
-    min_h,
-    max_s,
-    min_s,
-    max_v,
-    min_v,
-    inflate,
-    deflate,
-    postInflate
-  );
+    std::string colorNames[3] = {"red","green","white"};
+    for (int i = 0; i < 3; ++i) {
+        detection_.getRemoteParams(
+            i,
+            max_h,
+            min_h,
+            max_s,
+            min_s,
+            max_v,
+            min_v,
+            deflate,
+            inflate,
+            postDeflate,
+            blur
+        );
 
-  fileContent["red_max_h"] = max_h;
-  fileContent["red_min_h"] = min_h;
-  fileContent["red_max_s"] = max_s;
-  fileContent["red_min_s"] = min_s;
-  fileContent["red_max_v"] = max_v;
-  fileContent["red_min_v"] = min_v;
-  fileContent["red_inflate"] = inflate;
-  fileContent["red_deflate"] = deflate;
-
-  detection_.getRemoteParams(
-    1,
-    max_h,
-    min_h,
-    max_s,
-    min_s,
-    max_v,
-    min_v,
-    inflate,
-    deflate,
-    postInflate
-  );
-
-  fileContent["green_max_h"] = max_h;
-  fileContent["green_min_h"] = min_h;
-  fileContent["green_max_s"] = max_s;
-  fileContent["green_min_s"] = min_s;
-  fileContent["green_max_v"] = max_v;
-  fileContent["green_min_v"] = min_v;
-  fileContent["green_inflate"] = inflate;
-  fileContent["green_deflate"] = deflate;
-
-  detection_.getRemoteParams(
-    2,
-    max_h,
-    min_h,
-    max_s,
-    min_s,
-    max_v,
-    min_v,
-    inflate,
-    deflate,
-    postInflate
-  );
-
-  fileContent["green_max_h"] = max_h;
-  fileContent["green_min_h"] = min_h;
-  fileContent["green_max_s"] = max_s;
-  fileContent["green_min_s"] = min_s;
-  fileContent["green_max_v"] = max_v;
-  fileContent["green_min_v"] = min_v;
-  fileContent["green_inflate"] = inflate;
-  fileContent["green_deflate"] = deflate;
+        fileContent[colorNames[i] + "_max_h"] = max_h;
+        fileContent[colorNames[i] + "_min_h"] = min_h;
+        fileContent[colorNames[i] + "_max_s"] = max_s;
+        fileContent[colorNames[i] + "_min_s"] = min_s;
+        fileContent[colorNames[i] + "_max_v"] = max_v;
+        fileContent[colorNames[i] + "_min_v"] = min_v;
+        fileContent[colorNames[i] + "_inflate"] = inflate;
+        fileContent[colorNames[i] + "_deflate"] = deflate;
+        fileContent[colorNames[i] + "_post_deflate"] = postDeflate;
+        fileContent[colorNames[i] + "_blur"] = postDeflate;
+    }
+  
 }

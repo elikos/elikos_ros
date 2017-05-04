@@ -38,7 +38,7 @@ private:
 
     image_transport::Publisher pubImages_;//debug only
     image_transport::Publisher pubRed_;//debug only
-    //image_transport::Publisher pubGreen_;//debug only
+    image_transport::Publisher pubGreen_;//debug only
 };
 
 #endif /// MESSAGE_HANDLER

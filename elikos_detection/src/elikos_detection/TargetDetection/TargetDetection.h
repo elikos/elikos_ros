@@ -27,10 +27,10 @@ class TargetDetection {
     std::string getAllParams() { return blobDetection_.getAllParams(); }
 
     void updateHSV(int color, int h, int s, int v, int delta);
-    void getRemoteParams(int color, int& h_max, int& h_min, int& s_max, int& s_min, int& v_max, int& v_min,int& preErode, int& dilate, int& postErode);
+    void getRemoteParams(int color, int& h_max, int& h_min, int& s_max, int& s_min, int& v_max, int& v_min,int& preErode, int& dilate, int& postErode, int& blur);
     void fetchRemoteParams(int color, int h_max, int h_min, int s_max,
                            int s_min, int v_max, int v_min, int preErode,
-                           int dilate, int postErode);
+                           int dilate, int postErode, int blur);
 
    private:
     void displayID(const RobotDesc& robot, cv::Mat& output) const;
