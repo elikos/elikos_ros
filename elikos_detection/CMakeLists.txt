@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   elikos_remote_calib_client
 )
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV 2 REQUIRED)
 
 catkin_package(
 #   INCLUDE_DIRS include

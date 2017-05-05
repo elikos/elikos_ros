@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV 2 REQUIRED)
 find_package(Eigen REQUIRED)
 
 catkin_package(
