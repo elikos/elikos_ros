@@ -45,7 +45,7 @@ void MessageHandler::freeInstance()
 void MessageHandler::lookForMessages()
 {
     cv::VideoCapture vc;
-    std::string videoPath = "/home/olivier/Videos/cam_bas.mp4";
+    std::string videoPath = "/home/olstob/Videos/cam_bas.mp4";
     vc.open(videoPath.c_str());
     if (!vc.isOpened())
     {

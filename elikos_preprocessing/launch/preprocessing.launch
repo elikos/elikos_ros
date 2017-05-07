@@ -1,0 +1,9 @@
+<launch>
+
+    <node pkg="elikos_preprocessing" type="elikos_preprocessing" name="elikos_preprocessing" output="screen">
+
+    
+    
+    </node>
+
+</launch>
