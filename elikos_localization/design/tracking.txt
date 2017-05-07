@@ -49,28 +49,28 @@ Design notes for arena features and drone tracking
         [0, dt,  0, 0]
         [0,  0,  0, 0]
         [0,  0, dt, 0]
-        [0,  0, dt, 0]
         [0,  0,  0, 0]
+        [0,  0,  0, dt]
 
     We track every line in the arena all the time (even though they are not all updated
     from detection all the time)
 
     Every line has its own kalman filter with 8 state variables 
-    x = [x, x_dot, y, y_dot, z, z_dot theta]
+    s_x = [x, x_dot, y, y_dot, z, z_dot, theta]
 
-    State transition matrix (prediction = F * x + B * u)
-    F = [1,  1, 0,  0, 0,  0, 0]  
-        [0, dt, 0,  0, 0,  0, 0]  
-        [0,  0, 1,  1, 0,  0, 0]   
-        [0,  0, 0, dt, 0,  0, 0]   
-        [0,  0, 0,  0, 1,  1, 0]   
-        [0,  0, 0,  0, 0, dt, 0]   
+    State transition matrix (prediction = F * s_x + B * u)
+    F = [1, dt, 0,  0, 0,  0, 0]  
+        [0,  1, 0,  0, 0,  0, 0]  
+        [0,  0, 1, dt, 0,  0, 0]   
+        [0,  0, 0,  1, 0,  0, 0]   
+        [0,  0, 0,  0, 1, dt, 0]   
+        [0,  0, 0,  0, 0,  1, 0]   
         [0,  0, 0,  0, 0,  0, 1]  
 
     We expect to receive x, y, z and orientation angle (from 0 to pi rad around z)    
 
     Measurement vector
-    z = [x, y, z, theta]
+    s_z = [x, y, z, theta]
 
     Measurement fonction (transform state to measurement space)
     H = [1, 0, 0, 0, 0, 0, 0]
@@ -78,7 +78,7 @@ Design notes for arena features and drone tracking
         [0, 0, 0, 0, 1, 0, 0]
         [0, 0, 0, 0, 0, 0, 1]
     
-    y = z - H * x_prior
+    s_y = s_z - H * s_x_prior
 
     Obtain the average amount of movement and rotation from the detected lines to 
     artificially move the undetected lines (since they should move 
