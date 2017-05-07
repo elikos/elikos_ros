@@ -23,21 +23,29 @@ public:
     void lookForMessages();
 
 private:
+
+    static const std::string IMG_RCV_TOPIC;
+    static const std::string IMG_RGB_PUB_TOPIC;
+    static const std::string IMG_BW_PUB_TOPIC;
+    
     MessageHandler();
     ~MessageHandler();
 
-    void initMsgHandler();
     void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
     void imuCallback(const sensor_msgs::Imu& msg);
     void poseCallback(const geometry_msgs::PoseStamped& msg);
 
     static MessageHandler* instance_;
     ros::NodeHandle nh_;
+
     image_transport::ImageTransport it_;
     image_transport::Subscriber imageSub_;
+
     ros::Subscriber imuSub_;
     ros::Subscriber poseSub_;
-    PreProcessing* preProcessing_;
+
+    PreProcessing preProcessing_;
+
     image_transport::Publisher preprocessedPub_;
     image_transport::Publisher bwPreprocessedPub_;
 };
