@@ -71,6 +71,8 @@ public:
 
     bool getInsideFOV(){return insideFOV;}
     void setInsideFOV(bool in){insideFOV=in;}
+
+    bool operator==(const RobotDesc& otherDesc) const;
 private:
     /////Attributes/////
     //Inside fov(field of view)
@@ -85,7 +87,7 @@ private:
     double distancePrevious;
     //to insure that there is only one robot by id
     bool alreadyFound;
-    int id;//Still unused
+    int id;//Used to compare two RobotDesc
     //window is the area on the frame where the robot was found
     cv::RotatedRect window;
     ColorsIndex color;
