@@ -8,5 +8,7 @@ int main(int argc, char* argv[])
 
     preprocessing::MessageHandler::getInstance()->lookForMessages();
 
+    preprocessing::MessageHandler::freeInstance();
+    
     return 0;
 }
