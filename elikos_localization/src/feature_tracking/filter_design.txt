@@ -1,0 +1,48 @@
+What is this file?
+
+This file id the design file of the Kalman filter that is supposed to filter 
+the (static) features detected in the arena, in order to localize the drone.
+
+Design :
+
+T_T c dur de faire un filtre de kalman
+
+At the moment :
+
+let r be the tri-dimentional coorinates of position, and of components
+r_x (depth position)
+r_y (horizontal position)
+r_z (vertical position)
+
+let v be the first-order derivative of r (therfore, v is the speed), a vector of three components,
+v = [v_x, v_y, v_z] ^T
+
+let a be the second-order derivative of r (the acceleration), a vector of three components,
+a = [a_x, a_y, a_z] ^T
+
+let x be the state of out kalman filter model.
+x = [r_x, v_x, r_y, v_y, r_z, v_z] ^T
+
+let x+ be the next state of our system
+let F be the state transition matrix. 
+
+x+ = Fx
+
+for 
+F = [ 1,dt, 0, 0, 0, 0 ]
+    [ 0, 1, 0, 0, 0, 0 ]
+    [ 0, 0, 1,dt, 0, 0 ]
+    [ 0, 0, 0, 1, 0, 0 ]
+    [ 0, 0, 0, 0, 1,dt ]
+    [ 0, 0, 0, 0, 0, 1 ]
+
+H = [ 1, 0, 0, 0, 0, 0 ]
+    [ 0, 0, 1, 0, 0, 0 ]
+    [ 0, 0, 0, 0, 1, 0 ]
+
+
+
+
+
+
+
