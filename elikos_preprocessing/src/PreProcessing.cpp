@@ -40,7 +40,7 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
         raw.copyTo(typeConverted);
     }
 
-    cv::Mat undistorted = typeConverted;
+    cv::Mat undistorted = raw;
     if (!undistortType_) {
         cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
     }
@@ -50,16 +50,22 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
 
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
+    preProcessed = blured;
 
-    cv::Mat eroded;
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-    cv::erode(blured, eroded, element, cv::Point(0), 8);
+    //cv::Mat eroded;
+    //cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+    //cv::erode(blured, eroded, element, cv::Point(0), 8);
+
+    if (raw.type() != CV_8UC1) {
+        cv::cvtColor(blured, typeConverted, CV_BGR2GRAY);
+    } else {
+        raw.copyTo(typeConverted);
+    }
 
     cv::Mat thresholded;
-    cv::threshold(blured, thresholded, whiteThreshold_, 255, CV_THRESH_BINARY);
+    cv::threshold(typeConverted, thresholded, whiteThreshold_, 255, CV_THRESH_BINARY);
 
     preProcessedBW = thresholded;
-    preProcessed = blured;
 }
 
 void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) const
@@ -84,7 +90,8 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
          ROS_ERROR("%s", e.what());
     }
 
-    pitch += 1.5708;
+    //pitch -= 1.5708;+
+    pitch -= 1.0996;
 
     Eigen::Matrix3f r = (Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitX()) * 
                          Eigen::AngleAxisf(-roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
@@ -116,18 +123,28 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
                              Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
    
     Eigen::Matrix4f P = getPerspectiveProjectionTransform(f, width, height); 
+
+    Eigen::Matrix4f S = Eigen::Matrix4f::Zero();
+    float scale = std::abs(std::cos(pitch));
+    S(0, 0) = scale;
+    S(1, 1) = scale;
+    S(2, 2) = scale;
+    S(3, 3) = 1.0;
+
     Eigen::Translation<float, 4> T(Eigen::Vector4f(0.0, 0.0, -1.0, 0.0));
+    Eigen::Translation<float, 4> T2(Eigen::Vector4f(0.0, 0.0, -1.0 * scale, 0.0));
 
     for (int i = 0; i < 4; ++i) 
     {
-        dst[i] = T * dst[i];
+        dst[i] = T2 * dst[i];
         dst[i] = P * dst[i];
         dst[i] /= dst[i][3];
+        //dst[i] /= std::abs(std::cos(pitch));
 
+        //src[i] = S * src[i];
         src[i] = R * src[i];
         src[i] = T * src[i];
         src[i] = P * src[i];
-        //src[i] = P * T * R * dst[i];
         src[i] /= src[i][3];
     }
 
