@@ -4,12 +4,14 @@ u"""
 Module de text pour le module feature_tracking d'elikos_localization
 """
 import time
-
-import rospy
-from geometry_msgs.msg import PoseArray, Pose
+import threading
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+
+import rospy
+from geometry_msgs.msg import PoseArray, Pose
+from std_msgs.msg import Header
 
 import numpy as np
 from numpy.random import random_sample
@@ -35,7 +37,23 @@ class ArenaIntersectionModel(object):
         self.points += np.tile(value, (self.size, 1))
 
 
+callback_called = threading.Event()
+trajectories = []
 
+def tester_callback(pose_array):
+    """
+    Fonction de callback de test. Elle sert principalement a synchoniser les éléments
+    envoyés et reçus, afin qu'on puisse les afficher ensemble.
+    @param pose_array le tableau de posistions reçu
+    """
+    global callback_called, trajectories
+
+    for i in xrange(len(pose_array.poses)):
+        trajectories[i][0] = np.append(trajectories[i][0], pose_array.poses[i].position.x)
+        trajectories[i][1] = np.append(trajectories[i][1], pose_array.poses[i].position.y)
+        trajectories[i][2] = np.append(trajectories[i][2], pose_array.poses[i].position.z)
+
+    callback_called.set()
 
 def test_all():
     """
@@ -44,11 +62,14 @@ def test_all():
     but every position has a cmall error. We then get the calculated valued form the
     package, and match them with our values.
     """
-    global x,y,z,c
+    global callback_called, trajectories
 
     model = ArenaIntersectionModel(5, 5)
+    for _ in xrange(model.size):
+        trajectories.append([np.array([]), np.array([]), np.array([])])
     rospy.init_node("Tester_feature_tracking", anonymous=True)
-    pub = rospy.Publisher("arena_features", PoseArray, queue_size=300)
+    pub = rospy.Publisher("arena_features", PoseArray, queue_size=50)
+    sub = rospy.Subscriber("arena_static_feature_pose", PoseArray, tester_callback, queue_size=50)
 
     rate = rospy.Rate(60)
 
@@ -66,10 +87,16 @@ def test_all():
     start_time = time.time()
 
     for c_val in xrange(0, 300):
+        
         dt = time.time() - start_time
         start_time = time.time()
+        
         message = PoseArray()
-        model.move(np.array([0,0,0.1]) * dt)
+        
+        message.header = Header()
+        message.header.stamp = rospy.Time.now()
+
+        model.move(np.array([0,0,0.2]) * dt)
         points = model.get_points(0.1)
         for i in xrange(0, model.size):
             pos = points[i]
@@ -86,9 +113,18 @@ def test_all():
             z[i] = pos[2]
             c[i] = c_val
         
-        ax.scatter(x, y, z, c=c, cmap=plt.hot())
         fig.canvas.draw_idle()
+        callback_called.clear()
         pub.publish(message)
+        ok = callback_called.wait(10)#We wait 10 sec max
+        if not ok:
+            print "No message was heard"
+
+        ax.scatter(x, y, z, c=c, cmap=plt.hot())
+        for i in xrange(len(trajectories)):
+            trajectory = trajectories[i]
+            ax.plot(trajectory[0], trajectory[1], trajectory[2])
+
         plt.pause(1)
         ax.cla()
 
@@ -102,7 +138,10 @@ def test_all():
         rospy.spin()
 
 
-
-test_all()
+if __name__ == '__main__':
+    try:
+        test_all()
+    except rospy.ROSInterruptException:
+        pass
 
 

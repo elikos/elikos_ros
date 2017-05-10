@@ -3,8 +3,10 @@
 u"""
 Ce module python s'occupe de suivre les points d'intetêts de l'arène avec un filtre de Kalman
 """
+import copy
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import Header
+from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseArray
 
 from filterpy.kalman import KalmanFilter
@@ -62,12 +64,30 @@ def create_tracker(initial_state):
     tracker.P = np.eye(6) * 500.
     return tracker
 
-def input_pose_array(pose_array, model):
-    """ Ros callback for the input pose arrays. """
+last_time = 0.0
+first_call = True
+
+def input_pose_array(pose_array, extra_args):
+    """
+    Ros callback for the input pose arrays.
+    @param pose_array The array that contains all position for the features.
+    @param extra_args A tuple that contains the model and the publisher
+    """
     
-    for tracker in model.trackers:
-        tracker.predict()
-    predicted = list(model.trackers)
+    global last_time, first_call
+    
+    model, publisher = extra_args
+
+    current_time = pose_array.header.stamp.to_sec()
+    delta_time = current_time - last_time
+    last_time = current_time
+
+    if first_call:
+        delta_time = 0
+        first_call = False
+
+    model.update_trackers_prediction(delta_time)
+    predicted = model.get_all_trackers()[:]
 
     associated_trackers = []
 
@@ -76,44 +96,99 @@ def input_pose_array(pose_array, model):
         tracker_index = -1
         for i in xrange(len(predicted)):
             state = predicted[i]
-            distance = (pose.position.x - state.x[0]) ** 2 + (pose.position.y - state.x[3]) ** 2 + (pose.position.z - state.x[5]) ** 2
+            distance = (pose.position.x - state.x[0]) ** 2 + (pose.position.y - state.x[2]) ** 2 + (pose.position.z - state.x[4]) ** 2
             if distance < min_distance:
                 min_distance = distance
                 tracker_index = i
         if tracker_index is -1:
             print "Too many features!"
             break
-        
+
         associated_trackers.append(predicted[tracker_index])
         del predicted[tracker_index]
 
     for i in xrange(len(associated_trackers)):
         pos = pose_array.poses[i].position
         associated_trackers[i].update(np.array([pos.x, pos.y, pos.z]).T)
-    
-    speedMean = [0., 0, 0]
-    for tracker in model.trackers:
-        speedMean[0] += tracker.x[1]
-        speedMean[1] += tracker.x[3]
-        speedMean[2] += tracker.x[5]
-    
-    for i in xrange(len(speedMean)):
-        speedMean[i] /= len(model.trackers)
 
-    print "Average displacement : {0}".format(speedMean)
+
+    #Debug information on the speed.
+    #speedMean = [0., 0, 0]
+    #for tracker in model.trackers:
+    #    speedMean[0] += tracker.x[1]
+    #    speedMean[1] += tracker.x[3]
+    #    speedMean[2] += tracker.x[5]
+    #
+    #for i in xrange(len(speedMean)):
+    #    speedMean[i] /= len(model.trackers)
+
+
+    #Créer le message et le publier
+    output_message = PoseArray()
+
+    for tracker in model.get_all_trackers():
+        p = Pose()
+        p.position.x = tracker.x[0]
+        p.position.y = tracker.x[2]
+        p.position.z = tracker.x[4]
+
+        output_message.poses.append(p)
+
+    output_message.header = Header()
+    output_message.header.stamp = pose_array.header.stamp
+
+    publisher.publish(output_message)
+
+    #print "Average displacement : {0}".format(speedMean)
 
 class ArenaModel:
     def __init__(self, size):
         self.trackers = [
-            create_tracker(
-                np.array(
-                    [x*2, 0, y*2, 0, 0 ,0]
+            [
+                create_tracker(
+                    np.array(
+                        [x*2, 0, y*2, 0, 0 ,0]
+                    )
                 )
-            )
-            for x in xrange(size)
+                for x in xrange(size)
+            ]
             for y in xrange(size)
         ]
-        self.trackers[0].S
+        self.tracker_list = []
+        for trackers in self.trackers:
+            for tracker in trackers:
+                self.tracker_list.append(tracker)
+
+
+    def get_all_trackers(self):
+        """
+        @return a linear list of all trackers in the current model.
+        @rtype a mutable list of KalmanFilters
+        """
+        return self.tracker_list
+
+
+    def get_tracker(self, x, y):
+        """
+        @return the tracker (as a mutable) that is at the position (x,y) on the grid
+        @rtype filterpy.kalman.KalmanFilter
+        """
+        return self.trackers[x][y]
+
+
+    def update_trackers_prediction(self, delta_time):
+        """
+        Updates the F and Q matrix of all trackers using the provided delta time.
+        @param delta_time the elaplsed time to update the trackers with
+        """
+        newF = create_F(delta_time)
+        newQ = create_Q(delta_time)
+        for tracker in self.get_all_trackers():
+            tracker.F = newF
+            tracker.Q = newQ
+            tracker.predict()
+
+
 
 def talker():
     """ Main func. """
@@ -122,7 +197,7 @@ def talker():
 
     pub = rospy.Publisher("arena_static_feature_pose", PoseArray, queue_size=4)
 
-    rospy.Subscriber("arena_features", PoseArray, callback=input_pose_array, callback_args=arena_model, queue_size=20)
+    rospy.Subscriber("arena_features", PoseArray, callback=input_pose_array, callback_args=(arena_model, pub), queue_size=20)
 
     rospy.spin()
 
