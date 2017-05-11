@@ -9,6 +9,8 @@ from std_msgs.msg import Header
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseArray
 
+import cv2
+
 from filterpy.kalman import KalmanFilter
 from scipy.linalg import block_diag
 from filterpy.common import Q_discrete_white_noise
@@ -67,6 +69,8 @@ def create_tracker(initial_state):
 last_time = 0.0
 first_call = True
 
+
+
 def input_pose_array(pose_array, extra_args):
     """
     Ros callback for the input pose arrays.
@@ -88,10 +92,14 @@ def input_pose_array(pose_array, extra_args):
 
     model.update_trackers_prediction(delta_time)
     predicted = model.get_all_trackers()[:]
+    predicted_pos = model.get_all_trackers_position()[:]
 
     associated_trackers = []
+    average = np.array([0.,0,0])
 
     for pose in pose_array.poses:
+        average += np.array([pose.position.x, pose.position.y, pose.position.z])
+
         min_distance = float("inf")
         tracker_index = -1
         for i in xrange(len(predicted)):
@@ -100,17 +108,44 @@ def input_pose_array(pose_array, extra_args):
             if distance < min_distance:
                 min_distance = distance
                 tracker_index = i
+        if min_distance > model.max_accepted_error:
+            continue
         if tracker_index is -1:
-            print "Too many features!"
+            print "Too many points"
             break
 
-        associated_trackers.append(predicted[tracker_index])
+        associated_trackers.append((predicted[tracker_index], predicted_pos[tracker_index], pose))
         del predicted[tracker_index]
+        del predicted_pos[tracker_index]
 
-    for i in xrange(len(associated_trackers)):
-        pos = pose_array.poses[i].position
-        associated_trackers[i].update(np.array([pos.x, pos.y, pos.z]).T)
+    average /= len(pose_array.poses)
+    
+    point_in_matrix = np.empty((len(associated_trackers),3))
+    point_out_matrix = np.empty((len(associated_trackers),3))
 
+
+    for i, tpp in enumerate(associated_trackers):
+        tracker, position, pose = tpp
+        pos = np.array([pose.position.x, pose.position.y, pose.position.z])
+
+        tracker.update(pos.T)
+
+        point_in_matrix[i] = np.array(position)
+        point_out_matrix[i] = np.array(pos)
+
+    #point_in_matrix = point_in_matrix.T
+    #point_out_matrix = point_out_matrix.T
+
+    _, transformation, _ = cv2.estimateAffine3D(point_in_matrix, point_out_matrix)
+    print np.matmul(transformation, np.array([0., 0, 0, 1]))
+    
+    #update non-asociated trackers
+    for i, tracker in enumerate(predicted):
+        position = np.array(predicted_pos[i])
+        position = np.append(position, 1)#passing to homogenious coordinates
+        final_position = np.matmul(transformation, position)
+        tracker.update(final_position)
+        
 
     #Debug information on the speed.
     #speedMean = [0., 0, 0]
@@ -142,22 +177,26 @@ def input_pose_array(pose_array, extra_args):
     #print "Average displacement : {0}".format(speedMean)
 
 class ArenaModel:
-    def __init__(self, size):
-        self.trackers = [
-            [
-                create_tracker(
+    def __init__(self, number_of_points, size, max_accepted_error=1):
+        self.max_accepted_error = max_accepted_error
+        stride = size / (number_of_points - 1.0)
+
+        self.trackers = []
+        self.tracker_list = []
+        self.tracker_pos_list = []
+        for x in xrange(number_of_points):
+            trackers = []
+            self.trackers.append(trackers)
+            for y in xrange(number_of_points):
+                tracker = create_tracker(
                     np.array(
-                        [x*2, 0, y*2, 0, 0 ,0]
+                        [x*stride, 0, y*stride, 0, 0 ,0]
                     )
                 )
-                for x in xrange(size)
-            ]
-            for y in xrange(size)
-        ]
-        self.tracker_list = []
-        for trackers in self.trackers:
-            for tracker in trackers:
+                trackers.append(tracker)
                 self.tracker_list.append(tracker)
+                self.tracker_pos_list.append((x,y,0))
+
 
 
     def get_all_trackers(self):
@@ -167,6 +206,13 @@ class ArenaModel:
         """
         return self.tracker_list
 
+    def get_all_trackers_position(self):
+        """
+        @return a list of position of trackers on the grid following the same order
+        as in the tracker list form get all trackers
+        @rtype a list of coordinates (tuples)
+        """
+        return self.tracker_pos_list
 
     def get_tracker(self, x, y):
         """
@@ -192,7 +238,7 @@ class ArenaModel:
 
 def talker():
     """ Main func. """
-    arena_model = ArenaModel(5)
+    arena_model = ArenaModel(21, 20)
     rospy.init_node("talker")
 
     pub = rospy.Publisher("arena_static_feature_pose", PoseArray, queue_size=4)

@@ -20,14 +20,14 @@ from numpy.random import random_sample
 class ArenaIntersectionModel(object):
     """ Arena model for testing. """
 
-    def __init__(self, width, height):
-        x_components = np.linspace(0, 10, width)
-        y_components = np.linspace(0, 10, height)
+    def __init__(self, width, height, arena_size=20):
+        self.size = width * height
+        x_components = np.linspace(0, arena_size, width)
+        y_components = np.linspace(0, arena_size, height)
         z_components = np.array([0])
 
         xv, yv, zv = np.meshgrid(x_components, y_components, z_components)
-        self.points = np.reshape(np.dstack((xv, yv, zv)), (5 * 5, 3))
-        self.size = width * height
+        self.points = np.reshape(np.dstack((xv, yv, zv)), (self.size, 3))
 
 
     def get_points(self, error):
@@ -64,7 +64,7 @@ def test_all():
     """
     global callback_called, trajectories
 
-    model = ArenaIntersectionModel(5, 5)
+    model = ArenaIntersectionModel(21, 21)
     for _ in xrange(model.size):
         trajectories.append([np.array([]), np.array([]), np.array([])])
     rospy.init_node("Tester_feature_tracking", anonymous=True)
@@ -86,7 +86,7 @@ def test_all():
 
     start_time = time.time()
 
-    for c_val in xrange(0, 300):
+    for _ in xrange(0, 300):
         
         dt = time.time() - start_time
         start_time = time.time()
@@ -101,17 +101,20 @@ def test_all():
         for i in xrange(0, model.size):
             pos = points[i]
             p = Pose()
-            
+
             p.position.x = pos[0]
             p.position.y = pos[1]
             p.position.z = pos[2]
 
-            message.poses.append(p)
-            
             x[i] = pos[0]
             y[i] = pos[1]
             z[i] = pos[2]
-            c[i] = c_val
+
+            if random_sample() < 0.3:
+                message.poses.append(p)
+                c[i] = 0
+            else:
+                c[i] = 1
         
         fig.canvas.draw_idle()
         callback_called.clear()
