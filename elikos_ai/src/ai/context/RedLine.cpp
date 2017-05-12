@@ -9,7 +9,7 @@
 namespace ai
 {
 
-RedLine::RedLine(const tf::Point& cornerA, const tf::Point& cornerB)
+RedLine::RedLine(tf::Point& cornerA, tf::Point& cornerB)
         : AbstractLine(cornerA, cornerB)
 {
 }

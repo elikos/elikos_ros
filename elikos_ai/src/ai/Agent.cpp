@@ -30,11 +30,11 @@ void Agent::freeInstance()
     instance_ = nullptr;
 }
 
-void Agent::init(Configuration* config)
+void Agent::init()
 {
-    arena_ = std::unique_ptr<ArenaA>(new ArenaA(config));
-    behaviorManager_ = std::unique_ptr<BehaviorManager>(new BehaviorManager(arena_.get(), config));
-    priorityManager_ = std::unique_ptr<PriorityEvaluationManager>(new PriorityEvaluationManager(arena_.get(), config));
+    arena_ = std::unique_ptr<ArenaA>(new ArenaA());
+    behaviorManager_ = std::unique_ptr<BehaviorManager>(new BehaviorManager(arena_.get()));
+    priorityManager_ = std::unique_ptr<PriorityEvaluationManager>(new PriorityEvaluationManager(arena_.get()));
 }
 
 void Agent::behave()

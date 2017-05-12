@@ -8,10 +8,7 @@ int main(int argc, char* argv[])
     ros::init(argc, argv, "elikos_ai");
     ros::NodeHandle nh;
 
-    ai::Configuration config;
-    config.parseNodeArgs(argc, argv);
-
-    ai::Agent::getInstance()->init(&config);
+    ai::Agent::getInstance()->init();
     ai::MessageHandler::getInstance()->lookForMessages();
 
     ai::MessageHandler::freeInstance();

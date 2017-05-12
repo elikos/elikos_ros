@@ -16,7 +16,7 @@ class Configuration;
 class PriorityEvaluationManager
 {
 public:
-    PriorityEvaluationManager(AbstractArena* arena, Configuration* config);
+    PriorityEvaluationManager(AbstractArena* arena);
     ~PriorityEvaluationManager() = default;
 
     void updateQuadRobot(const tf::Pose& pose);

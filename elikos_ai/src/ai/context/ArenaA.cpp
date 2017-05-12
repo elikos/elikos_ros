@@ -10,17 +10,16 @@
 namespace ai
 {
 
-ArenaA::ArenaA(Configuration* config)
-    : greenLine_  { GreenLine(TOP_LEFT_CORNER,     TOP_RIGHT_CORNER)},
-      whiteLines_ { WhiteLine(BOTTOM_LEFT_CORNER,  TOP_LEFT_CORNER),
-                    WhiteLine(BOTTOM_RIGHT_CORNER, BOTTOM_LEFT_CORNER),
-                    WhiteLine(TOP_RIGHT_CORNER,    BOTTOM_RIGHT_CORNER)}
-{
-    ArenaConfig* arenaConfig = config->getArenaConfig();
-    lines_.push_back(&greenLine_);
+ArenaA::ArenaA()
+{    
+    greenLine_  =  new GreenLine(TOP_LEFT_CORNER,     TOP_RIGHT_CORNER);
+    whiteLines_[0] =  new WhiteLine(BOTTOM_LEFT_CORNER,  TOP_LEFT_CORNER);
+    whiteLines_[1] = new WhiteLine(BOTTOM_RIGHT_CORNER, BOTTOM_LEFT_CORNER);
+    whiteLines_[2] = new WhiteLine(TOP_RIGHT_CORNER,    BOTTOM_RIGHT_CORNER);
+    lines_.push_back(greenLine_);
     for (int i = 0; i < 3; i++)
     {
-        lines_.push_back(&whiteLines_[i]);
+        lines_.push_back(whiteLines_[i]);
     }
 }
 
@@ -72,7 +71,7 @@ int ArenaA::getNRotationsForOptimalDirection(const TargetRobot& target) const
 
 TargetRobot* ArenaA::findClosestTargetToGoodLine()
 {
-    double linePosition = 10.0;
+    double linePosition = TOP_RIGHT_CORNER.getX();
     double minDistance = 20;
     TargetRobot* closestRobot = nullptr;
     for (int i = 0; i < targets_.size(); ++i)

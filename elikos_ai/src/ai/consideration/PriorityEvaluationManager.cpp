@@ -13,7 +13,7 @@
 namespace ai
 {
 
-PriorityEvaluationManager::PriorityEvaluationManager(AbstractArena* arena, Configuration* config)
+PriorityEvaluationManager::PriorityEvaluationManager(AbstractArena* arena)
     : arena_(arena)
 {
     //TODO: use the config here.

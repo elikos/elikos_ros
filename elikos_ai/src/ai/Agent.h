@@ -26,7 +26,7 @@ public:
     static Agent* getInstance();
     static void freeInstance();
 
-    void init(Configuration* config);
+    void init();
 
     void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
     void updateQuadRobot(const tf::Pose& pose);

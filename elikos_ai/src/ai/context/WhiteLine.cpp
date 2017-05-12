@@ -10,7 +10,7 @@
 namespace ai
 {
 
-WhiteLine::WhiteLine(const tf::Point& cornerA, const tf::Point& cornerB)
+WhiteLine::WhiteLine(tf::Point& cornerA, tf::Point& cornerB)
         : AbstractLine(cornerA, cornerB)
 {
 }

@@ -17,7 +17,7 @@ AbstractLine::AbstractLine()
 {
 }
 
-AbstractLine::AbstractLine(const tf::Point& cornerA, const tf::Point& cornerB)
+AbstractLine::AbstractLine(tf::Point& cornerA, tf::Point& cornerB)
     : util::Segment(cornerA, cornerB)
 {
 }

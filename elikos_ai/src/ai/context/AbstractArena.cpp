@@ -10,18 +10,22 @@
 namespace ai
 {
 
-const double AbstractArena::MIN_EDGE = -9.5;
-const double AbstractArena::MAX_EDGE =  9.5;
-
-const tf::Point AbstractArena::TOP_RIGHT_CORNER    { 10.0,  10.0, 0.0 };
-const tf::Point AbstractArena::TOP_LEFT_CORNER     {-10.0,  10.0, 0.0 };
-const tf::Point AbstractArena::BOTTOM_LEFT_CORNER  {-10.0, -10.0, 0.0 };
-const tf::Point AbstractArena::BOTTOM_RIGHT_CORNER { 10.0, -10.0, 0.0 };
-
 AbstractArena::AbstractArena()
 {
     timer_.start();
     targets_.resize(10);
+
+    ros::NodeHandle nh;
+    double dimension_c;
+    nh.getParam("/elikos_ai/dimension_c", dimension_c);
+    double edge_tolerance;
+    nh.getParam("/elikos_ai/edge_tolerance", edge_tolerance);
+
+    TOP_RIGHT_CORNER = tf::Point( dimension_c,  dimension_c, 0.0 );
+    TOP_LEFT_CORNER = tf::Point(-dimension_c,  dimension_c, 0.0 );
+    BOTTOM_LEFT_CORNER = tf::Point(-dimension_c, -dimension_c, 0.0 );
+    BOTTOM_RIGHT_CORNER = tf::Point( dimension_c, -dimension_c, 0.0 );
+    EDGE_TOLERANCE = edge_tolerance;
 }
 
 AbstractArena::~AbstractArena()
@@ -114,8 +118,6 @@ TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::Targ
 
 void AbstractArena::evaluateOutOfBound(TargetRobot& target)
 {
-    const double MIN = -9.5;
-    const double MAX = 9.5;
     double x = target.getPose().getOrigin().x();
     double y = target.getPose().getOrigin().y();
     target.getOrientationEvaluation()->isOutOfBound_ = isOutOfBound(target);
@@ -123,8 +125,8 @@ void AbstractArena::evaluateOutOfBound(TargetRobot& target)
 
 bool AbstractArena::isOutOfBound(tf::Point position)
 {
-    return !(MIN_EDGE <= position.x() && position.x() <= MAX_EDGE &&
-             MIN_EDGE <= position.y() && position.y() <= MAX_EDGE);
+    return !(TOP_LEFT_CORNER.getX() + EDGE_TOLERANCE <= position.x() && position.x() <= TOP_RIGHT_CORNER.getX() - EDGE_TOLERANCE &&
+             BOTTOM_RIGHT_CORNER.getY() + EDGE_TOLERANCE <= position.y() && position.y() <= TOP_RIGHT_CORNER.getY() - EDGE_TOLERANCE);
 }
 
 bool AbstractArena::isOutOfBound(TargetRobot& target)

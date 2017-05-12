@@ -17,7 +17,7 @@ class AbstractLine : public util::Segment
 {
 public:
     AbstractLine();
-    AbstractLine(const tf::Point& cornerA, const tf::Point& cornerB);
+    AbstractLine(tf::Point& cornerA, tf::Point& cornerB);
     bool isInThePath(const TargetRobot& robot) const;
 
     virtual bool isGoodLineIntersection(const TargetRobot& robot) = 0;

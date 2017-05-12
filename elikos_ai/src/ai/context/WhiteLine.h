@@ -13,13 +13,13 @@ namespace ai
 class WhiteLine : public AbstractLine
 {
 public:
-    WhiteLine(const tf::Point& cornerA, const tf::Point& cornerB);
+    WhiteLine(tf::Point& cornerA, tf::Point& cornerB);
     virtual ~WhiteLine();
 
     virtual bool isGoodLineIntersection(const TargetRobot& robot);
 
 private:
-    WhiteLine() = delete;
+    //WhiteLine() = delete;
 };
 
 }

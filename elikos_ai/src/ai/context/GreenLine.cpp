@@ -12,7 +12,7 @@
 namespace ai
 {
 
-GreenLine::GreenLine(const tf::Point& cornerA, const tf::Point& cornerB)
+GreenLine::GreenLine(tf::Point& cornerA, tf::Point& cornerB)
     : AbstractLine(cornerA, cornerB)
 {
 }

@@ -16,7 +16,7 @@ class Configuration;
 class ArenaA : public AbstractArena
 {
 public:
-    ArenaA(Configuration* config);
+    ArenaA();
     virtual ~ArenaA();
 
     virtual void evaluateTargetOrientation(TargetRobot& target);
@@ -24,11 +24,9 @@ public:
 
     virtual TargetRobot* findClosestTargetToGoodLine();
 
-private:
-    WhiteLine whiteLines_[3];
-    GreenLine greenLine_;
+    WhiteLine* whiteLines_[3];
+    GreenLine* greenLine_;
 
-    ArenaA();
 };
 
 }

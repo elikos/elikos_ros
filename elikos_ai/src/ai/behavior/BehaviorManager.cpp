@@ -8,13 +8,20 @@
 namespace ai
 {
 
-BehaviorManager::BehaviorManager(AbstractArena* arena, Configuration* config)
-    : aggressiveBehavior_(arena), preventiveBehavior_(arena, config), researchBehavior_(arena)
+BehaviorManager::BehaviorManager(AbstractArena* arena)
+    : aggressiveBehavior_(arena), preventiveBehavior_(arena), researchBehavior_(arena)
 {
-    BehaviorConfig* behaviorConfig = config->getBehaviorConfig();
-    aggressiveBehavior_.setIsEnabled(behaviorConfig->isAggressiveEnabled);
-    preventiveBehavior_.setIsEnabled(behaviorConfig->isPreventiveEnabled);
-    researchBehavior_.setIsEnabled(behaviorConfig->isResearchEnabled);
+    ros::NodeHandle nh;
+    bool aggressive_enabled;
+    nh.getParam("/elikos_ai/aggressive_enabled", aggressive_enabled);
+    bool preventive_enabled;
+    nh.getParam("/elikos_ai/preventive_enabled", preventive_enabled);
+    bool research_enabled;
+    nh.getParam("/elikos_ai/research_enabled", research_enabled);
+
+    aggressiveBehavior_.setIsEnabled(aggressive_enabled);
+    preventiveBehavior_.setIsEnabled(preventive_enabled);
+    researchBehavior_.setIsEnabled(research_enabled);
 }
 
 BehaviorManager::~BehaviorManager()

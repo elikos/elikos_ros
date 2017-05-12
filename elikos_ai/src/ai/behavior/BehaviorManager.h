@@ -17,7 +17,7 @@ class Configuration;
 class BehaviorManager
 {
 public:
-    BehaviorManager(AbstractArena* arena, Configuration* config);
+    BehaviorManager(AbstractArena* arena);
     ~BehaviorManager();
 
     void behave();

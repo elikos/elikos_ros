@@ -12,6 +12,7 @@ namespace ai
 {
 AbstractBehavior::AbstractBehavior(AbstractArena* arena)
 {
+   arena_ = arena;
 }
 
 void AbstractBehavior::setIsEnabled(bool isEnabled)

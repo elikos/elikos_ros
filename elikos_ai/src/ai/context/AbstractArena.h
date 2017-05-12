@@ -24,13 +24,12 @@ class AbstractConsideration;
 class AbstractArena
 {
 public:
-    static const double MIN_EDGE;
-    static const double MAX_EDGE;
+    double EDGE_TOLERANCE;
 
-    static const tf::Point TOP_RIGHT_CORNER;
-    static const tf::Point TOP_LEFT_CORNER;
-    static const tf::Point BOTTOM_LEFT_CORNER;
-    static const tf::Point BOTTOM_RIGHT_CORNER;
+    tf::Point TOP_RIGHT_CORNER;
+    tf::Point TOP_LEFT_CORNER;
+    tf::Point BOTTOM_LEFT_CORNER;
+    tf::Point BOTTOM_RIGHT_CORNER;
 
     AbstractArena();
     virtual ~AbstractArena() = 0;

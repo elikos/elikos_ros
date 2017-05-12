@@ -17,7 +17,7 @@ class PreventiveBehavior : public AbstractBehavior
 public:
     static constexpr double MIN_ACCEPTABLE_PRIORITY { 0.90 };
 
-    PreventiveBehavior(AbstractArena* arena, Configuration* config);
+    PreventiveBehavior(AbstractArena* arena);
     virtual ~PreventiveBehavior();
 
     virtual void generateCommands();

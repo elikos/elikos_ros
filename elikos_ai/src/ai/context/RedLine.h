@@ -13,13 +13,13 @@ namespace ai
 class RedLine : public AbstractLine
 {
 public:
-    RedLine(const tf::Point& cornerA, const tf::Point& cornerB);
+    RedLine(tf::Point& cornerA, tf::Point& cornerB);
     virtual ~RedLine();
 
     virtual bool isGoodLineIntersection(const TargetRobot& robot);
 
 private:
-    RedLine() = delete;
+    //RedLine() = delete;
 };
 
 }

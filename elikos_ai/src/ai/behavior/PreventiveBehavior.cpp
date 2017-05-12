@@ -11,7 +11,7 @@
 
 namespace ai
 {
-PreventiveBehavior::PreventiveBehavior(AbstractArena* arena, Configuration* config)
+PreventiveBehavior::PreventiveBehavior(AbstractArena* arena)
     : AbstractBehavior(arena)
 {
 }
