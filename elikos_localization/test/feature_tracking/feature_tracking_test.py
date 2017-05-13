@@ -96,7 +96,7 @@ def test_all():
         message.header = Header()
         message.header.stamp = rospy.Time.now()
 
-        model.move(np.array([0,0,0.2]) * dt)
+        model.move(np.array([-0.2,0.2,0.2]) * dt)
         points = model.get_points(0.1)
         for i in xrange(0, model.size):
             pos = points[i]
@@ -110,7 +110,7 @@ def test_all():
             y[i] = pos[1]
             z[i] = pos[2]
 
-            if random_sample() < 0.3:
+            if random_sample() <= 0.3:
                 message.poses.append(p)
                 c[i] = 0
             else:

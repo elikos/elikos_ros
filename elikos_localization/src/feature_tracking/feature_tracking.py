@@ -96,6 +96,8 @@ def input_pose_array(pose_array, extra_args):
 
     associated_trackers = []
     average = np.array([0.,0,0])
+    average_in = np.zeros((3,))
+    average_out = np.zeros((3,))
 
     for pose in pose_array.poses:
         average += np.array([pose.position.x, pose.position.y, pose.position.z])
@@ -114,11 +116,19 @@ def input_pose_array(pose_array, extra_args):
             print "Too many points"
             break
 
-        associated_trackers.append((predicted[tracker_index], predicted_pos[tracker_index], pose))
+        in_position = predicted_pos[tracker_index]
+        average_in += np.array(in_position)
+        average_out += np.array([pose.position.x, pose.position.y, pose.position.z])
+
+        associated_trackers.append((predicted[tracker_index], in_position, pose))
         del predicted[tracker_index]
         del predicted_pos[tracker_index]
 
     average /= len(pose_array.poses)
+    average_in /= len(associated_trackers)
+    average_out /= len(associated_trackers)
+
+    deplacement = average_out - average_in
     
     point_in_matrix = np.empty((len(associated_trackers),3))
     point_out_matrix = np.empty((len(associated_trackers),3))
@@ -136,14 +146,16 @@ def input_pose_array(pose_array, extra_args):
     #point_in_matrix = point_in_matrix.T
     #point_out_matrix = point_out_matrix.T
 
-    _, transformation, _ = cv2.estimateAffine3D(point_in_matrix, point_out_matrix)
-    print np.matmul(transformation, np.array([0., 0, 0, 1]))
+    #_, transformation, _ = cv2.estimateAffine3D(point_in_matrix, point_out_matrix)
+    #print np.matmul(transformation, np.array([0., 0, 0, 1]))
     
+    print deplacement
+
     #update non-asociated trackers
     for i, tracker in enumerate(predicted):
         position = np.array(predicted_pos[i])
-        position = np.append(position, 1)#passing to homogenious coordinates
-        final_position = np.matmul(transformation, position)
+        #position = np.append(position, 1)#passing to homogenious coordinates
+        final_position = deplacement + position
         tracker.update(final_position)
         
 
