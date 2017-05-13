@@ -20,6 +20,7 @@ find_package(Qt5Concurrent)
 find_package(Qt5OpenGL)
 find_package(OpenCV 2 REQUIRED)
 
+
 catkin_package(
 #   INCLUDE_DIRS include
 #   LIBRARIES elikos_detection
@@ -51,6 +52,8 @@ add_executable( elikos_detection
     src/elikos_detection/TargetDetection/BlobDetection.h
     src/elikos_detection/TargetDetection/TargetDetection.h
     src/elikos_detection/TargetDetection/TargetDetection.cpp
+    src/elikos_detection/TargetDetection/ShapeDetection.h
+    src/elikos_detection/TargetDetection/ShapeDetection.cpp
     src/elikos_detection/TargetDetection/CVWrapper/CVWrapperInterface.h
     src/elikos_detection/TargetDetection/CVWrapper/CpuCV.cpp
     src/elikos_detection/TargetDetection/CVWrapper/CpuCV.h
