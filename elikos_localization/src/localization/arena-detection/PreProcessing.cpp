@@ -1,6 +1,13 @@
 
 #include "PreProcessing.h"
 
+#include <Eigen/Geometry>
+#include <Eigen/Core>
+
+#include <iostream>
+
+#include <cmath>
+
 namespace localization 
 {
 
@@ -16,10 +23,30 @@ PreProcessing::PreProcessing()
 
     cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
                                 cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
+
+    cv::namedWindow("PreProcessed", 1);
+    cv::createTrackbar("white threshold", "PreProcessed", &whiteThreshold_, 255);
+    cv::createTrackbar("undistort type", "PreProcessed", &undistortType_, 1);
 }
 
-void PreProcessing::preProcessImage(const cv::Mat& raw, cv::Mat& preProcessed) const
+void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed)
 {
+
+    /*
+    tf::StampedTransform tf;
+    try {
+        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
+
+        tf::Matrix3x3 m(tf.getRotation());
+        double yaw;
+        m.getRPY(roll_, pitch_, yaw);
+        std::cout << pitch_ << " : " << roll_ << std::endl;
+
+    } catch (tf::TransformException e) {
+         ROS_ERROR("%s", e.what());
+    }
+    */
+
     //undistort
     // Blur
     cv::Mat typeConverted;
@@ -29,84 +56,164 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, cv::Mat& preProcessed) c
         raw.copyTo(typeConverted);
     }
 
-    cv::Mat undistorted;
-    cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
-
-    cv::Mat blured;
-    cv::GaussianBlur(undistorted, blured, cv::Size(7,7), 8, 8);
-    
-    double height = 480.0;
-    double width = 640.0;
-
-    Eigen::Vector2f src[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
-    Eigen::Vector2f dst[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
-    
-    Eigen::Vector2f leftRotationPoint = { 0.0, height / 2.0 };
-    Eigen::Vector2f rightRotationPoint = { width, height / 2.0 };
-    Eigen::Vector2f center = { width / 2.0, height / 2.0 };
-
-    Eigen::Vector2f t = translate(leftRotationPoint, -center);
-    Eigen::Vector2f r = rotate(t, -roll_);
-    leftRotationPoint = translate(r, center);
-
-    t = translate(rightRotationPoint, -center);
-    r = rotate(t, -roll_);
-    rightRotationPoint = translate(r, center);
-
-    for (int i = 0; i < 4; ++i) 
-    {
-        Eigen::Vector2f translated = translate(dst[i], -center);
-        Eigen::Vector2f rotated = rotate(translated, -roll_);
-        dst[i] = translate(rotated, center);
+    cv::Mat undistorted = typeConverted;
+    if (!undistortType_) {
+        cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
     }
 
-    for (int i = 0; i < 2; ++i) 
-    {
-        Eigen::Vector2f translated = translate(dst[i], -leftRotationPoint);
-        Eigen::Vector2f rotated = rotate(translated, -pitch_);
-        src[i] = translate(rotated, leftRotationPoint);
-    }
-
-    for (int i = 2; i < 4; ++i) 
-    {
-        Eigen::Vector2f translated = translate(dst[i], -rightRotationPoint);
-        Eigen::Vector2f rotated = rotate(translated, pitch_);
-        src[i] = translate(rotated, rightRotationPoint);
-    }
-
-    cv::circle(undistorted, { (int)(src[0].x()), (int)(src[0].y()) }, 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, { (int)(src[1].x()), (int)(src[1].y()) }, 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, { (int)(src[2].x()), (int)(src[2].y()) }, 5, cv::Scalar(0, 0 ,0), -1);
-    cv::circle(undistorted, { (int)(src[3].x()), (int)(src[3].y()) }, 5, cv::Scalar(0, 0 ,0), -1);
-
-    cv::circle(undistorted, { (int)(dst[0].x()), (int)(dst[0].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, { (int)(dst[1].x()), (int)(dst[1].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, { (int)(dst[2].x()), (int)(dst[2].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
-    cv::circle(undistorted, { (int)(dst[3].x()), (int)(dst[3].y()) }, 5, cv::Scalar(0, 200 ,0), -1);
-
-    cv::Point2f tSrc[4], tDst[4];
-    for ( int i = 0; i < 4; ++i) 
-    {
-        tSrc[i] = { src[i].x(), src[i].y() };
-        tDst[i] = { dst[i].x(), dst[i].y() };
-    }
-
-
-    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
     cv::Mat perspective;
-
-    cv::warpPerspective(undistorted, perspective, perspectiveTransform, undistorted.size());
+    removePerspective(undistorted, perspective);
     cv::imshow("undistorted", undistorted);
     cv::imshow("perspective", perspective);
+
+    cv::Mat blured;
+    cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
+
 
     cv::Mat eroded;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
     cv::erode(blured, eroded, element, cv::Point(0), 8);
 
     cv::Mat thresholded;
-    cv::adaptiveThreshold(blured, thresholded, 200, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, 551, 2);
+    cv::threshold(blured, thresholded, whiteThreshold_, 255, CV_THRESH_BINARY);
 
     preProcessed = thresholded;
+
+    cv::imshow("PreProcessed", preProcessed);
+}
+
+void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) const
+{
+    double roll, pitch, yaw = 0.0;
+    Eigen::Vector3f direction;
+    try {
+        tf::StampedTransform tf;
+        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
+
+        tf::Matrix3x3 m(tf.getRotation());
+        m.getRPY(roll, pitch, yaw);
+
+        tf::Vector3 v = m * tf::Vector3(0.0, 0.0, 1.0);
+        direction.x() = v.x();
+        direction.y() = v.y();
+        direction.z() = v.z();
+
+    } catch (tf::TransformException e) {
+         ROS_ERROR("%s", e.what());
+    }
+
+    Eigen::Matrix3f r = (Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitX()) * 
+                         Eigen::AngleAxisf(-roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
+                            
+    Eigen::Matrix4f R = Eigen::Matrix4f::Zero();
+    R(3, 3) = 1;
+    for (int i = 0; i < 3; ++i) 
+    {
+        for (int j = 0; j < 3; j++) 
+        {
+            R(i, j) = r(i, j);
+        }
+    }
+
+    double height = input.size().height;
+    double width = input.size().width;
+    double f = 423.0;
+    double HFOV = std::atan( width / (2 * f));
+    double VFOV = std::atan( height / (2 * f));
+
+    Eigen::Vector4f src[4] { Eigen::Vector4f( 1.0,  1.0, 0.0, 1.0), 
+                             Eigen::Vector4f(-1.0,  1.0, 0.0, 1.0), 
+                             Eigen::Vector4f(-1.0, -1.0, 0.0, 1.0), 
+                             Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
+
+    Eigen::Vector4f dst[4] { Eigen::Vector4f( 1.0,  1.0, 0.0, 1.0), 
+                             Eigen::Vector4f(-1.0,  1.0, 0.0, 1.0), 
+                             Eigen::Vector4f(-1.0, -1.0, 0.0, 1.0), 
+                             Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
+   
+    Eigen::Matrix4f P = getPerspectiveProjectionTransform(f, width, height); 
+    Eigen::Translation<float, 4> T(Eigen::Vector4f(0.0, 0.0, -1.0, 0.0));
+
+    for (int i = 0; i < 4; ++i) 
+    {
+        dst[i] = T * dst[i];
+        dst[i] = P * dst[i];
+        dst[i] /= dst[i][3];
+
+        src[i] = R * src[i];
+        src[i] = T * src[i];
+        src[i] = P * src[i];
+        //src[i] = P * T * R * dst[i];
+        src[i] /= src[i][3];
+    }
+
+    cv::Point2f tSrc[4], tDst[4];
+    for (int i = 0; i < 4; ++i) 
+    {
+        tSrc[i] = cv::Point2f(src[i].x() * width / 2.0 + width / 2.0, src[i].y() * height / 2.0 + height / 2.0);
+        tDst[i] = cv::Point2f(dst[i].x() * width / 2.0 + width / 2.0, dst[i].y() * height / 2.0 + height / 2.0);
+    }
+
+    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
+    cv::warpPerspective(input, rectified, perspectiveTransform, input.size());
+
+    //rectified = input.clone();
+    for (int i = 0; i < 4; ++i) 
+    {
+        cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
+        cv::circle(rectified, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
+    }
+
+    //float y = src[1];
+    //float z = src[2];
+
+    //src[1] = y * std::sin(pitch) + z * std::cos(pitch);
+    //src[2] = y * std::cos(pitch) - z * std::
+
+    /*
+    Eigen::Vector2f src[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
+    Eigen::Vector2f dst[4] {{0.0, 0.0}, {0.0, height}, { width, height }, { width, 0.0}};
+    
+    
+    Eigen::Vector2f leftRotationPoint = src[0] + (src[1] - src[0]) / 2.0;
+    Eigen::Vector2f rightRotationPoint = src[3] + (src[2] - src[3]) / 2.0;;
+    Eigen::Vector2f center = (src[2] - src[0]) / 2.0;
+
+    float theta = std::atan2(direction.y(), -direction.x());
+    if (std::isnan(theta)) {
+        theta = 0.0;
+    }
+
+    float phi = std::atan2(std::sqrt(direction.x() * direction.x() + direction.y() * direction.y()), 1);
+
+    Eigen::Rotation2D<float> R(phi);
+    Eigen::Rotation2D<float> cr(theta);
+
+    for (int i = 0; i < 4; ++i) 
+    {
+        dst[i] = cr * (dst[i] - center) + center;
+    }
+    
+    leftRotationPoint = cr * (leftRotationPoint - center) + center;
+    rightRotationPoint = cr * (rightRotationPoint - center) + center;
+
+    src[0] = R.inverse() * (dst[0] - leftRotationPoint) + leftRotationPoint;
+    src[1] = R.inverse() * (dst[1] - leftRotationPoint) + leftRotationPoint;
+    src[2] = R * (dst[2] - rightRotationPoint) + rightRotationPoint;
+    src[3] = R * (dst[3] - rightRotationPoint) + rightRotationPoint;
+
+    */
+
+}
+
+Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLength, double width, double height) const
+{
+    Eigen::Matrix4f m = Eigen::Matrix4f::Zero();
+    m(0, 0) = 2 * focalLength / width;
+    m(1, 1) = 2 * focalLength / height;
+    m(3, 2) = -1;
+
+    return m;
 }
 
 void PreProcessing::showCalibTrackBars()

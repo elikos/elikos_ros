@@ -12,7 +12,7 @@ include_directories(
 )
 
 add_executable(elikos_localization
-    Localizaton.cpp
+    Localization.cpp
     MessageHandler.h
     MessageHandler.cpp
     arena-detection/ImageProcessor.h 
@@ -31,6 +31,8 @@ add_executable(elikos_localization
     arena-detection/algorithm/RANSAC.cpp
     arena-tracking/filter/KalmanFilter.h
     arena-tracking/filter/AbstractKalmanFilter.h
+    context/QuadState.h
+    context/QuadState.cpp
     context/intersection/DetectedIntersection.cpp
     context/intersection/DetectedIntersection.h
     context/line/Line.cpp

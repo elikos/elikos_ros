@@ -16,9 +16,16 @@ find_package(catkin REQUIRED COMPONENTS
   eigen_conversions
   pcl_ros
 )
+find_package(Qt5Gui)
+find_package(Qt5Core)
+find_package(Qt5Widgets)
+find_package(Qt5Test)
+find_package(Qt5Concurrent)
+find_package(Qt5OpenGL)
 
-find_package(OpenCV 3 REQUIRED)
-find_package(Eigen REQUIRED)
+find_package(OpenCV 2 REQUIRED)
+find_package(Eigen3 REQUIRED)
+
 
 catkin_package(
   CATKIN_DEPENDS image_transport cv_bridge geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros

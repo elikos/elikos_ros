@@ -59,9 +59,9 @@ ImageProcessor::~ImageProcessor()
 {
     file_.close();
 }
-void undistort(const cv::Mat& src, cv::Mat& undistorted)
-{
-}
+
+void updateQuadPose();
+void updateQuadImu();
 
 void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
 {
@@ -135,7 +135,6 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
         tDst[i] = { dst[i].x(), dst[i].y() };
     }
 
-
     cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
     cv::Mat perspective;
 
@@ -153,10 +152,11 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
     preProcessed = thresholded;
 }
 
-void ImageProcessor::processImage(const cv::Mat& input, ros::Time stamp)
+void ImageProcessor::processImage(const cv::Mat& input, const ros::Time& stamp)
 {
     image_ = input;
-    preProcess(input, preProcessed_);
+    preProcessing_.preProcessImage(input, stamp,  preProcessed_);
+    //preProcess(input, preProcessed_);
 
     cv::Mat edges;
     findEdges(preProcessed_, edges);
@@ -167,10 +167,10 @@ void ImageProcessor::processImage(const cv::Mat& input, ros::Time stamp)
     findLines(edges, lines_);
     analyzeLineCluster(stamp);
 
-    cv::imshow("input", preProcessed_);
+    cv::imshow("PreProcessed", preProcessed_);
     cv::imshow("mLines", mLines_);
     cv::imshow("lines", lines_);
-    cv::waitKey(1);
+    cv::waitKey(30);
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -269,7 +269,7 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
     if (gridFound) {
         grid.draw(preProcessed_);
         double height = 423.0 / grid.getDistance();
-        std::cout << stamp - start_ << " " << height << std::endl;
+        //std::cout << stamp - start_ << " " << height << std::endl;
     }
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
