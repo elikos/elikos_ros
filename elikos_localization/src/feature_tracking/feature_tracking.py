@@ -3,6 +3,7 @@
 u"""
 Ce module python s'occupe de suivre les points d'intetêts de l'arène avec un filtre de Kalman
 """
+from datetime import datetime
 import copy
 import rospy
 from std_msgs.msg import Header
@@ -66,10 +67,22 @@ def create_tracker(initial_state):
     tracker.P = np.eye(6) * 500.
     return tracker
 
+def closestNode(node_array, position):
+    """
+    @param node_array A numpy array of positions size:(x, 3)
+    @param position A numpy vector size:(3,)
+    @return the index of the closest node in the array of input nodes
+    @rtype ndarray(int)
+    """
+    if node_array.shape[0] is 0:
+        return None
+    deltas = node_array - position
+    dist_2 = np.einsum('ij,ij->i', deltas, deltas)
+    return np.argmin(dist_2)
+
+
 last_time = 0.0
 first_call = True
-
-
 
 def input_pose_array(pose_array, extra_args):
     """
@@ -93,26 +106,22 @@ def input_pose_array(pose_array, extra_args):
     model.update_trackers_prediction(delta_time)
     predicted = model.get_all_trackers()[:]
     predicted_pos = model.get_all_trackers_position()[:]
+    predicted_state_positions = np.take(model.get_tracker_x(), [0, 2, 4], axis=1)
 
     associated_trackers = []
     average = np.array([0.,0,0])
     average_in = np.zeros((3,))
     average_out = np.zeros((3,))
 
+
+    time_start = datetime.now()
     for pose in pose_array.poses:
         average += np.array([pose.position.x, pose.position.y, pose.position.z])
 
-        min_distance = float("inf")
-        tracker_index = -1
-        for i in xrange(len(predicted)):
-            state = predicted[i]
-            distance = (pose.position.x - state.x[0]) ** 2 + (pose.position.y - state.x[2]) ** 2 + (pose.position.z - state.x[4]) ** 2
-            if distance < min_distance:
-                min_distance = distance
-                tracker_index = i
-        if min_distance > model.max_accepted_error:
-            continue
-        if tracker_index is -1:
+        currentPosition = np.array([pose.position.x, pose.position.y, pose.position.z])
+        tracker_index = closestNode(predicted_state_positions, currentPosition)
+
+        if tracker_index is None:
             print "Too many points"
             break
 
@@ -124,12 +133,20 @@ def input_pose_array(pose_array, extra_args):
         del predicted[tracker_index]
         del predicted_pos[tracker_index]
 
+        predicted_state_positions = np.delete(predicted_state_positions, tracker_index, axis=0)
+
+    time_end = datetime.now()
+
+    time_delta = time_end - time_start
+    print "Time elapsed = {0}".format(time_delta)
+
+
     average /= len(pose_array.poses)
     average_in /= len(associated_trackers)
     average_out /= len(associated_trackers)
 
     deplacement = average_out - average_in
-    
+
     point_in_matrix = np.empty((len(associated_trackers),3))
     point_out_matrix = np.empty((len(associated_trackers),3))
 
@@ -143,12 +160,7 @@ def input_pose_array(pose_array, extra_args):
         point_in_matrix[i] = np.array(position)
         point_out_matrix[i] = np.array(pos)
 
-    #point_in_matrix = point_in_matrix.T
-    #point_out_matrix = point_out_matrix.T
 
-    #_, transformation, _ = cv2.estimateAffine3D(point_in_matrix, point_out_matrix)
-    #print np.matmul(transformation, np.array([0., 0, 0, 1]))
-    
     print deplacement
 
     #update non-asociated trackers
@@ -157,17 +169,6 @@ def input_pose_array(pose_array, extra_args):
         #position = np.append(position, 1)#passing to homogenious coordinates
         final_position = deplacement + position
         tracker.update(final_position)
-        
-
-    #Debug information on the speed.
-    #speedMean = [0., 0, 0]
-    #for tracker in model.trackers:
-    #    speedMean[0] += tracker.x[1]
-    #    speedMean[1] += tracker.x[3]
-    #    speedMean[2] += tracker.x[5]
-    #
-    #for i in xrange(len(speedMean)):
-    #    speedMean[i] /= len(model.trackers)
 
 
     #Créer le message et le publier
@@ -185,7 +186,6 @@ def input_pose_array(pose_array, extra_args):
     output_message.header.stamp = pose_array.header.stamp
 
     publisher.publish(output_message)
-
     #print "Average displacement : {0}".format(speedMean)
 
 class ArenaModel:
@@ -196,9 +196,12 @@ class ArenaModel:
         self.trackers = []
         self.tracker_list = []
         self.tracker_pos_list = []
+
         for x in xrange(number_of_points):
+
             trackers = []
             self.trackers.append(trackers)
+
             for y in xrange(number_of_points):
                 tracker = create_tracker(
                     np.array(
@@ -208,7 +211,6 @@ class ArenaModel:
                 trackers.append(tracker)
                 self.tracker_list.append(tracker)
                 self.tracker_pos_list.append((x,y,0))
-
 
 
     def get_all_trackers(self):
@@ -245,6 +247,17 @@ class ArenaModel:
             tracker.F = newF
             tracker.Q = newQ
             tracker.predict()
+    
+    def get_tracker_x(self):
+        """
+        @return the values of the state of each tracker
+        @rtype a ndarray fo dim 2 [x_1, x_2, ...]
+        """
+        #TODO 6 is a magic number
+        tracker_x = np.empty((len(self.tracker_list), 6))
+        for i, tracker in enumerate(self.tracker_list):
+            tracker_x[i] = tracker.x
+        return tracker_x
 
 
 

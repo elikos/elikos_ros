@@ -4,6 +4,7 @@ u"""
 Module de text pour le module feature_tracking d'elikos_localization
 """
 import time
+from datetime import datetime
 import threading
 
 from mpl_toolkits.mplot3d import Axes3D
@@ -79,7 +80,7 @@ def test_all():
     z = np.zeros(model.size)
     c = np.zeros(model.size)
     
-    plt.ion()
+    #plt.ion()
     fig = plt.figure()
 
     ax = fig.add_subplot(111, projection='3d')
@@ -96,7 +97,7 @@ def test_all():
         message.header = Header()
         message.header.stamp = rospy.Time.now()
 
-        model.move(np.array([-0.2,0.2,0.2]) * dt)
+        model.move(np.array([0,0,0.1]) * dt)
         points = model.get_points(0.1)
         for i in xrange(0, model.size):
             pos = points[i]
@@ -110,7 +111,7 @@ def test_all():
             y[i] = pos[1]
             z[i] = pos[2]
 
-            if random_sample() <= 0.3:
+            if random_sample() <= 1:
                 message.poses.append(p)
                 c[i] = 0
             else:
@@ -118,8 +119,16 @@ def test_all():
         
         fig.canvas.draw_idle()
         callback_called.clear()
+
+        time_start = datetime.now()
+
         pub.publish(message)
         ok = callback_called.wait(10)#We wait 10 sec max
+        time_end = datetime.now()
+
+        time_delta = time_end - time_start
+        print "Time elapsed = {0}".format(time_delta)
+
         if not ok:
             print "No message was heard"
 
@@ -128,6 +137,7 @@ def test_all():
             trajectory = trajectories[i]
             ax.plot(trajectory[0], trajectory[1], trajectory[2])
 
+        plt.draw()
         plt.pause(1)
         ax.cla()
 
