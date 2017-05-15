@@ -5,44 +5,43 @@ the (static) features detected in the arena, in order to localize the drone.
 
 Design :
 
-T_T c dur de faire un filtre de kalman
+In order to design a filter that takesi in account acceleration, we must do 
+the following:
 
-At the moment :
+STATE OF FILTER:
+state:
+x = [x, x', x'', y, y', y'', z, z', z'']
+let t be the elapsed time, and t² be equal to t*t/2
+state transition:
+F = [ 1, t, t²,0, 0, 0, 0, 0, 0 ]
+    [ 0, 1, t, 0, 0, 0, 0, 0, 0 ]
+    [ 0, 0, 1, 0, 0, 0, 0, 0, 0 ]
+    [ 0, 0, 0, 1, t, t²,0, 0, 0 ]
+    [ 0, 0, 0, 0, 1, t, 0, 0, 0 ]
+    [ 0, 0, 0, 0, 0, 1, 0, 0, 0 ]
+    [ 0, 0, 0, 0, 0, 0, 1, t, t²]
+    [ 0, 0, 0, 0, 0, 0, 0, 1, t ]
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 1 ]
 
-let r be the tri-dimentional coorinates of position, and of components
-r_x (depth position)
-r_y (horizontal position)
-r_z (vertical position)
+B and u are non-exsistant
 
-let v be the first-order derivative of r (therfore, v is the speed), a vector of three components,
-v = [v_x, v_y, v_z] ^T
+SENSORS:
+two sensors are given. Point positions, and acceleration from the imu:
+imu:
+z = [x'', y'', z'']
+H = [0, 0, 1, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 1, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 1]
 
-let a be the second-order derivative of r (the acceleration), a vector of three components,
-a = [a_x, a_y, a_z] ^T
+R is given to us be the imu. It is a 3x3 matrix.
 
-let x be the state of out kalman filter model.
-x = [r_x, v_x, r_y, v_y, r_z, v_z] ^T
+Point positions:
+z = [x, y, z]
+H = [1, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 1, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 1, 0, 0]
 
-let x+ be the next state of our system
-let F be the state transition matrix. 
+R is not given by the system
 
-x+ = Fx
-
-for 
-F = [ 1,dt, 0, 0, 0, 0 ]
-    [ 0, 1, 0, 0, 0, 0 ]
-    [ 0, 0, 1,dt, 0, 0 ]
-    [ 0, 0, 0, 1, 0, 0 ]
-    [ 0, 0, 0, 0, 1,dt ]
-    [ 0, 0, 0, 0, 0, 1 ]
-
-H = [ 1, 0, 0, 0, 0, 0 ]
-    [ 0, 0, 1, 0, 0, 0 ]
-    [ 0, 0, 0, 0, 1, 0 ]
-
-
-
-
-
-
+Since all the systems are linear, we can use the kalman filter?
 
