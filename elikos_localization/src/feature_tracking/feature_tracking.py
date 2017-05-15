@@ -7,14 +7,15 @@ from datetime import datetime
 import copy
 import rospy
 from std_msgs.msg import Header
+from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseArray
 
 import cv2
 
 from filterpy.kalman import KalmanFilter
-from scipy.linalg import block_diag
 from filterpy.common import Q_discrete_white_noise
+from scipy.linalg import block_diag
 import numpy as np
 
 
@@ -44,12 +45,28 @@ def create_Q(dt):
     q = Q_discrete_white_noise(dim=2, dt=dt, var=0.001)
     return block_diag(q, q, q)
 
+def create_B(dt):
+    """
+    Creates the B matrix, that takes the acceleration and gives the change to the velocity and
+    position
+    @param dt the variation in time in seconds
+    """
+    tt = dt * dt / 2
+    return np.array([
+        [0, 0, 0],
+        [dt, 0, 0],
+        [0, 0, 0],
+        [0, dt, 0],
+        [0, 0, 0],
+        [0, 0, dt]
+    ])
+
 def create_tracker(initial_state):
     """
     Creates a simple Kalman filter
     @param initial_state the initial state of the system. Of the form [r_x, v_x, r_y, v_y, r_z, v_z]
     """
-    tracker = KalmanFilter(6, 3)
+    tracker = KalmanFilter(6, 3, dim_u=3)
 
     tracker.H = np.array([[1, 0, 0, 0, 0, 0],
                           [0, 0, 1, 0, 0, 0],
@@ -62,6 +79,7 @@ def create_tracker(initial_state):
     tracker.R = np.array([[5., 0, 0],
                           [0, 5 ,0],
                           [0, 0 ,5]])
+    tracker.B = create_B(0)
 
     tracker.x = initial_state.T
     tracker.P = np.eye(6) * 500.
@@ -83,6 +101,13 @@ def closestNode(node_array, position):
 
 last_time = 0.0
 first_call = True
+global_acceleration = np.zeros((3,))
+
+def input_imu_data(imu_data):
+    global global_acceleration
+    global_acceleration[0] = imu_data.linear_acceleration.x
+    global_acceleration[1] = imu_data.linear_acceleration.y
+    global_acceleration[2] = imu_data.linear_acceleration.z
 
 def input_pose_array(pose_array, extra_args):
     """
@@ -91,7 +116,7 @@ def input_pose_array(pose_array, extra_args):
     @param extra_args A tuple that contains the model and the publisher
     """
     
-    global last_time, first_call
+    global last_time, first_call, global_acceleration
     
     model, publisher = extra_args
 
@@ -103,7 +128,10 @@ def input_pose_array(pose_array, extra_args):
         delta_time = 0
         first_call = False
 
-    model.update_trackers_prediction(delta_time)
+    print delta_time
+    model.update_trackers_prediction(delta_time, global_acceleration)
+    print delta_time
+
     predicted = model.get_all_trackers()[:]
     predicted_pos = model.get_all_trackers_position()[:]
     predicted_state_positions = np.take(model.get_tracker_x(), [0, 2, 4], axis=1)
@@ -236,17 +264,21 @@ class ArenaModel:
         return self.trackers[x][y]
 
 
-    def update_trackers_prediction(self, delta_time):
+    def update_trackers_prediction(self, delta_time, u):
         """
         Updates the F and Q matrix of all trackers using the provided delta time.
         @param delta_time the elaplsed time to update the trackers with
+        @param u the controll parameters
         """
         newF = create_F(delta_time)
         newQ = create_Q(delta_time)
+        newB = create_B(delta_time)
+        print np.matmul(newB, u)
         for tracker in self.get_all_trackers():
             tracker.F = newF
             tracker.Q = newQ
-            tracker.predict()
+            tracker.B = newB
+            tracker.predict(u)
     
     def get_tracker_x(self):
         """
@@ -269,6 +301,7 @@ def talker():
     pub = rospy.Publisher("arena_static_feature_pose", PoseArray, queue_size=4)
 
     rospy.Subscriber("arena_features", PoseArray, callback=input_pose_array, callback_args=(arena_model, pub), queue_size=20)
+    rospy.Subscriber("imu/data_raw", Imu, callback=input_imu_data, queue_size=20)
 
     rospy.spin()
 

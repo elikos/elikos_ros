@@ -11,6 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 import rospy
+from sensor_msgs.msg import Imu
 from geometry_msgs.msg import PoseArray, Pose
 from std_msgs.msg import Header
 
@@ -23,6 +24,8 @@ class ArenaIntersectionModel(object):
 
     def __init__(self, width, height, arena_size=20):
         self.size = width * height
+        self.linear_velocity = np.zeros((3,))
+        self.linear_acceleration = np.zeros((3,))
         x_components = np.linspace(0, arena_size, width)
         y_components = np.linspace(0, arena_size, height)
         z_components = np.array([0])
@@ -34,8 +37,12 @@ class ArenaIntersectionModel(object):
     def get_points(self, error):
         return self.points + ((random_sample((self.size, 3)) - 0.5) * 2 * error )
 
-    def move(self, value):
-        self.points += np.tile(value, (self.size, 1))
+    def get_linear_acceleration(self, error):
+        return self.linear_acceleration + ((random_sample((3,)) - 0.5) * 2 * error)
+
+    def move(self, delta_time):
+        self.linear_velocity += self.linear_acceleration * delta_time
+        self.points += np.tile(self.linear_velocity * delta_time, (self.size, 1))
 
 
 callback_called = threading.Event()
@@ -56,6 +63,13 @@ def tester_callback(pose_array):
 
     callback_called.set()
 
+def storeAcceleration(imu_data, acceleration):
+    imu_data.linear_acceleration.x = acceleration[0]
+    imu_data.linear_acceleration.y = acceleration[1]
+    imu_data.linear_acceleration.z = acceleration[2]
+    return imu_data
+
+
 def test_all():
     """
     Tests the feature_tracking.py code
@@ -70,6 +84,7 @@ def test_all():
         trajectories.append([np.array([]), np.array([]), np.array([])])
     rospy.init_node("Tester_feature_tracking", anonymous=True)
     pub = rospy.Publisher("arena_features", PoseArray, queue_size=50)
+    pub_acceleration_imu = rospy.Publisher("imu/data_raw", Imu, queue_size=50)
     sub = rospy.Subscriber("arena_static_feature_pose", PoseArray, tester_callback, queue_size=50)
 
     rate = rospy.Rate(60)
@@ -87,6 +102,8 @@ def test_all():
 
     start_time = time.time()
 
+    model.linear_acceleration = np.array([0, 0, 0.1])
+
     for _ in xrange(0, 300):
         
         dt = time.time() - start_time
@@ -97,7 +114,7 @@ def test_all():
         message.header = Header()
         message.header.stamp = rospy.Time.now()
 
-        model.move(np.array([0,0,0.1]) * dt)
+        model.move(dt)
         points = model.get_points(0.1)
         for i in xrange(0, model.size):
             pos = points[i]
@@ -111,7 +128,7 @@ def test_all():
             y[i] = pos[1]
             z[i] = pos[2]
 
-            if random_sample() <= 1:
+            if random_sample() <= 0.3:
                 message.poses.append(p)
                 c[i] = 0
             else:
@@ -121,6 +138,13 @@ def test_all():
         callback_called.clear()
 
         time_start = datetime.now()
+
+
+        imu_data = Imu()
+        imu_data.header = Header()
+        acceleration = model.get_linear_acceleration(0.1)
+        imu_data = storeAcceleration(imu_data, acceleration)
+        pub_acceleration_imu.publish(imu_data)
 
         pub.publish(message)
         ok = callback_called.wait(10)#We wait 10 sec max
@@ -138,7 +162,7 @@ def test_all():
             ax.plot(trajectory[0], trajectory[1], trajectory[2])
 
         plt.draw()
-        plt.pause(1)
+        plt.pause(0.1)
         ax.cla()
 
         if rospy.is_shutdown():
