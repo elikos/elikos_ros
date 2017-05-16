@@ -104,7 +104,11 @@ def test_all():
 
     model.linear_acceleration = np.array([0, 0, 0.1])
 
-    for _ in xrange(0, 300):
+    for i in xrange(0, 300):
+        if i == 7:
+            model.linear_acceleration = np.array([0, 0.1, 0.0])
+        if i == 14:
+            model.linear_acceleration = np.array([0, 0.0, -0.1])
         
         dt = time.time() - start_time
         start_time = time.time()
@@ -137,14 +141,15 @@ def test_all():
         fig.canvas.draw_idle()
         callback_called.clear()
 
-        time_start = datetime.now()
-
-
+        
         imu_data = Imu()
         imu_data.header = Header()
+        imu_data.header.stamp = rospy.Time.now()
         acceleration = model.get_linear_acceleration(0.1)
         imu_data = storeAcceleration(imu_data, acceleration)
-        pub_acceleration_imu.publish(imu_data)
+
+        time_start = datetime.now()
+
 
         pub.publish(message)
         ok = callback_called.wait(10)#We wait 10 sec max
@@ -160,6 +165,8 @@ def test_all():
         for i in xrange(len(trajectories)):
             trajectory = trajectories[i]
             ax.plot(trajectory[0], trajectory[1], trajectory[2])
+
+        pub_acceleration_imu.publish(imu_data)
 
         plt.draw()
         plt.pause(0.1)
