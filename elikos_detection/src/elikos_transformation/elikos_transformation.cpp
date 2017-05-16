@@ -12,7 +12,6 @@ int main(int argc, char* argv[])
     // Endless loop
     while(ros::ok())
     {
-
         ros::spinOnce();
         r.sleep();
     }

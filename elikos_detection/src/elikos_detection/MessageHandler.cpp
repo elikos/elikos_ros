@@ -36,8 +36,10 @@ MessageHandler::MessageHandler(string calibrationFilename) : it_(nh_) {
     is_ = it_.subscribe(inputTopic, 1, &MessageHandler::dispatchMessage, this);
     subRC_ = nh_.subscribe(RCinputTopic, 100, &MessageHandler::dispatchCommand,
                            this);
+    std::string cam_name = ros::this_node::getName();
+    cam_name = cam_name.substr(0, cam_name.size()-std::string("_detection").size());
     pub_ =
-        nh_.advertise<elikos_ros::RobotRawArray>("elikos_robot_raw_array", 1);
+        nh_.advertise<elikos_ros::RobotRawArray>("/"+cam_name+"/elikos_robot_raw_array", 1);
     pubCommandOutput_ =
         nh_.advertise<std_msgs::String>(RCCommandOutputTopic, 100);
     // pubImages_ = it_.advertise(inputTopic + "/debug", 1); //debug only
