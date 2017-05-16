@@ -81,13 +81,14 @@ def publish_current_status(model, publisher, time_stamp):
     """
     output_message = PoseArray()
 
-    for tracker in model.get_all_trackers():
-        p = Pose()
-        p.position.x = tracker.x[0]
-        p.position.y = tracker.x[3]
-        p.position.z = tracker.x[6]
+    point = model.get_drone_position()
 
-        output_message.poses.append(p)
+    p = Pose()
+    p.position.x = -point[0]
+    p.position.y = -point[1]
+    p.position.z = -point[2]
+
+    output_message.poses.append(p)
 
     output_message.header = Header()
     output_message.header.stamp = time_stamp
@@ -127,7 +128,7 @@ def input_imu_data(imu_data, extra_args):
     delta_time = get_delta_time(imu_data.header.stamp.to_sec())
     print "Acceleration dt : {0}".format(delta_time)
 
-    model.update_trackers_prediction(delta_time)
+    model.predict(delta_time)
 
 
     accel = np.empty((3,))
@@ -139,13 +140,13 @@ def input_imu_data(imu_data, extra_args):
     H = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
                   [0, 0, 0, 0, 0, 1, 0, 0, 0],
                   [0, 0, 0, 0, 0, 0, 0, 0, 1]])
-    R = np.array([[.1, 0, 0],
-                  [0, .1, 0],
-                  [0, 0, .1]])
-    for tracker in model.tracker_list:
-        tracker.update(accel, H=H, R=R)
+    R = np.array([[.15, 0, 0],
+                  [0, .15, 0],
+                  [0, 0, .15]])
 
-    publish_current_status(model, publisher, imu_data.header.stamp)
+    model.tracker.update(accel, H=H, R=R)
+
+    #publish_current_status(model, publisher, imu_data.header.stamp)
 
 
 def input_pose_array(pose_array, extra_args):
@@ -159,68 +160,45 @@ def input_pose_array(pose_array, extra_args):
     current_time = pose_array.header.stamp.to_sec()
     delta_time = get_delta_time(current_time)
 
-    model.update_trackers_prediction(delta_time)
+    
+    model.predict(delta_time)
 
-    predicted = model.get_all_trackers()[:]
-    predicted_pos = model.get_all_trackers_position()[:]
-    predicted_state_positions = np.take(model.get_tracker_x(), [0, 3, 6], axis=1)
+    predicted_positions = model.get_feature_position_relative_to_drone()
+    z = np.array([])
+    
+    number_of_asscociated_points = 0
 
-    associated_trackers = []
-    average = np.array([0.,0,0])
-    average_in = np.zeros((3,))
-    average_out = np.zeros((3,))
+    drone_position = model.get_drone_position()
+    for pose in [pose_array.poses[0]]:
 
-    for pose in pose_array.poses:
-        average += np.array([pose.position.x, pose.position.y, pose.position.z])
+        current_position = np.array([pose.position.x, pose.position.y, pose.position.z])
+        position_index = closestNode(predicted_positions, current_position)
 
-        currentPosition = np.array([pose.position.x, pose.position.y, pose.position.z])
-        tracker_index = closestNode(predicted_state_positions, currentPosition)
-
-        if tracker_index is None:
+        if position_index is None:
             print "Too many points"
             break
 
-        in_position = predicted_pos[tracker_index]
-        average_in += np.array(in_position)
-        average_out += np.array([pose.position.x, pose.position.y, pose.position.z])
+        old_position = predicted_positions[position_index]
+        new_position = current_position
+        displacement = (old_position - new_position)
+        new_drone_position = drone_position + displacement
 
-        associated_trackers.append((predicted[tracker_index], in_position, pose))
-        del predicted[tracker_index]
-        del predicted_pos[tracker_index]
+        z = np.append(z, new_drone_position)
+        number_of_asscociated_points += 1
 
-        predicted_state_positions = np.delete(predicted_state_positions, tracker_index, axis=0)
+    mini_R = np.array([[.15, 0, 0],
+                       [0, .15 ,0],
+                       [0, 0 ,.15]])
+    mini_R_list = [mini_R] * number_of_asscociated_points
+    R = block_diag(*mini_R_list)
+    mini_H = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 1, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 1, 0, 0]])
 
+    H = np.tile(mini_H, (number_of_asscociated_points, 1))
 
-    average /= len(pose_array.poses)
-    average_in /= len(associated_trackers)
-    average_out /= len(associated_trackers)
+    model.tracker.update(z, R=R, H=H)
 
-    deplacement = average_out - average_in
-
-    point_in_matrix = np.empty((len(associated_trackers),3))
-    point_out_matrix = np.empty((len(associated_trackers),3))
-
-    H = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
-                  [0, 0, 0, 1, 0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0, 0, 1, 0, 0]])
-    R = np.array([[.1, 0, 0],
-                  [0, .1 ,0],
-                  [0, 0 ,.1]])
-
-    for i, tpp in enumerate(associated_trackers):
-        tracker, position, pose = tpp
-        pos = np.array([pose.position.x, pose.position.y, pose.position.z])
-
-        tracker.update(pos.T, H=H, R=R)
-
-        point_in_matrix[i] = np.array(position)
-        point_out_matrix[i] = np.array(pos)
-
-    #update non-asociated trackers
-    for i, tracker in enumerate(predicted):
-        position = np.array(predicted_pos[i])
-        final_position = deplacement + position
-        tracker.update(final_position, H=H, R=R)
 
     publish_current_status(model, publisher, pose_array.header.stamp)
 
@@ -228,89 +206,42 @@ class ArenaModel:
     def __init__(self, number_of_points, size, max_accepted_error=1):
         self.max_accepted_error = max_accepted_error
         stride = size / (number_of_points - 1.0)
+        self.number_of_features = number_of_points * number_of_points
 
-        self.trackers = []
-        self.tracker_list = []
-        self.tracker_pos_list = []
+        self.tracker = create_tracker(np.array([0,0,0, 0,0,0, 0,0,0]))
+        self.features_positions = np.empty((self.number_of_features, 3))
 
         for x in xrange(number_of_points):
-
-            trackers = []
-            self.trackers.append(trackers)
-
             for y in xrange(number_of_points):
-                tracker = create_tracker(
-                    np.array(
-                        [x*stride, 0, 0,
-                         y*stride, 0, 0,
-                         0, 0, 0]
-                    )
+                self.features_positions[x + y * number_of_points] = np.array(
+                    [x*stride, y*stride, 0]
                 )
-                trackers.append(tracker)
-                self.tracker_list.append(tracker)
-                self.tracker_pos_list.append((x,y,0))
 
+    def get_drone_position(self):
+        """
+        Returns:
+        --------
+        ndarray(float) : 3x1 array representing the position of the drone
+        """
+        return np.take(self.tracker.x, np.array([0, 3, 6]))
+    
+    def get_feature_position_relative_to_drone(self):
+        """
+        Returns a numpy array containing numpy arrays of position of features on the map.
+        """
+        position = self.get_drone_position()
+        return self.features_positions - np.tile(position, (self.number_of_features,1))
 
-    def get_all_trackers(self):
+    def predict(self, delta_time):
         """
-        @return a linear list of all trackers in the current model.
-        @rtype a mutable list of KalmanFilters
+        Calculates a prediction based on the data of the filter and the time
+        Parameters:
+        -----------
+            delta_time: the time difference to use to predict the state
         """
-        return self.tracker_list
-
-    def get_all_trackers_position(self):
-        """
-        @return a list of position of trackers on the grid following the same order
-        as in the tracker list form get all trackers
-        @rtype a list of coordinates (tuples)
-        """
-        return self.tracker_pos_list
-
-    def get_tracker(self, x, y):
-        """
-        @return the tracker (as a mutable) that is at the position (x,y) on the grid
-        @rtype filterpy.kalman.KalmanFilter
-        """
-        return self.trackers[x][y]
-
-
-    def update_trackers_prediction(self, delta_time):
-        """
-        Updates the F and Q matrix of all trackers using the provided delta time.
-        @param delta_time the elaplsed time to update the trackers with
-        """
-        newF = create_F(delta_time)
-        newQ = create_Q(delta_time)
-        for tracker in self.get_all_trackers():
-            tracker.F = newF
-            tracker.Q = newQ
-            tracker.predict()
-
-    def update_all_trackers_from_position(self, positions):
-        """
-        Updates the trackers from the position of the points
-        @param positions the positions of the points stored as a numpy array of dimention (n, 3),
-        where n is the number of trackers
-        """
-        H = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 1, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 1, 0, 0]])
-        R = np.array([[5., 0, 0],
-                      [0, 5 ,0],
-                      [0, 0 ,5]])
-        for i, tracker in enumerate(self.tracker_list):
-            tracker.update(positions[i], H=H, R=R)
-
-    def get_tracker_x(self):
-        """
-        @return the values of the state of each tracker
-        @rtype a ndarray fo dim 2 [x_1, x_2, ...]
-        """
-        #TODO 9 is a magic number
-        tracker_x = np.empty((len(self.tracker_list), 9))
-        for i, tracker in enumerate(self.tracker_list):
-            tracker_x[i] = tracker.x
-        return tracker_x
+        F = create_F(delta_time)
+        Q = create_Q(delta_time)
+        self.tracker.predict(F=F, Q=Q)
 
 
 

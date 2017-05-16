@@ -46,7 +46,7 @@ class ArenaIntersectionModel(object):
 
 
 callback_called = threading.Event()
-trajectories = []
+trajectory = []
 
 def tester_callback(pose_array):
     """
@@ -54,12 +54,11 @@ def tester_callback(pose_array):
     envoyés et reçus, afin qu'on puisse les afficher ensemble.
     @param pose_array le tableau de posistions reçu
     """
-    global callback_called, trajectories
+    global callback_called, trajectory
 
-    for i in xrange(len(pose_array.poses)):
-        trajectories[i][0] = np.append(trajectories[i][0], pose_array.poses[i].position.x)
-        trajectories[i][1] = np.append(trajectories[i][1], pose_array.poses[i].position.y)
-        trajectories[i][2] = np.append(trajectories[i][2], pose_array.poses[i].position.z)
+    trajectory[0] = np.append(trajectory[0], pose_array.poses[0].position.x)
+    trajectory[1] = np.append(trajectory[1], pose_array.poses[0].position.y)
+    trajectory[2] = np.append(trajectory[2], pose_array.poses[0].position.z)
 
     callback_called.set()
 
@@ -77,11 +76,12 @@ def test_all():
     but every position has a cmall error. We then get the calculated valued form the
     package, and match them with our values.
     """
-    global callback_called, trajectories
+    global callback_called, trajectory
 
     model = ArenaIntersectionModel(21, 21)
-    for _ in xrange(model.size):
-        trajectories.append([np.array([]), np.array([]), np.array([])])
+    trajectory.append(np.array([]))
+    trajectory.append(np.array([]))
+    trajectory.append(np.array([]))
     rospy.init_node("Tester_feature_tracking", anonymous=True)
     pub = rospy.Publisher("arena_features", PoseArray, queue_size=50)
     pub_acceleration_imu = rospy.Publisher("imu/data_raw", Imu, queue_size=50)
@@ -104,15 +104,24 @@ def test_all():
 
     model.linear_acceleration = np.array([0, 0, 0.1])
 
-    for i in xrange(0, 300):
-        if i == 7:
+    perfect_trejectory = [np.array([]), np.array([]), np.array([])]
+    for i in xrange(0, 3000):
+        if i == 500:
             model.linear_acceleration = np.array([0, 0.1, 0.0])
-        if i == 14:
+        if i == 1000:
+            model.linear_acceleration = np.array([0, 0.0, -0.1])
+        if 1 == 1500:
+            model.linear_acceleration = np.array([0, -0.1, 0])
+        if 1 == 2000:
+            model.linear_acceleration = np.array([0, 0.0, 0.0])
+        if 1 == 2500:
             model.linear_acceleration = np.array([0, 0.0, -0.1])
         
         dt = time.time() - start_time
         start_time = time.time()
         
+        #time.sleep(0.03)
+
         message = PoseArray()
         
         message.header = Header()
@@ -120,6 +129,11 @@ def test_all():
 
         model.move(dt)
         points = model.get_points(0.1)
+
+        perfect_trejectory[0] = np.append(perfect_trejectory[0], model.points[0][0])
+        perfect_trejectory[1] = np.append(perfect_trejectory[1], model.points[0][1])
+        perfect_trejectory[2] = np.append(perfect_trejectory[2], model.points[0][2])
+
         for i in xrange(0, model.size):
             pos = points[i]
             p = Pose()
@@ -156,26 +170,25 @@ def test_all():
         time_end = datetime.now()
 
         time_delta = time_end - time_start
-        print "Time elapsed = {0}".format(time_delta)
+        #print "Time elapsed = {0}".format(time_delta)
 
         if not ok:
             print "No message was heard"
 
-        ax.scatter(x, y, z, c=c, cmap=plt.hot())
-        for i in xrange(len(trajectories)):
-            trajectory = trajectories[i]
-            ax.plot(trajectory[0], trajectory[1], trajectory[2])
-
         pub_acceleration_imu.publish(imu_data)
-
-        plt.draw()
-        plt.pause(0.1)
-        ax.cla()
 
         if rospy.is_shutdown():
             print "Premature shutdown"
             break
     
+    #ax.plot(trajectory[0], trajectory[1], trajectory[2])
+    #ax.plot(perfect_trejectory[0], perfect_trejectory[1], perfect_trejectory[2])
+    ax.scatter(
+        perfect_trejectory[0] - trajectory[0],
+        perfect_trejectory[1] - trajectory[1],
+        perfect_trejectory[2] - trajectory[2]
+    )
+    plt.show()
 
     if not rospy.is_shutdown():
         print "Finished sending valued, awayting ctrl-c"
