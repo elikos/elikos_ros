@@ -111,7 +111,7 @@ def test_all():
         if i == 1000:
             model.linear_acceleration = np.array([0, 0.0, -0.1])
         if 1 == 1500:
-            model.linear_acceleration = np.array([0, -0.1, 0])
+            model.linear_acceleration = np.array([0, 0.1, 0])
         if 1 == 2000:
             model.linear_acceleration = np.array([0, 0.0, 0.0])
         if 1 == 2500:
@@ -183,7 +183,7 @@ def test_all():
     
     #ax.plot(trajectory[0], trajectory[1], trajectory[2])
     #ax.plot(perfect_trejectory[0], perfect_trejectory[1], perfect_trejectory[2])
-    ax.scatter(
+    ax.plot(
         perfect_trejectory[0] - trajectory[0],
         perfect_trejectory[1] - trajectory[1],
         perfect_trejectory[2] - trajectory[2]

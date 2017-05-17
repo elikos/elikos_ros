@@ -15,9 +15,28 @@ import cv2
 
 from filterpy.kalman import KalmanFilter
 from filterpy.common import Q_discrete_white_noise
-from scipy.linalg import block_diag
-import numpy as np
+from filterpy.common import dot3
 
+from scipy.linalg import block_diag
+
+import numpy as np
+from numpy.linalg import inv
+
+#####
+#### For testing
+#####
+test_values = dict()
+def dump_test():
+    global test_values
+    for key, val in test_values.iteritems():
+        np.save("./{0}".format(key), val)
+def log_value(**kwargs):
+    global test_values
+    for key, val in kwargs.iteritems():
+        if key in test_values:
+            test_values[key] = np.append(test_values[key], val)
+        else:
+            test_values[key] = np.array([val])
 
 
 def create_F(dt):
@@ -126,7 +145,7 @@ def input_imu_data(imu_data, extra_args):
     """
     model, publisher = extra_args
     delta_time = get_delta_time(imu_data.header.stamp.to_sec())
-    print "Acceleration dt : {0}".format(delta_time)
+    #print "Acceleration dt : {0}".format(delta_time)
 
     model.predict(delta_time)
 
@@ -135,7 +154,7 @@ def input_imu_data(imu_data, extra_args):
     accel[0] = imu_data.linear_acceleration.x
     accel[1] = imu_data.linear_acceleration.y
     accel[2] = imu_data.linear_acceleration.z
-    print "Acceleration val: {0}".format(accel)
+    #print "Acceleration val: {0}".format(accel)
 
     H = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
                   [0, 0, 0, 0, 0, 1, 0, 0, 0],
@@ -145,6 +164,7 @@ def input_imu_data(imu_data, extra_args):
                   [0, 0, .15]])
 
     model.tracker.update(accel, H=H, R=R)
+    #model.variate_q()
 
     #publish_current_status(model, publisher, imu_data.header.stamp)
 
@@ -155,6 +175,7 @@ def input_pose_array(pose_array, extra_args):
     @param pose_array The array that contains all position for the features.
     @param extra_args A tuple that contains the model and the publisher
     """
+    global test_time, test_residuals
     model, publisher = extra_args
 
     current_time = pose_array.header.stamp.to_sec()
@@ -198,7 +219,9 @@ def input_pose_array(pose_array, extra_args):
     H = np.tile(mini_H, (number_of_asscociated_points, 1))
 
     model.tracker.update(z, R=R, H=H)
+    model.variate_q()
 
+    log_value(test_residuals=model.tracker.y[1])
 
     publish_current_status(model, publisher, pose_array.header.stamp)
 
@@ -208,6 +231,10 @@ class ArenaModel:
         stride = size / (number_of_points - 1.0)
         self.number_of_features = number_of_points * number_of_points
 
+        self.q_variation_count = 0
+        self.q_scale_factor = 2.5
+        self.epsilon_max = 0.1
+
         self.tracker = create_tracker(np.array([0,0,0, 0,0,0, 0,0,0]))
         self.features_positions = np.empty((self.number_of_features, 3))
 
@@ -216,6 +243,14 @@ class ArenaModel:
                 self.features_positions[x + y * number_of_points] = np.array(
                     [x*stride, y*stride, 0]
                 )
+
+    def variate_q(self):
+        y = self.tracker.y
+        eps = dot3(y.T, inv(self.tracker.S), y)
+        if eps > self.epsilon_max:
+            self.q_variation_count += 1
+        elif self.q_variation_count > 0:
+            self.q_variation_count -= 1
 
     def get_drone_position(self):
         """
@@ -240,7 +275,7 @@ class ArenaModel:
             delta_time: the time difference to use to predict the state
         """
         F = create_F(delta_time)
-        Q = create_Q(delta_time)
+        Q = create_Q(delta_time) * (self.q_scale_factor ** self.q_variation_count)
         self.tracker.predict(F=F, Q=Q)
 
 
@@ -262,4 +297,5 @@ if __name__ == '__main__':
         talker()
     except rospy.ROSInterruptException:
         pass
+    dump_test()
 
