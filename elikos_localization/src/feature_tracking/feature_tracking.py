@@ -4,6 +4,7 @@ u"""
 Ce module python s'occupe de suivre les points d'intetêts de l'arène avec un filtre de Kalman
 """
 from datetime import datetime
+from math import sqrt
 import copy
 import rospy
 from std_msgs.msg import Header
@@ -52,14 +53,14 @@ def create_F(dt):
                        [0, 0, 1]])
     return block_diag(mini_f, mini_f, mini_f)
 
-def create_Q(dt):
+def create_Q(dt, variation):
     """
     Creates a simple Q matrix for the kalman filter.
     @param dt the delta time
     @return the Q matrix
     @rtype a numpy array
     """
-    q = Q_discrete_white_noise(dim=3, dt=dt, var=0.001)
+    q = Q_discrete_white_noise(dim=3, dt=dt, var=variation)
     return block_diag(q, q, q)
 
 def create_tracker(initial_state):
@@ -70,7 +71,7 @@ def create_tracker(initial_state):
     tracker = KalmanFilter(9, 3, dim_u=3)
 
     tracker.F = create_F(0)
-    tracker.Q = create_Q(0)
+    tracker.Q = create_Q(0, 1)
 
     tracker.x = initial_state.T
     tracker.P = np.eye(9) * 500.
@@ -159,13 +160,15 @@ def input_imu_data(imu_data, extra_args):
     H = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
                   [0, 0, 0, 0, 0, 1, 0, 0, 0],
                   [0, 0, 0, 0, 0, 0, 0, 0, 1]])
-    R = np.array([[.15, 0, 0],
-                  [0, .15, 0],
-                  [0, 0, .15]])
+    R = model.imu_R_matrix
 
     model.tracker.update(accel, H=H, R=R)
     #model.variate_q()
-
+    log_value(acceleration=np.take(model.tracker.x, np.array([2, 5, 8])))
+    log_value(accel_x=model.tracker.x[2])
+    log_value(accel_y=model.tracker.x[5])
+    log_value(accel_z=model.tracker.x[8])
+    #log_value(acceleration_residuals=dot3(model.tracker.y.T, inv(model.tracker.S), model.tracker.y))
     #publish_current_status(model, publisher, imu_data.header.stamp)
 
 
@@ -207,9 +210,7 @@ def input_pose_array(pose_array, extra_args):
         z = np.append(z, new_drone_position)
         number_of_asscociated_points += 1
 
-    mini_R = np.array([[.15, 0, 0],
-                       [0, .15 ,0],
-                       [0, 0 ,.15]])
+    mini_R = model.point_R_matrix
     mini_R_list = [mini_R] * number_of_asscociated_points
     R = block_diag(*mini_R_list)
     mini_H = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -237,6 +238,10 @@ class ArenaModel:
 
         self.tracker = create_tracker(np.array([0,0,0, 0,0,0, 0,0,0]))
         self.features_positions = np.empty((self.number_of_features, 3))
+
+        self.Q_matrix_variation = 0.001
+        self.point_R_matrix = np.array([0,0,0,0,0,0,0,0,0])
+        self.imu_R_matrix = np.array([0,0,0,0,0,0,0,0,0])
 
         for x in xrange(number_of_points):
             for y in xrange(number_of_points):
@@ -275,20 +280,49 @@ class ArenaModel:
             delta_time: the time difference to use to predict the state
         """
         F = create_F(delta_time)
-        Q = create_Q(delta_time) * (self.q_scale_factor ** self.q_variation_count)
+        Q = create_Q(delta_time, self.Q_matrix_variation) * (self.q_scale_factor ** self.q_variation_count)
         self.tracker.predict(F=F, Q=Q)
 
 
+def get_param(name, default):
+    return rospy.get_param(name) if rospy.has_param(name) else default
 
 def talker():
     """ Main func. """
     arena_model = ArenaModel(21, 20)
-    rospy.init_node("talker")
+    rospy.init_node("feature_tracking")
 
-    pub = rospy.Publisher("arena_static_feature_pose", PoseArray, queue_size=4)
+    point_R_matrix = np.array(get_param("~point_R_matrix", [1, 0, 0, 0, 1, 0, 0, 0, 1]))
+    imu_R_matrix = np.array(get_param("~imu_R_matrix", [1, 0, 0, 0, 1, 0, 0, 0, 1]))
+    arena_model.Q_matrix_variation = get_param("~Q_matrix_variation", 0.001)
 
-    rospy.Subscriber("arena_features", PoseArray, callback=input_pose_array, callback_args=(arena_model, pub), queue_size=20)
-    rospy.Subscriber("imu/data_raw", Imu, callback=input_imu_data, callback_args=(arena_model, pub), queue_size=20)
+    imu_input_topic = get_param("~imu_input_topic", "imu/data_raw")
+    pose_input_topic = get_param("~pose_input_topic", "arena_features")
+    drone_pose_output_topic = get_param("~drone_pose_output_topic", "arena_static_feature_pose")
+
+    point_R_matrix = np.reshape(point_R_matrix, (3,3))
+    imu_R_matrix = np.reshape(imu_R_matrix, (3,3))
+    
+    arena_model.point_R_matrix = point_R_matrix
+    arena_model.imu_R_matrix = imu_R_matrix
+    print arena_model.point_R_matrix
+    print arena_model.imu_R_matrix
+
+
+    pub = rospy.Publisher(drone_pose_output_topic, PoseArray, queue_size=4)
+
+    rospy.Subscriber(
+        pose_input_topic,
+        PoseArray,
+        callback=input_pose_array,
+        callback_args=(arena_model, pub),
+        queue_size=20)
+
+    rospy.Subscriber(
+        imu_input_topic,
+        Imu, callback=input_imu_data,
+        callback_args=(arena_model, pub),
+        queue_size=20)
 
     rospy.spin()
 
@@ -298,4 +332,5 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException:
         pass
     dump_test()
+
 

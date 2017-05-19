@@ -102,20 +102,20 @@ def test_all():
 
     start_time = time.time()
 
-    model.linear_acceleration = np.array([0, 0, 0.1])
+    model.linear_acceleration = np.array([0, 0, 0.4])
 
     perfect_trejectory = [np.array([]), np.array([]), np.array([])]
     for i in xrange(0, 3000):
         if i == 500:
-            model.linear_acceleration = np.array([0, 0.1, 0.0])
+            model.linear_acceleration = np.array([0, 0.4, 0.0])
         if i == 1000:
-            model.linear_acceleration = np.array([0, 0.0, -0.1])
+            model.linear_acceleration = np.array([0, 0.0, -0.4])
         if 1 == 1500:
-            model.linear_acceleration = np.array([0, 0.1, 0])
+            model.linear_acceleration = np.array([0, 0.4, 0])
         if 1 == 2000:
             model.linear_acceleration = np.array([0, 0.0, 0.0])
         if 1 == 2500:
-            model.linear_acceleration = np.array([0, 0.0, -0.1])
+            model.linear_acceleration = np.array([0, 0.0, -0.4])
         
         dt = time.time() - start_time
         start_time = time.time()
