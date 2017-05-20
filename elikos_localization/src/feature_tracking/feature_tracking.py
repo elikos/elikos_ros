@@ -15,6 +15,7 @@ from geometry_msgs.msg import PoseArray
 import cv2
 
 from filterpy.kalman import KalmanFilter
+from filterpy.kalman import UnscentedKalmanFilter
 from filterpy.common import Q_discrete_white_noise
 from filterpy.common import dot3
 
@@ -22,6 +23,7 @@ from scipy.linalg import block_diag
 
 import numpy as np
 from numpy.linalg import inv
+import quaternion
 
 #####
 #### For testing
@@ -39,6 +41,42 @@ def log_value(**kwargs):
         else:
             test_values[key] = np.array([val])
 
+def funF(x, dt):
+    angular_speed = x[4:7] * dt
+    rotation_this_frame = quaternion.from_rotation_vector(angular_speed)
+    rotation = quaternion.as_quat_array(x[0:4])
+    rotation = rotation * rotation_this_frame
+
+    tt = (dt * dt)/2
+    mini_f = np.array([[1, dt, tt],
+                       [0, 1, dt],
+                       [0, 0, 1]])
+    fMat = block_diag(np.zeros((4,4)), np.identity(3), mini_f, mini_f, mini_f)
+    x_out = np.matmul(fMat, x)
+    x_out[0:4] = quaternion.as_float_array(rotation)
+    return x_out
+
+x = np.array([1, 0, 0, 0, 1, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+print funF(x, 1)
+
+gravity = np.array([0, 0, 9.81])
+
+def h_imu(x):
+    global gravity
+    rot = quaternion.as_float_array(x[0:4])
+    return quaternion.rotate_vectors(rot, (x[13:] + gravity))
+
+def h_pose(x, p):
+    pass
+
+def h_lidar(x):
+    pass
+
+def h_optical_flow(x):
+    pass
+
+def h_point_cloud(x):
+    pass
 
 def create_F(dt):
     """
