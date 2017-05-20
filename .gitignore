@@ -47,3 +47,6 @@ elikos_sim/.vscode/*
 elikos_localization/.vscode/*
 elikos_localization/build/*
 
+#Le bytecode de python
+*.pyc
+
