@@ -12,7 +12,7 @@ imu_R_matrix : [
 #9x9
 Q_matrix_variation : 0.001
 
-imu_input_topic : "imu/data_raw"
+imu_input_topic : "/mavros/imu/data_raw"
 pose_input_topic : "arena_features"
 
 drone_pose_output_topic : "arena_static_feature_pose"

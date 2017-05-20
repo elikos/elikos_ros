@@ -18,6 +18,8 @@ from std_msgs.msg import Header
 import numpy as np
 from numpy.random import random_sample
 
+import position_logger
+
 
 class ArenaIntersectionModel(object):
     """ Arena model for testing. """
@@ -31,7 +33,10 @@ class ArenaIntersectionModel(object):
         z_components = np.array([0])
 
         xv, yv, zv = np.meshgrid(x_components, y_components, z_components)
-        self.points = np.reshape(np.dstack((xv, yv, zv)), (self.size, 3))
+        self.arena_points = np.reshape(np.dstack((xv, yv, zv)), (self.size, 3))
+        self.quad_position = position_logger.GroundTruth()
+
+        self.points = self.arena_points + self.quad_position.position
 
 
     def get_points(self, error):
@@ -41,8 +46,7 @@ class ArenaIntersectionModel(object):
         return self.linear_acceleration + ((random_sample((3,)) - 0.5) * 2 * error)
 
     def move(self, delta_time):
-        self.linear_velocity += self.linear_acceleration * delta_time
-        self.points += np.tile(self.linear_velocity * delta_time, (self.size, 1))
+        self.points = self.arena_points + self.quad_position.position
 
 
 callback_called = threading.Event()
@@ -106,16 +110,6 @@ def test_all():
 
     perfect_trejectory = [np.array([]), np.array([]), np.array([])]
     for i in xrange(0, 3000):
-        if i == 500:
-            model.linear_acceleration = np.array([0, 0.4, 0.0])
-        if i == 1000:
-            model.linear_acceleration = np.array([0, 0.0, -0.4])
-        if 1 == 1500:
-            model.linear_acceleration = np.array([0, 0.4, 0])
-        if 1 == 2000:
-            model.linear_acceleration = np.array([0, 0.0, 0.0])
-        if 1 == 2500:
-            model.linear_acceleration = np.array([0, 0.0, -0.4])
         
         dt = time.time() - start_time
         start_time = time.time()

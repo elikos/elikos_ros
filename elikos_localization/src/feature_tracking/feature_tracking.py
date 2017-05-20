@@ -155,6 +155,8 @@ def input_imu_data(imu_data, extra_args):
     accel[0] = imu_data.linear_acceleration.x
     accel[1] = imu_data.linear_acceleration.y
     accel[2] = imu_data.linear_acceleration.z
+
+    
     #print "Acceleration val: {0}".format(accel)
 
     H = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
