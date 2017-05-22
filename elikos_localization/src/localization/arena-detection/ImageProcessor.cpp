@@ -15,24 +15,8 @@ namespace localization {
 
 using Vector = Eigen::Vector2f;
 
-ImageProcessor* ImageProcessor::instance_ = nullptr;
-
-ImageProcessor* ImageProcessor::getInstance()
-{
-    if (instance_ == nullptr)
-    {
-        instance_ = new ImageProcessor();
-    }
-    return instance_;
-}
-
-void ImageProcessor::freeInstance()
-{
-    delete instance_;
-    instance_ = nullptr;
-}
-
-ImageProcessor::ImageProcessor()
+ImageProcessor::ImageProcessor(QuadState* state)
+    : intersectionTransform_(423.0, state)
 {
     srand(time(NULL));
     // Init undistortion map
@@ -156,7 +140,6 @@ void ImageProcessor::processImage(const cv::Mat& input, const ros::Time& stamp)
 {
     image_ = input;
     preProcessing_.preProcessImage(input, stamp,  preProcessed_);
-    //preProcess(input, preProcessed_);
 
     cv::Mat edges;
     findEdges(preProcessed_, edges);
@@ -263,14 +246,6 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
 
     std::vector<Vector> intersections;
     parseClusterMemberships(clusterMemberships, intersections);
-
-    Grid grid;
-    bool gridFound = gridFitting_.findBestGridModel(intersections, grid);
-    if (gridFound) {
-        grid.draw(preProcessed_);
-        double height = 423.0 / grid.getDistance();
-        //std::cout << stamp - start_ << " " << height << std::endl;
-    }
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
     drawIntersection(intersections, cv::Scalar(0, 0, 150));
