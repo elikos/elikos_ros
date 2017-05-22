@@ -22,24 +22,25 @@ public:
     IntersectionTransform(double focalLength, QuadState* state);
     ~IntersectionTransform() = default;
 
-    void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections) const;
+    void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections);
 
 private:
 
-    double estimateAltitude(const std::Vector<Eigen::Vector2f>& imageIntersections) const;
+    const double GRID_SIDE_LENGTH_M = 1.0;
+    const double ALT_ERROR_THRESHOLD = 0.3;
+
+    void updateKDTree(const std::vector<Eigen::Vector2f>& imageIntersections);
+    double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
     void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, Eigen::Vector3f& intersection) const;
     void publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const;
+
 
     const double focalLength_;
     QuadState* const state_;
 
     pcl::KdTreeFLANN<pcl::PointXY> kdTree_;
-    pcl::PointCloud<pck::PointXY> pointCloud_;
+    pcl::PointCloud<pcl::PointXY>::Ptr pointCloud_;
 
-    pcl::PointCloud<pcl::PointXY>::Ptr pc(new pcl::PointCloud<pcl::PointXY>());
-    for (int i = 0; i < dataset.size(); ++i) {
-        pc->push_back({ dataset[i].x(), dataset[i].y() });
-    } 
 };
 
 }
