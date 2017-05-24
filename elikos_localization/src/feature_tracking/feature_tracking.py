@@ -57,10 +57,11 @@ def f_state(x, dt):
     rotation = rotation * rotation_this_frame
 
     tt = (dt * dt)/2
-    mini_f = np.array([[1, dt, tt],
-                       [0, 1, dt],
-                       [0, 0, 1]])
-    fMat = block_diag(np.zeros((4,4)), np.identity(3), mini_f, mini_f, mini_f)
+    #mini_f = np.array([[1, dt, tt],
+    #                   [0, 1, dt],
+    #                   [0, 0, 1]])
+    fMat = np.eye(9,k=0) + np.eye(9, k=3) * dt + np.eye(9, k=6) * tt
+    fMat = block_diag(np.identity(7), fMat)
     x_out = np.matmul(fMat, x)
     x_out[0:4] = quaternion.as_float_array(rotation)
     return x_out
@@ -231,7 +232,8 @@ def input_imu_data(imu_data, extra_args):
     R_linear = np.array(imu_data.linear_acceleration_covariance)
 
     R_angular = np.reshape(R_angular, (3,3))
-    R_linear = np.reshape(R_linear, (3,3))
+    #TODO Il faut changer la covariance de l'imu dans px4
+    R_linear = np.reshape(R_linear, (3,3)) * 5000000
 
     #print "Acceleration val: {0}".format(accel)
     R = block_diag(R_angular, R_linear)
@@ -359,7 +361,14 @@ class ArenaModel:
         --------
         ndarray(float) : 3x1 array representing the position of the drone
         """
-        return np.take(self.tracker.active.x, np.array([0, 3, 6]))
+        return np.take(self.tracker.active.x, np.array([7, 8, 9]))
+    def get_drone_orientation(self):
+        """
+        Returns:
+        --------
+        ndarray(float) : 4x1 array representing the orientation of the drone (a quaternion)
+        """
+        return np.take(self.tracker.active.x, np.array([0, 1, 2, 3]))
     
     def get_feature_position_relative_to_drone(self):
         """
