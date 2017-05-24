@@ -16,6 +16,7 @@ import cv2
 
 from filterpy.kalman import KalmanFilter
 from filterpy.kalman import UnscentedKalmanFilter
+from filterpy.kalman import MerweScaledSigmaPoints
 from filterpy.common import Q_discrete_white_noise
 from filterpy.common import dot3
 
@@ -24,6 +25,8 @@ from scipy.linalg import block_diag
 import numpy as np
 from numpy.linalg import inv
 import quaternion
+
+import unscented_kalman_filter as ukf
 
 #####
 #### For testing
@@ -41,7 +44,13 @@ def log_value(**kwargs):
         else:
             test_values[key] = np.array([val])
 
-def funF(x, dt):
+
+#####
+#### Global variables
+#####
+gravity = np.array([0, 0, -9.81])
+
+def f_state(x, dt):
     angular_speed = x[4:7] * dt
     rotation_this_frame = quaternion.from_rotation_vector(angular_speed)
     rotation = quaternion.as_quat_array(x[0:4])
@@ -56,17 +65,35 @@ def funF(x, dt):
     x_out[0:4] = quaternion.as_float_array(rotation)
     return x_out
 
-x = np.array([1, 0, 0, 0, 1, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-print funF(x, 1)
-
-gravity = np.array([0, 0, 9.81])
-
 def h_imu(x):
+    u"""
+    Transforms the state X into the mesurement space of the imu
+    Parameters:
+    -----------
+        x : the state of the system
+    IMU mesurement space:
+    ---------------------
+        z = [w, a]
+        where w is the angular speed
+        and a is the linear acceleration
+    """
     global gravity
-    rot = quaternion.as_float_array(x[0:4])
-    return quaternion.rotate_vectors(rot, (x[13:] + gravity))
+
+    rot = quaternion.as_quat_array(x[0:4])
+    irot = np.conjugate(rot)
+    accel = quaternion.rotate_vectors(irot, (x[13:] + gravity))
+
+    angular_speed = x[4:7]
+    return np.concatenate((angular_speed, accel))
 
 def h_pose(x, p):
+    rot = quaternion.as_quat_array(x[0:4])
+    delta_r = x[7:10]
+    new_pos = p + delta_r
+    z = quaternion.rotate_vectors(rot, new_pos, axis=2)
+    return z
+
+def h_magnetometer(x):
     pass
 
 def h_lidar(x):
@@ -98,8 +125,9 @@ def create_Q(dt, variation):
     @return the Q matrix
     @rtype a numpy array
     """
+    rot_q = np.eye(7) * variation
     q = Q_discrete_white_noise(dim=3, dt=dt, var=variation)
-    return block_diag(q, q, q)
+    return block_diag(rot_q, q, q, q)
 
 def create_tracker(initial_state):
     """
@@ -150,6 +178,7 @@ def publish_current_status(model, publisher, time_stamp):
 
     output_message.header = Header()
     output_message.header.stamp = time_stamp
+    output_message.header.frame_id = "elikos_local_origin"
 
     publisher.publish(output_message)
 
@@ -185,31 +214,36 @@ def input_imu_data(imu_data, extra_args):
     model, publisher = extra_args
     delta_time = get_delta_time(imu_data.header.stamp.to_sec())
     #print "Acceleration dt : {0}".format(delta_time)
+    model.tracker.set_active("imu")
 
     model.predict(delta_time)
 
 
-    accel = np.empty((3,))
-    accel[0] = imu_data.linear_acceleration.x
-    accel[1] = imu_data.linear_acceleration.y
-    accel[2] = imu_data.linear_acceleration.z
-
+    measurement = np.empty((6,))
+    measurement[0] = imu_data.angular_velocity.x
+    measurement[1] = imu_data.angular_velocity.y
+    measurement[2] = imu_data.angular_velocity.z
+    measurement[3] = imu_data.linear_acceleration.x
+    measurement[4] = imu_data.linear_acceleration.y
+    measurement[5] = imu_data.linear_acceleration.z
     
+    R_angular = np.array(imu_data.angular_velocity_covariance)
+    R_linear = np.array(imu_data.linear_acceleration_covariance)
+
+    R_angular = np.reshape(R_angular, (3,3))
+    R_linear = np.reshape(R_linear, (3,3))
+
     #print "Acceleration val: {0}".format(accel)
+    R = block_diag(R_angular, R_linear)
 
-    H = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0, 1, 0, 0, 0],
-                  [0, 0, 0, 0, 0, 0, 0, 0, 1]])
-    R = model.imu_R_matrix
-
-    model.tracker.update(accel, H=H, R=R)
+    model.tracker.update(measurement, R=R)
     #model.variate_q()
     log_value(acceleration=np.take(model.tracker.x, np.array([2, 5, 8])))
     log_value(accel_x=model.tracker.x[2])
     log_value(accel_y=model.tracker.x[5])
     log_value(accel_z=model.tracker.x[8])
     #log_value(acceleration_residuals=dot3(model.tracker.y.T, inv(model.tracker.S), model.tracker.y))
-    #publish_current_status(model, publisher, imu_data.header.stamp)
+    publish_current_status(model, publisher, imu_data.header.stamp)
 
 
 def input_pose_array(pose_array, extra_args):
@@ -276,7 +310,28 @@ class ArenaModel:
         self.q_scale_factor = 2.5
         self.epsilon_max = 0.1
 
-        self.tracker = create_tracker(np.array([0,0,0, 0,0,0, 0,0,0]))
+        #create_tracker(np.array([0,0,0, 0,0,0, 0,0,0]))
+        self.tracker = ukf.MultiUnscentedKalmanFilter(
+            np.array([1,0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]), np.eye(16) * 500
+        )
+        self.tracker.filters["imu"] = ukf.UnscentedKalmanFilter(
+            16,
+            6,
+            0,
+            h_imu,
+            f_state,
+            MerweScaledSigmaPoints(16, 0.5, 2, -13)
+        )
+        self.tracker.filters["pose_array"] = ukf.UnscentedKalmanFilter(
+            16,
+            3,
+            0,
+            h_pose,
+            f_state,
+            MerweScaledSigmaPoints(16, 0.5, 2, -13)
+        )
+        self.tracker.set_active("imu")
+
         self.features_positions = np.empty((self.number_of_features, 3))
 
         self.Q_matrix_variation = 0.001
@@ -288,10 +343,11 @@ class ArenaModel:
                 self.features_positions[x + y * number_of_points] = np.array(
                     [x*stride, y*stride, 0]
                 )
+        
 
-    def variate_q(self):
-        y = self.tracker.y
-        eps = dot3(y.T, inv(self.tracker.S), y)
+    def variate_q(self):#don't use
+        y = self.tracker.active.y
+        eps = dot3(y.T, inv(self.tracker.active.S), y)
         if eps > self.epsilon_max:
             self.q_variation_count += 1
         elif self.q_variation_count > 0:
@@ -303,7 +359,7 @@ class ArenaModel:
         --------
         ndarray(float) : 3x1 array representing the position of the drone
         """
-        return np.take(self.tracker.x, np.array([0, 3, 6]))
+        return np.take(self.tracker.active.x, np.array([0, 3, 6]))
     
     def get_feature_position_relative_to_drone(self):
         """
@@ -320,8 +376,9 @@ class ArenaModel:
             delta_time: the time difference to use to predict the state
         """
         F = create_F(delta_time)
-        Q = create_Q(delta_time, self.Q_matrix_variation) * (self.q_scale_factor ** self.q_variation_count)
-        self.tracker.predict(F=F, Q=Q)
+        Q = create_Q(delta_time, self.Q_matrix_variation * (self.q_scale_factor ** self.q_variation_count))
+        self.tracker.active.Q=Q
+        self.tracker.active.predict(dt=delta_time)
 
 
 def get_param(name, default):

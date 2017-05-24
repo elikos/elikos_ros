@@ -98,8 +98,7 @@ def test_all():
     y = np.zeros(model.size)
     z = np.zeros(model.size)
     c = np.zeros(model.size)
-    
-    #plt.ion()
+
     fig = plt.figure()
 
     ax = fig.add_subplot(111, projection='3d')
@@ -109,12 +108,12 @@ def test_all():
     model.linear_acceleration = np.array([0, 0, 0.4])
 
     perfect_trejectory = [np.array([]), np.array([]), np.array([])]
-    for i in xrange(0, 3000):
+    for i in xrange(0, 300):
         
         dt = time.time() - start_time
         start_time = time.time()
         
-        #time.sleep(0.03)
+        time.sleep(0.03)
 
         message = PoseArray()
         
@@ -147,9 +146,7 @@ def test_all():
                 c[i] = 1
         
         fig.canvas.draw_idle()
-        callback_called.clear()
 
-        
         imu_data = Imu()
         imu_data.header = Header()
         imu_data.header.stamp = rospy.Time.now()
@@ -157,9 +154,11 @@ def test_all():
         imu_data = storeAcceleration(imu_data, acceleration)
 
         time_start = datetime.now()
+        callback_called.clear()
 
-
-        pub.publish(message)
+        pub_acceleration_imu.publish(imu_data)
+        #pub.publish(message)
+        
         ok = callback_called.wait(10)#We wait 10 sec max
         time_end = datetime.now()
 
@@ -169,7 +168,6 @@ def test_all():
         if not ok:
             print "No message was heard"
 
-        pub_acceleration_imu.publish(imu_data)
 
         if rospy.is_shutdown():
             print "Premature shutdown"
