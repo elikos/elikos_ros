@@ -13,8 +13,8 @@
 namespace preprocessing {
 
 const std::string MessageHandler::IMG_RCV_TOPIC = "/r200_front/image_raw";
-const std::string MessageHandler::IMG_RGB_PUB_TOPIC = "/elikos/preprocessed_bw";
-const std::string MessageHandler::IMG_BW_PUB_TOPIC = "/elikos/preprocessed_rgb";
+const std::string MessageHandler::IMG_BW_PUB_TOPIC = "/elikos/preprocessed_bw";
+const std::string MessageHandler::IMG_RGB_PUB_TOPIC = "/elikos/preprocessed_rgb";
 
 MessageHandler* MessageHandler::instance_ = nullptr;
 

@@ -11,8 +11,8 @@ class QuadState
 {
 public:
 
-    static QuadState* getInstance();
-    static void freeInstance();
+    QuadState() = default;
+    ~QuadState() = default;
 
     Eigen::Vector3f position_;
     Eigen::Vector3f velocity_;
@@ -27,13 +27,6 @@ public:
 
     Eigen::Matrix3f orientationCovariance_;
     Eigen::Matrix3f angularVelocityCovariance_;
-
-private:
-
-    static QuadState* instance_;
-
-    QuadState() = default;
-    ~QuadState() = default;
 };
 
 }

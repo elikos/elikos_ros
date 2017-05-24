@@ -14,6 +14,7 @@
 #include "PerspectiveTransform.h"
 #include "GridFitting.h"
 #include "LineDetection.h"
+#include "IntersectionTransform.h"
 
 #include "Line.h"
 #include "AbstractKalmanFilter.h"
@@ -27,8 +28,8 @@ class ImageProcessor
 {
 public:
 
-    static ImageProcessor* getInstance();
-    static void freeInstance();
+    ImageProcessor(QuadState* state);
+    ~ImageProcessor();
 
     void processImage(const cv::Mat& input, const ros::Time& stamp);
 
@@ -42,9 +43,6 @@ public:
     Eigen::Vector3d imuOrientation_ = { 1.0, 0.0, 0.0 };
 
 private:
-
-    static ImageProcessor* instance_;
-
     cv::Mat image_;
 
     cv::Mat distortionMap1_;
@@ -63,6 +61,7 @@ private:
     PreProcessing preProcessing_;
     LineDetection lineDetection_;
     GridFitting gridFitting_;
+    IntersectionTransform intersectionTransform_;
 
     int C_W;
     int C_H;
@@ -92,8 +91,6 @@ private:
     void drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& color) const;
     void drawLineGroup(cv::Mat& dst, const LineGroup& group, const cv::Scalar& color);
 
-    ImageProcessor();
-    ~ImageProcessor();
 };
 
 }
