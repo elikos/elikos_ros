@@ -28,15 +28,23 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     if (imageIntersections.size() < 1) return;
 
     updateKDTree(imageIntersections);
-    double z = estimateAltitude(imageIntersections);
+    double z = -estimateAltitude(imageIntersections);
+
+    Eigen::Vector3f smallest(10.0, 10.0, 10.0);
 
     std::vector<Eigen::Vector3f> transformedIntersections;
     for (int i = 0; i < imageIntersections.size(); ++i)
     {
         Eigen::Vector3f transformedIntersection(0.0, 0.0, z);
         transformIntersectionXY(imageIntersections[i], transformedIntersection);
+        if (transformedIntersection.norm() < smallest.norm())
+        {
+            smallest = transformedIntersection;
+        }
         transformedIntersections.push_back(std::move(transformedIntersection));
     }
+
+    std::cout << smallest.x() << ":" << smallest.y() << ":" << smallest.z() << std::endl;
     publishTransformedIntersections(transformedIntersections);
 }
 
@@ -75,18 +83,15 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
     {
         estimate = state_->position_.z();
     }
-    std::cout << "\r " << estimate << "                      " << std::endl;
     return estimate;
 }
 
 void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& imageIntersection, 
                                                     Eigen::Vector3f& transformedIntersection) const
 {
-    double transformCoefficient = transformedIntersection.z() / focalLength_;
-    transformedIntersection.x() = imageIntersection.x() * transformCoefficient;
-    transformedIntersection.y() = imageIntersection.y() * transformCoefficient;
-
-    // TODO: Add offset from camera angle.
+    double transformCoefficient = std::abs(transformedIntersection.z()) / focalLength_;
+    transformedIntersection.x() = (imageIntersection.x() - 320.0) * transformCoefficient;
+    transformedIntersection.y() = (imageIntersection.y() - 240.0) * transformCoefficient;
 }
 
 void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const
