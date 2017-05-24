@@ -2,6 +2,8 @@
 
 #include "IntersectionTransform.h"
 
+#include <iostream>
+
 namespace localization {
 
 IntersectionTransform::IntersectionTransform(double focalLength, QuadState* state)
@@ -16,7 +18,7 @@ void IntersectionTransform::updateKDTree(const std::vector<Eigen::Vector2f>& ima
     pointCloud_->clear();
     for (int i = 0; i < imageIntersections.size(); ++i)
     {
-        pointCloud_->push_back({ imageIntersections[i].x(), imageIntersections[i].z() });
+        pointCloud_->push_back({ imageIntersections[i].x(), imageIntersections[i].y() });
     }
     kdTree_.setInputCloud(pointCloud_);
 }
@@ -54,13 +56,13 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
             double imageDistance = (distances[0] > distances[1]) ? distances[0] : distances[1];
 
             // Compute local height estimate and error.
-            double height = (GRID_SIDE_LENGTH_M / focalLength_) * imageDistance;
+            double height = GRID_SIDE_LENGTH_M * (focalLength_ / std::sqrt(imageDistance));
             double error = std::abs((height - state_->position_.z()) / state_->position_.z());
 
             // Use current state if error is too high.
             if (error < ALT_ERROR_THRESHOLD)
             {
-                height = state_->position_.z();
+                //height = state_->position_.z();
             }
             totalHeight += height;
             ++sampleSize;
@@ -73,6 +75,7 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
     {
         estimate = state_->position_.z();
     }
+    std::cout << "\r " << estimate << "                      " << std::endl;
     return estimate;
 }
 

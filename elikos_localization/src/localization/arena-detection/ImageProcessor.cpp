@@ -16,7 +16,7 @@ namespace localization {
 using Vector = Eigen::Vector2f;
 
 ImageProcessor::ImageProcessor(QuadState* state)
-    : intersectionTransform_(423.0, state)
+    : intersectionTransform_(320.25, state)
 {
     srand(time(NULL));
     // Init undistortion map
@@ -249,6 +249,8 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
 
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
     drawIntersection(intersections, cv::Scalar(0, 0, 150));
+
+    intersectionTransform_.transformIntersections(intersections);
 }
 
 void ImageProcessor::parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<Vector>& intersections)
