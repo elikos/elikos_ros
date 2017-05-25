@@ -130,19 +130,6 @@ def create_Q(dt, variation):
     q = Q_discrete_white_noise(dim=3, dt=dt, var=variation)
     return block_diag(rot_q, q, q, q)
 
-def create_tracker(initial_state):
-    """
-    Creates a simple Kalman filter
-    @param initial_state the initial state of the system. Of the form [r_x, v_x, a_x, r_y, v_y, a_y, r_z, v_z, a_z]
-    """
-    tracker = KalmanFilter(9, 3, dim_u=3)
-
-    tracker.F = create_F(0)
-    tracker.Q = create_Q(0, 1)
-
-    tracker.x = initial_state.T
-    tracker.P = np.eye(9) * 500.
-    return tracker
 
 def closestNode(node_array, position):
     """
@@ -213,11 +200,7 @@ def input_imu_data(imu_data, extra_args):
         extra_args : A tuple that contains the model and the publisher
     """
     model, publisher = extra_args
-    delta_time = get_delta_time(imu_data.header.stamp.to_sec())
     #print "Acceleration dt : {0}".format(delta_time)
-    model.tracker.set_active("imu")
-
-    model.predict(delta_time)
 
 
     measurement = np.empty((6,))
@@ -233,17 +216,18 @@ def input_imu_data(imu_data, extra_args):
 
     R_angular = np.reshape(R_angular, (3,3))
     #TODO Il faut changer la covariance de l'imu dans px4
-    R_linear = np.reshape(R_linear, (3,3)) * 5000000
+    R_linear = np.reshape(R_linear, (3,3)) * 500000000
 
     #print "Acceleration val: {0}".format(accel)
     R = block_diag(R_angular, R_linear)
 
-    model.tracker.update(measurement, R=R)
+    time = imu_data.header.stamp.to_sec()
+    model.tracker.calculate_for_new_message(measurement, R, time, "imu")
     #model.variate_q()
-    log_value(acceleration=np.take(model.tracker.x, np.array([2, 5, 8])))
-    log_value(accel_x=model.tracker.x[2])
-    log_value(accel_y=model.tracker.x[5])
-    log_value(accel_z=model.tracker.x[8])
+    #log_value(acceleration=np.take(model.tracker.x, np.array([2, 5, 8])))
+    #log_value(accel_x=model.tracker.x[2])
+    #log_value(accel_y=model.tracker.x[5])
+    #log_value(accel_z=model.tracker.x[8])
     #log_value(acceleration_residuals=dot3(model.tracker.y.T, inv(model.tracker.S), model.tracker.y))
     publish_current_status(model, publisher, imu_data.header.stamp)
 
@@ -314,8 +298,11 @@ class ArenaModel:
 
         #create_tracker(np.array([0,0,0, 0,0,0, 0,0,0]))
         self.tracker = ukf.MultiUnscentedKalmanFilter(
-            np.array([1,0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]), np.eye(16) * 500
-        )
+            np.array([1,0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0]),
+            np.eye(16) * 500,
+            create_Q,
+            Q_generator_args=(0.001,)
+            )
         self.tracker.filters["imu"] = ukf.UnscentedKalmanFilter(
             16,
             6,
@@ -332,7 +319,6 @@ class ArenaModel:
             f_state,
             MerweScaledSigmaPoints(16, 0.5, 2, -13)
         )
-        self.tracker.set_active("imu")
 
         self.features_positions = np.empty((self.number_of_features, 3))
 
@@ -348,12 +334,13 @@ class ArenaModel:
         
 
     def variate_q(self):#don't use
-        y = self.tracker.active.y
-        eps = dot3(y.T, inv(self.tracker.active.S), y)
-        if eps > self.epsilon_max:
-            self.q_variation_count += 1
-        elif self.q_variation_count > 0:
-            self.q_variation_count -= 1
+        #y = self.tracker.active.y
+        #eps = dot3(y.T, inv(self.tracker.active.S), y)
+        #if eps > self.epsilon_max:
+        #    self.q_variation_count += 1
+        #elif self.q_variation_count > 0:
+        #    self.q_variation_count -= 1
+        pass
 
     def get_drone_position(self):
         """
@@ -361,14 +348,14 @@ class ArenaModel:
         --------
         ndarray(float) : 3x1 array representing the position of the drone
         """
-        return np.take(self.tracker.active.x, np.array([7, 8, 9]))
+        return np.take(self.tracker.x, np.array([7, 8, 9]))
     def get_drone_orientation(self):
         """
         Returns:
         --------
         ndarray(float) : 4x1 array representing the orientation of the drone (a quaternion)
         """
-        return np.take(self.tracker.active.x, np.array([0, 1, 2, 3]))
+        return np.take(self.tracker.x, np.array([0, 1, 2, 3]))
     
     def get_feature_position_relative_to_drone(self):
         """
@@ -376,18 +363,6 @@ class ArenaModel:
         """
         position = self.get_drone_position()
         return self.features_positions - np.tile(position, (self.number_of_features,1))
-
-    def predict(self, delta_time):
-        """
-        Calculates a prediction based on the data of the filter and the time
-        Parameters:
-        -----------
-            delta_time: the time difference to use to predict the state
-        """
-        F = create_F(delta_time)
-        Q = create_Q(delta_time, self.Q_matrix_variation * (self.q_scale_factor ** self.q_variation_count))
-        self.tracker.active.Q=Q
-        self.tracker.active.predict(dt=delta_time)
 
 
 def get_param(name, default):
