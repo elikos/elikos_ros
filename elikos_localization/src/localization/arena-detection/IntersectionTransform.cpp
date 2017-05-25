@@ -2,6 +2,8 @@
 
 #include "IntersectionTransform.h"
 
+#include <iostream>
+
 namespace localization {
 
 IntersectionTransform::IntersectionTransform(double focalLength, QuadState* state)
@@ -16,7 +18,7 @@ void IntersectionTransform::updateKDTree(const std::vector<Eigen::Vector2f>& ima
     pointCloud_->clear();
     for (int i = 0; i < imageIntersections.size(); ++i)
     {
-        pointCloud_->push_back({ imageIntersections[i].x(), imageIntersections[i].z() });
+        pointCloud_->push_back({ imageIntersections[i].x(), imageIntersections[i].y() });
     }
     kdTree_.setInputCloud(pointCloud_);
 }
@@ -26,15 +28,23 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     if (imageIntersections.size() < 1) return;
 
     updateKDTree(imageIntersections);
-    double z = estimateAltitude(imageIntersections);
+    double z = -estimateAltitude(imageIntersections);
+
+    Eigen::Vector3f smallest(10.0, 10.0, 10.0);
 
     std::vector<Eigen::Vector3f> transformedIntersections;
     for (int i = 0; i < imageIntersections.size(); ++i)
     {
         Eigen::Vector3f transformedIntersection(0.0, 0.0, z);
         transformIntersectionXY(imageIntersections[i], transformedIntersection);
+        if (transformedIntersection.norm() < smallest.norm())
+        {
+            smallest = transformedIntersection;
+        }
         transformedIntersections.push_back(std::move(transformedIntersection));
     }
+
+    std::cout << smallest.x() << ":" << smallest.y() << ":" << smallest.z() << std::endl;
     publishTransformedIntersections(transformedIntersections);
 }
 
@@ -54,13 +64,13 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
             double imageDistance = (distances[0] > distances[1]) ? distances[0] : distances[1];
 
             // Compute local height estimate and error.
-            double height = (GRID_SIDE_LENGTH_M / focalLength_) * imageDistance;
+            double height = GRID_SIDE_LENGTH_M * (focalLength_ / std::sqrt(imageDistance));
             double error = std::abs((height - state_->position_.z()) / state_->position_.z());
 
             // Use current state if error is too high.
             if (error < ALT_ERROR_THRESHOLD)
             {
-                height = state_->position_.z();
+                //height = state_->position_.z();
             }
             totalHeight += height;
             ++sampleSize;
@@ -79,11 +89,9 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
 void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& imageIntersection, 
                                                     Eigen::Vector3f& transformedIntersection) const
 {
-    double transformCoefficient = transformedIntersection.z() / focalLength_;
-    transformedIntersection.x() = imageIntersection.x() * transformCoefficient;
-    transformedIntersection.y() = imageIntersection.y() * transformCoefficient;
-
-    // TODO: Add offset from camera angle.
+    double transformCoefficient = std::abs(transformedIntersection.z()) / focalLength_;
+    transformedIntersection.x() = (imageIntersection.x() - 320.0) * transformCoefficient;
+    transformedIntersection.y() = (imageIntersection.y() - 240.0) * transformCoefficient;
 }
 
 void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const
