@@ -38,4 +38,5 @@
   <run_depend>eigen_conversions</run_depend>
   <run_depend>pcl_ros</run_depend>
 
+  <test_depend>rosunit</test_depend>
 </package>

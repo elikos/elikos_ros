@@ -42,6 +42,7 @@ class SystemStateList(object):
         """
         Inserts element in order and returns the index of the inserted element
         """
+        self.current_count += 1
         for i, ith_system_state in enumerate(self.items):
             if system_state.time >= ith_system_state.time:
                 self.items.insert(i, system_state)
@@ -56,6 +57,7 @@ class SystemStateList(object):
         Removes last element, keeps lower bound up to date.
         Do not call if less that 2 elements, or else this will crash.
         """
+        self.current_count -= 1
         self.lower_bound = self.items[-2].time
         return self.items.pop()
 
@@ -70,7 +72,7 @@ class SystemStateList(object):
             itm = self.__remove_last()
             return self.__insert(system_state), itm
         else:
-            return None, None #Could not insert
+            return None, system_state #Could not insert
 
 def default_filtering_function(ukf, z, R, dt):
     ukf.predict(dt=dt)

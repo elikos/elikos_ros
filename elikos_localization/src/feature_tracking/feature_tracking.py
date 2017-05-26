@@ -54,6 +54,7 @@ def f_state(x, dt):
     angular_speed = x[4:7] * dt
     rotation_this_frame = quaternion.from_rotation_vector(angular_speed)
     rotation = quaternion.as_quat_array(x[0:4])
+    rotation = rotation.normalized()
     rotation = rotation * rotation_this_frame
 
     tt = (dt * dt)/2
@@ -82,7 +83,7 @@ def h_imu(x):
 
     rot = quaternion.as_quat_array(x[0:4])
     irot = np.conjugate(rot)
-    accel = quaternion.rotate_vectors(irot, (x[13:] + gravity))
+    accel = quaternion.rotate_vectors(irot, (x[13:] - gravity))
 
     angular_speed = x[4:7]
     return np.concatenate((angular_speed, accel))
@@ -156,11 +157,17 @@ def publish_current_status(model, publisher, time_stamp):
     output_message = PoseArray()
 
     point = model.get_drone_position()
+    rot = model.get_drone_orientation()
 
     p = Pose()
     p.position.x = -point[0]
     p.position.y = -point[1]
     p.position.z = -point[2]
+
+    p.orientation.w = rot[0]
+    p.orientation.x = rot[1]
+    p.orientation.y = rot[2]
+    p.orientation.z = rot[3]
 
     output_message.poses.append(p)
 
@@ -214,7 +221,7 @@ def input_imu_data(imu_data, extra_args):
     R_angular = np.array(imu_data.angular_velocity_covariance)
     R_linear = np.array(imu_data.linear_acceleration_covariance)
 
-    R_angular = np.reshape(R_angular, (3,3))
+    R_angular = np.reshape(R_angular, (3,3)) * 100000
     #TODO Il faut changer la covariance de l'imu dans px4
     R_linear = np.reshape(R_linear, (3,3)) * 500000000
 
@@ -309,7 +316,7 @@ class ArenaModel:
             0,
             h_imu,
             f_state,
-            MerweScaledSigmaPoints(16, 0.5, 2, -13)
+            MerweScaledSigmaPoints(16, 1.0, 2.5, 0)
         )
         self.tracker.filters["pose_array"] = ukf.UnscentedKalmanFilter(
             16,
