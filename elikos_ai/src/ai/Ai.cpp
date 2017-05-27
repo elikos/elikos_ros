@@ -1,15 +1,14 @@
 #include "MessageHandler.h"
 #include "Agent.h"
-#include "CmdLineParser.h"
+#include "Configuration.h"
 
 int main(int argc, char* argv[])
 {
     // ROS Init
     ros::init(argc, argv, "elikos_ai");
+    ros::NodeHandle nh;
 
-    ai::CmdLineParser parser(argc, argv);
-    parser.parse();
-
+    ai::Agent::getInstance()->init();
     ai::MessageHandler::getInstance()->lookForMessages();
 
     ai::MessageHandler::freeInstance();
