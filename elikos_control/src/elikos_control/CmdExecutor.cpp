@@ -31,6 +31,23 @@ CmdExecutor::~CmdExecutor()
 
 }
 
+
+OrderToGive CmdExecutor::checkNextOrder()
+{
+    if (currentCmd_->getCmdPriority() < pendingCmd_->getCmdPriority())
+        return OrderToGive::CONTINUE;
+    else if(currentCmd_->getCmdPriority() == pendingCmd_->getCmdPriority())
+        if  (
+                currentCmd_->getCmdCode() == pendingCmd_->getCmdCode() &&
+                (currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3 || currentCmd_->getCmdCode() == 4)
+            )
+            return OrderToGive::AJUST;
+        else
+            return OrderToGive::ABORT;
+    else
+        return OrderToGive::ABORT;
+}
+
 void CmdExecutor::checkForNewCommand()
 {
     CmdConfig lastConfig = msgHndlr_.getLastCmdConfig();
@@ -39,7 +56,23 @@ void CmdExecutor::checkForNewCommand()
     if(pendingId != lastConfig.id_)
     {
         createCommand(lastConfig);
-        currentCmd_->abort(); // En a-t-on besoin?
+        if(OrderToGive::ABORT == checkNextOrder())
+            currentCmd_->abort();
+        else if(OrderToGive::AJUST == checkNextOrder())
+        {
+            if(currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3) // Robot interaction
+            {
+                currentCmd_->setDestination(pendingDestination_);
+            } 
+            if(currentCmd_->getCmdCode() == 4) // Travel
+            {
+                currentCmd_->setTrajectory(pendingTrajectory_);
+            }
+            currentCmd_->ajustement();
+        }
+        
+        
+
     }
     pendingCmdLock_.unlock();
 }
@@ -55,11 +88,11 @@ void CmdExecutor::createCommand(const CmdConfig& config)
         it->second->setId(config.id_);
         if(it->first == 2 || it->first == 3) // Robot interaction
         {
-            it->second->setDestination(config.cmdDestination_);
+            pendingDestination_ = config.cmdDestination_;
         } 
         if(it->first == 4) // Travel
         {
-            it->second->setTrajectory(config.cmdTrajectory_);
+            pendingTrajectory_ = config.cmdTrajectory_;
         }
     }
 }  

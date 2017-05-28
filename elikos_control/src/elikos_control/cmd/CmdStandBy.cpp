@@ -3,6 +3,9 @@
 CmdStandBy::CmdStandBy(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)
 {
+    cmdPriority_ = PriorityLevel::ALWAYS_ABORTABLE;
+    cmdCode_ = 5;
+    
     currentPosition_.frame_id_ = WORLD_FRAME;
     currentPosition_.child_frame_id_ = MAV_FRAME;
     tf::Transform initialTransform;

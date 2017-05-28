@@ -3,7 +3,10 @@
 CmdTravel::CmdTravel(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)    
 {
-    lastPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 2.0 }));
+    cmdPriority_ = PriorityLevel::ALWAYS_ABORTABLE;
+	cmdCode_ = 4;
+	
+	lastPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 2.0 }));
     lastPosition_.child_frame_id_ = "elikos_setpoint";
     lastPosition_.frame_id_ = WORLD_FRAME;
 }

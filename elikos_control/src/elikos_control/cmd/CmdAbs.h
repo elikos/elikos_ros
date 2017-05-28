@@ -10,6 +10,13 @@
 #include <cv_bridge/cv_bridge.h>
 #include <elikos_ros/TrajectoryCmd.h>
 
+enum PriorityLevel {
+        LANDING,
+        OFFBOARD,
+        INTERACTING,
+        ALWAYS_ABORTABLE
+    };
+
 class CmdAbs
 {
 public:
@@ -26,6 +33,8 @@ public:
     inline int getId() const;
     inline void setTrajectory(trajectory_msgs::MultiDOFJointTrajectory cmdTraj);
     inline void setDestination(geometry_msgs::Pose cmdDest);
+    inline uint8_t getCmdCode();
+    inline PriorityLevel getCmdPriority();
 
 
     const std::string MAV_FRAME = { "elikos_fcu" };
@@ -35,8 +44,11 @@ protected:
     int id_ = -1;
     trajectory_msgs::MultiDOFJointTrajectory cmdTrajectory_;
     geometry_msgs::Pose cmdDestination_;
+    uint8_t cmdCode_;
 
     ros::NodeHandle* nh_;
+
+    PriorityLevel cmdPriority_;
 
     tf::TransformListener tf_listener_;
     tf::TransformBroadcaster tf_broadcaster_;
@@ -64,6 +76,16 @@ inline void CmdAbs::setTrajectory(trajectory_msgs::MultiDOFJointTrajectory cmdTr
 inline void CmdAbs::setDestination(geometry_msgs::Pose cmdDest)
 {
     cmdDestination_ = cmdDest;
+}
+
+inline uint8_t CmdAbs::getCmdCode()
+{
+    return cmdCode_;
+}
+
+inline PriorityLevel CmdAbs::getCmdPriority()
+{
+    return cmdPriority_;
 }
 
 #endif /// CMD_ABS
