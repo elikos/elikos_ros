@@ -27,7 +27,7 @@ public:
 
     virtual void execute() = 0;
     virtual void abort() = 0;
-    virtual void ajustement() = 0;
+    virtual void ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory);
 
     inline void setId(int id);
     inline int getId() const;
@@ -45,6 +45,8 @@ protected:
     trajectory_msgs::MultiDOFJointTrajectory cmdTrajectory_;
     geometry_msgs::Pose cmdDestination_;
     uint8_t cmdCode_;
+
+    bool isAborted_;
 
     ros::NodeHandle* nh_;
 

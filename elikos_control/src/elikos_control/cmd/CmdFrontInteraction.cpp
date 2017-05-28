@@ -1,10 +1,11 @@
 #include "CmdFrontInteraction.h"
 
 CmdFrontInteraction::CmdFrontInteraction(ros::NodeHandle* nh, int id)
-    : CmdAbs(nh, id)    
+    : CmdAbs(nh, id), SLEEP_TIME(4)    
 {
     cmdPriority_ = PriorityLevel::INTERACTING;
     cmdCode_ = 2;
+    isSleeping_ = false;
     
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 0.0 }));
     targetPosition_.child_frame_id_ = MAV_FRAME;
@@ -16,10 +17,19 @@ CmdFrontInteraction::~CmdFrontInteraction()
     int i = 0;
 }
 
+void CmdFrontInteraction::TakeABreak()
+{
+    std::unique_lock<std::mutex>(sleepLock_);
+    isSleeping_ = true;
+    sleepCV_.wait_for(sleepLock_, SLEEP_TIME, [this] {return !isSleeping_;});
+}
+
+
 void CmdFrontInteraction::execute()
 {
     interactionStatus_ = InteractionState::LANDING;
     ros::Rate rate(30.0);
+    isSleeping_ = false;
 
     tf::Vector3 groundPosition = targetPosition_.getOrigin();
     groundPosition.setZ(HIGH_OF_GROUND);
@@ -58,7 +68,10 @@ void CmdFrontInteraction::execute()
             else
             {
                 interactionStatus_ = InteractionState::HAS_TOUCHED_GROUND;
-                // TODO faire une pause au sol
+                // TODO atterrir
+
+                //faire une pause au sol. Éventuellement remplacer par signal capteur.
+                TakeABreak();
                 tf::Vector3 securityPosition = targetPosition_.getOrigin();
                 securityPosition.setZ( 1.0 );
                 targetPosition_.setOrigin(securityPosition);
@@ -69,9 +82,21 @@ void CmdFrontInteraction::execute()
 
 void CmdFrontInteraction::abort()
 {
+    std::unique_lock<std::mutex>(sleepLock_);
+    isSleeping_ = false;
+    sleepCV_.notify_one();
 }
 
-void CmdFrontInteraction::ajustement() //Paramètre à recevoir : XY devant le robot au sol
+void CmdFrontInteraction::ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory)
 {
-    //TODO : Faire l'update de la position devant le robot
+    std::unique_lock<std::mutex>(sleepLock_);
+    if(!isSleeping_ && lastPosition_.getOrigin().getZ() > THRESHOLD)
+    {
+        setDestination(destination);
+        tf::Vector3 groundPosition = targetPosition_.getOrigin();
+        groundPosition.setY(cmdDestination_.position.y);
+        groundPosition.setX(cmdDestination_.position.x);
+        targetPosition_.setOrigin(groundPosition);
+    }
+
 }

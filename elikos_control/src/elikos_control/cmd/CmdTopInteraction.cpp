@@ -70,7 +70,14 @@ void CmdTopInteraction::abort()
 {
 }
 
-void CmdTopInteraction::ajustement() //Paramètre à recevoir : XY du robot au sol
+void CmdTopInteraction::ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory)
 {
-    //TODO : Faire l'update de la position du robot
+    if(lastPosition_.getOrigin().getZ() > THRESHOLD)
+    {
+        setDestination(destination);
+        tf::Vector3 groundPosition = targetPosition_.getOrigin();
+        groundPosition.setY(cmdDestination_.position.y);
+        groundPosition.setX(cmdDestination_.position.x);
+        targetPosition_.setOrigin(groundPosition);
+    }
 }

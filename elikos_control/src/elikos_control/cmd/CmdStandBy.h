@@ -20,8 +20,6 @@ public:
 
 private:
 
-    bool continue_ = true;
-
     tf::StampedTransform currentPosition_;
 
     CmdStandBy() = delete;

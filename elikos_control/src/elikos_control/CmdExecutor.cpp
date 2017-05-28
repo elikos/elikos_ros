@@ -60,15 +60,10 @@ void CmdExecutor::checkForNewCommand()
             currentCmd_->abort();
         else if(OrderToGive::AJUST == checkNextOrder())
         {
-            if(currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3) // Robot interaction
+            if(currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3 || currentCmd_->getCmdCode() == 4) // Robot interaction || travel
             {
-                currentCmd_->setDestination(pendingDestination_);
-            } 
-            if(currentCmd_->getCmdCode() == 4) // Travel
-            {
-                currentCmd_->setTrajectory(pendingTrajectory_);
+                currentCmd_->ajustement(pendingDestination_, pendingTrajectory_);
             }
-            currentCmd_->ajustement();
         }
         
         

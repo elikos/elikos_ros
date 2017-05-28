@@ -16,7 +16,7 @@ public:
 
     virtual void execute();
     virtual void abort();
-    virtual void ajustement();
+    virtual void ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory);
 
 private:
     CmdTopInteraction() = delete;

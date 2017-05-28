@@ -1,6 +1,10 @@
 #ifndef CMD_FRONT_INTERACTION_H
 #define CMD_FRONT_INTERACTION_H
 
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
+
 #include <ros/ros.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
@@ -16,10 +20,16 @@ public:
 
     virtual void execute();
     virtual void abort();
-    virtual void ajustement();
+    virtual void ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory);
 
 private:
     CmdFrontInteraction() = delete;
+
+    void TakeABreak();
+    std::mutex sleepLock_;
+    bool isSleeping_;
+    std::condition_variable sleepCV_;
+    const std::chrono::duration<int, std::ratio<1, 1>> SLEEP_TIME;
 
     tf::StampedTransform targetPosition_;
     tf::StampedTransform lastPosition_;

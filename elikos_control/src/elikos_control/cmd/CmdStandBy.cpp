@@ -20,7 +20,7 @@ CmdStandBy::~CmdStandBy()
 
 void CmdStandBy::execute()
 {
-    continue_ = true;
+    isAborted_ = false;
     // TODO: Essayer a nouveau si le lookup echoue.
     try {
         tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), currentPosition_);
@@ -29,7 +29,7 @@ void CmdStandBy::execute()
     }
 
     ros::Rate rate(30.0);
-    while(ros::ok() && continue_)
+    while(ros::ok() && !isAborted_)
     {
         currentPosition_.stamp_ = ros::Time::now();
         tf_broadcaster_.sendTransform(currentPosition_);
@@ -40,7 +40,7 @@ void CmdStandBy::execute()
 
 void CmdStandBy::abort()
 {
-    continue_ = false;
+    isAborted_ = true;
 }
 
 void CmdStandBy::ajustement()
