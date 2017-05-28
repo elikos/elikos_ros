@@ -94,10 +94,7 @@ void CmdOffBoard::execute()
 
 void CmdOffBoard::abort()
 {
-}
-
-void CmdOffBoard::ajustement()
-{
+    ///
 }
 
 mavros_msgs::State current_state;

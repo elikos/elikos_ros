@@ -29,7 +29,7 @@ public:
 
     virtual void execute();
     virtual void abort();
-    virtual void ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory);
+    void ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory);
     CmdFrontInteraction::InteractionState getStatus();
 
 private:

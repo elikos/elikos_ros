@@ -42,8 +42,3 @@ void CmdStandBy::abort()
 {
     isAborted_ = true;
 }
-
-void CmdStandBy::ajustement()
-{
-
-}

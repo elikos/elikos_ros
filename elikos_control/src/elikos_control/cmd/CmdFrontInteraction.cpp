@@ -37,6 +37,7 @@ void CmdFrontInteraction::execute()
     interactionStatus_ = InteractionState::LANDING;
     ros::Rate rate(30.0);
     isSleeping_ = false;
+    isAborted_ = false;
 
     tf::Vector3 groundPosition = targetPosition_.getOrigin();
     groundPosition.setZ(HIGH_OF_GROUND);
@@ -45,7 +46,7 @@ void CmdFrontInteraction::execute()
     targetPosition_.setOrigin(groundPosition);
 
     
-    while (interactionStatus_ != InteractionState::DONE || interactionStatus_ != InteractionState::ASKS_FOR_OFFBOARD)
+    while (interactionStatus_ != InteractionState::DONE && interactionStatus_ != InteractionState::ASKS_FOR_OFFBOARD && !isAborted_)
     {
         ros::spinOnce();
         try 
@@ -100,6 +101,7 @@ void CmdFrontInteraction::abort()
     std::unique_lock<std::mutex>(sleepLock_);
     isSleeping_ = false;
     sleepCV_.notify_one();
+    isAborted_ = true;
 }
 
 void CmdFrontInteraction::ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory)

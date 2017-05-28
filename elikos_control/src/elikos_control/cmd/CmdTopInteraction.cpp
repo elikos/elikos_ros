@@ -18,6 +18,8 @@ CmdTopInteraction::~CmdTopInteraction()
 
 void CmdTopInteraction::execute()
 {
+    isAborted_ =false;
+
     interactionStatus_ = InteractionState::LANDING;
     ros::Rate rate(30.0);
 
@@ -28,7 +30,7 @@ void CmdTopInteraction::execute()
     targetPosition_.setOrigin(groundPosition);
 
     
-    while (interactionStatus_ != InteractionState::DONE)
+    while (interactionStatus_ != InteractionState::DONE  && !isAborted_)
     {
         ros::spinOnce();
         try 
@@ -68,6 +70,7 @@ void CmdTopInteraction::execute()
 
 void CmdTopInteraction::abort()
 {
+    isAborted_ = true;
 }
 
 void CmdTopInteraction::ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory)

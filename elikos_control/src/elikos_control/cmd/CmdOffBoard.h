@@ -16,7 +16,6 @@ public:
 
     virtual void execute();
     virtual void abort();
-    virtual void ajustement();
 
     void stateCallBack(const mavros_msgs::State::ConstPtr& msg);
 

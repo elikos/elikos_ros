@@ -16,7 +16,6 @@ public:
 
     virtual void execute();
     virtual void abort();
-    virtual void ajustement();
 
 private:
 

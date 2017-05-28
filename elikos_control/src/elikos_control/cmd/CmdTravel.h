@@ -20,13 +20,14 @@ public:
 
     virtual void execute();
     virtual void abort();
-    virtual void ajustement();
+    void ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory);
 
     void publishTrajectoryPosition(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint);
 
 
 private:
     CmdTravel() = delete;
+    int stepInTrajectory_;
 
     const double THRESHOLD = 0.05;  //TODO fichier de config
 

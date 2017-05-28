@@ -78,8 +78,5 @@ void CmdLanding::execute()
 
 void CmdLanding::abort()
 {
-}
-
-void CmdLanding::ajustement()
-{
+    ///
 }
