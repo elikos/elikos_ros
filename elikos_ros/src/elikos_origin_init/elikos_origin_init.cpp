@@ -49,10 +49,9 @@ int main(int argc, char* argv[])
       {
         try {
     			tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), arenaOriginTransform);
-          arenaOriginTransform.setRotation(initialFcu.getRotation());
-          tf::Vector3 origin = arenaOriginTransform.getOrigin();
+          tf::Vector3 origin = initialFcu.getOrigin();
           origin.setZ(0);
-          tf::Quaternion rotation = arenaOriginTransform.getRotation();
+          tf::Quaternion rotation = initialFcu.getRotation();
           double yaw = tf::getYaw(rotation);
           rotation.setRPY(0,0,yaw);
           ROS_ERROR_STREAM("Initialisation : Yaw diff is : "<<yaw);
