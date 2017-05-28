@@ -8,12 +8,6 @@
 #include <cv_bridge/cv_bridge.h>
 #include <elikos_ros/TrajectoryCmd.h>
 
-
-
-#ifndef PI
-#define PI 3.14159265
-#endif
-
 struct CmdConfig
 {
     int id_ = -1;

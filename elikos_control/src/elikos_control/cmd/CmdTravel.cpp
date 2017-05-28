@@ -3,9 +3,9 @@
 CmdTravel::CmdTravel(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)    
 {
-    targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 2.0 }));
-    targetPosition_.child_frame_id_ = MAV_FRAME;
-    targetPosition_.frame_id_ = WORLD_FRAME;
+    lastPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 2.0 }));
+    lastPosition_.child_frame_id_ = "elikos_setpoint";
+    lastPosition_.frame_id_ = WORLD_FRAME;
 }
 
 CmdTravel::~CmdTravel()
@@ -31,17 +31,18 @@ void CmdTravel::execute()
 	while(i < cmdTrajectory_.points.size()-1)
 	{
 		geometry_msgs::Vector3 targetTranslation = cmdTrajectory_.points[i].transforms[0].translation;
-        double distance = lastPosition_.getOrigin().distance(targetTranslation.getOrigin());
-		if (distance > THRESHOLD)
+        if(pow(targetTranslation.x-lastPosition_.getOrigin().x(), 2)+
+			pow(targetTranslation.y-lastPosition_.getOrigin().y(), 2)+
+			pow(targetTranslation.z-lastPosition_.getOrigin().z(), 2) > pow(THRESHOLD,2))
             break;
 		i++;
 	}
 
-    geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint_ = cmdTrajectory_.points[i].transforms[0];
+    trajectoryPoint_ = cmdTrajectory_.points[i].transforms[0];
 
 	//Set the rotation to face the direction which it is heading.
 	tf::Quaternion rotation = tf::createIdentityQuaternion();
-	double direction = cv::fastAtan2(trajectoryPoint_.translation.y - currentPosition.getOrigin().y(), trajectoryPoint_.translation.x - currentPosition.getOrigin().x()) / 360 * 2 *PI;
+	double direction = cv::fastAtan2(trajectoryPoint_.translation.y - lastPosition_.getOrigin().y(), trajectoryPoint_.translation.x - lastPosition_.getOrigin().x()) / 360 * 2 *PI;
 	rotation.setRPY((double) 0.0 , (double) 0.0, direction);
 
 	tf::quaternionTFToMsg(rotation, trajectoryPoint_.rotation);

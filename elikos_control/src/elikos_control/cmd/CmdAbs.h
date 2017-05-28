@@ -24,8 +24,8 @@ public:
 
     inline void setId(int id);
     inline int getId() const;
-    inline void CmdAbs::setTrajectory(trajectory_msgs::MultiDOFJointTrajectory cmdTraj);
-    inline void CmdAbs::setDestination(geometry_msgs::Pose cmdDest);
+    inline void setTrajectory(trajectory_msgs::MultiDOFJointTrajectory cmdTraj);
+    inline void setDestination(geometry_msgs::Pose cmdDest);
 
 
     const std::string MAV_FRAME = { "elikos_fcu" };

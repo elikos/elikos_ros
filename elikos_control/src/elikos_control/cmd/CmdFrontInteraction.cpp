@@ -20,8 +20,8 @@ void CmdFrontInteraction::execute()
 
     tf::Vector3 groundPosition = targetPosition_.getOrigin();
     groundPosition.setZ(HIGH_OF_GROUND);
-    groundPosition.setY(cmdDestination_.getY());
-    groundPosition.setX(cmdDestination_.getX());
+    groundPosition.setY(cmdDestination_.position.y);
+    groundPosition.setX(cmdDestination_.position.x);
     targetPosition_.setOrigin(groundPosition);
 
     
