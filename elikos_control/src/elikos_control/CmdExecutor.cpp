@@ -98,7 +98,10 @@ void CmdExecutor::executeCurrentCmd()
     {
         currentCmd_->execute();
         pendingCmdLock_.lock();
-        currentCmd_ = pendingCmd_;
+        if(currentCmd_->getCmdCode() == 2 && static_cast<CmdFrontInteraction*>(currentCmd_)->getStatus() == CmdFrontInteraction::InteractionState::ASKS_FOR_OFFBOARD)
+            currentCmd_ = commands_[0].get();
+        else
+            currentCmd_ = pendingCmd_;
         pendingCmd_ = commands_[5].get();
         pendingCmdLock_.unlock();
     }

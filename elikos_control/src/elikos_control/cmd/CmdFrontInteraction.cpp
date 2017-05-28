@@ -6,6 +6,13 @@ CmdFrontInteraction::CmdFrontInteraction(ros::NodeHandle* nh, int id)
     cmdPriority_ = PriorityLevel::INTERACTING;
     cmdCode_ = 2;
     isSleeping_ = false;
+
+    landingClient_ = nh_->serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/land");
+    landingCmd_.request.min_pitch = 0.0;
+    landingCmd_.request.yaw = 0.0;
+    landingCmd_.request.latitude = 0.0;
+    landingCmd_.request.longitude = 0.0;
+    landingCmd_.request.altitude = 0.0;
     
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 0.0 }));
     targetPosition_.child_frame_id_ = MAV_FRAME;
@@ -38,7 +45,7 @@ void CmdFrontInteraction::execute()
     targetPosition_.setOrigin(groundPosition);
 
     
-    while (interactionStatus_ != InteractionState::DONE)
+    while (interactionStatus_ != InteractionState::DONE || interactionStatus_ != InteractionState::ASKS_FOR_OFFBOARD)
     {
         ros::spinOnce();
         try 
@@ -69,12 +76,20 @@ void CmdFrontInteraction::execute()
             {
                 interactionStatus_ = InteractionState::HAS_TOUCHED_GROUND;
                 // TODO atterrir
-
-                //faire une pause au sol. Éventuellement remplacer par signal capteur.
-                TakeABreak();
-                tf::Vector3 securityPosition = targetPosition_.getOrigin();
-                securityPosition.setZ( 1.0 );
-                targetPosition_.setOrigin(securityPosition);
+                landingClient_.call(landingCmd_);
+                if(landingCmd_.response.success)
+                {
+                    //faire une pause au sol. Éventuellement remplacer par signal capteur.
+                    TakeABreak();
+                    //demander un CmdOffBoard.
+                    interactionStatus_ = InteractionState::ASKS_FOR_OFFBOARD;
+                }
+                else
+                {
+                    tf::Vector3 securityPosition = targetPosition_.getOrigin();
+                    securityPosition.setZ( 1.0 );
+                    targetPosition_.setOrigin(securityPosition);
+                }
             }
         }
     }
@@ -99,4 +114,9 @@ void CmdFrontInteraction::ajustement(geometry_msgs::Pose destination, trajectory
         targetPosition_.setOrigin(groundPosition);
     }
 
+}
+
+CmdFrontInteraction::InteractionState CmdFrontInteraction::getStatus()
+{
+    return interactionStatus_;
 }
