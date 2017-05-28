@@ -1,8 +1,12 @@
 #include <string>
 
 #include <ros/ros.h>
-#include "CmdStandBy.h"
 #include "CmdOffBoard.h"
+#include "CmdLanding.h"
+#include "CmdFrontInteraction.h"
+#include "CmdTopInteraction.h"
+#include "CmdTravel.h"
+#include "CmdStandBy.h"
 
 #include "CmdExecutor.h"
 
@@ -11,6 +15,10 @@ CmdExecutor::CmdExecutor()
 {
 
     commands_.insert(std::pair<int, std::unique_ptr<CmdOffBoard>>(0, std::unique_ptr<CmdOffBoard>(new CmdOffBoard(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdLanding>>(1, std::unique_ptr<CmdLanding>(new CmdLanding(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdFrontInteraction>>(2, std::unique_ptr<CmdFrontInteraction>(new CmdFrontInteraction(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdTopInteraction>>(3, std::unique_ptr<CmdTopInteraction>(new CmdTopInteraction(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdTravel>>(4, std::unique_ptr<CmdTravel>(new CmdTravel(&nh_, -1))));
     commands_.insert(std::pair<int, std::unique_ptr<CmdStandBy>>(5, std::unique_ptr<CmdStandBy>(new CmdStandBy(&nh_, -1))));
     currentCmd_ = commands_[5].get();
     pendingCmd_ = currentCmd_;
@@ -31,7 +39,7 @@ void CmdExecutor::checkForNewCommand()
     if(pendingId != lastConfig.id_)
     {
         createCommand(lastConfig);
-        currentCmd_->abort();
+        currentCmd_->abort(); // En a-t-on besoin?
     }
     pendingCmdLock_.unlock();
 }
@@ -44,7 +52,15 @@ void CmdExecutor::createCommand(const CmdConfig& config)
     if (it != commands_.end())
     {
         pendingCmd_ = it->second.get();
-        it->second->setId(config.id_); 
+        it->second->setId(config.id_);
+        if(it->first == 2 || it->first == 3) // Robot interaction
+        {
+            it->second->setDestination(config.cmdDestination_);
+        } 
+        if(it->first == 4) // Travel
+        {
+            it->second->setTrajectory(config.cmdTrajectory_);
+        }
     }
 }  
 

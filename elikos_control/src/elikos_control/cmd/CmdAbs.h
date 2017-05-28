@@ -24,12 +24,17 @@ public:
 
     inline void setId(int id);
     inline int getId() const;
+    inline void CmdAbs::setTrajectory(trajectory_msgs::MultiDOFJointTrajectory cmdTraj);
+    inline void CmdAbs::setDestination(geometry_msgs::Pose cmdDest);
+
 
     const std::string MAV_FRAME = { "elikos_fcu" };
     const std::string WORLD_FRAME = { "elikos_arena_origin" };
 
 protected:
     int id_ = -1;
+    trajectory_msgs::MultiDOFJointTrajectory cmdTrajectory_;
+    geometry_msgs::Pose cmdDestination_;
 
     ros::NodeHandle* nh_;
 
@@ -49,6 +54,16 @@ inline int CmdAbs::getId() const
 inline void CmdAbs::setId(int id)
 {
     id_ = id;
+}
+
+inline void CmdAbs::setTrajectory(trajectory_msgs::MultiDOFJointTrajectory cmdTraj)
+{
+    cmdTrajectory_ = cmdTraj;
+}
+
+inline void CmdAbs::setDestination(geometry_msgs::Pose cmdDest)
+{
+    cmdDestination_ = cmdDest;
 }
 
 #endif /// CMD_ABS

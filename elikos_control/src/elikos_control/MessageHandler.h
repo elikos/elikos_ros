@@ -19,6 +19,7 @@ struct CmdConfig
     int id_ = -1;
     uint8_t cmdCode_;
     trajectory_msgs::MultiDOFJointTrajectory cmdTrajectory_;
+    geometry_msgs::Pose cmdDestination_;
 };
 
 class CmdExecutor;
