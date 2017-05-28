@@ -5,6 +5,13 @@ CmdLanding::CmdLanding(ros::NodeHandle* nh, int id)
 {
     cmdPriority_ = PriorityLevel::LANDING;
     cmdCode_ = 1;
+
+    landingClient_ = nh_->serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/land");
+    landingCmd_.request.min_pitch = 0.0;
+    landingCmd_.request.yaw = 0.0;
+    landingCmd_.request.latitude = 0.0;
+    landingCmd_.request.longitude = 0.0;
+    landingCmd_.request.altitude = 0.0;
     
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 0.0 }));
     targetPosition_.child_frame_id_ = MAV_FRAME;
@@ -58,7 +65,13 @@ void CmdLanding::execute()
         else 
         {
             isDone = true;
-            // TODO : Il faudrait couper les moteurs...
+            // Atterrir
+            landingClient_.call(landingCmd_);
+            while(!landingCmd_.response.success)
+            {
+                 landingClient_.call(landingCmd_);
+                 // TODO éventuellement faire bipper le pixhawk pour avertir qu'il souhaite se poser.
+            }
         }
     }
 }

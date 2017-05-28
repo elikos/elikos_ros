@@ -5,6 +5,7 @@
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
+#include <mavros_msgs/CommandTOL.h>
 
 #include "CmdAbs.h"
 
@@ -23,6 +24,9 @@ private:
 
     tf::StampedTransform targetPosition_;
     tf::StampedTransform lastPosition_;
+
+    ros::ServiceClient landingClient_;
+    mavros_msgs::CommandTOL landingCmd_;
 
     double threshold_ = 0.2;
     
