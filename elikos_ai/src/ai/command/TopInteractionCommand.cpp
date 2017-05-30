@@ -27,7 +27,7 @@ void TopInteractionCommand::execute()
 {
     tf::Vector3 destination = target_->getPose().getOrigin();
     destination.setZ(-1.0);
-    MessageHandler::getInstance()->sendDestination(destination);
+    MessageHandler::getInstance()->sendDestination(destination, CmdCode::TOP_INTERACTION);
 }
 
 

@@ -22,7 +22,7 @@ MovementCommand::~MovementCommand()
 
 void MovementCommand::execute()
 {
-    MessageHandler::getInstance()->sendDestination(destination_);
+    MessageHandler::getInstance()->sendDestination(destination_, CmdCode::MOVE_TO_POINT);
 }
 
 bool MovementCommand::isCommmandDone()

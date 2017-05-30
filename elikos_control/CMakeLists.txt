@@ -20,12 +20,18 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES elikos_tracking
  CATKIN_DEPENDS elikos_ros roscpp std_msgs tf cv_bridge
 #  DEPENDS system_lib
 CATKIN_DEPENDS
 )
+
+
+install(DIRECTORY include/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}

@@ -67,6 +67,7 @@ add_message_files(
   TargetRobot.msg
   TargetRobotArray.msg
   TrajectoryCmd.msg
+  AICmd.msg
 )
 
 ## Generate services in the 'srv' folder

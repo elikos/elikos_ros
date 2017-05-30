@@ -25,7 +25,7 @@ ObservationCommand::~ObservationCommand()
 
 void ObservationCommand::execute()
 {
-    MessageHandler::getInstance()->sendDestination(OBSERVATION_POSITION);
+    MessageHandler::getInstance()->sendDestination(OBSERVATION_POSITION, CmdCode::MOVE_TO_POINT);
 }
 
 

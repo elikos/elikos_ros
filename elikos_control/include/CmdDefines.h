@@ -1,0 +1,8 @@
+enum CmdCode {
+    TAKEOFF,
+    LAND,
+    TOP_INTERACTION,
+    FRONT_INTERACTION,
+    MOVE_TO_POINT,
+    STANDBY
+    };

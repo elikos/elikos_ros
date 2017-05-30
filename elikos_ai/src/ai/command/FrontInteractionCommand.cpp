@@ -28,7 +28,7 @@ FrontInteractionCommand::~FrontInteractionCommand()
 
 void FrontInteractionCommand::execute()
 {
-    MessageHandler::getInstance()->sendDestination(destination_);
+    MessageHandler::getInstance()->sendDestination(destination_, CmdCode::FRONT_INTERACTION);
 }
 
 bool FrontInteractionCommand::isCommmandDone()
