@@ -33,7 +33,7 @@ void CmdTravel::execute()
 	tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
 	stepInTrajectory_ = 0;
 
-	while(!isAborted_)
+	while(!isAborted_ && stepInTrajectory_ < cmdTrajectory_.points.size()-1)
 	{
 
 		while(stepInTrajectory_ < cmdTrajectory_.points.size()-1)
