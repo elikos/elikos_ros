@@ -12,7 +12,7 @@ class SystemState(object):
     u"""
     Stores the current system state.
     """
-    def __init__(self, time, z, R, x, P, ukf, filtering_function):
+    def __init__(self, time, z, R, x, P, ukf, filtering_function, filtering_function_args):
         self.time = time
         self.z = z
         self.R = R
@@ -20,6 +20,7 @@ class SystemState(object):
         self.P = P
         self.ukf = ukf
         self.filtering_function = filtering_function
+        self.filtering_function_args = filtering_function_args
     
     def calculate(self, dt, Q):
         """
@@ -28,7 +29,7 @@ class SystemState(object):
         self.ukf.x = self.x
         self.ukf.P = self.P
         self.ukf.Q = Q
-        self.filtering_function(self.ukf, self.z, self.R, dt)
+        self.filtering_function(self.ukf, self.z, self.R, dt, *self.filtering_function_args)
         return self.ukf.x, self.ukf.P
 
 class SystemStateList(object):
@@ -93,7 +94,7 @@ class MultiUnscentedKalmanFilter(object):
         self.message_queue = SystemStateList(message_queue_size)
         self.lock = threading.Lock()
 
-    def calculate_for_new_message(self, z, R, time, filter_key, filtering_function=default_filtering_function):
+    def calculate_for_new_message(self, z, R, time, filter_key, filtering_function=default_filtering_function, filtering_function_args=()):
         """
         Calculates the whole filters state based on the new message
         Parameters:
@@ -103,8 +104,9 @@ class MultiUnscentedKalmanFilter(object):
             time : the time (NOT delta-time) of the mesurement
             filter_key : the key (string) of the filter to use
             filtering_function : an optional function to handle super-special cases. Refer to the default filtering function.
+            filtering_function_args : optionnal arguments to give the function
         """
-        message = SystemState(time, z, R, None, None, self.filters[filter_key], filtering_function)
+        message = SystemState(time, z, R, None, None, self.filters[filter_key], filtering_function, filtering_function_args)
 
         self.lock.acquire()
 

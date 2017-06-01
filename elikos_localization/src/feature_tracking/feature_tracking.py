@@ -179,25 +179,6 @@ def publish_current_status(model, publisher, time_stamp):
 
 
 
-def get_delta_time(current_time):
-    """
-    Time keeper. Call with current time to get the delta-time of the last time this function was called.
-    Parameters:
-    -----------
-        current_time: the current time in seconds
-    """
-
-    delta_time = current_time - get_delta_time.last_time
-    get_delta_time.last_time = current_time
-
-    if get_delta_time.first_call:
-        delta_time = 0
-        get_delta_time.first_call = False
-    
-    return delta_time
-get_delta_time.last_time = 0.0
-get_delta_time.first_call = True
-
 def input_imu_data(imu_data, extra_args):
     """
     Ros callback for the input imu data
@@ -208,7 +189,6 @@ def input_imu_data(imu_data, extra_args):
     """
     model, publisher = extra_args
     #print "Acceleration dt : {0}".format(delta_time)
-
 
     measurement = np.empty((6,))
     measurement[0] = imu_data.angular_velocity.x
@@ -245,20 +225,35 @@ def input_pose_array(pose_array, extra_args):
     @param pose_array The array that contains all position for the features.
     @param extra_args A tuple that contains the model and the publisher
     """
-    global test_time, test_residuals
     model, publisher = extra_args
 
     current_time = pose_array.header.stamp.to_sec()
-    delta_time = get_delta_time(current_time)
 
-    
-    model.predict(delta_time)
+    z_size = 3 * len(pose_array.poses)
+    z = np.empty((z_size,))
+    mini_r = np.array([[0.1, 0, 0],
+                       [0, 0.1, 0],
+                       [0, 0, 0.1]])
+    mini_r_array = []
 
-    predicted_positions = model.get_feature_position_relative_to_drone()
-    z = np.array([])
-    
-    number_of_asscociated_points = 0
+    for i, pose in enumerate(pose_array.poses):
+        z[i * 3 + 0] = pose.position.x
+        z[i * 3 + 1] = pose.position.y
+        z[i * 3 + 2] = pose.position.z
+        mini_r_array.append(mini_r)
 
+    R = block_diag(*mini_r_array)
+
+    model.tracker.calculate_for_new_message(
+        z,
+        R,
+        current_time,
+        "pose_array",
+        filtering_function=filter_pose,
+        filtering_function_args=(model,))
+
+
+    """
     drone_position = model.get_drone_position()
     for pose in [pose_array.poses[0]]:
 
@@ -290,8 +285,18 @@ def input_pose_array(pose_array, extra_args):
     model.variate_q()
 
     log_value(test_residuals=model.tracker.y[1])
-
+    """
     publish_current_status(model, publisher, pose_array.header.stamp)
+
+def filter_pose(ukf, z, R, dt, model):
+    ukf = UnscentedKalmanFilter()
+    ukf.predict(dt=dt)
+    predicted_state = ukf.x
+
+    positions_relative_to_drone = model.features_positions - np.tile(predicted_state[7:10], (model.number_of_features,1))
+    positions_in_drone_space = quaternion.rotate_vectors(predicted_state[0:4], positions_relative_to_drone)
+
+
 
 class ArenaModel:
     def __init__(self, number_of_points, size, max_accepted_error=1):
