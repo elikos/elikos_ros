@@ -10,6 +10,10 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
+//Here is the temporary ros stuff
+#include <ros/ros.h>
+#include <geometry_msgs/PoseArray.h>
+
 namespace localization
 {
 
@@ -22,7 +26,7 @@ public:
     IntersectionTransform(double focalLength, QuadState* state);
     ~IntersectionTransform() = default;
 
-    void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections);
+    void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections, const ros::Time& stamp);
 
 private:
 
@@ -32,7 +36,7 @@ private:
     void updateKDTree(const std::vector<Eigen::Vector2f>& imageIntersections);
     double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
     void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, Eigen::Vector3f& intersection) const;
-    void publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const;
+    void publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections, const ros::Time& stamp) const;
 
 
     const double focalLength_;
@@ -41,6 +45,7 @@ private:
     pcl::KdTreeFLANN<pcl::PointXY> kdTree_;
     pcl::PointCloud<pcl::PointXY>::Ptr pointCloud_;
 
+    ros::Publisher posePublisher_;
 };
 
 }

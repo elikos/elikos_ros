@@ -9,6 +9,7 @@ namespace localization {
 IntersectionTransform::IntersectionTransform(double focalLength, QuadState* state)
     : focalLength_(focalLength), state_(state), pointCloud_(new pcl::PointCloud<pcl::PointXY>())
 {
+    posePublisher_ = ros::NodeHandle().advertise<geometry_msgs::PoseArray>("localization/features", 5);
     // TODO: Set epsilon for kdtree here maybe ? ...
 }
 
@@ -23,7 +24,7 @@ void IntersectionTransform::updateKDTree(const std::vector<Eigen::Vector2f>& ima
     kdTree_.setInputCloud(pointCloud_);
 }
 
-void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections)
+void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections, const ros::Time& stamp)
 {
     if (imageIntersections.size() < 1) return;
 
@@ -45,7 +46,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     }
 
     std::cout << smallest.x() << ":" << smallest.y() << ":" << smallest.z() << std::endl;
-    publishTransformedIntersections(transformedIntersections);
+    publishTransformedIntersections(transformedIntersections, stamp);
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
@@ -94,8 +95,19 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
     transformedIntersection.y() = (imageIntersection.y() - 240.0) * transformCoefficient;
 }
 
-void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const
+void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections, const ros::Time& stamp) const
 {
+    geometry_msgs::PoseArray message = geometry_msgs::PoseArray();
+    for (unsigned i = 0; i < intersections.size(); ++i) {
+        geometry_msgs::Pose p = geometry_msgs::Pose();
+        p.position.x = intersections[i](0);
+        p.position.y = intersections[i](1);
+        p.position.z = intersections[i](2);
+        message.poses.push_back(p);
+    }
+    message.header.stamp = stamp;
+    message.header.frame_id = "elikos_ffmv_bottom";
+    posePublisher_.publish(message);
 }
 
 }
