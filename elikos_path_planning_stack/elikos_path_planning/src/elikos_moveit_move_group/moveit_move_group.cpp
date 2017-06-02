@@ -18,14 +18,13 @@ Moveit_move_group::Moveit_move_group():
 
   group_.setNumPlanningAttempts(20);
 
-  pub_ = nh_.advertise<elikos_ros::TrajectoryCmd>("elikos_trajectory", 1);
 }
 
 Moveit_move_group::~Moveit_move_group()
 {
 }
 
-void Moveit_move_group::move(geometry_msgs::PoseStamped target)
+trajectory_msgs::MultiDOFJointTrajectory Moveit_move_group::move(geometry_msgs::PoseStamped target)
 {
 
   std::vector<double> quad_variable_values;
@@ -79,14 +78,13 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
         ROS_ERROR("Computed time stamp on trajectory %s",success?"SUCCEDED":"FAILED");
 
         rt.getRobotTrajectoryMsg(trajectory_msg);
-        trajectory_msgs::MultiDOFJointTrajectory trajectory = trajectory_msg.multi_dof_joint_trajectory;
+        return trajectory_msg.multi_dof_joint_trajectory;
 
-        //Publish TrajectoryCmd message on "elikos_trajectory".
-        elikos_ros::TrajectoryCmd cmd;
-        cmd.cmdCode = 0;
-        cmd.trajectory = trajectory;
-
-        pub_.publish(cmd);
+        // Publish TrajectoryCmd message on "elikos_trajectory".
+        // elikos_ros::TrajectoryCmd cmd;
+        // cmd.cmdCode = 0;
+        // cmd.trajectory = trajectory;
+        // pub_.publish(cmd);
       }
       else
       {

@@ -3,24 +3,26 @@
 MessageHandler_moveit::MessageHandler_moveit()
 {
    sub_ = nh_.subscribe("elikos_ai_cmd", 1, &MessageHandler_moveit::dispatchMessageTarget, this);
-   hasTarget_ = false;
+   hasNewMessage_ = false;
 }
 
 MessageHandler_moveit::~MessageHandler_moveit()
 {
 }
 
-void MessageHandler_moveit::dispatchMessageTarget(const geometry_msgs::PoseStamped::ConstPtr &input)
+void MessageHandler_moveit::dispatchMessageTarget(const elikos_ros::AICmd::ConstPtr &input)
 {
-  inputTarget_ = *input;
-  hasTarget_ = true;
+  input_ = *(input);
+  hasNewMessage_ = true;
 }
 
-geometry_msgs::PoseStamped MessageHandler_moveit::getTarget()
+elikos_ros::AICmd MessageHandler_moveit::getAICmd()
 {
-  return inputTarget_;
+  return input_;
 }
-bool MessageHandler_moveit::hasTarget()
+bool MessageHandler_moveit::hasNewMessage()
 {
-  return hasTarget_;
+  bool hadNewMessage = hasNewMessage_;
+  hasNewMessage_ = false;
+  return hadNewMessage;
 }

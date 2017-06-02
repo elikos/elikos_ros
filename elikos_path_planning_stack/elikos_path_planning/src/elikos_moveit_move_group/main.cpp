@@ -6,8 +6,9 @@ int main(int argc, char* argv[])
     // ROS Init
     ros::init( argc, argv, "moveit_move_group" );
 
-    //Attributes
-    ros::NodeHandle nh_;
+    ros::NodeHandle nh;
+    ros::Publisher pub;
+    pub = nh.advertise<elikos_ros::TrajectoryCmd>("elikos_trajectory", 1);
 
     //Asynchronous spinner to compute the motion plan
     ros::AsyncSpinner spinner(1);
@@ -20,11 +21,19 @@ int main(int argc, char* argv[])
 
     ros::Rate r(10);
     while(ros::ok())
-    {;
-        if(messageHandler.hasTarget())
+    {
+        if(messageHandler.hasNewMessage())
         {
-          geometry_msgs::PoseStamped goal = messageHandler.getTarget();
-          move_group_.move(goal);
+            elikos_ros::AICmd ai_cmd = messageHandler.getAICmd();
+            elikos_ros::TrajectoryCmd traj_cmd;
+            traj_cmd.cmdCode = ai_cmd.cmdCode;
+
+            if (ai_cmd.cmdCode == CmdCode::MOVE_TO_POINT)
+            {
+                traj_cmd.trajectory = move_group_.move(ai_cmd.pose);
+            }
+
+            pub.publish(traj_cmd);
         }
         ros::spinOnce();
         r.sleep();
