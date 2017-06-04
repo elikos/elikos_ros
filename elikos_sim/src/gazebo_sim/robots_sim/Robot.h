@@ -8,9 +8,6 @@
 
 #define PI 3.14159265
 
-const double ROTATION_ANGLE = PI/4;
-const double ROTATION_SPEED = PI/8;
-const int RANDOM_ANGLE_TIME_LAP = 5;
 const std::string REFERENCE_FRAME = "world";
 
 class Robot 
@@ -31,5 +28,8 @@ protected:
     bool _isRotating;
     int _randomBit;
     int _beginRotationTimerCounter;
+    int _random_angle_time_lap;
+    double _rotation_angle;
+    double _rotation_speed;
 };
 #endif

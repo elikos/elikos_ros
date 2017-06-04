@@ -1,0 +1,90 @@
+Design notes for arena features and drone tracking
+
+1 - Detect lines in image space - done
+
+    Use kd-tree to find distance to closest line with same orientation to extract height measurement
+
+    Last altitude prediction to be used for clustering algorithm 
+
+
+2 - Transform line position from image space to real space
+
+    focal length coeficient + observed position offset
+
+    h = height as a scalar
+    f = focal length of camera
+
+    local_real_pos = (h / f) * image_pos
+
+    h = height as a 3d vector
+    u = camera direction = quad direction + camera direction offset
+    d = real position offset vector 
+
+    real_pos_offset = u * norm(h) / (dot(u, [0, 0, -1])) + h
+
+    note : Check for dot(-h,u) not being equal to 0 (or we get 1 / 0)
+
+    real_pos = local_real_pos + real_pos_offset
+
+    Last altitude and direction prediction (tracked yaw + reliable roll and pitch from pixhawk)
+    to be used for this space transform
+    
+
+3 - Tracking lines in real space
+
+    We track lines as if they are moving around the quad.
+
+    Regular kalman filter (not extended) is used since 
+    unpredictable sources of acceleration are negligeable (air drag, others)
+    and can be accounted as noise.
+
+    We account for rotor acceleration and gravity as predictable control inputs 
+    in the filter equation (B and u).
+
+    u = [x_dot_dot, y_dot_dot, z_dot_dot, theta_dot] 
+
+    B = [0,  0,  0, 0]
+        [dt, 0,  0, 0]
+        [0,  0,  0, 0]
+        [0, dt,  0, 0]
+        [0,  0,  0, 0]
+        [0,  0, dt, 0]
+        [0,  0,  0, 0]
+        [0,  0,  0, dt]
+
+    We track every line in the arena all the time (even though they are not all updated
+    from detection all the time)
+
+    Every line has its own kalman filter with 8 state variables 
+    s_x = [x, x_dot, y, y_dot, z, z_dot, theta]
+
+    State transition matrix (prediction = F * s_x + B * u)
+    F = [1, dt, 0,  0, 0,  0, 0]  
+        [0,  1, 0,  0, 0,  0, 0]  
+        [0,  0, 1, dt, 0,  0, 0]   
+        [0,  0, 0,  1, 0,  0, 0]   
+        [0,  0, 0,  0, 1, dt, 0]   
+        [0,  0, 0,  0, 0,  1, 0]   
+        [0,  0, 0,  0, 0,  0, 1]  
+
+    We expect to receive x, y, z and orientation angle (from 0 to pi rad around z)    
+
+    Measurement vector
+    s_z = [x, y, z, theta]
+
+    Measurement fonction (transform state to measurement space)
+    H = [1, 0, 0, 0, 0, 0, 0]
+        [0, 0, 1, 0, 0, 0, 0]
+        [0, 0, 0, 0, 1, 0, 0]
+        [0, 0, 0, 0, 0, 0, 1]
+    
+    s_y = s_z - H * s_x_prior
+
+    Obtain the average amount of movement and rotation from the detected lines to 
+    artificially move the undetected lines (since they should move 
+    as they are part of a grid).
+
+    Q (process noise) and R (measurement noise) are to be  
+    
+4 -    
+    We also track the global position of t  

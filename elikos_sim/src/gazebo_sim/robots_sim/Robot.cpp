@@ -2,6 +2,12 @@
 
 Robot::Robot(std::string name, double x, double y, double speed, double updateRate, ros::ServiceClient client): _speed(speed), _updateRate(updateRate), _client(client)
 {
+    _nh.getParam("/"+ros::this_node::getName()+"/random_angle_time_lap", _random_angle_time_lap);
+
+    _nh.getParam("/"+ros::this_node::getName()+"/rotation_angle", _rotation_angle);
+
+    _nh.getParam("/"+ros::this_node::getName()+"/rotation_speed", _rotation_speed);
+
     geometry_msgs::Pose pose;
     pose.position.x = x;
     pose.position.y = y;
@@ -39,7 +45,7 @@ Robot::Robot(std::string name, double x, double y, double speed, double updateRa
 
 void Robot::move()
 {
-    if((_timeCounter % (_updateRate*RANDOM_ANGLE_TIME_LAP))==0 || _isRotating)
+    if((_timeCounter % (_updateRate*_random_angle_time_lap))==0 || _isRotating)
     {
         if(!_isRotating)
         {
@@ -47,18 +53,18 @@ void Robot::move()
             _beginRotationTimerCounter = _timeCounter;
             _isRotating = true;
         }
-        else if((_timeCounter-_beginRotationTimerCounter)/_updateRate >= ROTATION_ANGLE/ROTATION_SPEED)
+        else if((_timeCounter-_beginRotationTimerCounter)/_updateRate >= _rotation_angle/_rotation_speed)
         {
             _isRotating = false;
         }
 
         if(_randomBit==1)
         {
-            _angle += ROTATION_SPEED/_updateRate;
+            _angle += _rotation_speed/_updateRate;
         }
         else
         {
-            _angle -= ROTATION_SPEED/_updateRate;
+            _angle -= _rotation_speed/_updateRate;
         }
     }
     _timeCounter++;
@@ -73,7 +79,7 @@ void Robot::move()
     } else {
         _setmodelstate.request.model_state.twist.linear.x = 0;
         _setmodelstate.request.model_state.twist.linear.y = 0;
-        _setmodelstate.request.model_state.twist.angular.z = _randomBit ? ROTATION_SPEED : -ROTATION_SPEED;
+        _setmodelstate.request.model_state.twist.angular.z = _randomBit ? _rotation_speed : -_rotation_speed;
     }
 
     _setmodelstate.request.model_state.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw (0, 0, _angle);

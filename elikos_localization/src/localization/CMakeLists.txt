@@ -1,0 +1,48 @@
+include_directories(
+    ${catkin_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    ${EIGEN_INCLUDE_DIR}
+    arena-detection
+    arena-detection/algorithm
+    context
+    context/intersection
+    context/line
+    arena-tracking
+    arena-tracking/filter
+)
+
+add_executable(elikos_localization
+    Localization.cpp
+    MessageHandler.h
+    MessageHandler.cpp
+    arena-detection/ImageProcessor.h 
+    arena-detection/ImageProcessor.cpp 
+    arena-detection/PreProcessing.h
+    arena-detection/PreProcessing.cpp
+    arena-detection/LineDetection.h
+    arena-detection/LineDetection.cpp
+    arena-detection/PerspectiveTransform.h 
+    arena-detection/PerspectiveTransform.cpp
+    arena-detection/GridFitting.h
+    arena-detection/GridFitting.cpp
+    arena-detection/algorithm/DBSCAN.h
+    arena-detection/algorithm/DBSCAN.cpp
+    arena-detection/algorithm/RANSAC.h
+    arena-detection/algorithm/RANSAC.cpp
+    arena-tracking/filter/KalmanFilter.h
+    arena-tracking/filter/AbstractKalmanFilter.h
+    context/QuadState.h
+    context/QuadState.cpp
+    context/intersection/DetectedIntersection.cpp
+    context/intersection/DetectedIntersection.h
+    context/line/Line.cpp
+    context/line/Line.h
+    context/line/LineGroup.cpp
+    context/line/LineGroup.h
+    context/Grid.h
+    context/Grid.cpp)
+
+target_link_libraries(elikos_localization 
+                      ${catkin_LIBRARIES} 
+                      ${OpenCV_LIBRARIES}
+)
