@@ -7,6 +7,7 @@ import itertools
 
 import rospy
 import numpy as np
+import quaternion
 from gazebo_msgs.msg import ModelStates
 
 
@@ -23,6 +24,9 @@ class GroundTruth(object):
             queue_size=1
         )
         self.position = np.zeros((3,))
+        self.orientation = quaternion.quaternion(1, 0, 0, 0)
+
+        self.callback = None
 
 def _ground_truth_quad_position(message, args):
     owner, quad_name = args
@@ -31,4 +35,12 @@ def _ground_truth_quad_position(message, args):
             owner.position[0] = pose.position.x
             owner.position[1] = pose.position.y
             owner.position[2] = pose.position.z
+
+            owner.orientation = quaternion.quaternion(
+                pose.orientation.w,
+                pose.orientation.x,
+                pose.orientation.y,
+                pose.orientation.z)
+    if owner.callback is not None:
+        owner.callback()
 
