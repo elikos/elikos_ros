@@ -126,6 +126,7 @@ def input_localization_points(point_array):
 
     if transform is None:
         rospy.logwarn("The transformation was null! Skipping message.")
+        return
 
     angle_delta = math.atan2(transform[0,0], transform[1,0])
     if angle_delta > 3 * math.pi / 4:
