@@ -4,9 +4,11 @@
 #include "CpuCV.h"
 
 Color::Color() {
-    int nDevices = gpu::getCudaEnabledDeviceCount();
-    cvWrapper = (nDevices > 0 ? (CVWrapperInterface*) new GpuCV() :
-                                (CVWrapperInterface*) new CpuCV());
+    // int nDevices = gpu::getCudaEnabledDeviceCount();
+    // cvWrapper = (nDevices > 0 ? (CVWrapperInterface*) new GpuCV() :
+    //                             (CVWrapperInterface*) new CpuCV());
+
+    cvWrapper = new CpuCV();
 }
 
 Color::~Color() {

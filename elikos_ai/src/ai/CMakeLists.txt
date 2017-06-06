@@ -1,92 +1,94 @@
 include_directories(
   	${catkin_INCLUDE_DIRS}
-    Command
-    Consideration
-	Robot
-	Util
-	Behavior
-    Context)
+    command
+    consideration
+    context
+	robot
+	util
+	behavior)
 
 set(BEHAVIOR_SRC
-    Behavior/AbstractBehavior.cpp
-    Behavior/AbstractBehavior.h
-    Behavior/AggressiveBehavior.cpp
-    Behavior/AggressiveBehavior.h
-    Behavior/PreventiveBehavior.cpp
-    Behavior/PreventiveBehavior.h
-    Behavior/TargetResearch.cpp
-    Behavior/TargetResearch.h
-    Behavior/BehaviorTypes.h)
+    behavior/AbstractBehavior.cpp
+    behavior/AbstractBehavior.h
+    behavior/AggressiveBehavior.cpp
+    behavior/AggressiveBehavior.h
+    behavior/PreventiveBehavior.cpp
+    behavior/PreventiveBehavior.h
+    behavior/ResearchBehavior.cpp
+    behavior/ResearchBehavior.h
+    behavior/BehaviorTypes.h
+    behavior/BehaviorManager.cpp
+    behavior/BehaviorManager.h)
 
 set(COMMAND_SRC
-    Command/CommandQueue.h
-    Command/CommandQueue.cpp
-    Command/AbstractCommand.h
-    Command/AbstractCommand.cpp
-    Command/MovementCommand.cpp
-    Command/MovementCommand.h
-	Command/FollowCommand.cpp
-	Command/FollowCommand.h
-    Command/ObservationCommand.cpp
-    Command/ObservationCommand.h
-    Command/TopInteractionCommand.cpp
-    Command/TopInteractionCommand.h
-    Command/FrontInteractionCommand.cpp
-    Command/FrontInteractionCommand.h)
+    command/CommandQueue.h
+    command/CommandQueue.cpp
+    command/AbstractCommand.h
+    command/AbstractCommand.cpp
+    command/MovementCommand.cpp
+    command/MovementCommand.h
+	command/FollowCommand.cpp
+	command/FollowCommand.h
+    command/ObservationCommand.cpp
+    command/ObservationCommand.h
+    command/TopInteractionCommand.cpp
+    command/TopInteractionCommand.h
+    command/FrontInteractionCommand.cpp
+    command/FrontInteractionCommand.h)
 
 set(CONTEXT_SRC
-    Context/AbstractLine.cpp
-    Context/AbstractLine.h
-	Context/AbstractArena.h
-	Context/AbstractArena.cpp
-    Context/ArenaA.cpp
-    Context/ArenaA.h
-    Context/RedLine.cpp
-    Context/RedLine.h
-    Context/WhiteLine.cpp
-    Context/WhiteLine.h
-    Context/GreenLine.cpp
-    Context/GreenLine.h
-    Context/LineTypes.h)
+    context/AbstractLine.cpp
+    context/AbstractLine.h
+	context/AbstractArena.h
+	context/AbstractArena.cpp
+    context/ArenaA.cpp
+    context/ArenaA.h
+    context/RedLine.cpp
+    context/RedLine.h
+    context/WhiteLine.cpp
+    context/WhiteLine.h
+    context/GreenLine.cpp
+    context/GreenLine.h
+    context/LineTypes.h)
 
 set(ROBOT_SRC
-    Robot/AbstractRobot.h
-    Robot/AbstractRobot.cpp
-    Robot/QuadRobot.h
-    Robot/QuadRobot.cpp
-    Robot/TargetRobot.h
-    Robot/TargetRobot.cpp
-    Robot/RobotTypes.h)
+    robot/AbstractRobot.h
+    robot/AbstractRobot.cpp
+    robot/QuadRobot.h
+    robot/QuadRobot.cpp
+    robot/TargetRobot.h
+    robot/TargetRobot.cpp
+    robot/RobotTypes.h robot/GreenTargetRobot.cpp robot/GreenTargetRobot.h robot/RedTargetRobot.cpp robot/RedTargetRobot.h)
 
 set(CONSIDERATION_SRC
-    Consideration/PriorityEvaluationPipeline.cpp
-    Consideration/PriorityEvaluationPipeline.h
-    Consideration/AbstractConsideration.cpp
-    Consideration/AbstractConsideration.h
-    Consideration/QuadDistance.cpp
-    Consideration/QuadDistance.h
-    Consideration/TargetDestination.cpp
-    Consideration/TargetDestination.h
-    Consideration/ConsiderationTypes.h
-    Consideration/ClusterSize.cpp
-    Consideration/ClusterSize.h)
+    consideration/PriorityEvaluationManager.cpp
+    consideration/PriorityEvaluationManager.h
+    consideration/AbstractConsideration.cpp
+    consideration/AbstractConsideration.h
+    consideration/QuadDistance.cpp
+    consideration/QuadDistance.h
+		consideration/DestinationConsideration.cpp
+		consideration/DestinationConsideration.h
+    consideration/ConsiderationTypes.h
+    consideration/ClusterSize.cpp
+    consideration/ClusterSize.h)
 
 set(UTIL_SRC
-    Util/Line.cpp
-    Util/Line.h
-    Util/Segment.cpp
-    Util/Segment.h 
-    Util/Timer.cpp 
-    Util/Timer.h)
+    util/Line.cpp
+    util/Line.h
+    util/Segment.cpp
+    util/Segment.h
+    util/Timer.cpp
+    util/Timer.h)
 
 add_executable(elikos_ai
     Ai.cpp
-    CmdLineParser.h
-    CmdLineParser.cpp
     Agent.cpp
     Agent.h
     MessageHandler.h
     MessageHandler.cpp
+    Configuration.h
+    Configuration.cpp
     ${CONSIDERATION_SRC}
     ${COMMAND_SRC}
     ${CONTEXT_SRC}
@@ -95,4 +97,5 @@ add_executable(elikos_ai
 	${BEHAVIOR_SRC})
 
 target_link_libraries(elikos_ai
-    ${catkin_LIBRARIES})
+    ${catkin_LIBRARIES}
+	yaml-cpp)

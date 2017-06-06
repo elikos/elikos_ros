@@ -29,6 +29,7 @@
 4. Builder le code du Firmware
 
     Suivre les instructions pour installer les dépendances requises : http://dev.px4.io/starting-installing-linux.html
+    Note: Installer les dépendances pour Nuttx based hardware.
 
     Ajouter les packages de osrfoundation.org pour gazebo : http://gazebosim.org/tutorials?tut=install_ubuntu
 
