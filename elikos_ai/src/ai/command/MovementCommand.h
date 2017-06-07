@@ -22,6 +22,7 @@ public:
 private:
     MovementCommand() = delete;
     tf::Point destination_;
+    bool is_takeoff_;
 };
 
 }
