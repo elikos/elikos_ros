@@ -37,6 +37,9 @@ public:
 
     void updateQuadImu();
 
+    void setFocalLength(float focalLength);
+    void setFrameId(const std::string& frameId);
+
     double roll_ = 0.0;
     double pitch_ = 0.0;
 

@@ -91,7 +91,7 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
                                                     Eigen::Vector3f& transformedIntersection) const
 {
     double transformCoefficient = std::abs(transformedIntersection.z()) / focalLength_;
-    transformedIntersection.x() = (imageIntersection.x() - 320.0) * transformCoefficient;
+    transformedIntersection.x() = (imageIntersection.x() - 320.0) * transformCoefficient;//TODO plz no hardcode
     transformedIntersection.y() = (imageIntersection.y() - 240.0) * transformCoefficient;
 }
 
@@ -106,7 +106,7 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<Ei
         message.poses.push_back(p);
     }
     message.header.stamp = stamp;
-    message.header.frame_id = "elikos_ffmv_bottom";
+    message.header.frame_id = frameId_;
     posePublisher_.publish(message);
 }
 

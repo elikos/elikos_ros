@@ -62,7 +62,7 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     }
 
     cv::Mat perspective;
-    removePerspective(undistorted, perspective);
+    removePerspectiveAndRotation(undistorted, perspective);
     cv::imshow("undistorted", undistorted);
     cv::imshow("perspective", perspective);
 
@@ -82,7 +82,126 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     cv::imshow("PreProcessed", preProcessed);
 }
 
-void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) const
+Eigen::Matrix4f createProjectionMatrix(double n) {
+    Eigen::Matrix4f p = Eigen::Matrix4f::Zero();
+    p(0, 0) = 1;
+    p(1, 1) = 1;
+    p(2, 2) = 1;
+    p(3, 2) = 1/n;
+    return p;
+}
+
+Eigen::Vector4f homogenize(const Eigen::Vector4f& vector){
+    return vector / vector[3];
+}
+
+cv::Mat PreProcessing::removePerspectiveAndRotation(const cv::Mat& input, cv::Mat& rectified) const {
+    Eigen::Matrix4f cameraRotation = Eigen::Matrix4f::Zero();
+
+    Eigen::Vector4f direction;
+    try {
+        tf::StampedTransform tf;
+        tfListener_.lookupTransform("elikos_local_origin", "elikos_ffmv_bottom", ros::Time(0), tf);
+
+        tf::Matrix3x3 m(tf.getRotation());
+
+        tf::Vector3 v = m * tf::Vector3(0.0, 0.0, 1.0);
+        direction.x() = v.x();
+        direction.y() = v.y();
+        direction.z() = v.z();
+        direction[3] = 1.0;
+
+        cameraRotation(3, 3) = 1;
+        for (int i = 0; i < 3; ++i) 
+        {
+            for (int j = 0; j < 3; j++) 
+            {
+                cameraRotation(i, j) = m[i][j];
+            }
+        }
+    } catch (tf::TransformException e) {
+         ROS_ERROR("%s", e.what());
+    }
+
+    double height = input.size().height;
+    double width = input.size().width;
+
+    double hheight = height/2.0;
+    double hwidth = width/2.0;
+    
+    double f = focalLength_;
+
+    Eigen::Vector4f sourcePoints[] = {
+        Eigen::Vector4f( hwidth,  hheight, f, 1.0),
+        Eigen::Vector4f(-hwidth,  hheight, f, 1.0),
+        Eigen::Vector4f(-hwidth, -hheight, f, 1.0),
+        Eigen::Vector4f( hwidth, -hheight, f, 1.0)
+    };
+    
+    Eigen::Vector4f destinationPoints[4];
+
+    Eigen::Matrix4f projectionMatrix = createProjectionMatrix(-1);
+    Eigen::Vector4f center = homogenize(projectionMatrix * direction);
+
+    Eigen::Vector2f scale = Eigen::Vector2f(1/0., 1/0.);
+
+    //Tourner les points et les projeter sur le sol (on suppose que le sol est a 1 de distance)
+    for(int i = 0; i < 4; ++i){
+        destinationPoints[i] = homogenize(projectionMatrix * cameraRotation * sourcePoints[i]) - center;
+
+        double scaleX = abs(hwidth / destinationPoints[i].x());
+        if(scaleX < scale[0]){
+            scale[0] = scaleX;
+        }
+        
+        double scaleY = abs(hheight / destinationPoints[i].y());
+        if(scaleY < scale[1]){
+            scale[1] = scaleY;
+        }
+        /* CODE POUR SCALE UNIFORME (Pas pret)
+        double angleFromCenter = atan2(destinationPoints[i][1], destinationPoints[i][0]);
+        if (-angleUpRight <= angleFromCenter && angleFromCenter <= angleUpRight) {
+            //DROIT
+            projectedPoint[0] = hwidth;
+            projectedPoint[1] = (hwidth / destinationPoints[i].x()) * destinationPoints[i].y();
+        } else if (angleUpRight <= angleFromCenter && angleFromCenter <= PI - angleUpRight) {
+            //HAUT
+            projectedPoint[0] = (hheight / destinationPoints[i].y()) * destinationPoints[i].x();
+            projectedPoint[1] = hheight;
+        } else if (- PI + angleUpRight <= angleFromCenter && angleFromCenter <= - angleUpRight) {
+            //BAS
+            projectedPoint[0] = (-hheight / destinationPoints[i].y()) * destinationPoints[i].x();
+            projectedPoint[1] = -hheight;
+        } else {
+            //GAUCHE
+            projectedPoint[0] = -hwidth;
+            projectedPoint[1] = (-hwidth / destinationPoints[i].x()) * destinationPoints[i].y();
+        }
+        double distance = projectedPoint.norm();
+        
+        if (distance > maxDistance) maxDistance = distance;
+        */
+    }
+
+    for (int i = 0; i < 4; ++i){
+        destinationPoints[i][0] *= scale[0];
+        destinationPoints[i][1] *= scale[1];
+    }
+
+    cv::Point2f tSrc[4], tDst[4];
+    for (int i = 0; i < 4; ++i) 
+    {
+        tSrc[i] = cv::Point2f(sourcePoints[i].x() + hwidth, sourcePoints[i].y() + hheight);
+        tDst[i] = cv::Point2f(destinationPoints[i].x() + hwidth, destinationPoints[i].y() + hheight);
+    }
+
+    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
+    cv::warpPerspective(input, rectified, perspectiveTransform, input.size());
+
+    return cv::getPerspectiveTransform(tDst, tSrc);
+}
+
+cv::Mat PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) const
 {
     double roll, pitch, yaw = 0.0;
     Eigen::Vector3f direction;
@@ -101,7 +220,7 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
     } catch (tf::TransformException e) {
          ROS_ERROR("%s", e.what());
     }
-    pitch -= CV_PI / 2.0  - 0.4712;
+    //pitch -= CV_PI / 2.0  - 0.4712;
     
 
     Eigen::Matrix3f r = (Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitX()) * 
@@ -119,7 +238,7 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
 
     double height = input.size().height;
     double width = input.size().width;
-    double f = 320.25;
+    double f = focalLength_;
     double HFOV = std::atan( width / (2 * f));
     double VFOV = std::atan( height / (2 * f));
 
@@ -145,8 +264,8 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
         dst[i] /= dst[i][3];
 
         //src[i] = S * src[i];
-        src[i].x() *= S;
-        src[i].y() *= S;
+        //src[i].x() *= S;
+        //src[i].y() *= S;
         src[i] = R * src[i];
         src[i] = T * src[i];
         //src[i].z() *= S;
@@ -171,6 +290,8 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
         cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
         cv::circle(rectified, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
     }
+
+    return cv::getPerspectiveTransform(tDst, tSrc);
 }
 
 Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLength, double width, double height) const

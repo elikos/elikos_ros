@@ -28,6 +28,9 @@ public:
 
     void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections, const ros::Time& stamp);
 
+    inline void setFocalLength(double focalLength){focalLength_ = focalLength;}
+    //TODO remove
+    std::string frameId_ = "r200_front";
 private:
 
     const double GRID_SIDE_LENGTH_M = 1.0;
@@ -39,7 +42,7 @@ private:
     void publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections, const ros::Time& stamp) const;
 
 
-    const double focalLength_;
+    double focalLength_;
     QuadState* const state_;
 
     pcl::KdTreeFLANN<pcl::PointXY> kdTree_;
