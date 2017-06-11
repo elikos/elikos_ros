@@ -20,6 +20,7 @@ CmdStandBy::~CmdStandBy()
 
 void CmdStandBy::execute()
 {
+    ROS_INFO("Started standby command");
     isAborted_ = false;
     // TODO: Essayer a nouveau si le lookup echoue.
     try {
@@ -36,6 +37,7 @@ void CmdStandBy::execute()
         ros::spinOnce();
         rate.sleep();
     }
+    ROS_INFO("Finished standby command");
 }
 
 void CmdStandBy::abort()

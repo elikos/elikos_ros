@@ -83,6 +83,7 @@ void MessageHandler::sendDestination(const tf::Vector3& destination, CmdCode cmd
         elikos_ros::AICmd cmd_msg;
         cmd_msg.pose = msg;
         cmd_msg.cmdCode = cmd_code;
+        cmdPub_.publish(cmd_msg);
     }
 }
 

@@ -25,6 +25,7 @@ CmdLanding::~CmdLanding()
 
 void CmdLanding::execute()
 {
+    ROS_INFO("Started landing command");
     ros::Rate rate(30.0);
     // TODO: Essayer a nouveau si le lookup echoue.
     try
@@ -74,6 +75,7 @@ void CmdLanding::execute()
             }
         }
     }
+    ROS_INFO("Finished landing command");
 }
 
 void CmdLanding::abort()

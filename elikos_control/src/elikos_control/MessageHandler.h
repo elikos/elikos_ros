@@ -21,7 +21,7 @@ class CmdExecutor;
 class MessageHandler
 {
 public:
-    MessageHandler(ros::NodeHandle* nh);
+    MessageHandler(CmdExecutor& CmdExecutor);
     ~MessageHandler();
     void dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr &input);
     void publishTrajectoryPosition(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint);
@@ -30,8 +30,12 @@ public:
 private:
     ros::Subscriber sub_;
 
+    ros::NodeHandle nh_;
+
     CmdConfig lastReceivedCmd_;
     int lastCmdId_ = 0;
+
+    CmdExecutor& cmdExecutor_;
 
     MessageHandler() = delete;
 };

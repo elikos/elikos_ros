@@ -29,6 +29,8 @@ void CmdOffBoard::stateCallBack(const mavros_msgs::State::ConstPtr& msg)
 
 void CmdOffBoard::execute()
 {
+    ROS_INFO("Started offboard command");
+
     ros::Rate rate(30.0);
 
     //send a few setpoints before starting
@@ -89,6 +91,7 @@ void CmdOffBoard::execute()
             isDone = true;
         }
     }
+    ROS_INFO("Finished offboard command");
 }
 
 

@@ -11,7 +11,6 @@
 #include "CmdExecutor.h"
 
 CmdExecutor::CmdExecutor()
-    : msgHndlr_(&nh_)
 {
 
     commands_.insert(std::pair<int, std::unique_ptr<CmdOffBoard>>(0, std::unique_ptr<CmdOffBoard>(new CmdOffBoard(&nh_, -1))));
@@ -48,26 +47,18 @@ OrderToGive CmdExecutor::checkNextOrder()
         return OrderToGive::ABORT;
 }
 
-void CmdExecutor::checkForNewCommand()
+void CmdExecutor::commandReceived(const CmdConfig& newCommand)
 {
-    CmdConfig lastConfig = msgHndlr_.getLastCmdConfig();
     pendingCmdLock_.lock();
-    int pendingId = pendingCmd_->getId();
-    if(pendingId != lastConfig.id_)
+    createCommand(newCommand);
+    if (OrderToGive::ABORT == checkNextOrder())
+        currentCmd_->abort();
+    else if(OrderToGive::AJUST == checkNextOrder())
     {
-        createCommand(lastConfig);
-        if(OrderToGive::ABORT == checkNextOrder())
-            currentCmd_->abort();
-        else if(OrderToGive::AJUST == checkNextOrder())
+        if (currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3 || currentCmd_->getCmdCode() == 4) // Robot interaction || travel
         {
-            if(currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3 || currentCmd_->getCmdCode() == 4) // Robot interaction || travel
-            {
-                currentCmd_->ajustement(pendingDestination_, pendingTrajectory_);
-            }
+            currentCmd_->ajustement(pendingDestination_, pendingTrajectory_);
         }
-        
-        
-
     }
     pendingCmdLock_.unlock();
 }
@@ -100,8 +91,10 @@ void CmdExecutor::executeCurrentCmd()
         pendingCmdLock_.lock();
         if(currentCmd_->getCmdCode() == 2 && static_cast<CmdFrontInteraction*>(currentCmd_)->getStatus() == CmdFrontInteraction::InteractionState::ASKS_FOR_OFFBOARD)
             currentCmd_ = commands_[0].get();
-        else
+        else {
             currentCmd_ = pendingCmd_;
+        }
+
         pendingCmd_ = commands_[5].get();
         pendingCmdLock_.unlock();
     }
@@ -110,9 +103,5 @@ void CmdExecutor::executeCurrentCmd()
 void CmdExecutor::run()
 {
     ros::Rate r(30);
-    while(ros::ok())
-    {
-        ros::spinOnce(); 
-        checkForNewCommand();
-    }
+    ros::spin();
 }

@@ -23,20 +23,21 @@ public:
     CmdExecutor();
     ~CmdExecutor();
 
+    void commandReceived(const CmdConfig& newCommand);
+
     void run(); 
 
 private:
-    ros::NodeHandle nh_;
-    MessageHandler msgHndlr_;
-
     CmdAbs* pendingCmd_;
     CmdAbs* currentCmd_;
+
+    ros::NodeHandle nh_;
 
     trajectory_msgs::MultiDOFJointTrajectory pendingTrajectory_;
     geometry_msgs::Pose pendingDestination_;
 
     void executeCurrentCmd();
-    void checkForNewCommand();
+
     OrderToGive checkNextOrder();
 
     std::unordered_map<int, std::unique_ptr<CmdAbs>> commands_;

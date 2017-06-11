@@ -39,6 +39,7 @@ public:
 
     const std::string MAV_FRAME = { "elikos_fcu" };
     const std::string WORLD_FRAME = { "elikos_arena_origin" };
+    const std::string SETPOINT = { "elikos_setpoint" };
 
 protected:
     int id_ = -1;

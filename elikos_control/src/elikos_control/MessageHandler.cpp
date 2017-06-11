@@ -3,12 +3,14 @@
 #include <mavros_msgs/State.h>
 
 #include "MessageHandler.h"
+#include "CmdExecutor.h"
 
 
 
-MessageHandler::MessageHandler(ros::NodeHandle* nh)
+MessageHandler::MessageHandler(CmdExecutor& cmdExecutor)
+	: cmdExecutor_(cmdExecutor)
 {
-	sub_ = nh->subscribe("elikos_trajectory", 1, &MessageHandler::dispatchMessage, this);
+	sub_ = nh_.subscribe("elikos_trajectory", 1, &MessageHandler::dispatchMessage, this);
 }
 
 
@@ -23,4 +25,5 @@ void MessageHandler::dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr& 
 	lastReceivedCmd_.cmdTrajectory_ = input->trajectory;
 	lastReceivedCmd_.cmdDestination_ = input->destination;
 	lastReceivedCmd_.id_ = lastCmdId_++;
+	cmdExecutor_.commandReceived(lastReceivedCmd_);
 }
