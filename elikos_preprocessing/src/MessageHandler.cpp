@@ -12,18 +12,22 @@
 
 namespace preprocessing {
 
-const std::string MessageHandler::IMG_RCV_TOPIC = "/r200_front/image_raw";
-const std::string MessageHandler::IMG_BW_PUB_TOPIC = "/elikos/preprocessed_bw";
-const std::string MessageHandler::IMG_RGB_PUB_TOPIC = "/elikos/preprocessed_rgb";
-
 MessageHandler* MessageHandler::instance_ = nullptr;
 
 MessageHandler::MessageHandler()
     : it_(nh_)
 {
+    std::string nodeNamespace = ros::this_node::getName();
+    bool hasParams = nh_.getParam(nodeNamespace + "/topic", IMG_RCV_TOPIC) &&
+                     nh_.getParam(nodeNamespace + "/preprocessed_topic", IMG_PUB_TOPIC);
+
+    if (!hasParams) {
+        ROS_FATAL("Could not find expteced parameters: topic, preprocessed_topic");
+        exit(1);
+    }
+
     imageSub_ = it_.subscribe(IMG_RCV_TOPIC, 1, &MessageHandler::cameraCallback, this);
-    preprocessedPub_ = it_.advertise(IMG_RGB_PUB_TOPIC, 1);
-    bwPreprocessedPub_ = it_.advertise(IMG_BW_PUB_TOPIC, 1);
+    preprocessedPub_ = it_.advertise(IMG_PUB_TOPIC, 1);
 }
 
 MessageHandler::~MessageHandler()
@@ -45,13 +49,7 @@ void MessageHandler::freeInstance()
 
 void MessageHandler::lookForMessages()
 {
-    
-    ros::Rate rate(30);
-    while(ros::ok())
-    {
-        ros::spinOnce();
-        rate.sleep();
-    }
+    ros::spin();
 }
 
 void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -63,9 +61,6 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
     sensor_msgs::ImagePtr msgPreproc = cv_bridge::CvImage(std_msgs::Header(), "rgb8", output).toImageMsg();
     preprocessedPub_.publish(msgPreproc);
-
-    sensor_msgs::ImagePtr msgPreprocBw = cv_bridge::CvImage(std_msgs::Header(), "mono8", bwOutput).toImageMsg();
-    bwPreprocessedPub_.publish(msgPreprocBw);
 }
 
 }

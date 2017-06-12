@@ -29,7 +29,7 @@ include_directories(
 )
 
 add_executable( elikos_preprocessing
-    src/main.cpp
+    src/Main.cpp
     src/MessageHandler.cpp
     src/MessageHandler.h
     src/PreProcessing.cpp

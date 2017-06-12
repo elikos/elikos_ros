@@ -10,7 +10,7 @@
 
 #include <Eigen/Core>
 
-namespace preprocessing
+namespace localization
 {
 
 class PreProcessing
@@ -19,7 +19,7 @@ public:
     PreProcessing();
     ~PreProcessing() = default;
 
-    void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& preProcessedBW);
+    void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed);
     void removePerspective(const cv::Mat& input, cv::Mat& rectified) const;
     void showCalibTrackBars();
 
@@ -33,7 +33,6 @@ private:
     Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength, double height, double length) const;
 
     tf::TransformListener tfListener_;
-    ros::NodeHandle nh_;
 
     double blurSigma = 0.0;
     int whiteThreshold_ = 149;

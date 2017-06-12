@@ -24,9 +24,8 @@ public:
 
 private:
 
-    static const std::string IMG_RCV_TOPIC;
-    static const std::string IMG_RGB_PUB_TOPIC;
-    static const std::string IMG_BW_PUB_TOPIC;
+    std::string IMG_RCV_TOPIC;
+    std::string IMG_PUB_TOPIC;
     
     MessageHandler();
     ~MessageHandler();

@@ -1,9 +1,6 @@
 <launch>
-
-    <node pkg="elikos_preprocessing" type="elikos_preprocessing" name="elikos_preprocessing" output="screen">
-
-    
-    
+    <arg name="camera_name" default="elikos_ffmv_bottom"/>
+    <node name="elikos_$(arg camera_name)_preprocessing" type="elikos_preprocessing" pkg="elikos_preprocessing">
+        <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg camera_name).yaml"/>
     </node>
-
 </launch>
