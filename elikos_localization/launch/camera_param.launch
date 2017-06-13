@@ -1,0 +1,4 @@
+<launch>
+    <arg name="camera_name" default="elikos_ffmv_bottom"/>
+    <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg camera_name).yaml" ns="$(arg camera_name)"/>
+</launch>

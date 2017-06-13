@@ -10,6 +10,7 @@
 #include <opencv2/core/core.hpp>
 #include <Eigen/Core>
 
+#include "CameraInfo.h"
 #include "PreProcessing.h"
 #include "PerspectiveTransform.h"
 #include "GridFitting.h"
@@ -28,7 +29,7 @@ class ImageProcessor
 {
 public:
 
-    ImageProcessor(QuadState* state);
+    ImageProcessor(const CameraInfo& cameraInfo, QuadState* state);
     ~ImageProcessor();
 
     void processImage(const cv::Mat& input, const ros::Time& stamp);

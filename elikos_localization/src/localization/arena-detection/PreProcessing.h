@@ -5,6 +5,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
+#include "CameraInfo.h"
+
 #include <ros/time.h>
 #include <tf/transform_listener.h>
 
@@ -16,7 +18,7 @@ namespace localization
 class PreProcessing
 {
 public:
-    PreProcessing();
+    PreProcessing(const CameraInfo& cameraInfo);
     ~PreProcessing() = default;
 
     void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed);
@@ -33,6 +35,8 @@ private:
     Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength, double height, double length) const;
 
     tf::TransformListener tfListener_;
+
+    const CameraInfo& cameraInfo_;
 
     double blurSigma = 0.0;
     int whiteThreshold_ = 149;

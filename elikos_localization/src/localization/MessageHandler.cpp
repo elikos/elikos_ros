@@ -15,10 +15,10 @@
 
 namespace localization {
 
-MessageHandler::MessageHandler(QuadState* state, ImageProcessor* processor)
+MessageHandler::MessageHandler(const CameraInfo& cameraInfo, QuadState* state, ImageProcessor* processor)
     : it_(nh_), state_(state), processor_(processor)
 {
-    imageSub_ = it_.subscribe("/r200_front/image_raw", 1, &MessageHandler::cameraCallback, this);
+    imageSub_ = it_.subscribe(cameraInfo.topic, 1, &MessageHandler::cameraCallback, this);
     imuSub_ = nh_.subscribe("/mavros/imu/data", 1, &MessageHandler::imuCallback, this);
     poseSub_ = nh_.subscribe("/mavros/local_position/pose", 1, &MessageHandler::poseCallback, this);
 }

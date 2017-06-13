@@ -11,6 +11,8 @@
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/PoseStamped.h>
 
+#include "CameraInfo.h"
+
 namespace localization {
 
 class QuadState;
@@ -19,7 +21,7 @@ class ImageProcessor;
 class MessageHandler
 {
 public:
-    MessageHandler(QuadState* state, ImageProcessor* processsor); 
+    MessageHandler(const CameraInfo& cameraInfo, QuadState* state, ImageProcessor* processsor); 
     ~MessageHandler();
 
     void lookForMessages();

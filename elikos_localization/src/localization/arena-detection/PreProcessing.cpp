@@ -11,7 +11,8 @@
 namespace localization 
 {
 
-PreProcessing::PreProcessing()
+PreProcessing::PreProcessing(const CameraInfo& cameraInfo)
+    : cameraInfo_(cameraInfo)
 {
     cv::Mat distortedCamera = (cv::Mat_<float>(3,3) << 422.918640,    0.000000,    350.119451,
             0.000000,  423.121112,    236.380265,
@@ -52,7 +53,9 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     cv::Mat typeConverted;
     if (raw.type() != CV_8UC1) {
         cv::cvtColor(raw, typeConverted, CV_BGR2GRAY);
-    } else {
+    }
+    else 
+    {
         raw.copyTo(typeConverted);
     }
 
@@ -87,10 +90,13 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
     double roll, pitch, yaw = 0.0;
     Eigen::Vector3f direction;
     try {
-        tf::StampedTransform tf;
-        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
+        tf::StampedTransform origin2fcu;
+        tfListener_.lookupTransform("elikos_arena_origin", "elikos_fcu", ros::Time(0), origin2fcu);
+        tf::StampedTransform fcu2camera;
+        tfListener_.lookupTransform("elikos_fcu", cameraInfo_.frame, ros::Time(0), fcu2camera);
 
-        tf::Matrix3x3 m(tf.getRotation());
+        tf::Transform origin2camera = origin2fcu * fcu2camera;
+        tf::Matrix3x3 m(origin2camera.getRotation());
         m.getRPY(roll, pitch, yaw);
 
         tf::Vector3 v = m * tf::Vector3(0.0, 0.0, 1.0);
