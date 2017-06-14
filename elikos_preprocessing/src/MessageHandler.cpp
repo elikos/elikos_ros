@@ -12,7 +12,6 @@
 
 namespace preprocessing {
 
-MessageHandler* MessageHandler::instance_ = nullptr;
 
 MessageHandler::MessageHandler()
     : it_(nh_)
@@ -36,15 +35,8 @@ MessageHandler::~MessageHandler()
 
 MessageHandler* MessageHandler::getInstance()
 {
-    if (instance_ == nullptr) {
-        instance_ = new MessageHandler();
-    }
-    return instance_;
-}
-
-void MessageHandler::freeInstance()
-{
-    delete instance_;
+    static MessageHandler instance_;
+    return &instance_;
 }
 
 void MessageHandler::lookForMessages()
@@ -59,7 +51,7 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     cv::Mat bwOutput;
     preProcessing_.preProcessImage(input, ros::Time::now(), output, bwOutput);
 
-    sensor_msgs::ImagePtr msgPreproc = cv_bridge::CvImage(std_msgs::Header(), "rgb8", output).toImageMsg();
+    sensor_msgs::ImagePtr msgPreproc = cv_bridge::CvImage(std_msgs::Header(), "bgr8", output).toImageMsg();
     preprocessedPub_.publish(msgPreproc);
 }
 

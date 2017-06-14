@@ -30,6 +30,9 @@ private:
     MessageHandler();
     ~MessageHandler();
 
+    MessageHandler(const MessageHandler& other) = delete;
+    MessageHandler& operator=(const MessageHandler& other) = delete;
+
     void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
     void imuCallback(const sensor_msgs::Imu& msg);
     void poseCallback(const geometry_msgs::PoseStamped& msg);

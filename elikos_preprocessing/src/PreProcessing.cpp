@@ -46,7 +46,7 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     }
 
     cv::Mat perspective;
-    removePerspective(undistorted, perspective);
+    removePerspective(undistorted, perspective, stamp);
 
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
@@ -68,7 +68,7 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     preProcessedBW = thresholded;
 }
 
-void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) const
+void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const
 {
     double roll = 0.0;
     double pitch = 0.0;
@@ -76,7 +76,8 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
     Eigen::Vector3f direction;
     try {
         tf::StampedTransform tf;
-        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
+        tfListener_.waitForTransform("elikos_local_origin", "elikos_fcu", imageTime, ros::Duration(1.0));
+        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", imageTime, tf);
 
         tf::Matrix3x3 m(tf.getRotation());
         m.getRPY(roll, pitch, yaw);
@@ -91,7 +92,7 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
     }
 
     //pitch -= 1.5708;+
-    pitch -= 1.0996;
+    //pitch -= 1.0996;
 
     Eigen::Matrix3f r = (Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitX()) * 
                          Eigen::AngleAxisf(-roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
