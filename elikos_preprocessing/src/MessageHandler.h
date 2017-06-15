@@ -23,9 +23,6 @@ public:
     void lookForMessages();
 
 private:
-
-    std::string IMG_RCV_TOPIC;
-    std::string IMG_PUB_TOPIC;
     
     MessageHandler();
     ~MessageHandler();

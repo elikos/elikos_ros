@@ -41,9 +41,9 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     }
 
     cv::Mat undistorted = raw;
-    if (!undistortType_) {
+    /*if (!undistortType_) {
         cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
-    }
+    }*/
 
     cv::Mat perspective;
     removePerspective(undistorted, perspective, stamp);

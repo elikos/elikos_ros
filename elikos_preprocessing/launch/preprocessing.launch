@@ -1,6 +1,15 @@
 <launch>
     <arg name="camera_name" default="elikos_ffmv_bottom"/>
-    <node name="elikos_$(arg camera_name)_preprocessing" type="elikos_preprocessing" pkg="elikos_preprocessing">
-        <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg camera_name).yaml"/>
-    </node>
+    <arg name="camera_namespace" default="elikos_ffmv_bottom_camera"/>
+    <arg name="camera_manager_nodelet" default="camera_manager"/>
+
+    <group ns="$(arg camera_namespace)">
+        <node name="$(arg camera_manager_nodelet)" type="nodelet" pkg="nodelet" args="manager"/>
+        <node name="image_rect" type="nodelet" pkg="nodelet" args="load image_proc/rectify $(arg camera_manager_nodelet)" output="screen">
+            <remap from="image_mono" to="image_raw"/>
+        </node>
+        <node name="preprocessing" type="elikos_preprocessing" pkg="elikos_preprocessing">
+            <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg camera_name).yaml"/>
+        </node>
+    </group>
 </launch>

@@ -16,17 +16,8 @@ namespace preprocessing {
 MessageHandler::MessageHandler()
     : it_(nh_)
 {
-    std::string nodeNamespace = ros::this_node::getName();
-    bool hasParams = nh_.getParam(nodeNamespace + "/topic", IMG_RCV_TOPIC) &&
-                     nh_.getParam(nodeNamespace + "/preprocessed_topic", IMG_PUB_TOPIC);
-
-    if (!hasParams) {
-        ROS_FATAL("Could not find expteced parameters: topic, preprocessed_topic");
-        exit(1);
-    }
-
-    imageSub_ = it_.subscribe(IMG_RCV_TOPIC, 1, &MessageHandler::cameraCallback, this);
-    preprocessedPub_ = it_.advertise(IMG_PUB_TOPIC, 1);
+    imageSub_ = it_.subscribe("image_rect", 1, &MessageHandler::cameraCallback, this);
+    preprocessedPub_ = it_.advertise("image_preprocessed", 1);
 }
 
 MessageHandler::~MessageHandler()
