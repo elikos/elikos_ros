@@ -12,38 +12,13 @@ namespace preprocessing
 
 PreProcessing::PreProcessing()
 {
-    cv::Mat distortedCamera = (cv::Mat_<float>(3,3) << 
-            422.918640,  0.000000,    350.119451,
-            0.000000,  423.121112,    236.380265,
-            0.000000,    0.000000,      1.000000);
-
-    cv::Mat cameraDistortion = (cv::Mat_<float>(1,5) << -0.321590, 0.089597, 0.001090, -0.000489, 0.000000);
-
-    cv::Mat undistortedCamera = cv::getOptimalNewCameraMatrix(distortedCamera, cameraDistortion, cv::Size(640, 480), 0);
-
-    cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
-                                cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
-
     cv::namedWindow("PreProcessed", 1);
-    cv::createTrackbar("white threshold", "PreProcessed", &whiteThreshold_, 255);
-    cv::createTrackbar("undistort type", "PreProcessed", &undistortType_, 1);
 }
 
 void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& preProcessedBW)
 {
-    //undistort
-    // Blur
-    cv::Mat typeConverted;
-    if (raw.type() != CV_8UC1) {
-        cv::cvtColor(raw, typeConverted, CV_BGR2GRAY);
-    } else {
-        raw.copyTo(typeConverted);
-    }
-
+    //L'image vient de image_proc
     cv::Mat undistorted = raw;
-    /*if (!undistortType_) {
-        cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
-    }*/
 
     cv::Mat perspective;
     removePerspective(undistorted, perspective, stamp);
@@ -51,21 +26,6 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
     preProcessed = blured;
-
-    //cv::Mat eroded;
-    //cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-    //cv::erode(blured, eroded, element, cv::Point(0), 8);
-
-    if (raw.type() != CV_8UC1) {
-        cv::cvtColor(blured, typeConverted, CV_BGR2GRAY);
-    } else {
-        raw.copyTo(typeConverted);
-    }
-
-    cv::Mat thresholded;
-    cv::threshold(typeConverted, thresholded, whiteThreshold_, 255, CV_THRESH_BINARY);
-
-    preProcessedBW = thresholded;
 }
 
 void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const
@@ -109,7 +69,7 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified, 
 
     double height = input.size().height;
     double width = input.size().width;
-    double f = 423.0;
+    double f = focalLength_;
     double HFOV = std::atan( width / (2 * f));
     double VFOV = std::atan( height / (2 * f));
 

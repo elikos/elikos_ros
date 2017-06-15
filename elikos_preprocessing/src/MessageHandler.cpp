@@ -12,14 +12,18 @@
 
 namespace preprocessing {
 
-/******************************************************************************
-* Le 'constructeur' des nodelets. Le setup de ros doit être fait ici.
-******************************************************************************/
-void MessageHandler::onInit()
+MessageHandler::MessageHandler(const ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodeHandle)
+    : nh_(nodeHandle)
+    , privateNh_(privateNodeHandle)
+    , it_(nh_)
 {
-    nh_ = getNodeHandle();
-    image_transport::ImageTransport it_ = image_transport::ImageTransport(nh_); 
-    imageSub_ = it_.subscribe("image_rect", 1, &MessageHandler::cameraCallback, this);
+    imageSub_ = it_.subscribeCamera(
+        "image_rect",
+        5,
+        &MessageHandler::cameraCallback,
+        this,
+        image_transport::TransportHints("raw", ros::TransportHints(), privateNh_)
+    );
     preprocessedPub_ = it_.advertise("image_preprocessed", 1);
 }
 
@@ -32,11 +36,12 @@ void MessageHandler::lookForMessages()
     ros::spin();
 }
 
-void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
+void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& image_msg, const sensor_msgs::CameraInfoConstPtr& info_msg)
 {
-    cv::Mat input = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
+    cv::Mat input = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
     cv::Mat output;
     cv::Mat bwOutput;
+    preProcessing_.setFocalLength(info_msg->K[0]);//TODO avoir des longeurs focales différentes pour x et y
     preProcessing_.preProcessImage(input, ros::Time::now(), output, bwOutput);
 
     sensor_msgs::ImagePtr msgPreproc = cv_bridge::CvImage(std_msgs::Header(), "bgr8", output).toImageMsg();

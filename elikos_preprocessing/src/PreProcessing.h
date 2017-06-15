@@ -27,6 +27,7 @@ public:
     Eigen::Vector2f rotate(const Eigen::Vector2f& v, double theta) const;
 
     inline void setRollPitch(double roll, double pitch);
+    inline void setFocalLength(double focalLength);
 
 private:
 
@@ -35,13 +36,7 @@ private:
     tf::TransformListener tfListener_;
     ros::NodeHandle nh_;
 
-    double blurSigma = 0.0;
-    int whiteThreshold_ = 149;
-    int undistortType_ = 1;
-
-    cv::Mat distortionMap1_;
-    cv::Mat distortionMap2_;
-
+    double focalLength_ = 0;
     double roll_ = 0.0;
     double pitch_ = 0.0;
 };
@@ -52,6 +47,10 @@ inline void PreProcessing::setRollPitch(double roll, double pitch)
     pitch_ = pitch; 
 }
 
+inline void PreProcessing::setFocalLength(double focalLength)
+{
+    focalLength_ = focalLength;
+}
 }
 
 #endif // PRE_PROCESSING_H

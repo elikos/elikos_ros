@@ -1,5 +1,5 @@
 <library path="lib/libelikos_preprocessing">
-    <class name="elikos_preprocessing/preprocessing" type="preprocessing::MessageHandler" base_class_type="nodelet::Nodelet">
+    <class name="elikos_preprocessing/preprocessing" type="preprocessing::ElikosPreprocessing" base_class_type="nodelet::Nodelet">
         <description>
             A nodelet that is used to pre-process images.
         </description>
