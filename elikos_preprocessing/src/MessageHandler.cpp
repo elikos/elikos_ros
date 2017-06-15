@@ -12,22 +12,19 @@
 
 namespace preprocessing {
 
-
-MessageHandler::MessageHandler()
-    : it_(nh_)
+/******************************************************************************
+* Le 'constructeur' des nodelets. Le setup de ros doit être fait ici.
+******************************************************************************/
+void MessageHandler::onInit()
 {
+    nh_ = getNodeHandle();
+    image_transport::ImageTransport it_ = image_transport::ImageTransport(nh_); 
     imageSub_ = it_.subscribe("image_rect", 1, &MessageHandler::cameraCallback, this);
     preprocessedPub_ = it_.advertise("image_preprocessed", 1);
 }
 
 MessageHandler::~MessageHandler()
 {
-}
-
-MessageHandler* MessageHandler::getInstance()
-{
-    static MessageHandler instance_;
-    return &instance_;
 }
 
 void MessageHandler::lookForMessages()
