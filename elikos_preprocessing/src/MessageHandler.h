@@ -8,6 +8,7 @@
 #include <ros/ros.h>
 
 #include <image_transport/image_transport.h>
+#include <elikos_ros/StampedMatrix3.h>
 #include "PreProcessing.h"
 
 namespace preprocessing {
@@ -29,6 +30,7 @@ private:
     image_transport::CameraSubscriber imageSub_;
 
     image_transport::Publisher preprocessedPub_;
+    ros::Publisher inverseTransformPub_;
 
     PreProcessing preProcessing_;
 

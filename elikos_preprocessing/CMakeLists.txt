@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   geometry_msgs
   nav_msgs
+  elikos_ros
   image_transport
   roscpp
   std_msgs

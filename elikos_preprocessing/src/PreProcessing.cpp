@@ -15,20 +15,20 @@ PreProcessing::PreProcessing()
     cv::namedWindow("PreProcessed", 1);
 }
 
-void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& preProcessedBW)
+void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& inverseTransform)
 {
     //L'image vient de image_proc
     cv::Mat undistorted = raw;
 
     cv::Mat perspective;
-    removePerspective(undistorted, perspective, stamp);
+    inverseTransform = removePerspective(undistorted, perspective, stamp);
 
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
     preProcessed = blured;
 }
 
-void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const
+cv::Mat PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const
 {
     double roll = 0.0;
     double pitch = 0.0;
@@ -125,6 +125,7 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified, 
         cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
         cv::circle(rectified, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
     }
+    return cv::getPerspectiveTransform(tDst, tSrc);
 }
 
 Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLength, double width, double height) const

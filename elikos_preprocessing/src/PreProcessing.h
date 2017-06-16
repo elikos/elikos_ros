@@ -19,8 +19,8 @@ public:
     PreProcessing();
     ~PreProcessing() = default;
 
-    void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& preProcessedBW);
-    void removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const;
+    void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& inverseTransform);
+    cv::Mat removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const;
 
     Eigen::Vector2f translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const;
     Eigen::Vector2f rotate(const Eigen::Vector2f& v, double theta) const;

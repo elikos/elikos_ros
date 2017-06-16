@@ -25,6 +25,7 @@ MessageHandler::MessageHandler(const ros::NodeHandle& nodeHandle, ros::NodeHandl
         image_transport::TransportHints("raw", ros::TransportHints(), privateNh_)
     );
     preprocessedPub_ = it_.advertise("image_preprocessed", 1);
+    inverseTransformPub_ = nh_.advertise<elikos_ros::StampedMatrix3>("image_preprocessed/inverse_transform", 1);
 }
 
 MessageHandler::~MessageHandler()
@@ -35,12 +36,19 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& image_msg,
 {
     cv::Mat input = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
     cv::Mat output;
-    cv::Mat bwOutput;
+    cv::Mat inverseTransform;
     preProcessing_.setFocalLength(info_msg->K[0]);//TODO avoir des longeurs focales différentes pour x et y
-    preProcessing_.preProcessImage(input, ros::Time::now(), output, bwOutput);
+    preProcessing_.preProcessImage(input, image_msg->header.stamp, output, inverseTransform);
 
-    sensor_msgs::ImagePtr msgPreproc = cv_bridge::CvImage(std_msgs::Header(), "bgr8", output).toImageMsg();
+    sensor_msgs::ImagePtr msgPreproc = cv_bridge::CvImage(image_msg->header, "bgr8", output).toImageMsg();
     preprocessedPub_.publish(msgPreproc);
+
+    elikos_ros::StampedMatrix3 invTransformMsg;
+    invTransformMsg.header = image_msg->header;
+    for(int i = 0; i < 9; ++i){
+        invTransformMsg.matrix.data[i] = inverseTransform.at<double>(i/3, i%3);
+    }
+    inverseTransformPub_.publish(invTransformMsg);
 }
 
 }
