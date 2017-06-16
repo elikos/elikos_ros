@@ -21,13 +21,12 @@ public:
 
     void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& preProcessedBW);
     void removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const;
-    void showCalibTrackBars();
 
     Eigen::Vector2f translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const;
     Eigen::Vector2f rotate(const Eigen::Vector2f& v, double theta) const;
 
-    inline void setRollPitch(double roll, double pitch);
-    inline void setFocalLength(double focalLength);
+    void setRollPitch(double roll, double pitch);
+    void setFocalLength(double focalLength);
 
 private:
 
@@ -41,16 +40,7 @@ private:
     double pitch_ = 0.0;
 };
 
-inline void PreProcessing::setRollPitch(double roll, double pitch)
-{
-    roll_ = roll;
-    pitch_ = pitch; 
-}
 
-inline void PreProcessing::setFocalLength(double focalLength)
-{
-    focalLength_ = focalLength;
-}
 }
 
 #endif // PRE_PROCESSING_H

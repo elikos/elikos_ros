@@ -137,11 +137,6 @@ Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLen
     return m;
 }
 
-void PreProcessing::showCalibTrackBars()
-{
-
-}
-
 Eigen::Vector2f PreProcessing::translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const
 {
     return v + translation;
@@ -157,6 +152,17 @@ Eigen::Vector2f PreProcessing::rotate(const Eigen::Vector2f& v, double theta) co
     rotated.y() = v.x() * sinTheta + v.y() * cosTheta;
 
     return rotated;
+}
+
+void PreProcessing::setRollPitch(double roll, double pitch)
+{
+    roll_ = roll;
+    pitch_ = pitch; 
+}
+
+void PreProcessing::setFocalLength(double focalLength)
+{
+    focalLength_ = focalLength;
 }
 
 }

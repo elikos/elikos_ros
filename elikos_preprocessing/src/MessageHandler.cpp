@@ -31,11 +31,6 @@ MessageHandler::~MessageHandler()
 {
 }
 
-void MessageHandler::lookForMessages()
-{
-    ros::spin();
-}
-
 void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& image_msg, const sensor_msgs::CameraInfoConstPtr& info_msg)
 {
     cv::Mat input = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
