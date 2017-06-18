@@ -88,30 +88,16 @@ void PreProcessing::preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Ma
 void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
 {
     double roll, pitch, yaw = 0.0;
-    try {
-        tf::StampedTransform origin2fcu;
-        tfListener_.lookupTransform("elikos_arena_origin", "elikos_fcu", ros::Time(0), origin2fcu);
 
-        tf::StampedTransform fcu2camera;
-        tfListener_.lookupTransform("elikos_fcu", cameraInfo_.frame, ros::Time(0), fcu2camera);
+    tf::Quaternion q = tf::Quaternion::getIdentity();
+    q.setRPY(CV_PI, 0.0, 0.0);
+    tf::Transform z2x(q);
 
-        tf::Quaternion q = tf::Quaternion::getIdentity();
-        q.setRPY(CV_PI, 0.0, 0.0);
-        tf::Transform z2x(q);
+    tf::Transform debug = state_.origin2fcu * state_.fcu2camera * z2x;
 
-        fcu2camera.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
-        origin2fcu.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
-
-        tf::Transform debug = origin2fcu * fcu2camera * z2x;
-
-        tf::Matrix3x3 n(debug.getRotation());
-        n.getRPY(roll, pitch, yaw);
-//        q.setRPY(roll, pitch, 0.0);
-        tfPub_.sendTransform(tf::StampedTransform(debug, ros::Time::now(), "elikos_arena_origin", "debug"));        
-
-    } catch (tf::TransformException e) {
-         ROS_ERROR("%s", e.what());
-    }
+    tf::Matrix3x3 n(debug.getRotation());
+    n.getRPY(roll, pitch, yaw);
+    tfPub_.sendTransform(tf::StampedTransform(debug, ros::Time::now(), "elikos_arena_origin", "debug"));        
 
     Eigen::Matrix3f r = (Eigen::AngleAxisf(roll,   Eigen::Vector3f::UnitX()) * 
                          Eigen::AngleAxisf(-pitch,  Eigen::Vector3f::UnitY()) *

@@ -51,7 +51,7 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 {
     try {
         isWaitingForImage_ = true;
-        ros::Time stamp = ros::Time::now();
+        ros::Time stamp = msg->header.stamp;
 
         tfListener_.waitForTransform("elikos_arena_origin", "elikos_fcu",  stamp, ros::Duration(1.0));
         tfListener_.lookupTransform("elikos_arena_origin", "elikos_fcu", stamp, state_.origin2fcu);

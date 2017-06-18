@@ -1,81 +1,13 @@
 <launch>
-     <!-- 
-     ############
-     ### SITL ###
-     ############
-     -->
-    <arg name="est" default="lpe"/>
-    <arg name="vehicle" default="iris"/>
-    <arg name="world" default="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/worlds/stadium.world"/>
+    <include file="$(find elikos_sim)/src/gazebo_sim/Firmware/launch/mavros_posix_sitl.launch">
+        <arg name="world" value="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/worlds/stadium.world"/>
+        <arg name="sdf" value="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/iris_realsense/iris_opt_flow.sdf"/>
+        <arg name="config_yaml" value="$(find elikos_ros)/launch/px4_config_sim.yaml"/>
+     </include>
+     <node name="gazebo_tf_fix" pkg="elikos_sim" type="gazebo_tf_fix"/>
 
-    <arg name="rcS" default="$(find px4)/posix-configs/SITL/init/$(arg est)/$(arg vehicle)"/>
-
-    <node name="sitl" pkg="px4" type="px4" output="screen"
-        args="$(find px4) $(arg rcS)">
-    </node>
-
-    <!-- 
-    ##############
-    ### GAZEBO ###
-    ##############
-    -->
-
-    <arg name="headless" default="false"/>
-    <arg name="gui" default="true"/>
-
-    <arg name="debug" default="false"/>
-    <arg name="verbose" default="false"/>
-    <arg name="paused" default="false"/>
-    <arg name="use_sim_time" default="false"/>
-
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="headless" value="$(arg headless)"/>
-        <arg name="gui" value="$(arg gui)"/>
-        <arg name="world_name" value="$(arg world)" />
-        <arg name="debug" value="$(arg debug)" />
-        <arg name="verbose" value="$(arg verbose)" />
-        <arg name="paused" value="$(arg paused)" />
-        <arg name="use_sim_time" value="$(arg use_sim_time)" />
-    </include>
-
-    <!--
-    #####################
-    ### VEHICLE_SPAWN ###
-    #####################
-    -->
-
-    <arg name="sdf" default="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/iris_realsense/iris_opt_flow.sdf"/>
-    <arg name="x" default="0"/>
-    <arg name="y" default="0"/>
-    <arg name="z" default="0"/>
-    <arg name="R" default="0"/>
-    <arg name="P" default="0"/>
-    <arg name="Y" default="0"/>
-
-    <node name="$(anon vehicle_spawn)" output="screen" pkg="gazebo_ros" type="spawn_model"
-        args="-sdf -file $(arg sdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>
-
-    <!-- 
-    ##############
-    ### MAVROS ###
-    ##############
-    -->
-
-    <arg name="ns" default="/"/>
-    <arg name="fcu_url" default="udp://:14540@localhost:14557"/>
-    <arg name="pluginlists_yaml" default="$(find mavros)/launch/px4_pluginlists.yaml" />
-    <arg name="config_yaml" value="$(find elikos_ros)/launch/px4_config.yaml"/>
-
-    <include file="$(find px4)/launch/mavros.launch">
-        <arg name="ns" value="$(arg ns)"/>
-        <arg name="gcs_url" value=""/> <!-- GCS link is provided by SITL -->
-        <arg name="fcu_url" value="$(arg fcu_url)"/>
-        <arg name="pluginlists_yaml" value="$(arg pluginlists_yaml)" />
-        <arg name="config_yaml" value="$(arg config_yaml)" />
-    </include>
-
-    <node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
-    <node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
+	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
+	<node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
     <node pkg="tf" type="static_transform_publisher" name="r200_front_broadcaster" args="0.15 0 0 0.6029 -0.6029 0.3695 -0.3695 elikos_base_link r200_front 100" />
     <node pkg="tf" type="static_transform_publisher" name="r200_left_broadcaster" args="0 0.15 0 -0.8526 0.0 0.0 0.5225 elikos_base_link r200_left 100" />
     <node pkg="tf" type="static_transform_publisher" name="r200_right_broadcaster" args="0 -0.15 0 -0.0 -0.8526 0.5225 0.0 elikos_base_link r200_right 100" />

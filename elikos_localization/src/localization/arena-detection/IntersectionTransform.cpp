@@ -102,8 +102,6 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
     transformedIntersection.x() = (imageIntersection.x() - 320.0) * transformCoefficient;
     transformedIntersection.y() = (imageIntersection.y() - 240.0) * transformCoefficient;
 
-
-
 }
 
 void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const
