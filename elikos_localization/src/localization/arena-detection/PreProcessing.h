@@ -22,8 +22,8 @@ public:
     PreProcessing(const CameraInfo& cameraInfo);
     ~PreProcessing() = default;
 
-    void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed);
-    void removePerspective(const cv::Mat& input, cv::Mat& rectified);
+    void preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed);
+    void removePerspective(cv::Mat& input, cv::Mat& rectified);
     void showCalibTrackBars();
 
     Eigen::Vector2f translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const;

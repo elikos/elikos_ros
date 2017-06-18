@@ -136,7 +136,7 @@ void ImageProcessor::preProcess(const cv::Mat& raw, cv::Mat& preProcessed)
     preProcessed = thresholded;
 }
 
-void ImageProcessor::processImage(const cv::Mat& input, const ros::Time& stamp)
+void ImageProcessor::processImage(cv::Mat& input, const ros::Time& stamp)
 {
     image_ = input;
     preProcessing_.preProcessImage(input, stamp,  preProcessed_);

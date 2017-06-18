@@ -32,7 +32,7 @@ public:
     ImageProcessor(const CameraInfo& cameraInfo, QuadState* state);
     ~ImageProcessor();
 
-    void processImage(const cv::Mat& input, const ros::Time& stamp);
+    void processImage(cv::Mat& input, const ros::Time& stamp);
 
     void perspectiveToOrtho(double theta);
 

@@ -30,7 +30,7 @@ PreProcessing::PreProcessing(const CameraInfo& cameraInfo)
     cv::createTrackbar("undistort type", "PreProcessed", &undistortType_, 1);
 }
 
-void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed)
+void PreProcessing::preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed)
 {
 
     /*
@@ -85,7 +85,7 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     cv::imshow("PreProcessed", preProcessed);
 }
 
-void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified)
+void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
 {
     double roll, pitch, yaw = 0.0;
     try {
@@ -95,30 +95,31 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified)
         tf::StampedTransform fcu2camera;
         tfListener_.lookupTransform("elikos_fcu", cameraInfo_.frame, ros::Time(0), fcu2camera);
 
-        /*
-        */
-
         tf::Quaternion q = tf::Quaternion::getIdentity();
-        q.setRPY(0.0, -CV_PI / 2.0, CV_PI / 2.0);
+        q.setRPY(CV_PI, 0.0, 0.0);
         tf::Transform z2x(q);
 
         fcu2camera.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
         origin2fcu.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
-        tf::Transform debug = origin2fcu * fcu2camera * z2x;
 
+        tf::Transform debug = origin2fcu * fcu2camera * z2x;
 
         tf::Matrix3x3 n(debug.getRotation());
         n.getRPY(roll, pitch, yaw);
-        q.setRPY(roll, pitch, 0.0);
-        debug.setRotation(q);
+//        q.setRPY(roll, pitch, 0.0);
         tfPub_.sendTransform(tf::StampedTransform(debug, ros::Time::now(), "elikos_arena_origin", "debug"));        
 
     } catch (tf::TransformException e) {
          ROS_ERROR("%s", e.what());
     }
 
-    Eigen::Matrix3f r = (Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitX()) * 
-                         Eigen::AngleAxisf(roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
+    Eigen::Matrix3f r = (Eigen::AngleAxisf(roll,   Eigen::Vector3f::UnitX()) * 
+                         Eigen::AngleAxisf(-pitch,  Eigen::Vector3f::UnitY()) *
+                         Eigen::AngleAxisf(0.0, Eigen::Vector3f::UnitZ())).toRotationMatrix();
+
+    if (pitch > CV_PI / 6.0) {
+        int i = 0;
+    }
                             
     Eigen::Matrix4f R = Eigen::Matrix4f::Zero();
     R(3, 3) = 1;
@@ -182,7 +183,9 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified)
     for (int i = 0; i < 4; ++i) 
     {
         cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
-        cv::circle(rectified, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
+        cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
+        cv::circle(input, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
+        cv::circle(input, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
     }
 }
 
