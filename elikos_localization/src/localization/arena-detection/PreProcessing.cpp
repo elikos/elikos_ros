@@ -11,8 +11,8 @@
 namespace localization 
 {
 
-PreProcessing::PreProcessing(const CameraInfo& cameraInfo)
-    : cameraInfo_(cameraInfo)
+PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& state)
+    : cameraInfo_(cameraInfo), state_(state)
 {
     cv::Mat distortedCamera = (cv::Mat_<float>(3,3) << 422.918640,    0.000000,    350.119451,
             0.000000,  423.121112,    236.380265,
@@ -133,9 +133,9 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
 
     double height = input.size().height;
     double width = input.size().width;
-    double f = 320.25;
-    double HFOV = std::atan( width / (2 * f));
-    double VFOV = std::atan( height / (2 * f));
+    double f = cameraInfo_.focalLength;
+    double HFOV = cameraInfo_.hfov;
+    double VFOV = cameraInfo_.vfov;
 
     Eigen::Vector4f src[4] { Eigen::Vector4f( 1.0,  1.0, 0.0, 1.0), 
                              Eigen::Vector4f(-1.0,  1.0, 0.0, 1.0), 
@@ -147,7 +147,10 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
                              Eigen::Vector4f(-1.0, -1.0, 0.0, 1.0), 
                              Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
    
-    float S = std::cos(pitch);
+
+    Eigen::Vector4f test(0.0, 0.0, 1.0, 0.0);
+    test = R * test;
+    float S = std::cos(std::atan(std::sqrt(test.x() * test.x() + test.y() * test.y()) / test.z()));
 
     Eigen::Matrix4f P = getPerspectiveProjectionTransform(f, width, height); 
     Eigen::Translation<float, 4> T(Eigen::Vector4f(0.0, 0.0, -1.0, 0.0));

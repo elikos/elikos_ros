@@ -5,7 +5,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include "CameraInfo.h"
 
 #include <ros/time.h>
 #include <tf/transform_listener.h>
@@ -13,13 +12,16 @@
 
 #include <Eigen/Core>
 
+#include "CameraInfo.h"
+#include "QuadState.h"
+
 namespace localization
 {
 
 class PreProcessing
 {
 public:
-    PreProcessing(const CameraInfo& cameraInfo);
+    PreProcessing(const CameraInfo& cameraInfo, const QuadState& state);
     ~PreProcessing() = default;
 
     void preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed);
@@ -39,6 +41,7 @@ private:
     tf::TransformBroadcaster tfPub_;
 
     const CameraInfo& cameraInfo_;
+    const QuadState& state_;
 
     double blurSigma = 0.0;
     int whiteThreshold_ = 149;

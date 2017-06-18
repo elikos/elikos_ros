@@ -15,8 +15,8 @@ namespace localization {
 
 using Vector = Eigen::Vector2f;
 
-ImageProcessor::ImageProcessor(const CameraInfo& cameraInfo, QuadState* state)
-    : preProcessing_(cameraInfo), intersectionTransform_(320.25, state)
+ImageProcessor::ImageProcessor(const CameraInfo& cameraInfo, const QuadState& state)
+    : preProcessing_(cameraInfo, state), intersectionTransform_(cameraInfo, state)
 {
     srand(time(NULL));
     // Init undistortion map

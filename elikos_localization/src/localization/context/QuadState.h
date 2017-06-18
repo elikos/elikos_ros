@@ -4,6 +4,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "tf/tf.h"
+
 namespace localization
 {
 
@@ -14,19 +16,9 @@ public:
     QuadState() = default;
     ~QuadState() = default;
 
-    Eigen::Vector3f position_;
-    Eigen::Vector3f velocity_;
-    Eigen::Vector3f linearAcceleration_;
+    tf::StampedTransform origin2fcu;
+    tf::StampedTransform fcu2camera;
 
-    Eigen::Matrix3f positionCovariance_;
-    Eigen::Matrix3f velocityCovariance_;
-    Eigen::Matrix3f linearAccelerationCovariance_;
-
-    Eigen::Quaternionf orientation_;
-    Eigen::Vector3f angularVelocity_;
-
-    Eigen::Matrix3f orientationCovariance_;
-    Eigen::Matrix3f angularVelocityCovariance_;
 };
 
 }

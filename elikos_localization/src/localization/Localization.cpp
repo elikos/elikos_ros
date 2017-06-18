@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
     }
 
     localization::QuadState state;
-    localization::ImageProcessor processor(cameraInfo, &state);
-    localization::MessageHandler msgHdl(cameraInfo, &state, &processor);
+    localization::ImageProcessor processor(cameraInfo, state);
+    localization::MessageHandler msgHdl(cameraInfo, state, &processor);
 
     msgHdl.lookForMessages();
 

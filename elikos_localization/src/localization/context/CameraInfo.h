@@ -3,11 +3,19 @@
 
 #include <string>
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 class CameraInfo
 {
 public:
     std::string frame;
     std::string topic;
+
+    double hfov;
+    double vfov;
+    double height;
+    double width;
+    double focalLength;
 
     CameraInfo() = default;
     ~CameraInfo() = default;

@@ -29,7 +29,7 @@ class ImageProcessor
 {
 public:
 
-    ImageProcessor(const CameraInfo& cameraInfo, QuadState* state);
+    ImageProcessor(const CameraInfo& cameraInfo, const QuadState& state);
     ~ImageProcessor();
 
     void processImage(cv::Mat& input, const ros::Time& stamp);
