@@ -9,6 +9,7 @@
 
 #include <ros/time.h>
 #include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
 
 #include <Eigen/Core>
 
@@ -22,7 +23,7 @@ public:
     ~PreProcessing() = default;
 
     void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed);
-    void removePerspective(const cv::Mat& input, cv::Mat& rectified) const;
+    void removePerspective(const cv::Mat& input, cv::Mat& rectified);
     void showCalibTrackBars();
 
     Eigen::Vector2f translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const;
@@ -35,6 +36,7 @@ private:
     Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength, double height, double length) const;
 
     tf::TransformListener tfListener_;
+    tf::TransformBroadcaster tfPub_;
 
     const CameraInfo& cameraInfo_;
 
