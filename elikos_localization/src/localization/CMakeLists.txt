@@ -41,6 +41,8 @@ add_executable(elikos_localization
     context/line/Line.h
     context/line/LineGroup.cpp
     context/line/LineGroup.h
+    context/CameraInfo.h
+    context/CameraInfo.cpp
     context/Grid.h
     context/Grid.cpp)
 

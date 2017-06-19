@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "CameraInfo.h"
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
@@ -23,7 +25,7 @@ class IntersectionTransform
 {
 public:
 
-    IntersectionTransform(double focalLength, QuadState* state);
+    IntersectionTransform(const CameraInfo& cameraInfo, const QuadState& state);
     ~IntersectionTransform() = default;
 
     void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections, const ros::Time& stamp);
@@ -38,9 +40,8 @@ private:
     void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, Eigen::Vector3f& intersection) const;
     void publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections, const ros::Time& stamp) const;
 
-
-    const double focalLength_;
-    QuadState* const state_;
+    const CameraInfo& cameraInfo_;
+    const QuadState& state_;
 
     pcl::KdTreeFLANN<pcl::PointXY> kdTree_;
     pcl::PointCloud<pcl::PointXY>::Ptr pointCloud_;

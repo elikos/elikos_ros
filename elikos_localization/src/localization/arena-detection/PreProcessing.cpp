@@ -11,7 +11,8 @@
 namespace localization 
 {
 
-PreProcessing::PreProcessing()
+PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& state)
+    : cameraInfo_(cameraInfo), state_(state)
 {
     cv::Mat distortedCamera = (cv::Mat_<float>(3,3) << 422.918640,    0.000000,    350.119451,
             0.000000,  423.121112,    236.380265,
@@ -29,7 +30,7 @@ PreProcessing::PreProcessing()
     cv::createTrackbar("undistort type", "PreProcessed", &undistortType_, 1);
 }
 
-void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed)
+void PreProcessing::preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed)
 {
 
     /*
@@ -52,7 +53,9 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     cv::Mat typeConverted;
     if (raw.type() != CV_8UC1) {
         cv::cvtColor(raw, typeConverted, CV_BGR2GRAY);
-    } else {
+    }
+    else 
+    {
         raw.copyTo(typeConverted);
     }
 
@@ -82,30 +85,27 @@ void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, 
     cv::imshow("PreProcessed", preProcessed);
 }
 
-void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) const
+void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
 {
     double roll, pitch, yaw = 0.0;
-    Eigen::Vector3f direction;
-    try {
-        tf::StampedTransform tf;
-        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
 
-        tf::Matrix3x3 m(tf.getRotation());
-        m.getRPY(roll, pitch, yaw);
+    tf::Quaternion q = tf::Quaternion::getIdentity();
+    q.setRPY(CV_PI, 0.0, 0.0);
+    tf::Transform z2x(q);
 
-        tf::Vector3 v = m * tf::Vector3(0.0, 0.0, 1.0);
-        direction.x() = v.x();
-        direction.y() = v.y();
-        direction.z() = v.z();
+    tf::Transform debug = state_.origin2fcu * state_.fcu2camera * z2x;
 
-    } catch (tf::TransformException e) {
-         ROS_ERROR("%s", e.what());
+    tf::Matrix3x3 n(debug.getRotation());
+    n.getRPY(roll, pitch, yaw);
+    tfPub_.sendTransform(tf::StampedTransform(debug, ros::Time::now(), "elikos_arena_origin", "debug"));        
+
+    Eigen::Matrix3f r = (Eigen::AngleAxisf(roll,   Eigen::Vector3f::UnitX()) * 
+                         Eigen::AngleAxisf(-pitch,  Eigen::Vector3f::UnitY()) *
+                         Eigen::AngleAxisf(0.0, Eigen::Vector3f::UnitZ())).toRotationMatrix();
+
+    if (pitch > CV_PI / 6.0) {
+        int i = 0;
     }
-    pitch -= CV_PI / 2.0  - 0.4712;
-    
-
-    Eigen::Matrix3f r = (Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitX()) * 
-                         Eigen::AngleAxisf(-roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
                             
     Eigen::Matrix4f R = Eigen::Matrix4f::Zero();
     R(3, 3) = 1;
@@ -119,9 +119,9 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
 
     double height = input.size().height;
     double width = input.size().width;
-    double f = 320.25;
-    double HFOV = std::atan( width / (2 * f));
-    double VFOV = std::atan( height / (2 * f));
+    double f = cameraInfo_.focalLength;
+    double HFOV = cameraInfo_.hfov;
+    double VFOV = cameraInfo_.vfov;
 
     Eigen::Vector4f src[4] { Eigen::Vector4f( 1.0,  1.0, 0.0, 1.0), 
                              Eigen::Vector4f(-1.0,  1.0, 0.0, 1.0), 
@@ -133,7 +133,10 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
                              Eigen::Vector4f(-1.0, -1.0, 0.0, 1.0), 
                              Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
    
-    float S = std::cos(pitch);
+
+    Eigen::Vector4f test(0.0, 0.0, 1.0, 0.0);
+    test = R * test;
+    float S = std::cos(std::atan(std::sqrt(test.x() * test.x() + test.y() * test.y()) / test.z()));
 
     Eigen::Matrix4f P = getPerspectiveProjectionTransform(f, width, height); 
     Eigen::Translation<float, 4> T(Eigen::Vector4f(0.0, 0.0, -1.0, 0.0));
@@ -169,7 +172,9 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
     for (int i = 0; i < 4; ++i) 
     {
         cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
-        cv::circle(rectified, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
+        cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
+        cv::circle(input, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
+        cv::circle(input, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
     }
 }
 

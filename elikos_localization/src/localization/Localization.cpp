@@ -4,6 +4,8 @@
 
 #include <ros/ros.h>
 
+#include "CameraInfo.h"
+
 #include "QuadState.h"
 #include "ImageProcessor.h"
 #include "MessageHandler.h"
@@ -12,9 +14,18 @@ int main(int argc, char* argv[])
 {
     ros::init(argc, argv, "elikos_localization");
 
+    CameraInfo cameraInfo;
+    std::string camera_name;
+    bool initSucceed = argc > 1;
+    if (argc > 1) 
+    {
+        camera_name = std::string(argv[1]);
+        cameraInfo.load(camera_name);
+    }
+
     localization::QuadState state;
-    localization::ImageProcessor processor(&state);
-    localization::MessageHandler msgHdl(&state, &processor);
+    localization::ImageProcessor processor(cameraInfo, state);
+    localization::MessageHandler msgHdl(cameraInfo, state, &processor);
 
     msgHdl.lookForMessages();
 

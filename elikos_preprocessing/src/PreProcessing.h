@@ -19,37 +19,27 @@ public:
     PreProcessing();
     ~PreProcessing() = default;
 
-    void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& preProcessedBW);
-    void removePerspective(const cv::Mat& input, cv::Mat& rectified) const;
-    void showCalibTrackBars();
+    void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& inverseTransform);
+    cv::Mat removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const;
 
     Eigen::Vector2f translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const;
     Eigen::Vector2f rotate(const Eigen::Vector2f& v, double theta) const;
 
-    inline void setRollPitch(double roll, double pitch);
+    void setRollPitch(double roll, double pitch);
+    void setFocalLength(double focalLength);
 
 private:
 
     Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength, double height, double length) const;
 
     tf::TransformListener tfListener_;
+    ros::NodeHandle nh_;
 
-    double blurSigma = 0.0;
-    int whiteThreshold_ = 149;
-    int undistortType_ = 1;
-
-    cv::Mat distortionMap1_;
-    cv::Mat distortionMap2_;
-
+    double focalLength_ = 0;
     double roll_ = 0.0;
     double pitch_ = 0.0;
 };
 
-inline void PreProcessing::setRollPitch(double roll, double pitch)
-{
-    roll_ = roll;
-    pitch_ = pitch; 
-}
 
 }
 

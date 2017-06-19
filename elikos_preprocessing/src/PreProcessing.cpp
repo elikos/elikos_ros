@@ -12,63 +12,23 @@ namespace preprocessing
 
 PreProcessing::PreProcessing()
 {
-    cv::Mat distortedCamera = (cv::Mat_<float>(3,3) << 
-            422.918640,  0.000000,    350.119451,
-            0.000000,  423.121112,    236.380265,
-            0.000000,    0.000000,      1.000000);
-
-    cv::Mat cameraDistortion = (cv::Mat_<float>(1,5) << -0.321590, 0.089597, 0.001090, -0.000489, 0.000000);
-
-    cv::Mat undistortedCamera = cv::getOptimalNewCameraMatrix(distortedCamera, cameraDistortion, cv::Size(640, 480), 0);
-
-    cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
-                                cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
-
     cv::namedWindow("PreProcessed", 1);
-    cv::createTrackbar("white threshold", "PreProcessed", &whiteThreshold_, 255);
-    cv::createTrackbar("undistort type", "PreProcessed", &undistortType_, 1);
 }
 
-void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& preProcessedBW)
+void PreProcessing::preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed, cv::Mat& inverseTransform)
 {
-    //undistort
-    // Blur
-    cv::Mat typeConverted;
-    if (raw.type() != CV_8UC1) {
-        cv::cvtColor(raw, typeConverted, CV_BGR2GRAY);
-    } else {
-        raw.copyTo(typeConverted);
-    }
-
+    //L'image vient de image_proc
     cv::Mat undistorted = raw;
-    if (!undistortType_) {
-        cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
-    }
 
     cv::Mat perspective;
-    removePerspective(undistorted, perspective);
+    inverseTransform = removePerspective(undistorted, perspective, stamp);
 
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
     preProcessed = blured;
-
-    //cv::Mat eroded;
-    //cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-    //cv::erode(blured, eroded, element, cv::Point(0), 8);
-
-    if (raw.type() != CV_8UC1) {
-        cv::cvtColor(blured, typeConverted, CV_BGR2GRAY);
-    } else {
-        raw.copyTo(typeConverted);
-    }
-
-    cv::Mat thresholded;
-    cv::threshold(typeConverted, thresholded, whiteThreshold_, 255, CV_THRESH_BINARY);
-
-    preProcessedBW = thresholded;
 }
 
-void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) const
+cv::Mat PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified, const ros::Time& imageTime) const
 {
     double roll = 0.0;
     double pitch = 0.0;
@@ -76,7 +36,8 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
     Eigen::Vector3f direction;
     try {
         tf::StampedTransform tf;
-        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
+        tfListener_.waitForTransform("elikos_local_origin", "elikos_fcu", imageTime, ros::Duration(1.0));
+        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", imageTime, tf);
 
         tf::Matrix3x3 m(tf.getRotation());
         m.getRPY(roll, pitch, yaw);
@@ -91,7 +52,7 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
     }
 
     //pitch -= 1.5708;+
-    pitch -= 1.0996;
+    //pitch -= 1.0996;
 
     Eigen::Matrix3f r = (Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitX()) * 
                          Eigen::AngleAxisf(-roll,  Eigen::Vector3f::UnitY())).toRotationMatrix();
@@ -108,7 +69,7 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
 
     double height = input.size().height;
     double width = input.size().width;
-    double f = 423.0;
+    double f = focalLength_;
     double HFOV = std::atan( width / (2 * f));
     double VFOV = std::atan( height / (2 * f));
 
@@ -164,6 +125,7 @@ void PreProcessing::removePerspective(const cv::Mat& input, cv::Mat& rectified) 
         cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
         cv::circle(rectified, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
     }
+    return cv::getPerspectiveTransform(tDst, tSrc);
 }
 
 Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLength, double width, double height) const
@@ -174,11 +136,6 @@ Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLen
     m(3, 2) = -1;
 
     return m;
-}
-
-void PreProcessing::showCalibTrackBars()
-{
-
 }
 
 Eigen::Vector2f PreProcessing::translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const
@@ -196,6 +153,17 @@ Eigen::Vector2f PreProcessing::rotate(const Eigen::Vector2f& v, double theta) co
     rotated.y() = v.x() * sinTheta + v.y() * cosTheta;
 
     return rotated;
+}
+
+void PreProcessing::setRollPitch(double roll, double pitch)
+{
+    roll_ = roll;
+    pitch_ = pitch; 
+}
+
+void PreProcessing::setFocalLength(double focalLength)
+{
+    focalLength_ = focalLength;
 }
 
 }
