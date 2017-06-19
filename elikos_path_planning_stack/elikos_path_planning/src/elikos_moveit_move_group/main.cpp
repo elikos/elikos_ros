@@ -8,7 +8,9 @@ int main(int argc, char* argv[])
 
     ros::NodeHandle nh;
     ros::Publisher pub;
+    ros::Publisher debug_pub;
     pub = nh.advertise<elikos_ros::TrajectoryCmd>("elikos_trajectory", 1);
+    debug_pub = nh.advertise<geometry_msgs::Transform>("elikos_trajectory_debug", 1);
 
     //Asynchronous spinner to compute the motion plan
     ros::AsyncSpinner spinner(1);
@@ -34,6 +36,11 @@ int main(int argc, char* argv[])
             }
 
             pub.publish(traj_cmd);
+            if (traj_cmd.trajectory.points.size() > 0) {
+                if (traj_cmd.trajectory.points[0].transforms.size() > 0) {
+                    debug_pub.publish(traj_cmd.trajectory.points[0].transforms[0]);
+                }
+            }
         }
         ros::spinOnce();
         r.sleep();

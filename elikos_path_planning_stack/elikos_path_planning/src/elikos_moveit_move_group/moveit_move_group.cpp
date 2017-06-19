@@ -26,7 +26,6 @@ Moveit_move_group::~Moveit_move_group()
 
 trajectory_msgs::MultiDOFJointTrajectory Moveit_move_group::move(geometry_msgs::PoseStamped target)
 {
-
   std::vector<double> quad_variable_values;
 
   group_.getCurrentState()->copyJointGroupPositions(group_.getCurrentState()->getRobotModel()->getJointModelGroup(group_.getName()), quad_variable_values);
@@ -78,13 +77,18 @@ trajectory_msgs::MultiDOFJointTrajectory Moveit_move_group::move(geometry_msgs::
         ROS_ERROR("Computed time stamp on trajectory %s",success?"SUCCEDED":"FAILED");
 
         rt.getRobotTrajectoryMsg(trajectory_msg);
+        // publish trajectorycmd message on "elikos_trajectory".
+         //elikos_ros::trajectorycmd cmd;
+         //cmd.cmdcode = 0;
+         //cmd.trajectory = trajectory;
+         //pub_.publish(cmd);
         return trajectory_msg.multi_dof_joint_trajectory;
 
-        // Publish TrajectoryCmd message on "elikos_trajectory".
-        // elikos_ros::TrajectoryCmd cmd;
-        // cmd.cmdCode = 0;
-        // cmd.trajectory = trajectory;
-        // pub_.publish(cmd);
+        // publish trajectorycmd message on "elikos_trajectory".
+         //elikos_ros::trajectorycmd cmd;
+         //cmd.cmdcode = 0;
+         //cmd.trajectory = trajectory;
+         //pub_.publish(cmd);
       }
       else
       {
