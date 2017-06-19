@@ -18,21 +18,7 @@ namespace localization {
 MessageHandler::MessageHandler(QuadState* state, ImageProcessor* processor)
     : it_(nh_), state_(state), processor_(processor)
 {
-    ros::NodeHandle paramFetcher("~");
-
-    double focalLength;
-    std::string camName;
-    std::string outputFrameId;
-    if(!paramFetcher.getParam("focal_length", focalLength))
-        focalLength=400;
-    if(!paramFetcher.getParam("camera", camName))
-        camName="camera";
-    if(!paramFetcher.getParam("output_frame_id", outputFrameId))
-        outputFrameId="camera";
-    processor->setFocalLength(focalLength);
-    processor->setFrameId(outputFrameId);
-
-    imageSub_ = it_.subscribe("/" + camName + "/image_raw", 1, &MessageHandler::cameraCallback, this);
+    imageSub_ = it_.subscribe("/r200_front/image_raw", 1, &MessageHandler::cameraCallback, this);
     imuSub_ = nh_.subscribe("/mavros/imu/data", 1, &MessageHandler::imuCallback, this);
     poseSub_ = nh_.subscribe("/mavros/local_position/pose", 1, &MessageHandler::poseCallback, this);
 }

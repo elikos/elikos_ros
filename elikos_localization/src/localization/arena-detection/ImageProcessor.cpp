@@ -400,11 +400,4 @@ double resolveLineProximity(const Line& line, const Line& otherLine, double erro
     return std::abs((rectifiedRho - line.getRho()) / 800.0);
 }
 
-void ImageProcessor::setFocalLength(float f){
-    preProcessing_.setFocalLength(f);
-    //intersectionTransform_.setFocalLength(f);
-}
-void ImageProcessor::setFrameId(const std::string& frameId){
-    intersectionTransform_.frameId_ = frameId;
-}
 }

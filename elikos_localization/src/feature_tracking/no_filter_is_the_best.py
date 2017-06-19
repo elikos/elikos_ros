@@ -72,13 +72,6 @@ def match_points_2d(src, dst):
         matched_mesurement = np.append(matched_mesurement, np.array([[position]]), axis=1)
     return matched_estimation, matched_mesurement
 
-def compute_projection_tranlation(position, rotation):
-    """
-    Computes a translation of projection based on the given camera position and rotation
-    """
-    forward = quaternion.rotate_vectors(rotation, np.array([0,0,1]))
-    forward *= -position[2]/forward[2]
-    return np.array([forward[0], forward[1], 0])
 
 ###
 #
@@ -105,7 +98,6 @@ def input_mavros_speed(velocity):
 
     g_lock.release()
 
-
 def input_localization_points(point_array):
     """
     Ros callback for the points sent by the localization.
@@ -116,32 +108,19 @@ def input_localization_points(point_array):
 
     camera_points = np.empty((len(point_array.poses), 3))
     for i, pose in enumerate(point_array.poses):
-        camera_points[i, 0] = -pose.position.y
-        camera_points[i, 1] = -pose.position.x
-        camera_points[i, 2] = -pose.position.z
+        camera_points[i, 0] = pose.position.x
+        camera_points[i, 1] = pose.position.y
+        camera_points[i, 2] = pose.position.z
 
-    (trans,rot) = g_tf_listener.lookupTransform(g_frames["arena_center_frame_id"], camera_frame, rospy.Time())
+    (trans,rot) = g_tf_listener.lookupTransform(camera_frame, g_frames["arena_center_frame_id"], rospy.Time())
 
-    _, _, yaw = tf.transformations.euler_from_quaternion(rot)
-
-    #print camera_points[0][2]
-    camera_points += np.array([trans[0], trans[1], trans[2]])
-    camera_points = quaternion.rotate_vectors(quaternion.from_euler_angles(0, 0, yaw), camera_points)
-
-    trans_projection = compute_projection_tranlation(np.array(trans), quaternion.quaternion(rot[3], rot[0], rot[1], rot[2]))
-    camera_points += trans_projection
-    print trans_projection
-
-
-    tmp_publish(camera_points)
+    camera_points -= trans
+    camera_points = quaternion.rotate_vectors(quaternion.quaternion(rot[3], rot[0], rot[1], rot[2]), camera_points)
 
     mask = np.ones(3, dtype=np.bool)
     mask[2] = False
 
     matched_src, matched_dts = match_points_2d(g_arena_points[:, mask], camera_points[:, mask])
-
-    matched_src -= np.array([[trans[:2]]])
-    matched_dts -= np.array([[trans[:2]]])
     
     transform = cv2.estimateRigidTransform(matched_src.astype(np.float32), matched_dts.astype(np.float32), False)
 
@@ -163,6 +142,8 @@ def input_localization_points(point_array):
     dx = transform[0, 2]
     dy = transform[1, 2]
 
+    tmp_publish(camera_points)
+
     
     (trans,rot) = g_tf_listener.lookupTransform(g_frames["arena_center_frame_id"], g_frames["fcu_frame_id"], rospy.Time())
     
@@ -171,7 +152,7 @@ def input_localization_points(point_array):
 
     final_rot = delta_rot * rot
 
-    trans =  (trans[0] - dx, trans[1] - dy, trans[2] - camera_points[0, 2])
+    trans =  (trans[0] - dx, trans[1] - dy, trans[2] + camera_points[0, 2])
     g_tf_broadcaster.sendTransform(
         trans,
         (final_rot.x, final_rot.y, final_rot.z, final_rot.w),
@@ -216,13 +197,14 @@ def init_node():
     rospy.init_node("feature_tracking")
 
     #speed is from mavros vecause TF dosen't store that
-    topic_mavros_speed = rospy.get_param("~mavros_speed_topic", "/mavros/global_position/local")
-    topic_localization_points = rospy.get_param("~topic_input_points", "/localization/features")
+    topic_mavros_speed = rospy.get_param("mavros_speed_topic", "/mavros/global_position/local")
+    topic_localization_points = rospy.get_param("topic_localization_points", "/localization/features")
+    topic_publication_pose = rospy.get_param("topic_publication_pose", "/localization/drone_pose")
 
-    g_frames["arena_center_frame_id"] = rospy.get_param("~arena_center_frame_id", "elikos_arena_origin")
-    g_frames["base_link_frame_id"] = rospy.get_param("~base_link_frame_id", "elikos_base_link")
-    g_frames["fcu_frame_id"] = rospy.get_param("~fcu_frame_id", "elikos_fcu")
-    g_frames["output_position_fcu"] = rospy.get_param("~output_position_fcu_frame_id", "elikos_vision")
+    g_frames["arena_center_frame_id"] = rospy.get_param("arena_center_frame_id", "elikos_arena_origin")
+    g_frames["base_link_frame_id"] = rospy.get_param("arena_center_frame_id", "elikos_base_link")
+    g_frames["fcu_frame_id"] = rospy.get_param("arena_center_frame_id", "elikos_fcu")
+    g_frames["output_position_fcu"] = rospy.get_param("output_position_fcu_frame_id", "elikos_vision")
 
     g_tf_listener = tf.TransformListener()
     g_tf_broadcaster = tf.TransformBroadcaster()
