@@ -1,8 +1,10 @@
+#include <iostream>
+
+#include <geometry_msgs/Point.h>
+
 #include "QuadState.h"
 
 #include "IntersectionTransform.h"
-
-#include <iostream>
 
 namespace localization {
 
@@ -10,6 +12,9 @@ IntersectionTransform::IntersectionTransform(double focalLength, QuadState* stat
     : focalLength_(focalLength), state_(state), pointCloud_(new pcl::PointCloud<pcl::PointXY>())
 {
     // TODO: Set epsilon for kdtree here maybe ? ...
+    ros::NodeHandle nh;
+
+    intersectionPub_ = nh.advertise<elikos_ros::IntersectionArray>("intersections", 1);
 }
 
 
@@ -45,7 +50,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     }
 
     std::cout << smallest.x() << ":" << smallest.y() << ":" << smallest.z() << std::endl;
-    publishTransformedIntersections(transformedIntersections);
+    publishTransformedIntersections(imageIntersections, transformedIntersections);
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
@@ -94,8 +99,29 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
     transformedIntersection.y() = (imageIntersection.y() - 240.0) * transformCoefficient;
 }
 
-void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const
+void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
+                                                            const std::vector<Eigen::Vector3f>& transformedIntersections) const
 {
+    if (imageIntersections.size() == transformedIntersections.size()) 
+    {
+        elikos_ros::IntersectionArray msg;
+        // TODO: Use the stamp from the image.
+        msg.header.stamp = ros::Time::now();
+
+        for (int i = 0; i < imageIntersections.size(); ++i) 
+        {
+            elikos_ros::Intersection intersection;
+            intersection.imagePosition.x = imageIntersections[i].x();
+            intersection.imagePosition.y = imageIntersections[i].y();
+
+            intersection.arenaPosition.x = transformedIntersections[i].x();
+            intersection.arenaPosition.y = transformedIntersections[i].y();
+            intersection.arenaPosition.z = transformedIntersections[i].z();
+
+            msg.intersections.push_back(intersection);
+        }
+        intersectionPub_.publish(msg);
+    }
 }
 
 }

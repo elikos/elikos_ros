@@ -10,6 +10,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
+#include <ros/ros.h>
+
 #include <elikos_ros/Intersection.h>
 #include <elikos_ros/IntersectionArray.h>
 
@@ -35,8 +37,10 @@ private:
     void updateKDTree(const std::vector<Eigen::Vector2f>& imageIntersections);
     double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
     void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, Eigen::Vector3f& intersection) const;
-    void publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const;
+    void publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
+                                         const std::vector<Eigen::Vector3f>& TransformedIntersections) const;
 
+    ros::Publisher intersectionPub_;
 
     const double focalLength_;
     QuadState* const state_;
