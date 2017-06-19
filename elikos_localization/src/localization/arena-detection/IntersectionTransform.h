@@ -10,6 +10,9 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
+#include <elikos_ros/Intersection.h>
+#include <elikos_ros/IntersectionArray.h>
+
 namespace localization
 {
 
