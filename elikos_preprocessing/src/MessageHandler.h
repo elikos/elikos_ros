@@ -8,8 +8,7 @@
 #include <ros/ros.h>
 
 #include <image_transport/image_transport.h>
-#include <sensor_msgs/Imu.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <elikos_ros/StampedMatrix3.h>
 #include "PreProcessing.h"
 
 namespace preprocessing {
@@ -17,36 +16,24 @@ namespace preprocessing {
 class MessageHandler
 {
 public:
-    static MessageHandler* getInstance();
-    static void freeInstance();
-
-    void lookForMessages();
+    MessageHandler(const ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodeHandle);
+    ~MessageHandler();
 
 private:
 
-    std::string IMG_RCV_TOPIC;
-    std::string IMG_PUB_TOPIC;
-    
-    MessageHandler();
-    ~MessageHandler();
+    void cameraCallback(const sensor_msgs::ImageConstPtr& msg, const sensor_msgs::CameraInfoConstPtr& info_msg);
 
-    void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
-    void imuCallback(const sensor_msgs::Imu& msg);
-    void poseCallback(const geometry_msgs::PoseStamped& msg);
-
-    static MessageHandler* instance_;
     ros::NodeHandle nh_;
+    ros::NodeHandle privateNh_;
 
     image_transport::ImageTransport it_;
-    image_transport::Subscriber imageSub_;
+    image_transport::CameraSubscriber imageSub_;
 
-    ros::Subscriber imuSub_;
-    ros::Subscriber poseSub_;
+    image_transport::Publisher preprocessedPub_;
+    ros::Publisher inverseTransformPub_;
 
     PreProcessing preProcessing_;
 
-    image_transport::Publisher preprocessedPub_;
-    image_transport::Publisher bwPreprocessedPub_;
 };
 
 }
