@@ -69,8 +69,6 @@ private:
     ros::Time start_;
     std::ofstream file_;
 
-    const QuadState* state_;
-
     void preProcess(const cv::Mat& raw, cv::Mat& preProcessed);
     void findEdges(const cv::Mat& src, cv::Mat& edges);
     void findLines(const cv::Mat& edges, cv::Mat& line);

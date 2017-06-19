@@ -18,7 +18,6 @@ using Vector = Eigen::Vector2f;
 ImageProcessor::ImageProcessor(QuadState* state)
     : intersectionTransform_(320.25, state)
 {
-    state_ = state;
     srand(time(NULL));
     // Init undistortion map
     start_ = ros::Time::now();

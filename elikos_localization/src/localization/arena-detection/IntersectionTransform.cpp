@@ -29,7 +29,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     if (imageIntersections.size() < 1) return;
 
     updateKDTree(imageIntersections);
-    double z = estimateAltitude(imageIntersections);//La caméra pointe vers le bas?
+    double z = -estimateAltitude(imageIntersections);
 
     Eigen::Vector3f smallest(10.0, 10.0, 10.0);
 
