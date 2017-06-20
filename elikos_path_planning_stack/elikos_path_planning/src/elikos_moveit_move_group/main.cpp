@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
             elikos_ros::AICmd ai_cmd = messageHandler.getAICmd();
             elikos_ros::TrajectoryCmd traj_cmd;
             traj_cmd.cmdCode = ai_cmd.cmdCode;
+            traj_cmd.destination = ai_cmd.pose.pose;
 
             if (ai_cmd.cmdCode == CmdCode::MOVE_TO_POINT)
             {
