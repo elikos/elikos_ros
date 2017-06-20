@@ -12,6 +12,10 @@ namespace ai
 ResearchBehavior::ResearchBehavior(AbstractArena* arena)
     : AbstractBehavior(arena)
 {
+   ros::NodeHandle nh;
+   double takeoff_altitude;
+   nh.getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);
+   q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), {  0.0,  0.0, takeoff_altitude })));
 }
 
 ResearchBehavior::~ResearchBehavior()

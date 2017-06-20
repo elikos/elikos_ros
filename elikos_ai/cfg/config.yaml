@@ -1,5 +1,6 @@
 dimension_c: 3
 research_altitude: 2
+takeoff_altitude: 2
 edge_tolerance: 0.5
 research_enabled: true
 aggressive_enabled: false
