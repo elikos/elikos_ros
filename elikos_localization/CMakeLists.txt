@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   cv_bridge
   geometry_msgs
+  elikos_ros
   nav_msgs
   image_transport
   roscpp
@@ -21,7 +22,7 @@ find_package(OpenCV 2 REQUIRED)
 find_package(Eigen REQUIRED)
 
 catkin_package(
-  CATKIN_DEPENDS image_transport cv_bridge geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros
+  CATKIN_DEPENDS image_transport cv_bridge elikos_ros geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros
 )
 
 add_subdirectory(src/localization)

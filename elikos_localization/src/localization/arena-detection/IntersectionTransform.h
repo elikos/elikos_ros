@@ -12,6 +12,11 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
+#include <ros/ros.h>
+
+#include <elikos_ros/Intersection.h>
+#include <elikos_ros/IntersectionArray.h>
+
 namespace localization
 {
 
@@ -33,11 +38,13 @@ private:
 
     void updateKDTree(const std::vector<Eigen::Vector2f>& imageIntersections);
     double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
-    void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, Eigen::Vector3f& intersection) const;
-    void publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const;
+    void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, Eigen::Vector3f& intersection, Eigen::Vector3f& offset) const;
+    void publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
+                                         const std::vector<Eigen::Vector3f>& TransformedIntersections) const;
 
     const CameraInfo& cameraInfo_;
     const QuadState& state_;
+    ros::Publisher intersectionPub_;
 
     pcl::KdTreeFLANN<pcl::PointXY> kdTree_;
     pcl::PointCloud<pcl::PointXY>::Ptr pointCloud_;

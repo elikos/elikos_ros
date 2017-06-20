@@ -1,11 +1,11 @@
 #include <iostream>
 
 #include "tf/tf.h"
+#include <geometry_msgs/Point.h>
 
 #include "QuadState.h"
 
 #include "IntersectionTransform.h"
-
 
 namespace localization {
 
@@ -13,6 +13,9 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     : cameraInfo_(cameraInfo), state_(state), pointCloud_(new pcl::PointCloud<pcl::PointXY>())
 {
     // TODO: Set epsilon for kdtree here maybe ? ...
+    ros::NodeHandle nh;
+
+    intersectionPub_ = nh.advertise<elikos_ros::IntersectionArray>("intersections", 1);
 }
 
 
@@ -33,15 +36,21 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     updateKDTree(imageIntersections);
     double z = -estimateAltitude(imageIntersections);
 
+    tf::Vector3 cameraDirection(0.0, 0.0, 1.0);
+    cameraDirection =  state_.origin2fcu * state_.fcu2camera * cameraDirection;
+
+    tf::Vector3 height(0.0, 0.0, -z);
+
+    tf::Vector3 offset = cameraDirection * height.length() / (cameraDirection * tf::Vector3(0.0, 0.0, -1.0)) + height - state_.fcu2camera.getOrigin();
+    Eigen::Vector3f cameraOffset(offset.x(), offset.y(), offset.z());
+
     Eigen::Vector3f smallest(10.0, 10.0, 10.0);
 
     std::vector<Eigen::Vector3f> transformedIntersections;
     for (int i = 0; i < imageIntersections.size(); ++i)
     {
         Eigen::Vector3f transformedIntersection(0.0, 0.0, z);
-        transformIntersectionXY(imageIntersections[i], transformedIntersection);
-
-
+        transformIntersectionXY(imageIntersections[i], transformedIntersection, cameraOffset);
 
         if (transformedIntersection.norm() < smallest.norm())
         {
@@ -50,8 +59,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
         transformedIntersections.push_back(std::move(transformedIntersection));
     }
 
-    std::cout << smallest.x() << ":" << smallest.y() << ":" << smallest.z() << std::endl;
-    publishTransformedIntersections(transformedIntersections);
+    publishTransformedIntersections(imageIntersections, transformedIntersections);
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
@@ -96,16 +104,38 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
 }
 
 void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& imageIntersection, 
-                                                    Eigen::Vector3f& transformedIntersection) const
+                                                    Eigen::Vector3f& transformedIntersection,
+                                                    Eigen::Vector3f& cameraDirectionOffset) const
 {
     double transformCoefficient = std::abs(transformedIntersection.z()) / cameraInfo_.focalLength;
     transformedIntersection.x() = (imageIntersection.x() - 320.0) * transformCoefficient;
     transformedIntersection.y() = (imageIntersection.y() - 240.0) * transformCoefficient;
-
+    transformedIntersection += cameraDirectionOffset;
 }
 
-void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector3f>& intersections) const
+void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
+                                                            const std::vector<Eigen::Vector3f>& transformedIntersections) const
 {
+    if (imageIntersections.size() == transformedIntersections.size()) 
+    {
+        elikos_ros::IntersectionArray msg;
+        // TODO: Use the stamp from the image.
+        msg.header.stamp = ros::Time::now();
+
+        for (int i = 0; i < imageIntersections.size(); ++i) 
+        {
+            elikos_ros::Intersection intersection;
+            intersection.imagePosition.x = imageIntersections[i].x();
+            intersection.imagePosition.y = imageIntersections[i].y();
+
+            intersection.arenaPosition.x = transformedIntersections[i].x();
+            intersection.arenaPosition.y = transformedIntersections[i].y();
+            intersection.arenaPosition.z = transformedIntersections[i].z();
+
+            msg.intersections.push_back(intersection);
+        }
+        intersectionPub_.publish(msg);
+    }
 }
 
 }
