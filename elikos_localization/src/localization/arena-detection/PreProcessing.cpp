@@ -103,10 +103,6 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
                          Eigen::AngleAxisf(-pitch,  Eigen::Vector3f::UnitY()) *
                          Eigen::AngleAxisf(0.0, Eigen::Vector3f::UnitZ())).toRotationMatrix();
 
-    if (pitch > CV_PI / 6.0) {
-        int i = 0;
-    }
-                            
     Eigen::Matrix4f R = Eigen::Matrix4f::Zero();
     R(3, 3) = 1;
     for (int i = 0; i < 3; ++i) 
