@@ -34,7 +34,9 @@ set(COMMAND_SRC
     command/TopInteractionCommand.cpp
     command/TopInteractionCommand.h
     command/FrontInteractionCommand.cpp
-    command/FrontInteractionCommand.h)
+    command/FrontInteractionCommand.h
+    command/TakeOffCommand.cpp
+    command/TakeOffCommand.h)
 
 set(CONTEXT_SRC
     context/AbstractLine.cpp
