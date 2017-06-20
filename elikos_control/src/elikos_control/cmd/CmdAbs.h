@@ -33,7 +33,7 @@ public:
     inline int getId() const;
     inline void setTrajectory(trajectory_msgs::MultiDOFJointTrajectory cmdTraj);
     inline void setDestination(geometry_msgs::Pose cmdDest);
-    inline uint8_t getCmdCode();
+    inline int getCmdCode();
     inline PriorityLevel getCmdPriority();
 
 
@@ -81,9 +81,9 @@ inline void CmdAbs::setDestination(geometry_msgs::Pose cmdDest)
     cmdDestination_ = cmdDest;
 }
 
-inline uint8_t CmdAbs::getCmdCode()
+inline int CmdAbs::getCmdCode()
 {
-    return cmdCode_;
+    return (int) cmdCode_;
 }
 
 inline PriorityLevel CmdAbs::getCmdPriority()

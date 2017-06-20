@@ -33,9 +33,8 @@ void CmdTravel::execute()
 	tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
 	stepInTrajectory_ = 0;
 
-	while(!isAborted_ && stepInTrajectory_ < cmdTrajectory_.points.size()-1)
+	while(!isAborted_ && (stepInTrajectory_ < cmdTrajectory_.points.size()-1))
 	{
-
 		while(stepInTrajectory_ < cmdTrajectory_.points.size()-1)
 		{
 			geometry_msgs::Vector3 targetTranslation = cmdTrajectory_.points[stepInTrajectory_].transforms[0].translation;
@@ -68,6 +67,4 @@ void CmdTravel::abort()
 void CmdTravel::ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory)
 {
 	CmdAbs::setTrajectory(trajectory);
-
-
 }

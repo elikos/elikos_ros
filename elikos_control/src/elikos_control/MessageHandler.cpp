@@ -24,6 +24,6 @@ void MessageHandler::dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr& 
 	lastReceivedCmd_.cmdCode_ = input->cmdCode;
 	lastReceivedCmd_.cmdTrajectory_ = input->trajectory;
 	lastReceivedCmd_.cmdDestination_ = input->destination;
-	lastReceivedCmd_.id_ = lastCmdId_++;
+	lastReceivedCmd_.id_ = lastCmdId_++;	
 	cmdExecutor_.commandReceived(lastReceivedCmd_);
 }

@@ -52,7 +52,9 @@ void CmdExecutor::commandReceived(const CmdConfig& newCommand)
     pendingCmdLock_.lock();
     createCommand(newCommand);
     if (OrderToGive::ABORT == checkNextOrder())
+    {
         currentCmd_->abort();
+    }
     else if(OrderToGive::AJUST == checkNextOrder())
     {
         if (currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3 || currentCmd_->getCmdCode() == 4) // Robot interaction || travel
@@ -80,6 +82,7 @@ void CmdExecutor::createCommand(const CmdConfig& config)
         {
             pendingTrajectory_ = config.cmdTrajectory_;
         }
+        pendingCmd_->ajustement(pendingDestination_, pendingTrajectory_);
     }
 }  
 
