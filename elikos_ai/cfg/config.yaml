@@ -6,3 +6,4 @@ research_enabled: true
 aggressive_enabled: false
 preventive_enabled: false
 simulation: false
+max_altitude: 3

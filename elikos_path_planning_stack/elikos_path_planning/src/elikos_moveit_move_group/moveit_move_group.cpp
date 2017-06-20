@@ -11,8 +11,14 @@ Moveit_move_group::Moveit_move_group():
   //move_group settings
   group_.setPlanningTime(1.0);//In seconds
 
+
+  ros::NodeHandle nh;
+  double dimension_c = 5;
+  nh.getParam("/elikos_ai/dimension_c", dimension_c);
+  double max_altitude = 3;
+  nh.getParam("/elikos_ai/max_altitude", max_altitude);
   //The workspace represents the boundaries of the planning volume.
-  group_.setWorkspace(-10,-10,0,10,10,3);
+  group_.setWorkspace(-dimension_c/2,-dimension_c/2,0,dimension_c/2,dimension_c/2,max_altitude);
 
   group_.allowReplanning(true);
 
@@ -74,21 +80,9 @@ trajectory_msgs::MultiDOFJointTrajectory Moveit_move_group::move(geometry_msgs::
         trajectory_processing::IterativeParabolicTimeParameterization iptp;
 
         bool success = iptp.computeTimeStamps(rt);
-        ROS_ERROR("Computed time stamp on trajectory %s",success?"SUCCEDED":"FAILED");
 
         rt.getRobotTrajectoryMsg(trajectory_msg);
-        // publish trajectorycmd message on "elikos_trajectory".
-         //elikos_ros::trajectorycmd cmd;
-         //cmd.cmdcode = 0;
-         //cmd.trajectory = trajectory;
-         //pub_.publish(cmd);
         return trajectory_msg.multi_dof_joint_trajectory;
-
-        // publish trajectorycmd message on "elikos_trajectory".
-         //elikos_ros::trajectorycmd cmd;
-         //cmd.cmdcode = 0;
-         //cmd.trajectory = trajectory;
-         //pub_.publish(cmd);
       }
       else
       {
