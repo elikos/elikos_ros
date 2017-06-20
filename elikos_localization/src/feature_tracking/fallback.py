@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-u
 u"""
-Je me suis finalement rendu compte qu'on n'avais PAS besoin de filtre!
-HA Ha ha ha   ha     ha    ...
+Fallback du merge des points.
 """
 import threading
 import math
@@ -19,20 +18,10 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseArray
 from std_msgs.msg import Header
+import elikos_ros.msg as elikos_ros
 
-###
-#
-# Classes
-#
-###
+import message_interface as msgs
 
-class Twist(object):
-    def __init__(self,
-                 initial_linear_velocity=np.array([0., 0, 0]),
-                 initial_angular_velocity=np.array([0., 0, 0])):
-        self.linear = initial_linear_velocity
-        self.angular = initial_angular_velocity
-        self.last_set_time = 0
 
 ###
 #
@@ -80,29 +69,11 @@ def match_points_2d(src, dst):
 ###
 
 #callbacks
-def input_mavros_speed(velocity):
-    """
-    Ros callback for the mavros message.
-    """
-    global g_quad_twist, g_lock
-
-    g_lock.acquire()
-
-    g_quad_twist.linear[0] = velocity.twist.twist.linear.x
-    g_quad_twist.linear[1] = velocity.twist.twist.linear.y
-    g_quad_twist.linear[2] = velocity.twist.twist.linear.z
-
-    g_quad_twist.angular[0] = velocity.twist.twist.angular.x
-    g_quad_twist.angular[1] = velocity.twist.twist.angular.y
-    g_quad_twist.angular[2] = velocity.twist.twist.angular.z
-
-    g_lock.release()
-
-def input_localization_points(point_array):
+def input_localization_points_point_array(point_array):
     """
     Ros callback for the points sent by the localization.
     """
-    global g_lock, g_tf_listener, g_arena_points, g_quad_twist, g_frames
+    global g_tf_listener
 
     camera_frame = point_array.header.frame_id
 
@@ -112,55 +83,73 @@ def input_localization_points(point_array):
         camera_points[i, 1] = pose.position.y
         camera_points[i, 2] = pose.position.z
 
-    (trans,rot) = g_tf_listener.lookupTransform(camera_frame, g_frames["arena_center_frame_id"], rospy.Time())
+    localize_drone(camera_points, camera_frame, point_array.header.stamp)
 
-    camera_points -= trans
-    camera_points = quaternion.rotate_vectors(quaternion.quaternion(rot[3], rot[0], rot[1], rot[2]), camera_points)
+
+def input_localization_points(localization_msg):
+    #type: (elikos_ros.IntersectionArray)->None
+
+    points_image, points_arena = msgs.deserialize_intersections(localization_msg)
+    stamp = localization_msg.header.stamp
+    frame = localization_msg.header.frame_id
+
+    localize_drone(points_arena, frame, stamp)
+
+
+def localize_drone(input_points_3d, input_points_frame, frame_time):
+    # type: (np.ndarray, str, rospy.Time)->None
+
+    global g_tf_listener, g_frames, g_tf_broadcaster
+
+    g_tf_listener.waitForTransform(input_points_frame, g_frames["arena_center_frame_id"], frame_time, rospy.Duration(3.0))
+    (trans, rot) = g_tf_listener.lookupTransform(input_points_frame, g_frames["arena_center_frame_id"], frame_time)
+
+    input_points_3d -= trans
+    input_points_3d = quaternion.rotate_vectors(quaternion.quaternion(rot[3], rot[0], rot[1], rot[2]), input_points_3d)
 
     mask = np.ones(3, dtype=np.bool)
     mask[2] = False
 
-    matched_src, matched_dts = match_points_2d(g_arena_points[:, mask], camera_points[:, mask])
-    
+    matched_src, matched_dts = match_points_2d(g_arena_points[:, mask], input_points_3d[:, mask])
+
     transform = cv2.estimateRigidTransform(matched_src.astype(np.float32), matched_dts.astype(np.float32), False)
 
     if transform is None:
         rospy.logwarn("The transformation was null! Skipping message.")
         return
 
-    angle_delta = math.atan2(transform[0,0], transform[1,0])
+    angle_delta = math.atan2(transform[0, 0], transform[1, 0])
     if angle_delta > 3 * math.pi / 4:
         angle_delta -= math.pi
     elif angle_delta > math.pi / 4:
         angle_delta -= math.pi / 2
     elif angle_delta < - 3 * math.pi / 4:
-        angle_delta +=math.pi
+        angle_delta += math.pi
     elif angle_delta < - math.pi / 4:
         angle_delta += math.pi / 2
-    
-    scale = math.sqrt(transform[0,0]**2 + transform[1,0] ** 2)
+
+    scale = math.sqrt(transform[0, 0] ** 2 + transform[1, 0] ** 2)
     dx = transform[0, 2]
     dy = transform[1, 2]
 
-    tmp_publish(camera_points)
+    tmp_publish(input_points_3d)
 
-    
-    (trans,rot) = g_tf_listener.lookupTransform(g_frames["arena_center_frame_id"], g_frames["fcu_frame_id"], rospy.Time())
-    
+    (trans, rot) = g_tf_listener.lookupTransform(g_frames["arena_center_frame_id"], g_frames["fcu_frame_id"],
+                                                 rospy.Time())
+
     delta_rot = quaternion.from_euler_angles(0, 0, angle_delta)
     rot = quaternion.quaternion(rot[3], rot[0], rot[1], rot[2])
 
     final_rot = delta_rot * rot
 
-    trans =  (trans[0] - dx, trans[1] - dy, trans[2] + camera_points[0, 2])
+    trans = (trans[0] - dx, trans[1] - dy, trans[2] + input_points_3d[0, 2])
     g_tf_broadcaster.sendTransform(
         trans,
         (final_rot.x, final_rot.y, final_rot.z, final_rot.w),
-        rospy.Time.now(),
+        rospy.Time.frame_time(),
         g_frames["output_position_fcu"],
         g_frames["arena_center_frame_id"]
     )
-
 
 
 def tmp_publish(camera_points):
@@ -212,8 +201,7 @@ def init_node():
     #wait for tf
     g_tf_listener.waitForTransform(g_frames["arena_center_frame_id"], g_frames["base_link_frame_id"], rospy.Time(), rospy.Duration(1))
 
-    rospy.Subscriber(topic_mavros_speed, Odometry, callback=input_mavros_speed)
-    rospy.Subscriber(topic_localization_points, PoseArray, callback=input_localization_points)
+    rospy.Subscriber(topic_localization_points, elikos_ros.IntersectionArray, callback=input_localization_points)
 
 
     g_pub_dbg = rospy.Publisher("/localization/features_debug", PoseArray, queue_size=10)
@@ -224,11 +212,9 @@ def init_node():
 # Globals
 #
 ###
-g_lock = threading.Lock()
 g_tf_listener = None
 g_tf_broadcaster = None
 
-g_quad_twist = Twist()
 g_arena_points = create_grid_mesh(side_points_number=21, side_mesure=20) - np.array([10, 10, 0])
 
 g_frames = {}

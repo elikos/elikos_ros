@@ -79,3 +79,40 @@ def create_3d_projection_matrix(plane):
         [0, 0, np.true_divide(1, plane), 0]
     ])
 
+
+
+
+
+##########
+#
+# OpenCV utils
+#
+##########
+
+def prepare_points_for_cv(input_points):
+    # type: (np.ndarray)->np.ndarray
+    u"""
+    Takes an array of shape (x, n), of x n-dimentional points,
+     and transforms it into an array of shape (x, 1, n), the
+     shape that is used by openCV. If the points are floats,
+     makes them float32 (again, this is for openCv to work)
+    :param input_points: an array of shape (x, n)
+    :return: an array of shape (x, 1, n)
+    """
+    if input_points.dtype == np.float:
+        input_points = input_points.astype(np.float32)
+    return np.ascontiguousarray(input_points).reshape(
+        (input_points.shape[0], 1, input_points.shape[-1])
+    )
+
+def unconvert_points_from_cv(input_points):
+    # type: (np.ndarray)->np.ndarray
+    u"""
+    Opposite of prepare_points_for_cv
+    :param input_points: an array of shape (x, 1, n)
+    :return: an array of shape (x, n)
+    """
+    return input_points.reshape(
+        (input_points.shape[0], input_points.shape[-1])
+    )
+

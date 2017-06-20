@@ -1,6 +1,6 @@
-<launch>  
-    <arg name="cfg" default="feature_tracking"/>
-	<node pkg="elikos_localization" type="better_tracking.py" name="feature_tracking" output="screen">
-        <rosparam command="load" file="$(find elikos_localization)/cfg/$(arg cfg).yaml" />
+<launch>
+	<node pkg="elikos_localization" type="fallback.py" name="feature_tracking" output="screen">
+        <remap from="localization/features" to="intersections"/>
+        <remap from="inverse_transform" to="elikos_ffmv_bottom_camera/image_preprocessed/inverse_transform"/>
 	</node>
 </launch>
