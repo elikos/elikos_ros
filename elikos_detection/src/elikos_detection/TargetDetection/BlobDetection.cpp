@@ -171,7 +171,7 @@ void BlobDetection::detectCircles(const cv::Mat& input, cv::Mat& output_w,
     vector<Vec3f> circles;
 
     tf::StampedTransform sTrans;
-    tfListener_.lookupTransform("local_origin", "fcu", ros::Time(0), sTrans);
+    tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), sTrans);
 
     cv::putText(output, "X: " + std::to_string(sTrans.getOrigin().x()),
                 cv::Point(10, 50), cv::FONT_HERSHEY_PLAIN, 1.0,
@@ -347,7 +347,7 @@ void BlobDetection::removePerspective(const cv::Mat& input,
     Eigen::Vector3f direction;
     try {
         tf::StampedTransform tf;
-        tfListener_.lookupTransform("local_origin", "fcu", ros::Time(0), tf);
+        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
 
         tf::Matrix3x3 m(tf.getRotation());
         m.getRPY(roll, pitch, yaw);
