@@ -250,7 +250,7 @@ void ImageProcessor::analyzeLineCluster(ros::Time stamp)
     drawIntersection(intersections_, cv::Scalar(150, 150, 0));
     drawIntersection(intersections, cv::Scalar(0, 0, 150));
 
-    intersectionTransform_.transformIntersections(intersections, stamp);
+    intersectionTransform_.transformIntersections(intersections);
 }
 
 void ImageProcessor::parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<Vector>& intersections)
