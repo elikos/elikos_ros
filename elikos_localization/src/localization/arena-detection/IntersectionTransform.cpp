@@ -34,25 +34,24 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     if (imageIntersections.size() < 1) return;
 
     updateKDTree(imageIntersections);
-    double z = -estimateAltitude(imageIntersections);
+    double z = estimateAltitude(imageIntersections);
 
     tf::Vector3 cameraDirection(0.0, 0.0, 1.0);
     cameraDirection =  state_.origin2fcu * state_.fcu2camera * cameraDirection;
 
-    tf::Vector3 height(0.0, 0.0, -z);
+    tf::Vector3 height(0.0, 0.0, z);
 
-    tf::Vector3 offset = cameraDirection * height.length() / (cameraDirection * tf::Vector3(0.0, 0.0, -1.0)) + height - state_.fcu2camera.getOrigin();
-    Eigen::Vector3f cameraOffset(offset.x(), offset.y(), offset.z());
+    tf::Vector3 offset = cameraDirection * height.length() / cameraDirection.dot(tf::Vector3(0.0, 0.0, -1.0)) + height;
 
-    Eigen::Vector3f smallest(10.0, 10.0, 10.0);
+    tf::Vector3 smallest(10.0, 10.0, 10.0);
 
-    std::vector<Eigen::Vector3f> transformedIntersections;
+    std::vector<tf::Vector3> transformedIntersections;
     for (int i = 0; i < imageIntersections.size(); ++i)
     {
-        Eigen::Vector3f transformedIntersection(0.0, 0.0, z);
-        transformIntersectionXY(imageIntersections[i], transformedIntersection, cameraOffset);
+        tf::Vector3 transformedIntersection(0.0, 0.0, z);
+        transformIntersectionXY(imageIntersections[i], transformedIntersection, offset);
 
-        if (transformedIntersection.norm() < smallest.norm())
+        if (transformedIntersection.length() < smallest.length())
         {
             smallest = transformedIntersection;
         }
@@ -104,17 +103,21 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
 }
 
 void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& imageIntersection, 
-                                                    Eigen::Vector3f& transformedIntersection,
-                                                    Eigen::Vector3f& cameraDirectionOffset) const
+                                                    tf::Vector3& transformedIntersection,
+                                                    tf::Vector3& cameraDirectionOffset) const
 {
     double transformCoefficient = std::abs(transformedIntersection.z()) / cameraInfo_.focalLength;
-    transformedIntersection.x() = (imageIntersection.x() - 320.0) * transformCoefficient;
-    transformedIntersection.y() = (imageIntersection.y() - 240.0) * transformCoefficient;
-    transformedIntersection += cameraDirectionOffset;
+    // Center intersections and swap axes.
+    tf::Vector3 camera2intersection;
+    camera2intersection.setX((imageIntersection.x() - 320.0) * transformCoefficient);
+    camera2intersection.setY((imageIntersection.y() - 240.0) * transformCoefficient);
+    camera2intersection.setZ(transformedIntersection.z());
+    transformedIntersection = state_.fcu2camera * camera2intersection;
+    //transformedIntersection += cameraDirectionOffset;
 }
 
 void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                                            const std::vector<Eigen::Vector3f>& transformedIntersections) const
+                                                            const std::vector<tf::Vector3>& transformedIntersections) const
 {
     if (imageIntersections.size() == transformedIntersections.size()) 
     {
