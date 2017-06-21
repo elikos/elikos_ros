@@ -38,9 +38,9 @@ private:
 
     void updateKDTree(const std::vector<Eigen::Vector2f>& imageIntersections);
     double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
-    void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, Eigen::Vector3f& intersection, Eigen::Vector3f& offset) const;
+    void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, tf::Vector3& intersection, tf::Vector3& offset) const;
     void publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                         const std::vector<Eigen::Vector3f>& TransformedIntersections) const;
+                                         const std::vector<tf::Vector3>& TransformedIntersections) const;
 
     const CameraInfo& cameraInfo_;
     const QuadState& state_;
