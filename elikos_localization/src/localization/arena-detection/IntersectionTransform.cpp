@@ -16,6 +16,30 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     ros::NodeHandle nh;
 
     intersectionPub_ = nh.advertise<elikos_ros::IntersectionArray>("intersections", 1);
+    debugPub_ = nh.advertise<visualization_msgs::MarkerArray>("intersection_debug", 1);
+
+    marker_.header.frame_id = "elikos_fcu";
+    marker_.header.stamp = ros::Time::now();
+
+    marker_.id = 0;
+    marker_.type = visualization_msgs::Marker::SPHERE;
+    marker_.action = visualization_msgs::Marker::ADD;
+    marker_.pose.position.x = 0;
+    marker_.pose.position.y = 0;
+    marker_.pose.position.z = 0;
+    marker_.pose.orientation.x = 0.0;
+    marker_.pose.orientation.y = 0.0;
+    marker_.pose.orientation.z = 0.0;
+    marker_.pose.orientation.w = 1.0;
+    marker_.scale.x = 0.05;
+    marker_.scale.y = 0.05;
+    marker_.scale.z = 0.05;
+    marker_.color.a = 1.0; // Don't forget to set the alpha!
+    marker_.color.r = 0.0;
+    marker_.color.g = 1.0;
+    marker_.color.b = 0.0;
+
+
 }
 
 
@@ -41,7 +65,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
 
     tf::Vector3 height(0.0, 0.0, z);
 
-    tf::Vector3 offset = cameraDirection * height.length() / cameraDirection.dot(tf::Vector3(0.0, 0.0, -1.0)) + height;
+    tf::Vector3 offset = (cameraDirection * height.length()) / cameraDirection.dot(tf::Vector3(0.0, 0.0, -1.0)) + height;
 
     tf::Vector3 smallest(10.0, 10.0, 10.0);
 
@@ -116,14 +140,18 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
     //transformedIntersection += cameraDirectionOffset;
 }
 
+
+
 void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                                            const std::vector<tf::Vector3>& transformedIntersections) const
+                                                            const std::vector<tf::Vector3>& transformedIntersections)
 {
     if (imageIntersections.size() == transformedIntersections.size()) 
     {
         elikos_ros::IntersectionArray msg;
         // TODO: Use the stamp from the image.
         msg.header.stamp = ros::Time::now();
+
+        visualization_msgs::MarkerArray array;
 
         for (int i = 0; i < imageIntersections.size(); ++i) 
         {
@@ -135,9 +163,18 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<Ei
             intersection.arenaPosition.y = transformedIntersections[i].y();
             intersection.arenaPosition.z = transformedIntersections[i].z();
 
+            marker_.id = i;
+            marker_.header.stamp = ros::Time::now();
+            
+            marker_.pose.position.x = transformedIntersections[i].x();
+            marker_.pose.position.y = transformedIntersections[i].y();
+            marker_.pose.position.z = transformedIntersections[i].z();
+
+            array.markers.push_back(marker_);
             msg.intersections.push_back(intersection);
         }
         intersectionPub_.publish(msg);
+        debugPub_.publish(array);
     }
 }
 
