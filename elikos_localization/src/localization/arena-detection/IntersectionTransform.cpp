@@ -53,7 +53,7 @@ void IntersectionTransform::updateKDTree(const std::vector<Eigen::Vector2f>& ima
     kdTree_.setInputCloud(pointCloud_);
 }
 
-void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections)
+void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections, const ros::Time stamp)
 {
     if (imageIntersections.size() < 1) return;
 
@@ -82,7 +82,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
         transformedIntersections.push_back(std::move(transformedIntersection));
     }
 
-    publishTransformedIntersections(imageIntersections, transformedIntersections);
+    publishTransformedIntersections(imageIntersections, transformedIntersections, stamp);
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
@@ -143,13 +143,15 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
 
 
 void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                                            const std::vector<tf::Vector3>& transformedIntersections)
+                                                            const std::vector<tf::Vector3>& transformedIntersections,
+                                                            const ros::Time stamp)
 {
     if (imageIntersections.size() == transformedIntersections.size()) 
     {
         elikos_ros::IntersectionArray msg;
         // TODO: Use the stamp from the image.
-        msg.header.stamp = ros::Time::now();
+        msg.header.stamp = stamp;
+        msg.header.frame_id = "elikos_fcu";
 
         visualization_msgs::MarkerArray array;
 

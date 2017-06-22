@@ -36,6 +36,7 @@ def closest_point(point_array, position):
 
 
 def match_points(input_points, points_to_match_to):
+    # type: (np.ndarray, np.ndarray)->np.ndarray
     u"""
     Typical usage : for a 20mx20m arena with 21 intersections :
     match_points(detected_intersections, create_grid_mesh(21, 20))
@@ -46,7 +47,7 @@ def match_points(input_points, points_to_match_to):
     :return: the matched points from points_to_match_to using input_points indexing
     """
 
-    matched_points = np.empty((0, 3))
+    matched_points = np.empty((0, input_points.shape[-1]))
 
     for i in xrange(np.size(input_points, axis=0)):
         position = input_points[i]

@@ -32,7 +32,7 @@ public:
     IntersectionTransform(const CameraInfo& cameraInfo, const QuadState& state);
     ~IntersectionTransform() = default;
 
-    void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections);
+    void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections, const ros::Time stamp);
 
 private:
 
@@ -43,7 +43,8 @@ private:
     double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
     void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, tf::Vector3& intersection, tf::Vector3& offset) const;
     void publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                         const std::vector<tf::Vector3>& TransformedIntersections);
+                                         const std::vector<tf::Vector3>& TransformedIntersections,
+                                         const ros::Time stamp);
 
     visualization_msgs::Marker marker_;
 

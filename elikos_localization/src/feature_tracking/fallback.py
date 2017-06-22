@@ -21,6 +21,8 @@ from std_msgs.msg import Header
 import elikos_ros.msg as elikos_ros
 
 import message_interface as msgs
+import point_manipulation as pt_manip
+import point_matching as pt_match
 
 
 ###
@@ -61,6 +63,8 @@ def match_points_2d(src, dst):
         matched_mesurement = np.append(matched_mesurement, np.array([[position]]), axis=1)
     return matched_estimation, matched_mesurement
 
+def yaw_from_quaterion(q):
+    return math.atan2(2.0*(q.x*q.y + q.w*q.z), q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z)
 
 ###
 #
@@ -101,18 +105,39 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
 
     global g_tf_listener, g_frames, g_tf_broadcaster
 
-    g_tf_listener.waitForTransform(input_points_frame, g_frames["arena_center_frame_id"], frame_time, rospy.Duration(3.0))
-    (trans, rot) = g_tf_listener.lookupTransform(input_points_frame, g_frames["arena_center_frame_id"], frame_time)
+    (trans_ref2arena, rot_ref2arena) = get_tf_transform(
+        g_frames["arena_center_frame_id"],
+        input_points_frame,
+        frame_time,
+        rospy.Duration(3.0)
+    )
 
-    input_points_3d -= trans
-    input_points_3d = quaternion.rotate_vectors(quaternion.quaternion(rot[3], rot[0], rot[1], rot[2]), input_points_3d)
+    (trans_fcu2arena, rot_fcu2arena) = get_tf_transform(
+        g_frames["arena_center_frame_id"],
+        g_frames["fcu_frame_id"],
+        frame_time,
+        rospy.Duration(3.0)
+    )
+
+    input_points_3d = quaternion.rotate_vectors(rot_ref2arena, input_points_3d)
+    input_points_3d += trans_ref2arena
 
     mask = np.ones(3, dtype=np.bool)
     mask[2] = False
 
-    matched_src, matched_dts = match_points_2d(g_arena_points[:, mask], input_points_3d[:, mask])
+    matched_areana_points = pt_match.match_points(input_points_3d, g_arena_points)
 
-    transform = cv2.estimateRigidTransform(matched_src.astype(np.float32), matched_dts.astype(np.float32), False)
+    transform_arena_pts = matched_areana_points[:, mask] - np.array([trans_ref2arena[0], trans_ref2arena[1]])
+    transform_detected_pts = input_points_3d[:, mask] - np.array([trans_ref2arena[0], trans_ref2arena[1]])
+
+    tmp_publish(np.concatenate([transform_arena_pts, transform_detected_pts]))
+
+
+    transform = cv2.estimateRigidTransform(
+        pt_manip.prepare_points_for_cv(transform_detected_pts),
+        pt_manip.prepare_points_for_cv(transform_arena_pts),
+        False
+    )
 
     if transform is None:
         rospy.logwarn("The transformation was null! Skipping message.")
@@ -132,21 +157,16 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
     dx = transform[0, 2]
     dy = transform[1, 2]
 
-    tmp_publish(input_points_3d)
 
-    (trans, rot) = g_tf_listener.lookupTransform(g_frames["arena_center_frame_id"], g_frames["fcu_frame_id"],
-                                                 rospy.Time())
+    delta_rot = quaternion.from_euler_angles(0, 0, -angle_delta)
 
-    delta_rot = quaternion.from_euler_angles(0, 0, angle_delta)
-    rot = quaternion.quaternion(rot[3], rot[0], rot[1], rot[2])
+    trans = trans_fcu2arena + np.array((dx, dy, 0))
 
-    final_rot = delta_rot * rot
 
-    trans = (trans[0] - dx, trans[1] - dy, trans[2] + input_points_3d[0, 2])
     g_tf_broadcaster.sendTransform(
         trans,
-        (final_rot.x, final_rot.y, final_rot.z, final_rot.w),
-        rospy.Time.frame_time(),
+        pt_manip.create_tf_from_quaterion(delta_rot * rot_fcu2arena),
+        frame_time,
         g_frames["output_position_fcu"],
         g_frames["arena_center_frame_id"]
     )
@@ -160,7 +180,7 @@ def tmp_publish(camera_points):
         p = Pose()
         p.position.x = camera_points[i, 0]
         p.position.y = camera_points[i, 1]
-        p.position.z = camera_points[i, 2]
+        p.position.z = 0#camera_points[i, 2]
 
         output_message.poses.append(p)
     for i in xrange(np.size(g_arena_points, axis=0)):
@@ -176,6 +196,14 @@ def tmp_publish(camera_points):
     output_message.header.frame_id = g_frames["arena_center_frame_id"]
 
     g_pub_dbg.publish(output_message)
+
+
+def get_tf_transform(source_frame, dest_frame, time, timeout):
+    # type: (str, str, rospy.Time, rospy.Duration)->(np.ndarray, quaternion.quaternion)
+    global g_tf_listener
+    g_tf_listener.waitForTransform(source_frame, dest_frame, time, timeout)
+    (trans, rot) = g_tf_listener.lookupTransform(source_frame, dest_frame, time)
+    return np.array(trans), pt_manip.create_quaterion_from_tf(rot)
 
 
 def init_node():

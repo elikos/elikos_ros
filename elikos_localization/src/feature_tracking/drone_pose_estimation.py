@@ -40,7 +40,7 @@ def message_callback(localization_points, inverse_transform):
     print points_image
     print points_arena
 
-
+    
 
 
 
