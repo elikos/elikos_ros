@@ -17,6 +17,9 @@
 #include <elikos_ros/Intersection.h>
 #include <elikos_ros/IntersectionArray.h>
 
+#include <visualization_msgs/MarkerArray.h>
+#include <visualization_msgs/Marker.h>
+
 namespace localization
 {
 
@@ -40,11 +43,15 @@ private:
     double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
     void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, tf::Vector3& intersection, tf::Vector3& offset) const;
     void publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                         const std::vector<tf::Vector3>& TransformedIntersections) const;
+                                         const std::vector<tf::Vector3>& TransformedIntersections);
+
+    visualization_msgs::Marker marker_;
 
     const CameraInfo& cameraInfo_;
     const QuadState& state_;
+
     ros::Publisher intersectionPub_;
+    ros::Publisher debugPub_;
 
     pcl::KdTreeFLANN<pcl::PointXY> kdTree_;
     pcl::PointCloud<pcl::PointXY>::Ptr pointCloud_;
