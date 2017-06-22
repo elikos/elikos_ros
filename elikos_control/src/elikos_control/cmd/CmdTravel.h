@@ -29,7 +29,8 @@ private:
     CmdTravel() = delete;
     int stepInTrajectory_;
 
-    const double THRESHOLD = 0.05;  //TODO fichier de config
+    double threshold_;
+    double max_step_;
 
     geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint_;
     tf::StampedTransform lastPosition_;

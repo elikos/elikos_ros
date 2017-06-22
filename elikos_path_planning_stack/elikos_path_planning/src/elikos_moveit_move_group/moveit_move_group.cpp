@@ -3,7 +3,7 @@
 
 Moveit_move_group::Moveit_move_group():
   parent_frame_("elikos_arena_origin"),
-  child_frame_("elikos_setpoint"),
+  child_frame_("elikos_moveit_setpoint"),
   toleranceAchieveGoal_(0.5),
   toleranceFreeOctomap_(0.1),
   safetyTime_(3.0)
@@ -11,14 +11,8 @@ Moveit_move_group::Moveit_move_group():
   //move_group settings
   group_.setPlanningTime(1.0);//In seconds
 
-
-  ros::NodeHandle nh;
-  double dimension_c = 5;
-  nh.getParam("/elikos_ai/dimension_c", dimension_c);
-  double max_altitude = 3;
-  nh.getParam("/elikos_ai/max_altitude", max_altitude);
   //The workspace represents the boundaries of the planning volume.
-  group_.setWorkspace(-dimension_c/2,-dimension_c/2,0,dimension_c/2,dimension_c/2,max_altitude);
+  group_.setWorkspace(-10,-10,0,10,10,4);
 
   group_.allowReplanning(true);
 
@@ -92,6 +86,8 @@ trajectory_msgs::MultiDOFJointTrajectory Moveit_move_group::move(geometry_msgs::
         std_srvs::Empty::Request req;
         std_srvs::Empty::Response res;
         ros::service::call("/clear_octomap", req, res);
+        trajectory_msgs::MultiDOFJointTrajectory dumb_traj;
+        return dumb_traj;
       }
     }
 
