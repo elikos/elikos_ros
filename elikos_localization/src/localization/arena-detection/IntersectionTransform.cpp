@@ -105,23 +105,20 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
 
             // Compute local height estimate and error.
             double height = GRID_SIDE_LENGTH_M * (cameraInfo_.focalLength / std::sqrt(imageDistance));
-            double error = std::abs((height - currentPosition.z()) / currentPosition.z());
+            double error = std::abs(height - currentPosition.z());
 
-            // Use current state if error is too high.
-            if (error < ALT_ERROR_THRESHOLD)
-            {
-                //height = state_->position_.z();
-            }
             totalHeight += height;
             ++sampleSize;
+            estimate = totalHeight / sampleSize;
+            std::string e(std::to_string(error));
+            ROS_ERROR(e.c_str());
         }
-        // return average of local height estimates.
-        estimate = totalHeight / sampleSize;
     }
     // We detected only 1 intersection, we use the current state of the quad.
     else 
     {
         estimate = currentPosition.z();
+        ROS_ERROR("BYPASS");
     }
     return estimate;
 }

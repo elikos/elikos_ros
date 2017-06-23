@@ -103,34 +103,20 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
                              Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
 
 
-    Eigen::Vector4f test(0.0, 0.0, 1.0, 0.0);
-    test = R * test;
-    float S = std::cos(std::atan(std::sqrt(test.x() * test.x() + test.y() * test.y()) / test.z()));
 
     Eigen::Matrix4f P = getPerspectiveProjectionTransform(f, width, height); 
-    Eigen::Translation<float, 4> T2 = Eigen::Translation<float, 4>(Eigen::Vector4f(0.0, 0.0, S, 0.0));
-    Eigen::Translation<float, 4> T = Eigen::Translation<float, 4>(Eigen::Vector4f(0.0, 0.0, -1.0, 0.0));
+    Eigen::Matrix4f T = Eigen::Matrix4f::Identity();
+    T(2, 3) = -1.0;
 
-    Eigen::Vector4f t;
+    Eigen::Matrix4f perspectiveTransform = P * T * R;
+    Eigen::Matrix4f orthoTransform =  P * T;
+
     for (int i = 0; i < 4; ++i)
     {
-        dst[i] = T * dst[i];
-        dst[i] = P * dst[i];
+        dst[i] = orthoTransform * dst[i];
         dst[i] /= dst[i][3];
 
-        //src[i] = S * src[i];
-        //src[i].x() *= S;
-        //src[i].y() *= S;
-        t = src[i];
-        t = R * t;
-        t = T * t;
-        t = P * t;
-        t /= t[3];
-
-        src[i] = R * src[i];
-        src[i] = T * src[i];
-        src[i] = P * src[i];
-        //src[i] = P * T * R * dst[i];
+        src[i] = perspectiveTransform * src[i];
         src[i] /= src[i][3];
     }
 
@@ -141,12 +127,13 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
         tDst[i] = cv::Point2f(dst[i].x() * width / 2.0 + width / 2.0, dst[i].y() * height / 2.0 + height / 2.0);
     }
 
-    cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
+    Eigen::Vector4f camDirection = R * Eigen::Vector4f(0.0, 0.0, 1.0, 0.0);
+    float S = 1.0 / std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
 
     cv::Mat tmp;
-    cv::warpPerspective(input, tmp, perspectiveTransform, input.size());
+    cv::warpPerspective(input, tmp, cv::getPerspectiveTransform(tSrc, tDst), input.size());
     if (!std::isnan(S)) {
-        cv::resize(tmp, rectified, cv::Size(), 1 / S, 1 / S);
+        cv::resize(tmp, rectified, cv::Size(), S, S);
     } else {
         rectified = input.clone();
     }
