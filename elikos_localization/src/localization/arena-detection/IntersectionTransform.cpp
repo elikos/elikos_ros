@@ -134,10 +134,10 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
     // Center intersections and swap axes.
     tf::Vector3 camera2intersection;
     camera2intersection.setX((imageIntersection.x() - 320.0) * transformCoefficient);
-    camera2intersection.setY((imageIntersection.y() - 240.0) * transformCoefficient);
-    camera2intersection.setZ(transformedIntersection.z());
-    transformedIntersection = state_.getFcu2Camera() * camera2intersection;
-    //transformedIntersection += cameraDirectionOffset;
+    camera2intersection.setY(-(imageIntersection.y() - 240.0) * transformCoefficient);
+    camera2intersection.setZ(-transformedIntersection.z());
+
+    transformedIntersection = camera2intersection;
 }
 
 

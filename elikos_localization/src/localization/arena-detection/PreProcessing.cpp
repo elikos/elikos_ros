@@ -48,7 +48,6 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed)
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
 
-
     cv::Mat eroded;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
     cv::erode(blured, eroded, element, cv::Point(0), 8);
@@ -102,27 +101,34 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
                              Eigen::Vector4f(-1.0,  1.0, 0.0, 1.0), 
                              Eigen::Vector4f(-1.0, -1.0, 0.0, 1.0), 
                              Eigen::Vector4f( 1.0, -1.0, 0.0, 1.0) };
-   
+
 
     Eigen::Vector4f test(0.0, 0.0, 1.0, 0.0);
     test = R * test;
     float S = std::cos(std::atan(std::sqrt(test.x() * test.x() + test.y() * test.y()) / test.z()));
 
     Eigen::Matrix4f P = getPerspectiveProjectionTransform(f, width, height); 
-    Eigen::Translation<float, 4> T(Eigen::Vector4f(0.0, 0.0, -1.0, 0.0));
+    Eigen::Translation<float, 4> T2 = Eigen::Translation<float, 4>(Eigen::Vector4f(0.0, 0.0, S, 0.0));
+    Eigen::Translation<float, 4> T = Eigen::Translation<float, 4>(Eigen::Vector4f(0.0, 0.0, -1.0, 0.0));
 
-    for (int i = 0; i < 4; ++i) 
+    Eigen::Vector4f t;
+    for (int i = 0; i < 4; ++i)
     {
         dst[i] = T * dst[i];
         dst[i] = P * dst[i];
         dst[i] /= dst[i][3];
 
         //src[i] = S * src[i];
-        src[i].x() *= S;
-        src[i].y() *= S;
+        //src[i].x() *= S;
+        //src[i].y() *= S;
+        t = src[i];
+        t = R * t;
+        t = T * t;
+        t = P * t;
+        t /= t[3];
+
         src[i] = R * src[i];
         src[i] = T * src[i];
-        //src[i].z() *= S;
         src[i] = P * src[i];
         //src[i] = P * T * R * dst[i];
         src[i] /= src[i][3];
@@ -136,10 +142,16 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
     }
 
     cv::Mat perspectiveTransform = cv::getPerspectiveTransform(tSrc, tDst);
-    cv::warpPerspective(input, rectified, perspectiveTransform, input.size());
 
-    //rectified = input.clone();
-    for (int i = 0; i < 4; ++i) 
+    cv::Mat tmp;
+    cv::warpPerspective(input, tmp, perspectiveTransform, input.size());
+    if (!std::isnan(S)) {
+        cv::resize(tmp, rectified, cv::Size(), 1 / S, 1 / S);
+    } else {
+        rectified = input.clone();
+    }
+
+    for (int i = 0; i < 4; ++i)
     {
         cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
         cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
