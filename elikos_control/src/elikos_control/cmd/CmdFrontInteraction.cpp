@@ -34,6 +34,7 @@ void CmdFrontInteraction::TakeABreak()
 
 void CmdFrontInteraction::execute()
 {
+    ROS_ERROR("CmdFrontInteraction");
     interactionStatus_ = InteractionState::LANDING;
     ros::Rate rate(30.0);
     isSleeping_ = false;
