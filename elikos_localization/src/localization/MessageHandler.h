@@ -32,14 +32,12 @@ private:
 
     ros::NodeHandle nh_;
     image_transport::ImageTransport it_;
-    image_transport::Subscriber imageSub_;
 
-    tf::TransformListener tfListener_;
+    image_transport::Subscriber imageSub_;
+    image_transport::Publisher imagePub_;
 
     ImageProcessor* const processor_;
     QuadState& state_;
-
-    bool isWaitingForImage_ = false;
 
     const CameraInfo& cameraInfo_;
 };

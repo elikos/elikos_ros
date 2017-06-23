@@ -24,7 +24,7 @@ public:
     PreProcessing(const CameraInfo& cameraInfo, const QuadState& state);
     ~PreProcessing() = default;
 
-    void preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed);
+    void preProcessImage(cv::Mat& raw, cv::Mat& preProcessed);
     void removePerspective(cv::Mat& input, cv::Mat& rectified);
     void showCalibTrackBars();
 

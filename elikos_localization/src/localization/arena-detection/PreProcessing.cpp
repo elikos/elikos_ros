@@ -24,32 +24,10 @@ PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& stat
 
     cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
                                 cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
-
-    cv::namedWindow("PreProcessed", 1);
-    cv::createTrackbar("white threshold", "PreProcessed", &whiteThreshold_, 255);
-    cv::createTrackbar("undistort type", "PreProcessed", &undistortType_, 1);
 }
 
-void PreProcessing::preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed)
+void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed)
 {
-
-    /*
-    tf::StampedTransform tf;
-    try {
-        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
-
-        tf::Matrix3x3 m(tf.getRotation());
-        double yaw;
-        m.getRPY(roll_, pitch_, yaw);
-        std::cout << pitch_ << " : " << roll_ << std::endl;
-
-    } catch (tf::TransformException e) {
-         ROS_ERROR("%s", e.what());
-    }
-    */
-
-    //undistort
-    // Blur
     cv::Mat typeConverted;
     if (raw.type() != CV_8UC1) {
         cv::cvtColor(raw, typeConverted, CV_BGR2GRAY);
@@ -66,8 +44,6 @@ void PreProcessing::preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Ma
 
     cv::Mat perspective;
     removePerspective(undistorted, perspective);
-    cv::imshow("undistorted", undistorted);
-    cv::imshow("perspective", perspective);
 
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
@@ -81,8 +57,6 @@ void PreProcessing::preProcessImage(cv::Mat& raw, const ros::Time& stamp, cv::Ma
     cv::threshold(blured, thresholded, whiteThreshold_, 255, CV_THRESH_BINARY);
 
     preProcessed = thresholded;
-
-    cv::imshow("PreProcessed", preProcessed);
 }
 
 void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
@@ -93,7 +67,7 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
     q.setRPY(CV_PI, 0.0, 0.0);
     tf::Transform z2x(q);
 
-    tf::Transform debug = state_.origin2fcu * state_.fcu2camera * z2x;
+    tf::Transform debug = state_.getOrigin2Fcu() * state_.getFcu2Camera() * z2x;
 
     tf::Matrix3x3 n(debug.getRotation());
     n.getRPY(roll, pitch, yaw);
@@ -182,11 +156,6 @@ Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLen
     m(3, 2) = -1;
 
     return m;
-}
-
-void PreProcessing::showCalibTrackBars()
-{
-
 }
 
 Eigen::Vector2f PreProcessing::translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const

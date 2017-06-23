@@ -53,7 +53,7 @@ void IntersectionTransform::updateKDTree(const std::vector<Eigen::Vector2f>& ima
     kdTree_.setInputCloud(pointCloud_);
 }
 
-void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections, const ros::Time stamp)
+void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections)
 {
     if (imageIntersections.size() < 1) return;
 
@@ -61,7 +61,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     double z = estimateAltitude(imageIntersections);
 
     tf::Vector3 cameraDirection(0.0, 0.0, 1.0);
-    cameraDirection =  state_.origin2fcu * state_.fcu2camera * cameraDirection;
+    cameraDirection =  state_.getOrigin2Fcu() * state_.getFcu2Camera() * cameraDirection;
 
     tf::Vector3 height(0.0, 0.0, z);
 
@@ -82,7 +82,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
         transformedIntersections.push_back(std::move(transformedIntersection));
     }
 
-    publishTransformedIntersections(imageIntersections, transformedIntersections, stamp);
+    publishTransformedIntersections(imageIntersections, transformedIntersections);
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
@@ -91,7 +91,7 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
     double totalHeight = 0.0;
     int sampleSize = 0;
 
-    const tf::Vector3& currentPosition = state_.origin2fcu.getOrigin();
+    const tf::Vector3& currentPosition = state_.getOrigin2Fcu().getOrigin();
 
     if (imageIntersections.size() > 1) 
     {
@@ -136,21 +136,20 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
     camera2intersection.setX((imageIntersection.x() - 320.0) * transformCoefficient);
     camera2intersection.setY((imageIntersection.y() - 240.0) * transformCoefficient);
     camera2intersection.setZ(transformedIntersection.z());
-    transformedIntersection = state_.fcu2camera * camera2intersection;
+    transformedIntersection = state_.getFcu2Camera() * camera2intersection;
     //transformedIntersection += cameraDirectionOffset;
 }
 
 
 
 void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                                            const std::vector<tf::Vector3>& transformedIntersections,
-                                                            const ros::Time stamp)
+                                                            const std::vector<tf::Vector3>& transformedIntersections)
 {
     if (imageIntersections.size() == transformedIntersections.size()) 
     {
         elikos_ros::IntersectionArray msg;
         // TODO: Use the stamp from the image.
-        msg.header.stamp = stamp;
+        msg.header.stamp = state_.getTimeStamp();
         msg.header.frame_id = "elikos_fcu";
 
         visualization_msgs::MarkerArray array;
