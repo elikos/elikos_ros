@@ -14,7 +14,7 @@ namespace localization {
 using Vector = Eigen::Vector2f;
 
 ImageProcessor::ImageProcessor(const CameraInfo& cameraInfo, const QuadState& state)
-    : preProcessing_(cameraInfo, state), intersectionTransform_(cameraInfo, state)
+    : cameraInfo_(cameraInfo), state_(state), preProcessing_(cameraInfo, state), intersectionTransform_(cameraInfo, state)
 {
     srand(time(NULL));
 }
@@ -89,7 +89,8 @@ void ImageProcessor::analyzeLineCluster(cv::Mat& debug)
 
     findLineIntersections(orientationGroup);
     std::vector<int> clusterMemberships;
-    DBSCAN::DBSCAN(intersections_, 50, 2, clusterMemberships);
+    int radius = 0.5 * cameraInfo_.focalLength / state_.getOrigin2Fcu().getOrigin().z();
+    DBSCAN::DBSCAN(intersections_, radius, 2, clusterMemberships);
 
     std::vector<Vector> intersections;
     parseClusterMemberships(clusterMemberships, intersections);

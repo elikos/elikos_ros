@@ -10,6 +10,7 @@
 #include <opencv2/core/core.hpp>
 #include <Eigen/Core>
 
+#include "QuadState.h"
 #include "CameraInfo.h"
 #include "PreProcessing.h"
 #include "PerspectiveTransform.h"
@@ -39,12 +40,12 @@ private:
 
     std::vector<Eigen::Vector2f> intersections_;
 
+    const CameraInfo& cameraInfo_;
+    const QuadState& state_;
+
     PreProcessing preProcessing_;
     LineDetection lineDetection_;
     IntersectionTransform intersectionTransform_;
-
-    int C_W;
-    int C_H;
 
     void findEdges(const cv::Mat& src, cv::Mat& edges);
     void findLines(const cv::Mat& edges);
