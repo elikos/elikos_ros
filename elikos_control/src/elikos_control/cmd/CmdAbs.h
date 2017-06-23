@@ -9,6 +9,7 @@
 #include <tf/transform_broadcaster.h>
 #include <cv_bridge/cv_bridge.h>
 #include <elikos_ros/TrajectoryCmd.h>
+#include "../../../include/CmdDefines.h"
 
 enum PriorityLevel {
         LANDING,

@@ -13,13 +13,13 @@
 CmdExecutor::CmdExecutor()
 {
 
-    commands_.insert(std::pair<int, std::unique_ptr<CmdOffBoard>>(0, std::unique_ptr<CmdOffBoard>(new CmdOffBoard(&nh_, -1))));
-    commands_.insert(std::pair<int, std::unique_ptr<CmdLanding>>(1, std::unique_ptr<CmdLanding>(new CmdLanding(&nh_, -1))));
-    commands_.insert(std::pair<int, std::unique_ptr<CmdFrontInteraction>>(2, std::unique_ptr<CmdFrontInteraction>(new CmdFrontInteraction(&nh_, -1))));
-    commands_.insert(std::pair<int, std::unique_ptr<CmdTopInteraction>>(3, std::unique_ptr<CmdTopInteraction>(new CmdTopInteraction(&nh_, -1))));
-    commands_.insert(std::pair<int, std::unique_ptr<CmdTravel>>(4, std::unique_ptr<CmdTravel>(new CmdTravel(&nh_, -1))));
-    commands_.insert(std::pair<int, std::unique_ptr<CmdStandBy>>(5, std::unique_ptr<CmdStandBy>(new CmdStandBy(&nh_, -1))));
-    currentCmd_ = commands_[5].get();
+    commands_.insert(std::pair<int, std::unique_ptr<CmdOffBoard>>(CmdCode::TAKEOFF, std::unique_ptr<CmdOffBoard>(new CmdOffBoard(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdLanding>>(CmdCode::LAND, std::unique_ptr<CmdLanding>(new CmdLanding(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdFrontInteraction>>(CmdCode::FRONT_INTERACTION, std::unique_ptr<CmdFrontInteraction>(new CmdFrontInteraction(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdTopInteraction>>(CmdCode::TOP_INTERACTION, std::unique_ptr<CmdTopInteraction>(new CmdTopInteraction(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdTravel>>(CmdCode::MOVE_TO_POINT, std::unique_ptr<CmdTravel>(new CmdTravel(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdStandBy>>(CmdCode::STANDBY, std::unique_ptr<CmdStandBy>(new CmdStandBy(&nh_, -1))));
+    currentCmd_ = commands_[CmdCode::STANDBY].get();
     pendingCmd_ = currentCmd_;
 
     cmdExecutionThread_ = std::thread(&CmdExecutor::executeCurrentCmd, this);
@@ -38,7 +38,7 @@ OrderToGive CmdExecutor::checkNextOrder()
     else if(currentCmd_->getCmdPriority() == pendingCmd_->getCmdPriority())
         if  (
                 currentCmd_->getCmdCode() == pendingCmd_->getCmdCode() &&
-                (currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3 || currentCmd_->getCmdCode() == 4)
+                (currentCmd_->getCmdCode() == CmdCode::FRONT_INTERACTION || currentCmd_->getCmdCode() == CmdCode::TOP_INTERACTION || currentCmd_->getCmdCode() == CmdCode::MOVE_TO_POINT)
             )
             return OrderToGive::AJUST;
         else
@@ -57,7 +57,7 @@ void CmdExecutor::commandReceived(const CmdConfig& newCommand)
     }
     else if(OrderToGive::AJUST == checkNextOrder())
     {
-        if (currentCmd_->getCmdCode() == 2 || currentCmd_->getCmdCode() == 3 || currentCmd_->getCmdCode() == 4) // Robot interaction || travel
+        if (currentCmd_->getCmdCode() == CmdCode::FRONT_INTERACTION || currentCmd_->getCmdCode() == CmdCode::TOP_INTERACTION || currentCmd_->getCmdCode() == CmdCode::MOVE_TO_POINT) // Robot interaction || travel
         {
             currentCmd_->ajustement(pendingDestination_, pendingTrajectory_);
         }
@@ -74,13 +74,18 @@ void CmdExecutor::createCommand(const CmdConfig& config)
     {
         pendingCmd_ = it->second.get();
         it->second->setId(config.id_);
-        if(it->first == 2 || it->first == 3) // Robot interaction
+        if(it->first == CmdCode::TOP_INTERACTION || it->first == CmdCode::FRONT_INTERACTION) // Robot interaction
         {
             pendingDestination_ = config.cmdDestination_;
         } 
-        if(it->first == 4) // Travel
+        if(it->first == CmdCode::MOVE_TO_POINT) // Travel
         {
             pendingTrajectory_ = config.cmdTrajectory_;
+            if (config.cmdTrajectory_.points.empty())
+            {
+                it = commands_.find(CmdCode::STANDBY);
+                pendingCmd_ = it->second.get();
+            }
         }
         pendingCmd_->ajustement(pendingDestination_, pendingTrajectory_);
     }
@@ -92,7 +97,7 @@ void CmdExecutor::executeCurrentCmd()
     {
         currentCmd_->execute();
         pendingCmdLock_.lock();
-        if(currentCmd_->getCmdCode() == 2 && static_cast<CmdFrontInteraction*>(currentCmd_)->getStatus() == CmdFrontInteraction::InteractionState::ASKS_FOR_OFFBOARD)
+        if(currentCmd_->getCmdCode() == CmdCode::FRONT_INTERACTION && static_cast<CmdFrontInteraction*>(currentCmd_)->getStatus() == CmdFrontInteraction::InteractionState::ASKS_FOR_OFFBOARD)
             currentCmd_ = commands_[0].get();
         else {
             currentCmd_ = pendingCmd_;
