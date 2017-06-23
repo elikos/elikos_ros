@@ -16,7 +16,7 @@ CmdOffBoard::CmdOffBoard(ros::NodeHandle* nh, int id)
     double takeoff_altitude = 1;
     nh_->getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, takeoff_altitude }));
-    targetPosition_.child_frame_id_ = "elikos_setpoint";
+    targetPosition_.child_frame_id_ = SETPOINT;
     targetPosition_.frame_id_ = WORLD_FRAME;
 }
 

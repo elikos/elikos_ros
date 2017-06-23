@@ -31,6 +31,8 @@ private:
 
     double threshold_;
     double max_step_;
+    double max_altitude_;
+    double dimension_c_;
 
     geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint_;
     tf::StampedTransform lastPosition_;

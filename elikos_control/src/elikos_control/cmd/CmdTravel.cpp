@@ -6,14 +6,12 @@ CmdTravel::CmdTravel(ros::NodeHandle* nh, int id)
     cmdPriority_ = PriorityLevel::ALWAYS_ABORTABLE;
 	cmdCode_ = 4;
 	
-	double dimension_c = 5;
-	nh_->getParam("/elikos_ai/dimension_c", dimension_c);
-	double max_altitude = 3;
- 	nh_->getParam("/elikos_ai/max_altitude", max_altitude);
+	nh_->getParam("/elikos_ai/dimension_c", dimension_c_);
+ 	nh_->getParam("/elikos_ai/max_altitude", max_altitude_);
     double takeoff_altitude = 1;
     nh_->getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);
 	lastPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, takeoff_altitude }));
-    lastPosition_.child_frame_id_ = "elikos_setpoint";
+    lastPosition_.child_frame_id_ = SETPOINT;
     lastPosition_.frame_id_ = WORLD_FRAME;
 
 	threshold_ = 0.8;
@@ -33,7 +31,7 @@ void CmdTravel::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocat
   tf::transformMsgToTF(trajectoryPoint, tfTrajectoryPoint);
 
   //Broadcast command
-  tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), WORLD_FRAME, "elikos_setpoint"));
+  tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), WORLD_FRAME, SETPOINT));
 }
 
 void CmdTravel::execute()
@@ -44,12 +42,20 @@ void CmdTravel::execute()
     
 	tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
 	stepInTrajectory_ = 0;
-
 	double step_lenght = 0;
 	bool is_too_near = true;
-	while(is_too_near && stepInTrajectory_ < cmdTrajectory_.points.size())
+	bool is_outside_boundaries = false;
+	while(is_too_near && !is_outside_boundaries && stepInTrajectory_ < cmdTrajectory_.points.size())
 	{
 		geometry_msgs::Vector3 targetTranslation = cmdTrajectory_.points[stepInTrajectory_].transforms[0].translation;
+		if ( targetTranslation.z > max_altitude_ ||
+			targetTranslation.x < -dimension_c_/2 || targetTranslation.x > dimension_c_/2 ||
+			targetTranslation.y < -dimension_c_/2 || targetTranslation.y > dimension_c_/2 )
+			{
+				is_outside_boundaries = true;
+				ROS_ERROR("Setpoint outside the box!");
+			}
+
 		step_lenght = pow(targetTranslation.x-lastPosition_.getOrigin().x(), 2)+
 			pow(targetTranslation.y-lastPosition_.getOrigin().y(), 2)+
 			pow(targetTranslation.z-lastPosition_.getOrigin().z(), 2);
@@ -59,7 +65,7 @@ void CmdTravel::execute()
 		}
 		else
 		{
-			if (stepInTrajectory_ = cmdTrajectory_.points.size() - 1) 
+			if ((stepInTrajectory_ = cmdTrajectory_.points.size() - 1) || is_outside_boundaries)
 			{
 				break;
 			}

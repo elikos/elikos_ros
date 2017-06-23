@@ -15,7 +15,7 @@ CmdFrontInteraction::CmdFrontInteraction(ros::NodeHandle* nh, int id)
     landingCmd_.request.altitude = 0.0;
     
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 0.0 }));
-    targetPosition_.child_frame_id_ = MAV_FRAME;
+    targetPosition_.child_frame_id_ = SETPOINT;
     targetPosition_.frame_id_ = WORLD_FRAME;
 }
 

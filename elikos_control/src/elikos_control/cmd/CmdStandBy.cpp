@@ -5,13 +5,6 @@ CmdStandBy::CmdStandBy(ros::NodeHandle* nh, int id)
 {
     cmdPriority_ = PriorityLevel::ALWAYS_ABORTABLE;
     cmdCode_ = 5;
-    
-    currentPosition_.frame_id_ = WORLD_FRAME;
-    currentPosition_.child_frame_id_ = MAV_FRAME;
-    tf::Transform initialTransform;
-    initialTransform.setOrigin({ 0.0, 0.0, 0.0 });
-    initialTransform.setRotation({ 0.0, 0.0, 0.0, 1.0 });
-    currentPosition_.setData(initialTransform);
 }
 
 CmdStandBy::~CmdStandBy()
@@ -32,8 +25,7 @@ void CmdStandBy::execute()
     ros::Rate rate(30.0);
     while(ros::ok() && !isAborted_)
     {
-        currentPosition_.stamp_ = ros::Time::now();
-        tf_broadcaster_.sendTransform(currentPosition_);
+        tf_broadcaster_.sendTransform(tf::StampedTransform(currentPosition_, ros::Time::now(), WORLD_FRAME, SETPOINT));
         ros::spinOnce();
         rate.sleep();
     }
