@@ -32,14 +32,14 @@ void ResearchBehavior::generateCommands()
 
     if (q_.empty()) {
     	q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.6*dimension_c, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -0.6*dimension_c,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.6*dimension_c,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -0.6*dimension_c, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.6*dimension_c, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.6*dimension_c,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -0.6*dimension_c,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -0.6*dimension_c, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.6*(dimension_c/2), research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -0.6*(dimension_c/2),  0.0, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.6*(dimension_c/2),  0.0, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -0.6*(dimension_c/2), research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.6*(dimension_c/2), research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.6*(dimension_c/2),  0.0, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -0.6*(dimension_c/2),  0.0, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -0.6*(dimension_c/2), research_altitude })));
     }
 }
 

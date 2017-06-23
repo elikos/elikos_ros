@@ -7,5 +7,6 @@ aggressive_enabled: false
 preventive_enabled: false
 simulation: false
 max_altitude: 3
-min_step: 0.8
+min_step: 0.5
 max_step: 2
+has_reach_destination_threshold: 0.3

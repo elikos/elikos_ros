@@ -6,6 +6,9 @@ namespace ai
 AbstractCommand::AbstractCommand(QuadRobot* quad, TargetRobot* target)
     : quad_(quad), target_(target)
 {
+    ros::NodeHandle nh_;
+    has_reach_destination_threshold_ = 0.2;
+    nh_.getParam("/elikos_ai/has_reach_destination_threshold", has_reach_destination_threshold_);
 }
 
 AbstractCommand::~AbstractCommand()
@@ -25,7 +28,7 @@ bool AbstractCommand::hasReachedDestination(const tf::Vector3& currentPosition, 
     {
       distance = tf::tfDistance(currentPosition, destination);
     }
-    return std::abs(distance) < 0.2;
+    return std::abs(distance) < has_reach_destination_threshold_;
 }
 
 }
