@@ -1,0 +1,47 @@
+What is this file?
+
+This file id the design file of the Kalman filter that is supposed to filter 
+the (static) features detected in the arena, in order to localize the drone.
+
+Design :
+
+In order to design a filter that takesi in account acceleration, we must do 
+the following:
+
+STATE OF FILTER:
+state:
+x = [x, x', x'', y, y', y'', z, z', z'']
+let t be the elapsed time, and t² be equal to t*t/2
+state transition:
+F = [ 1, t, t²,0, 0, 0, 0, 0, 0 ]
+    [ 0, 1, t, 0, 0, 0, 0, 0, 0 ]
+    [ 0, 0, 1, 0, 0, 0, 0, 0, 0 ]
+    [ 0, 0, 0, 1, t, t²,0, 0, 0 ]
+    [ 0, 0, 0, 0, 1, t, 0, 0, 0 ]
+    [ 0, 0, 0, 0, 0, 1, 0, 0, 0 ]
+    [ 0, 0, 0, 0, 0, 0, 1, t, t²]
+    [ 0, 0, 0, 0, 0, 0, 0, 1, t ]
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 1 ]
+
+B and u are non-exsistant
+
+SENSORS:
+two sensors are given. Point positions, and acceleration from the imu:
+imu:
+z = [x'', y'', z'']
+H = [0, 0, 1, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 1, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 1]
+
+R is given to us be the imu. It is a 3x3 matrix.
+
+Point positions:
+z = [x, y, z]
+H = [1, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 1, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 1, 0, 0]
+
+R is not given by the system
+
+Since all the systems are linear, we can use the kalman filter?
+

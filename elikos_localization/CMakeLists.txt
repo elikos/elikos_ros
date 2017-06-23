@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   cv_bridge
   geometry_msgs
+  elikos_ros
   nav_msgs
   image_transport
   roscpp
@@ -28,7 +29,12 @@ find_package(Eigen3 REQUIRED)
 
 
 catkin_package(
-  CATKIN_DEPENDS image_transport cv_bridge geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros
+  CATKIN_DEPENDS image_transport cv_bridge elikos_ros geometry_msgs nav_msgs message_runtime roscpp rospy sensor_msgs std_msgs tf2 pcl_ros
+)
+
+catkin_python_setup()
+catkin_add_nosetests(
+  test/feature_tracking/unittest_unscented_kalman_filter.py
 )
 
 add_subdirectory(src/localization)

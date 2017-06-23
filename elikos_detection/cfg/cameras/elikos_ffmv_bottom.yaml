@@ -1,6 +1,8 @@
 #topic: "/cam1/camera/image_raw" #Real Stuff
-topic: "/camera/image_rect_color" #RosBag with ImageProc
-#topic: "/elikos_ffmv_bottom_camera/image_raw" #Simulation Gazebo
+#topic: "/camera/image_rect_color" #RosBag with ImageProc
+
+topic: "/elikos_ffmv_bottom_camera/image_raw" #Simulation Gazebo
+preprocessed_topic: "/elikos_ffmv_bottom_camera/preprocessed"
 
 frame: "elikos_ffmv_bottom"
 calibration: false

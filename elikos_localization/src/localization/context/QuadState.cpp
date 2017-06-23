@@ -1,23 +1,27 @@
 #include "QuadState.h"
 
-namespace localization
-{
+namespace localization {
 
-QuadState* QuadState::instance_ = nullptr;
-
-QuadState* QuadState::getInstance()
+QuadState::QuadState(const std::string& cameraFrame)
+    : cameraFrame_(cameraFrame)
 {
-    if (instance_ == nullptr)
-    {
-        instance_ = new QuadState();
+}
+
+void QuadState::update(ros::Time stamp)
+{
+    timeStamp_ = stamp;
+    try {
+        tfListener_.waitForTransform("elikos_arena_origin", "elikos_fcu",  stamp, ros::Duration(1.0));
+        tfListener_.lookupTransform("elikos_arena_origin", "elikos_fcu", stamp, origin2fcu_);
+
+        tfListener_.waitForTransform("elikos_fcu", cameraFrame_, stamp, ros::Duration(1.0));
+        tfListener_.lookupTransform("elikos_fcu", cameraFrame_, stamp, fcu2camera_);
     }
-    return instance_;
-}
-
-void QuadState::freeInstance()
-{
-    delete instance_;
-    instance_ = nullptr;
+    catch (tf::TransformException e)
+    {
+        ROS_ERROR("%s", e.what());
+    }
 }
 
 }
+
