@@ -33,8 +33,8 @@ void ImageProcessor::processImage(cv::Mat& input, cv::Mat& result)
 
     findLines(edges);
 
-    result = cv::Mat(input.size(), CV_8UC3, cv::Scalar(0, 0, 0));
-    analyzeLineCluster(result);
+    result = cv::Mat(edges.size(), CV_8UC3, cv::Scalar(0, 0, 0));
+    analyzeLineCluster(result, edges.size());
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -64,7 +64,7 @@ void ImageProcessor::findLines(const cv::Mat& edges)
     buildLineArray(rawLines);
 }
 
-void ImageProcessor::analyzeLineCluster(cv::Mat& debug)
+void ImageProcessor::analyzeLineCluster(cv::Mat& debug, const cv::Size& size)
 {
     if (lineCluster_.size() == 0)
     {
@@ -87,7 +87,7 @@ void ImageProcessor::analyzeLineCluster(cv::Mat& debug)
     groupByOrientation(orientationGroup, lineCluster_);
 
 
-    findLineIntersections(orientationGroup);
+    findLineIntersections(orientationGroup, size);
     std::vector<int> clusterMemberships;
     int radius = 0.5 * cameraInfo_.focalLength / state_.getOrigin2Fcu().getOrigin().z();
     DBSCAN::DBSCAN(intersections_, radius, 2, clusterMemberships);
@@ -127,19 +127,19 @@ void ImageProcessor::parseClusterMemberships(const std::vector<int>& clusterMemb
     }
 }
 
-void ImageProcessor::findLineIntersections(const std::vector<LineGroup>& orientationGroups)
+void ImageProcessor::findLineIntersections(const std::vector<LineGroup>& orientationGroups, const cv::Size& size)
 {
     intersections_.clear();
     for (size_t i = 0; i < orientationGroups.size(); ++i) {
         const LineGroup& firstGroup = orientationGroups[i];
         for (size_t j = (i + 1) % orientationGroups.size(); j < orientationGroups.size() - 1; j++) {
             const LineGroup& otherGroup = orientationGroups[j];
-            findLineIntersections(firstGroup, otherGroup);
+            findLineIntersections(firstGroup, otherGroup, size);
         }
     }
 }
 
-void ImageProcessor::findLineIntersections(const LineGroup& firstGroup, const LineGroup otherGroup)
+void ImageProcessor::findLineIntersections(const LineGroup& firstGroup, const LineGroup otherGroup, const cv::Size& size)
 {
     const std::vector<const Line*> firstLines = firstGroup.getLines();
     const std::vector<const Line*> otherLines = otherGroup.getLines();
@@ -156,7 +156,7 @@ void ImageProcessor::findLineIntersections(const LineGroup& firstGroup, const Li
             }
             Vector intersection;
             if (firstLines[i]->findIntersection(*otherLines[j], intersection)) {
-                Eigen::AlignedBox<float, 2> box(Vector(0.0, 0.0), Vector(640.0, 480.0));
+                Eigen::AlignedBox<float, 2> box(Vector(0.0, 0.0), Vector(size.width, size.height));
                 if (box.contains(intersection)) {
                     intersections_.push_back(intersection);
                 }

@@ -50,15 +50,15 @@ private:
     void findEdges(const cv::Mat& src, cv::Mat& edges);
     void findLines(const cv::Mat& edges);
 
-    void analyzeLineCluster(cv::Mat& debug);
+    void analyzeLineCluster(cv::Mat& debug, const cv::Size& size);
     void buildLineArray(const std::vector<cv::Vec2f>& lineCluster);
 
     void groupByOrientation(std::vector<LineGroup>& orientationGroup, const std::vector<Line>& lines);
     void groupByOrientation(std::vector<LineGroup>& group, Line& line);
 
     void parseClusterMemberships(const std::vector<int>& clusterMemberships, std::vector<Eigen::Vector2f>& intersections);
-    void findLineIntersections(const std::vector<LineGroup>& orientationGroups);
-    void findLineIntersections(const LineGroup& firstGroup, const LineGroup otherGroup);
+    void findLineIntersections(const std::vector<LineGroup>& orientationGroups, const cv::Size& size);
+    void findLineIntersections(const LineGroup& firstGroup, const LineGroup otherGroup, const cv::Size& size);
 
     void drawIntersection(const std::vector<Eigen::Vector2f>& intersections, const cv::Scalar& color, cv::Mat& dst);
     void drawLine(cv::Mat& dst, const Line& line, const cv::Scalar& color) const;
