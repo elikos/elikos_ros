@@ -38,42 +38,53 @@ void CmdTravel::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocat
 
 void CmdTravel::execute()
 {
+    ROS_ERROR("CmdTravel");
     isAborted_ = false;
 	ros::Rate rate(30.0);
     
 	tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
 	stepInTrajectory_ = 0;
 
-	//while(!isAborted_ && (stepInTrajectory_ < cmdTrajectory_.points.size()-1))
-	//{
-		double step_lenght = 0;
-		while(stepInTrajectory_ < cmdTrajectory_.points.size()-1)
+	double step_lenght = 0;
+	bool is_too_near = true;
+	while(is_too_near && stepInTrajectory_ < cmdTrajectory_.points.size())
+	{
+		geometry_msgs::Vector3 targetTranslation = cmdTrajectory_.points[stepInTrajectory_].transforms[0].translation;
+		step_lenght = pow(targetTranslation.x-lastPosition_.getOrigin().x(), 2)+
+			pow(targetTranslation.y-lastPosition_.getOrigin().y(), 2)+
+			pow(targetTranslation.z-lastPosition_.getOrigin().z(), 2);
+		if(step_lenght > pow(threshold_,2))
 		{
-			geometry_msgs::Vector3 targetTranslation = cmdTrajectory_.points[stepInTrajectory_].transforms[0].translation;
-			step_lenght = pow(targetTranslation.x-lastPosition_.getOrigin().x(), 2)+
-				pow(targetTranslation.y-lastPosition_.getOrigin().y(), 2)+
-				pow(targetTranslation.z-lastPosition_.getOrigin().z(), 2);
-			if(step_lenght > pow(threshold_,2))
+			is_too_near = false;
+		}
+		else
+		{
+			if (stepInTrajectory_ = cmdTrajectory_.points.size() - 1) 
+			{
 				break;
-			stepInTrajectory_++;
+			}
+			else
+			{
+				stepInTrajectory_++;
+			}
 		}
-		ROS_ERROR_STREAM("stepInTrajectory_:"<<stepInTrajectory_<<" cmdTrajectory_.points.size()"<<cmdTrajectory_.points.size()<<" THRESHOLD:"<<threshold_<<" step_lenght:"<<step_lenght);
-		trajectoryPoint_ = cmdTrajectory_.points[stepInTrajectory_].transforms[0];
+	}
+	ROS_ERROR_STREAM("stepInTrajectory_:"<<stepInTrajectory_<<" cmdTrajectory_.points.size()"<<cmdTrajectory_.points.size()<<" THRESHOLD:"<<threshold_<<" step_lenght:"<<step_lenght);
+	trajectoryPoint_ = cmdTrajectory_.points[stepInTrajectory_].transforms[0];
 
-		if(step_lenght > pow(max_step_,2))
-		{
-			ROS_ERROR_STREAM("Step to big!! step_lenght:"<< " max_step:"<<max_step_);
-			// Interpolation
-			double direction = cv::fastAtan2(trajectoryPoint_.translation.y - lastPosition_.getOrigin().y(), trajectoryPoint_.translation.x - lastPosition_.getOrigin().x()) / 360 * 2 *PI;
-			trajectoryPoint_.translation.x = lastPosition_.getOrigin().x() + max_step_ * std::cos(direction);
-			trajectoryPoint_.translation.y = lastPosition_.getOrigin().y() + max_step_ * std::sin(direction);
-		}
+	if(step_lenght > pow(max_step_,2))
+	{
+		ROS_ERROR_STREAM("Step to big!! step_lenght:"<< step_lenght<<" max_step:"<<max_step_);
+		// Interpolation
+		double direction = cv::fastAtan2(trajectoryPoint_.translation.y - lastPosition_.getOrigin().y(), trajectoryPoint_.translation.x - lastPosition_.getOrigin().x()) / 360 * 2 *PI;
+		trajectoryPoint_.translation.x = lastPosition_.getOrigin().x() + max_step_ * std::cos(direction);
+		trajectoryPoint_.translation.y = lastPosition_.getOrigin().y() + max_step_ * std::sin(direction);
+	}
 
-		tf::Quaternion identity_rotation = tf::createIdentityQuaternion();
-		tf::quaternionTFToMsg(identity_rotation, trajectoryPoint_.rotation);
+	tf::Quaternion identity_rotation = tf::createIdentityQuaternion();
+	tf::quaternionTFToMsg(identity_rotation, trajectoryPoint_.rotation);
 
-		publishTrajectoryPosition(trajectoryPoint_);
-	//}
+	publishTrajectoryPosition(trajectoryPoint_);
 }
 
 
