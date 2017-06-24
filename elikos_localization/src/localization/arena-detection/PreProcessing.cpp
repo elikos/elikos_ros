@@ -26,7 +26,7 @@ PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& stat
                                 cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
 }
 
-void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed)
+void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat& perspectiveTransform)
 {
     cv::Mat typeConverted;
     if (raw.type() != CV_8UC1) {
@@ -43,7 +43,7 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed)
     }
 
     cv::Mat perspective;
-    removePerspective(undistorted, perspective);
+    removePerspective(undistorted, perspective, perspectiveTransform);
 
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
@@ -58,7 +58,7 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed)
     preProcessed = thresholded;
 }
 
-void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
+void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Mat& toPerspective)
 {
     double roll, pitch, yaw = 0.0;
 
@@ -127,24 +127,20 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
         tDst[i] = cv::Point2f(dst[i].x() * width / 2.0 + width / 2.0, dst[i].y() * height / 2.0 + height / 2.0);
     }
 
-    Eigen::Vector4f camDirection = R * Eigen::Vector4f(0.0, 0.0, 1.0, 0.0);
-    float S = 1.0 / std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
+    cv::warpPerspective(input, rectified, cv::getPerspectiveTransform(tSrc, tDst), input.size());
+    toPerspective = cv::getPerspectiveTransform(tDst, tSrc);
 
-    cv::Mat tmp;
-    cv::warpPerspective(input, tmp, cv::getPerspectiveTransform(tSrc, tDst), input.size());
+
+    //Eigen::Vector4f camDirection = R * Eigen::Vector4f(0.0, 0.0, 1.0, 0.0);
+    //float S = 1.0 / std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
+    /*
     if (!std::isnan(S)) {
-        cv::resize(tmp, rectified, cv::Size(), S, S);
+        cv::resize(transformed, rectified, cv::Size(), S, S);
+        //rectified = transformed;
     } else {
         rectified = input.clone();
-    }
+    }*/
 
-    for (int i = 0; i < 4; ++i)
-    {
-        cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
-        cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
-        cv::circle(input, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
-        cv::circle(input, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
-    }
 }
 
 Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLength, double width, double height) const

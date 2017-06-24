@@ -41,34 +41,37 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
     //Stamp the array
     results.header.stamp = ros::Time();
     results.header.frame_id = "elikos_arena_origin";
+
+	//Get the origin to camera transform
+	tf::StampedTransform origin2camera;
+	try {
+		tf_listener_.lookupTransform("elikos_arena_origin", cameraFrameID_, ros::Time(0), origin2camera);
+	}
+	catch (tf::TransformException &ex) {
+		ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
+		ros::Duration(1.0).sleep();
+	}
+	//Get the fcu to camera transform
+	tf::StampedTransform fcu2camera;
+	try {
+		tf_listener_.lookupTransform("elikos_fcu", cameraFrameID_, ros::Time(0), fcu2camera);
+	}
+	catch (tf::TransformException &ex) {
+		ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
+		ros::Duration(1.0).sleep();
+	}
+
 	for(auto robot: robotArray.robots){
+
 		//Define the camera2turret turret transform
 		tf::Transform camera2turret = tf::Transform::getIdentity();
+
 		//Same origin than the camera
 		camera2turret.setOrigin(tf::Vector3(0, 0, 0));
+
 		//Rotation in function of the detection with computer vision
 		tf::Quaternion rotation = computeTurretRotation(robot);
 		camera2turret.setRotation(rotation);
-
-
-		//Get the origin to camera transform
-		tf::StampedTransform origin2camera;
-		try {
-			tf_listener_.lookupTransform("elikos_arena_origin", cameraFrameID_, ros::Time(0), origin2camera);
-		}
-		catch (tf::TransformException &ex) {
-			ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
-			ros::Duration(1.0).sleep();
-		}
-		//Get the fcu to camera transform
-    	tf::StampedTransform fcu2camera;
-		try {
-			tf_listener_.lookupTransform("elikos_fcu", cameraFrameID_, ros::Time(0), fcu2camera);
-		}
-		catch (tf::TransformException &ex) {
-			ROS_ERROR("TransformationUnit::computeTransformForRobots() exception : %s",ex.what());
-			ros::Duration(1.0).sleep();
-		}
 
 		// Compute the origin to turret transform
 		tf::Transform origin2turret = origin2camera * camera2turret;
@@ -150,7 +153,7 @@ tf::Transform TransformationUnit::computeRobotTransform(tf::Transform origin2tur
 	tf::Transform robotFrame = tf::Transform::getIdentity();
 	robotFrame.setOrigin(tf::Vector3(0, 0, 0));
 
-	// Get distance from turret to target (using angle and altitude) Should we use a mavros topic?
+	// Get distance from turret to target (using angle and altitude) Should we use a mavros topic? nope
 	double altitude = origin2turret.getOrigin().getZ();
 	double distance_from_robot = altitude / cos(zAxis_turret_angle);
 	robotFrame.setOrigin(tf::Vector3(0, 0, distance_from_robot));
