@@ -1,0 +1,21 @@
+<launch>
+  <arg name="camera_left"              default="r200_left" />
+  <arg name="camera_left_camera_type"  default="R200"    /> <!-- Type of camera -->
+  <arg name="camera_left_serial_no"    default="2401001385" /> <!-- Note: Replace with actual serial number -->
+  <arg name="camera_left_enable_color"      default="true" />
+  <arg name="camera_left_enable_pointcloud" default="true" />
+  <arg name="camera_left_enable_tf"         default="true" />
+
+  <arg name="manager_left" value="camera_nodelet_manager_left" /> <!-- Single nodelet manager for all cameras -->
+  <node pkg="nodelet" type="nodelet" name="$(arg manager_left)" args="manager" output="screen"/>
+
+  <include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch">
+      <arg name="manager"      value="$(arg manager_left)" />
+      <arg name="camera"       value="$(arg camera_left)" />
+      <arg name="camera_type"  value="$(arg camera_left_camera_type)" />
+      <arg name="serial_no"    value="$(arg camera_left_serial_no)" />
+      <arg name="enable_color"      default="$(arg camera_left_enable_color)" />
+      <arg name="enable_pointcloud" default="$(arg camera_left_enable_pointcloud)" />
+      <arg name="enable_tf"         default="$(arg camera_left_enable_tf)" />
+  </include>
+</launch>

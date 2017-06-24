@@ -96,7 +96,7 @@ setpoint_attitude:
 setpoint_position:
   tf:
     listen: true           # enable tf listener (disable topic subscribers)
-    frame_id: "elikos_local_origin"
+    frame_id: "elikos_arena_origin"
     child_frame_id: "elikos_setpoint"
     rate_limit: 50.0
 
@@ -163,7 +163,7 @@ vision_pose:
   tf:
     listen: true           # enable tf listener (disable topic subscribers)
     frame_id: "elikos_local_origin"
-    child_frame_id: "elikos_vision"
+    child_frame_id: "imu"
     rate_limit: 10.0
 
 # vision_speed_estimate
