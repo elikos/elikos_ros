@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
   tf::StampedTransform initialFcu;
   try {
-    tf_listener_.waitForTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time::now(), ros::Duration(3.0));
+    tf_listener_.waitForTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time::now(), ros::Duration(5.0));
     tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), initialFcu);
   }
   catch (tf::TransformException &ex) {
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
           tf::Quaternion rotation = initialFcu.getRotation();
           double yaw = tf::getYaw(rotation);
           rotation.setRPY(0,0,yaw);
-          ROS_ERROR_STREAM("Initialisation : Yaw diff is : "<<yaw);
+          ROS_INFO_STREAM("Initialisation : Yaw diff is : "<<yaw);
           arenaOriginTransform.setOrigin(origin);
           arenaOriginTransform.setRotation(rotation);
           lookupDone = true;

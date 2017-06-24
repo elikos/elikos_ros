@@ -105,6 +105,22 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
 
     global g_tf_listener, g_frames, g_tf_broadcaster
 
+    init = false
+
+    try:
+        init = not g_tf_listener.canTranform(g_frames["fcu_frame_id"], g_frames["arena_center_frame_id"], frame_time)
+    except (tf.Exception) :
+        init = true
+    if init:
+        g_tf_broadcaster.sendTransform(
+            (0, 0, 0),
+            (0, 0, 0, 1),
+            frame_time,
+            g_frames["output_position_fcu"],
+            g_frames["arena_center_frame_id"]
+        )
+        return
+
     (trans_ref2arena, rot_ref2arena) = get_tf_transform(
         g_frames["arena_center_frame_id"],
         input_points_frame,
@@ -118,6 +134,17 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
         frame_time,
         rospy.Duration(3.0)
     )
+
+    if len(input_points_3d) == 0:
+        rospy.loginfo("Using fcu")
+        g_tf_broadcaster.sendTransform(
+            trans_fcu2arena,
+            pt_manip.create_tf_from_quaterion(rot_fcu2arena),
+            frame_time,
+            g_frames["output_position_fcu"],
+            g_frames["arena_center_frame_id"]
+        )
+        return
 
     input_points_3d = quaternion.rotate_vectors(rot_ref2arena, input_points_3d)
     input_points_3d += trans_ref2arena
@@ -225,9 +252,6 @@ def init_node():
 
     g_tf_listener = tf.TransformListener()
     g_tf_broadcaster = tf.TransformBroadcaster()
-
-    #wait for tf
-    g_tf_listener.waitForTransform(g_frames["arena_center_frame_id"], g_frames["base_link_frame_id"], rospy.Time(), rospy.Duration(1))
 
     rospy.Subscriber(topic_localization_points, elikos_ros.IntersectionArray, callback=input_localization_points)
 
