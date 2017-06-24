@@ -22,16 +22,17 @@ find_package(OpenCV 2 REQUIRED)
 
 
 catkin_package(
-#   INCLUDE_DIRS include
-#   LIBRARIES elikos_detection
+   INCLUDE_DIRS src/elikos_transformation_utils
+   LIBRARIES elikos_transformation_utils
 	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf
 #   DEPENDS system_lib
 )
 
 include_directories(
 	${catkin_INCLUDE_DIRS}
-  src/elikos_detection/TargetDetection/CVWrapper
   ${OpenCV_INCLUDE_DIRS}
+  src/elikos_detection/TargetDetection/CVWrapper
+  src/elikos_transformation_utils
 )
 
 add_executable( elikos_detection
@@ -71,6 +72,11 @@ add_executable( elikos_transformation
    src/elikos_transformation/MessageHandler.cpp
    src/elikos_transformation/TransformationUnit.h
    src/elikos_transformation/TransformationUnit.cpp)
+
+add_library( elikos_transformation_utils
+    STATIC
+    src/elikos_transformation_utils/TransformationUtils.cpp
+    src/elikos_transformation_utils/TransformationUtils.h)
 
 target_link_libraries(elikos_transformation
   ${catkin_LIBRARIES}

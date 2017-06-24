@@ -14,6 +14,8 @@
 
 #include <ros/ros.h>
 
+#include "geometry_msgs/PoseArray.h"
+
 #include <elikos_ros/Intersection.h>
 #include <elikos_ros/IntersectionArray.h>
 
@@ -32,7 +34,9 @@ public:
     IntersectionTransform(const CameraInfo& cameraInfo, const QuadState& state);
     ~IntersectionTransform() = default;
 
-    void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections);
+    void transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
+                                const cv::Mat& perspectiveTransform,
+                                cv::Size imageSize);
 
 private:
 
@@ -43,7 +47,7 @@ private:
     double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
     void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, tf::Vector3& intersection, tf::Vector3& offset) const;
     void publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                         const std::vector<tf::Vector3>& TransformedIntersections);
+                                         const geometry_msgs::PoseArray& poseArray);
 
     visualization_msgs::Marker marker_;
 

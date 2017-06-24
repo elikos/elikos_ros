@@ -50,7 +50,7 @@ private:
     void findEdges(const cv::Mat& src, cv::Mat& edges);
     void findLines(const cv::Mat& edges);
 
-    void analyzeLineCluster(cv::Mat& debug, const cv::Size& size);
+    void analyzeLineCluster(cv::Mat& debug, const cv::Size& size, const cv::Mat& perspectiveTransform);
     void buildLineArray(const std::vector<cv::Vec2f>& lineCluster);
 
     void groupByOrientation(std::vector<LineGroup>& orientationGroup, const std::vector<Line>& lines);

@@ -26,7 +26,7 @@ PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& stat
                                 cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
 }
 
-void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed)
+void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat& perspectiveTransform)
 {
     cv::Mat typeConverted;
     if (raw.type() != CV_8UC1) {
@@ -43,7 +43,7 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed)
     }
 
     cv::Mat perspective;
-    removePerspective(undistorted, perspective);
+    removePerspective(undistorted, perspective, perspectiveTransform);
 
     cv::Mat blured;
     cv::GaussianBlur(perspective, blured, cv::Size(7,7), 8, 8);
@@ -58,7 +58,7 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed)
     preProcessed = thresholded;
 }
 
-void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
+void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Mat& toPerspective)
 {
     double roll, pitch, yaw = 0.0;
 
@@ -130,10 +130,13 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified)
     Eigen::Vector4f camDirection = R * Eigen::Vector4f(0.0, 0.0, 1.0, 0.0);
     float S = 1.0 / std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
 
-    cv::Mat tmp;
-    cv::warpPerspective(input, tmp, cv::getPerspectiveTransform(tSrc, tDst), input.size());
+    cv::Mat transformed;
+    cv::warpPerspective(input, transformed, cv::getPerspectiveTransform(tSrc, tDst), input.size());
+    toPerspective = cv::getPerspectiveTransform(tDst, tSrc);
+
     if (!std::isnan(S)) {
-        cv::resize(tmp, rectified, cv::Size(), S, S);
+        //cv::resize(transformed, rectified, cv::Size(), S, S);
+        rectified = transformed;
     } else {
         rectified = input.clone();
     }

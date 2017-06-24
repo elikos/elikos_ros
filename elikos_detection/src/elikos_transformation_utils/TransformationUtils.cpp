@@ -6,6 +6,9 @@
 
 #include "TransformationUtils.h"
 
+#include <cmath>
+#include <tf/transform_broadcaster.h>
+
 namespace transformation_utils {
 
 geometry_msgs::PoseArray getFcu2TargetArray(const tf::StampedTransform& origin2fcu,
@@ -24,7 +27,6 @@ geometry_msgs::PoseArray getFcu2TargetArray(const tf::StampedTransform& origin2f
         poseArray.poses.push_back(computeFcu2Target(fcu2camera, origin2camera, points[i], dimensions, hfov, vfov));
     }
     return poseArray;
-
 }
 
 geometry_msgs::PoseStamped getFcu2Target(const tf::StampedTransform& origin2fcu,
@@ -59,7 +61,6 @@ geometry_msgs::Pose computeFcu2Target(const tf::StampedTransform& fcu2camera,
     tf::Quaternion rotation = computeTurretRotation(point, dimensions, hfov, vfov);
     camera2turret.setRotation(rotation);
 
-
     // Compute the origin to turret transform
     tf::Transform origin2turret = origin2camera * camera2turret;
 
@@ -88,9 +89,15 @@ tf::Transform computeTurret2Target(tf::Transform origin2turret)
     tf::Transform robotFrame = tf::Transform::getIdentity();
     robotFrame.setOrigin(tf::Vector3(0, 0, 0));
 
+    tf::Transform lol2 = tf::Transform::getIdentity();
+    lol2.setOrigin(tf::Vector3(0, 0, 0));
+    lol2.setRotation(origin2turret.getRotation());
     // Get distance from turret to target (using angle and altitude) Should we use a mavros topic? nope
     double altitude = origin2turret.getOrigin().getZ();
-    double distance_from_robot = altitude / cos(zAxis_turret_angle);
+    tf::Vector3 direction = lol2.inverse() * tf::Vector3(0,0,1);
+    double distance_from_robot = altitude*(pow(direction.x(), 2) +pow(direction.y(), 2) +pow(direction.z(), 2))/-direction.z();
+
+            //altitude / cos(zAxis_turret_angle);
     robotFrame.setOrigin(tf::Vector3(0, 0, distance_from_robot));
     //Set the orientation
     //the robots are on the ground, so we use the local_origin frame
@@ -103,14 +110,34 @@ tf::Transform computeTurret2Target(tf::Transform origin2turret)
 tf::Quaternion computeTurretRotation(cv::Point2f point, cv::Size imageSize,
                                                          float hfov, float vfov)
 {
+    float f = imageSize.width / (2.f * tan(hfov / 2));
     //initialization
-    tf::Quaternion rotation = tf::createIdentityQuaternion();
+    //tf::Quaternion rotation = tf::createIdentityQuaternion();
     //compute angles
-    double roll = -((double) (point.y - imageSize.height / 2) / (double) imageSize.height) * vfov;
-    double pitch = ((double) (point.x - imageSize.width / 2) / (double) imageSize.width) * hfov;
+    //double roll = -((double) (point.y - imageSize.height / 2) / (double) imageSize.height) * vfov;rotation
+    //double pitch = ((double) (point.x - imageSize.width / 2) / (double) imageSize.width) * hfov;
+    //double roll = -(double) atan2((point.y - imageSize.height / 2), f);
+    //double pitch = (double) atan2((point.x - imageSize.width / 2), f);
     //set rotation
-    rotation.setRPY(roll , pitch, (double) 0.0);
-    return rotation;
+    //rotation.setRPY(roll , pitch, (double) 0.0);
+    tf::Vector3 camera(0, 0, f);
+    tf::Vector3 turret(point.x-imageSize.width / 2, point.y - imageSize.height / 2, f);
+    float k_cos_theta = camera.dot(turret);
+    float k = std::sqrt(camera.length2() * turret.length2());
+
+    tf::Vector3 result;
+
+    //if((int)(k_cos_theta/k) == -1)
+    //{
+    //    result = result.normalize();
+    //    rotation
+    //}
+
+    result = camera.cross(turret);
+
+    tf::Quaternion rotation(result.x(), result.y(), result.z(), k_cos_theta+k);
+
+    return rotation.normalize();
 }
 
 }

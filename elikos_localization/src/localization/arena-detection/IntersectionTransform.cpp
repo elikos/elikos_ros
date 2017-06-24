@@ -1,9 +1,11 @@
 #include <iostream>
 
 #include "tf/tf.h"
-#include <geometry_msgs/Point.h>
+
 
 #include "QuadState.h"
+
+#include "TransformationUtils.h"
 
 #include "IntersectionTransform.h"
 
@@ -35,8 +37,8 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     marker_.scale.y = 0.05;
     marker_.scale.z = 0.05;
     marker_.color.a = 1.0; // Don't forget to set the alpha!
-    marker_.color.r = 0.0;
-    marker_.color.g = 1.0;
+    marker_.color.r = 1.0;
+    marker_.color.g = 0.0;
     marker_.color.b = 0.0;
 
 
@@ -53,36 +55,27 @@ void IntersectionTransform::updateKDTree(const std::vector<Eigen::Vector2f>& ima
     kdTree_.setInputCloud(pointCloud_);
 }
 
-void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections)
+void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
+                                                   const cv::Mat& perspectiveTransform,
+                                                   cv::Size imageSize)
 {
     if (imageIntersections.size() < 1) return;
 
     updateKDTree(imageIntersections);
     double z = estimateAltitude(imageIntersections);
 
-    tf::Vector3 cameraDirection(0.0, 0.0, 1.0);
-    cameraDirection =  state_.getOrigin2Fcu() * state_.getFcu2Camera() * cameraDirection;
-
-    tf::Vector3 height(0.0, 0.0, z);
-
-    tf::Vector3 offset = (cameraDirection * height.length()) / cameraDirection.dot(tf::Vector3(0.0, 0.0, -1.0)) + height;
-
-    tf::Vector3 smallest(10.0, 10.0, 10.0);
-
-    std::vector<tf::Vector3> transformedIntersections;
+    std::vector<cv::Point2f> dst;
+    std::vector<cv::Point2f> src;
     for (int i = 0; i < imageIntersections.size(); ++i)
     {
-        tf::Vector3 transformedIntersection(0.0, 0.0, z);
-        transformIntersectionXY(imageIntersections[i], transformedIntersection, offset);
-
-        if (transformedIntersection.length() < smallest.length())
-        {
-            smallest = transformedIntersection;
-        }
-        transformedIntersections.push_back(std::move(transformedIntersection));
+        src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
     }
+    cv::perspectiveTransform(src, dst, perspectiveTransform);
 
-    publishTransformedIntersections(imageIntersections, transformedIntersections);
+    publishTransformedIntersections(imageIntersections,
+                                    transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
+                                                                             state_.getFcu2Camera(), dst, imageSize,
+                                                                             cameraInfo_.hfov, cameraInfo_.vfov));
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
@@ -110,15 +103,12 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
             totalHeight += height;
             ++sampleSize;
             estimate = totalHeight / sampleSize;
-            std::string e(std::to_string(error));
-            ROS_ERROR(e.c_str());
         }
     }
     // We detected only 1 intersection, we use the current state of the quad.
     else 
     {
         estimate = currentPosition.z();
-        ROS_ERROR("BYPASS");
     }
     return estimate;
 }
@@ -140,12 +130,11 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
 
 
 void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
-                                                            const std::vector<tf::Vector3>& transformedIntersections)
+                                                            const geometry_msgs::PoseArray& poseArray)
 {
-    if (imageIntersections.size() == transformedIntersections.size()) 
+    if (imageIntersections.size() == poseArray.poses.size())
     {
         elikos_ros::IntersectionArray msg;
-        // TODO: Use the stamp from the image.
         msg.header.stamp = state_.getTimeStamp();
         msg.header.frame_id = "elikos_fcu";
 
@@ -157,17 +146,12 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<Ei
             intersection.imagePosition.x = imageIntersections[i].x();
             intersection.imagePosition.y = imageIntersections[i].y();
 
-            intersection.arenaPosition.x = transformedIntersections[i].x();
-            intersection.arenaPosition.y = transformedIntersections[i].y();
-            intersection.arenaPosition.z = transformedIntersections[i].z();
+
+            intersection.arenaPosition = poseArray.poses[i].position;
 
             marker_.id = i;
             marker_.header.stamp = ros::Time::now();
-            
-            marker_.pose.position.x = transformedIntersections[i].x();
-            marker_.pose.position.y = transformedIntersections[i].y();
-            marker_.pose.position.z = transformedIntersections[i].z();
-
+            marker_.pose = poseArray.poses[i];
             array.markers.push_back(marker_);
             msg.intersections.push_back(intersection);
         }
