@@ -36,6 +36,7 @@ void ImageProcessor::processImage(cv::Mat& input, cv::Mat& result)
 
     result = cv::Mat(edges.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     analyzeLineCluster(result, edges.size(), perspectiveTransform);
+    /*
 
     cv::Mat debug;
     cv::warpPerspective(input, debug, perspectiveTransform, debug.size());
@@ -61,6 +62,7 @@ void ImageProcessor::processImage(cv::Mat& input, cv::Mat& result)
         cv::imshow("debug", input);
         cv::waitKey(30);
     }
+    */
 }
 void ImageProcessor::findEdges(const cv::Mat& src, cv::Mat& edges)
 {
@@ -115,13 +117,18 @@ void ImageProcessor::analyzeLineCluster(cv::Mat& debug, const cv::Size& size, co
 
     findLineIntersections(orientationGroup, size);
     std::vector<int> clusterMemberships;
-    //int radius = 0.5 * cameraInfo_.focalLength / state_.getOrigin2Fcu().getOrigin().z();
-    DBSCAN::DBSCAN(intersections_, 50, 2, clusterMemberships);
+    tf::Transform origin2camera = state_.getOrigin2Fcu() * state_.getFcu2Camera();
+    tf::Vector3 camDirection = tf::quatRotate(origin2camera.getRotation(), tf::Vector3(0.0, 0.0, 1.0));
+
+    camDirection.normalize();
+    float S = std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
+    int radius = 0.5 * S * cameraInfo_.focalLength / state_.getOrigin2Fcu().getOrigin().z();
+    DBSCAN::DBSCAN(intersections_, radius, 2, clusterMemberships);
 
     std::vector<Vector> intersections;
     parseClusterMemberships(clusterMemberships, intersections);
 
-    drawIntersection(intersections_, cv::Scalar(150, 150, 0), debug);
+    //drawIntersection(intersections_, cv::Scalar(150, 150, 0), debug);
     drawIntersection(intersections, cv::Scalar(0, 0, 150), debug);
 
     intersectionTransform_.transformIntersections(intersections, perspectiveTransform, size);

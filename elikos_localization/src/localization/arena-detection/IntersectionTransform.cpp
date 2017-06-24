@@ -40,8 +40,6 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     marker_.color.r = 1.0;
     marker_.color.g = 0.0;
     marker_.color.b = 0.0;
-
-
 }
 
 
@@ -146,11 +144,10 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<Ei
             intersection.imagePosition.x = imageIntersections[i].x();
             intersection.imagePosition.y = imageIntersections[i].y();
 
-
             intersection.arenaPosition = poseArray.poses[i].position;
 
             marker_.id = i;
-            marker_.header.stamp = ros::Time::now();
+            marker_.header.stamp = state_.getTimeStamp();
             marker_.pose = poseArray.poses[i];
             array.markers.push_back(marker_);
             msg.intersections.push_back(intersection);

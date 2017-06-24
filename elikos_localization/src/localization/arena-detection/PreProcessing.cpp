@@ -127,27 +127,20 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Ma
         tDst[i] = cv::Point2f(dst[i].x() * width / 2.0 + width / 2.0, dst[i].y() * height / 2.0 + height / 2.0);
     }
 
-    Eigen::Vector4f camDirection = R * Eigen::Vector4f(0.0, 0.0, 1.0, 0.0);
-    float S = 1.0 / std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
-
-    cv::Mat transformed;
-    cv::warpPerspective(input, transformed, cv::getPerspectiveTransform(tSrc, tDst), input.size());
+    cv::warpPerspective(input, rectified, cv::getPerspectiveTransform(tSrc, tDst), input.size());
     toPerspective = cv::getPerspectiveTransform(tDst, tSrc);
 
+
+    //Eigen::Vector4f camDirection = R * Eigen::Vector4f(0.0, 0.0, 1.0, 0.0);
+    //float S = 1.0 / std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
+    /*
     if (!std::isnan(S)) {
-        //cv::resize(transformed, rectified, cv::Size(), S, S);
-        rectified = transformed;
+        cv::resize(transformed, rectified, cv::Size(), S, S);
+        //rectified = transformed;
     } else {
         rectified = input.clone();
-    }
+    }*/
 
-    for (int i = 0; i < 4; ++i)
-    {
-        cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
-        cv::circle(rectified, tSrc[i], 5, cv::Scalar(0, 200 ,0), -1);
-        cv::circle(input, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
-        cv::circle(input, tDst[i], 5, cv::Scalar(0, 100 ,0), -1);
-    }
 }
 
 Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLength, double width, double height) const
