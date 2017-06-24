@@ -14,7 +14,7 @@
     <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/gazebo_r200_back.yaml" ns="gazebo_r200_back"/>
 
 	<!-- Static transforms -->
-	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
+	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0.024 0.147 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
 	<node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
     <node pkg="tf" type="static_transform_publisher" name="r200_front_broadcaster" args="0.15 0 0 0.6029 -0.6029 0.3695 -0.3695 elikos_base_link r200_front 100" />
     <node pkg="tf" type="static_transform_publisher" name="r200_left_broadcaster" args="0 0.15 0 -0.8526 0.0 0.0 0.5225 elikos_base_link r200_left 100" />
