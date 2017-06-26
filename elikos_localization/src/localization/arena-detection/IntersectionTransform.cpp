@@ -57,23 +57,26 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
                                                    const cv::Mat& perspectiveTransform,
                                                    cv::Size imageSize)
 {
-    if (imageIntersections.size() < 1) return;
-
-    updateKDTree(imageIntersections);
-    double z = estimateAltitude(imageIntersections);
-
-    std::vector<cv::Point2f> dst;
-    std::vector<cv::Point2f> src;
-    for (int i = 0; i < imageIntersections.size(); ++i)
+    if (imageIntersections.size() >= 1)
     {
-        src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
-    }
-    cv::perspectiveTransform(src, dst, perspectiveTransform);
+        updateKDTree(imageIntersections);
+        double z = estimateAltitude(imageIntersections);
 
-    publishTransformedIntersections(imageIntersections,
-                                    transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
-                                                                             state_.getFcu2Camera(), dst, imageSize,
-                                                                             cameraInfo_.hfov, cameraInfo_.vfov));
+        std::vector<cv::Point2f> dst;
+        std::vector<cv::Point2f> src;
+        for (int i = 0; i < imageIntersections.size(); ++i)
+        {
+            src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
+        }
+        cv::perspectiveTransform(src, dst, perspectiveTransform);
+
+        publishTransformedIntersections(imageIntersections,
+                                        transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
+                                                                                 state_.getFcu2Camera(), dst, imageSize,
+                                                                                 cameraInfo_.hfov, cameraInfo_.vfov));
+    } else {
+        publishTransformedIntersections(std::vector<Eigen::Vector2f>(), geometry_msgs::PoseArray());
+    }
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
