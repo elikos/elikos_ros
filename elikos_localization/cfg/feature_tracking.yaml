@@ -1,1 +1,15 @@
+#frame in the center of the arena
+arena_center_frame_id: "arc"
+#frame of the fcu
+fcu_frame_id: "elikos_fcu"
+#output frame of the vision
 output_position_fcu_frame_id: "elikos_vision_debug"
+
+#initial pose of the drone
+initial_drone_pos: [-1, -0.5, 0.14]
+initial_drone_rot: [1, 0, 0, 0]
+
+# Nombre d'intersection de l'arène sur une dimention
+arena_intersection_num: 6
+# mesure de côté de l'arère (en m)
+arena_size: 5

@@ -5,6 +5,7 @@ Fallback du merge des points.
 """
 import threading
 import math
+import sys
 
 import numpy as np
 import quaternion
@@ -24,21 +25,22 @@ import message_interface as msgs
 import point_manipulation as pt_manip
 import point_matching as pt_match
 
+###
+#
+# Classes
+#
+###
+class LocalizationUnavailableException(Exception):
+    u"""
+    Excepition thrown when the drone cannot localize itself.
+    """
+    pass
 
 ###
 #
 # Math methods
 #
 ###
-def create_grid_mesh(side_points_number, side_mesure):
-    u"""
-    Creates a grid mesh containing side_points_number² points ane mesuring side_mesure x side_mesure
-    """
-    x = np.linspace(0, side_mesure, num=side_points_number)
-    y = np.linspace(0, side_mesure, num=side_points_number)
-    z = np.array([0])
-    xs, ys, zs = np.meshgrid(x, y, z)
-    return np.stack([xs.ravel(), ys.ravel(), zs.ravel()], axis=1)
 
 def closest_point(point_array, position):
     """
@@ -94,32 +96,20 @@ def input_localization_points(localization_msg):
     #type: (elikos_ros.IntersectionArray)->None
 
     points_image, points_arena = msgs.deserialize_intersections(localization_msg)
-    stamp = localization_msg.header.stamp
+    time = localization_msg.header.stamp
     frame = localization_msg.header.frame_id
 
-    localize_drone(points_arena, frame, stamp)
+    try:
+        localize_drone(points_arena, frame, time)
+    except LocalizationUnavailableException:
+        rospy.logwarn("Localization unavailable!")
+        publish_fcu_transform(g_fcu_last_pose[0], g_fcu_last_pose[1], time)
 
 
 def localize_drone(input_points_3d, input_points_frame, frame_time):
     # type: (np.ndarray, str, rospy.Time)->None
 
-    global g_tf_listener, g_frames, g_tf_broadcaster
-
-    init = false
-
-    try:
-        init = not g_tf_listener.canTranform(g_frames["fcu_frame_id"], g_frames["arena_center_frame_id"], frame_time)
-    except (tf.Exception) :
-        init = true
-    if init:
-        g_tf_broadcaster.sendTransform(
-            (0, 0, 0),
-            (0, 0, 0, 1),
-            frame_time,
-            g_frames["output_position_fcu"],
-            g_frames["arena_center_frame_id"]
-        )
-        return
+    global g_tf_listener, g_frames, g_tf_broadcaster, g_fcu_last_pose
 
     (trans_ref2arena, rot_ref2arena) = get_tf_transform(
         g_frames["arena_center_frame_id"],
@@ -134,17 +124,8 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
         frame_time,
         rospy.Duration(3.0)
     )
+    g_fcu_last_pose = (trans_fcu2arena, rot_fcu2arena)
 
-    if len(input_points_3d) == 0:
-        rospy.loginfo("Using fcu")
-        g_tf_broadcaster.sendTransform(
-            trans_fcu2arena,
-            pt_manip.create_tf_from_quaterion(rot_fcu2arena),
-            frame_time,
-            g_frames["output_position_fcu"],
-            g_frames["arena_center_frame_id"]
-        )
-        return
 
     input_points_3d = quaternion.rotate_vectors(rot_ref2arena, input_points_3d)
     input_points_3d += trans_ref2arena
@@ -157,6 +138,7 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
     transform_arena_pts = matched_areana_points[:, mask] - np.array([trans_ref2arena[0], trans_ref2arena[1]])
     transform_detected_pts = input_points_3d[:, mask] - np.array([trans_ref2arena[0], trans_ref2arena[1]])
 
+
     tmp_publish(np.concatenate([transform_arena_pts, transform_detected_pts]))
 
 
@@ -168,7 +150,8 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
 
     if transform is None:
         rospy.logwarn("The transformation was null! Skipping message.")
-        return
+        raise LocalizationUnavailableException
+
 
     angle_delta = math.atan2(transform[0, 0], transform[1, 0])
     if angle_delta > 3 * math.pi / 4:
@@ -184,15 +167,24 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
     dx = transform[0, 2]
     dy = transform[1, 2]
 
+    print transform
+    print "{0}, {1}".format(dx, dy)
 
     delta_rot = quaternion.from_euler_angles(0, 0, -angle_delta)
 
     trans = trans_fcu2arena + np.array((dx, dy, 0))
 
+    publish_fcu_transform(trans, delta_rot * rot_fcu2arena, frame_time)
+
+
+def publish_fcu_transform(trans, rot, frame_time):
+    # type: (np.ndarray, quaternion.quaternion, rospy.Time)->None
+
+    global g_tf_broadcaster, g_frames
 
     g_tf_broadcaster.sendTransform(
         trans,
-        pt_manip.create_tf_from_quaterion(delta_rot * rot_fcu2arena),
+        pt_manip.create_tf_from_quaterion(rot),
         frame_time,
         g_frames["output_position_fcu"],
         g_frames["arena_center_frame_id"]
@@ -228,9 +220,39 @@ def tmp_publish(camera_points):
 def get_tf_transform(source_frame, dest_frame, time, timeout):
     # type: (str, str, rospy.Time, rospy.Duration)->(np.ndarray, quaternion.quaternion)
     global g_tf_listener
-    g_tf_listener.waitForTransform(source_frame, dest_frame, time, timeout)
+    try:
+        g_tf_listener.waitForTransform(source_frame, dest_frame, time, timeout)
+    except Exception:
+        _, ex, traceback = sys.exc_info()
+        message = "Failed getting tf from '%s' to '%s': %s." % (
+            source_frame,
+            dest_frame,
+            ex.strerror
+        )
+        raise LocalizationUnavailableException, (ex.errno, message), traceback
+
     (trans, rot) = g_tf_listener.lookupTransform(source_frame, dest_frame, time)
     return np.array(trans), pt_manip.create_quaterion_from_tf(rot)
+
+
+def initial_hack(initial_fcu_pose, initial_fcu_rot):
+    global g_fcu_last_pose, g_frames
+
+    r = rospy.Rate(10)
+
+    while g_fcu_last_pose is None and not rospy.is_shutdown():
+        publish_fcu_transform(initial_fcu_pose, initial_fcu_rot, rospy.Time.now())
+        try:
+            g_fcu_last_pose = get_tf_transform(
+                g_frames["arena_center_frame_id"],
+                g_frames["fcu_frame_id"],
+                rospy.Time.now(),
+                rospy.Duration(0.05)
+            )
+        except Exception:
+            g_fcu_last_pose = None
+        r.sleep()
+
 
 
 def init_node():
@@ -241,14 +263,15 @@ def init_node():
     rospy.init_node("feature_tracking")
 
     #speed is from mavros vecause TF dosen't store that
-    topic_mavros_speed = rospy.get_param("mavros_speed_topic", "/mavros/global_position/local")
-    topic_localization_points = rospy.get_param("topic_localization_points", "/localization/features")
-    topic_publication_pose = rospy.get_param("topic_publication_pose", "/localization/drone_pose")
+    topic_mavros_speed = rospy.get_param("~mavros_speed_topic", "/mavros/global_position/local")
+    topic_localization_points = rospy.get_param("~topic_localization_points", "/localization/features")
+    topic_publication_pose = rospy.get_param("~topic_publication_pose", "/localization/drone_pose")
 
-    g_frames["arena_center_frame_id"] = rospy.get_param("arena_center_frame_id", "elikos_arena_origin")
-    g_frames["base_link_frame_id"] = rospy.get_param("arena_center_frame_id", "elikos_base_link")
-    g_frames["fcu_frame_id"] = rospy.get_param("arena_center_frame_id", "elikos_fcu")
-    g_frames["output_position_fcu"] = rospy.get_param("output_position_fcu_frame_id", "elikos_vision")
+    g_frames["arena_center_frame_id"] = rospy.get_param("~arena_center_frame_id", "elikos_arena_origin")
+    g_frames["fcu_frame_id"] = rospy.get_param("~fcu_frame_id", "elikos_fcu")
+    g_frames["output_position_fcu"] = rospy.get_param("~output_position_fcu_frame_id", "elikos_vision")
+
+    rospy.loginfo("Publishing on %s", g_frames["output_position_fcu"])
 
     g_tf_listener = tf.TransformListener()
     g_tf_broadcaster = tf.TransformBroadcaster()
@@ -267,12 +290,33 @@ def init_node():
 g_tf_listener = None
 g_tf_broadcaster = None
 
-g_arena_points = create_grid_mesh(side_points_number=21, side_mesure=20) - np.array([10, 10, 0])
+g_arena_points = pt_match.create_grid_mesh(side_points_number=21, side_mesure=20) - np.array([10, 10, 0])
 
 g_frames = {}
 
+g_fcu_last_pose = None
+
 if __name__ == '__main__':
     init_node()
+
+    g_arena_points = pt_match.create_grid_mesh(
+        side_mesure=rospy.get_param("~arena_size", 20),
+        side_points_number=rospy.get_param("~arena_intersection_num", 21)
+    )
+
+    initial_drone_position = np.array(
+        rospy.get_param("~initial_drone_pos", [0, 0, 0])
+    )
+
+
+    initial_drone_rotation = quaternion.as_quat_array(
+        np.array(
+            rospy.get_param("~initial_drone_rot", [1, 0, 0, 0])
+        )
+    )
+
+    initial_hack(initial_drone_position, initial_drone_rotation)
+
     rospy.spin()
 
 
