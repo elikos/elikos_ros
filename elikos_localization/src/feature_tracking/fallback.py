@@ -92,6 +92,12 @@ def input_localization_points_point_array(point_array):
     localize_drone(camera_points, camera_frame, point_array.header.stamp)
 
 
+def no_estimate_shit(time):
+    global g_fcu_last_pose
+    publish_fcu_transform(g_fcu_last_pose[0], g_fcu_last_pose[1], time)
+    #pass
+
+
 def input_localization_points(localization_msg):
     #type: (elikos_ros.IntersectionArray)->None
 
@@ -99,11 +105,15 @@ def input_localization_points(localization_msg):
     time = localization_msg.header.stamp
     frame = localization_msg.header.frame_id
 
+    if points_arena.shape[0] == 0:
+        no_estimate_shit(time)
+        return
+
     try:
         localize_drone(points_arena, frame, time)
     except LocalizationUnavailableException:
         rospy.logwarn("Localization unavailable!")
-        publish_fcu_transform(g_fcu_last_pose[0], g_fcu_last_pose[1], time)
+        no_estimate_shit(time)
 
 
 def localize_drone(input_points_3d, input_points_frame, frame_time):
@@ -141,33 +151,37 @@ def localize_drone(input_points_3d, input_points_frame, frame_time):
 
     tmp_publish(np.concatenate([transform_arena_pts, transform_detected_pts]))
 
+    if input_points_3d.shape[0] <= 2:
+        angle_delta = 0
+        dx = transform_arena_pts[0, 0] - transform_detected_pts[0, 0]
+        dy = transform_arena_pts[0, 1] - transform_detected_pts[0, 1]
+    else:
+        transform = cv2.estimateRigidTransform(
+            pt_manip.prepare_points_for_cv(transform_detected_pts),
+            pt_manip.prepare_points_for_cv(transform_arena_pts),
+            False
+        )
 
-    transform = cv2.estimateRigidTransform(
-        pt_manip.prepare_points_for_cv(transform_detected_pts),
-        pt_manip.prepare_points_for_cv(transform_arena_pts),
-        False
-    )
-
-    if transform is None:
-        rospy.logwarn("The transformation was null! Skipping message.")
-        raise LocalizationUnavailableException
+        if transform is None:
+            rospy.logwarn("The transformation was null! Skipping message.")
+            raise LocalizationUnavailableException
 
 
-    angle_delta = math.atan2(transform[0, 0], transform[1, 0])
-    if angle_delta > 3 * math.pi / 4:
-        angle_delta -= math.pi
-    elif angle_delta > math.pi / 4:
-        angle_delta -= math.pi / 2
-    elif angle_delta < - 3 * math.pi / 4:
-        angle_delta += math.pi
-    elif angle_delta < - math.pi / 4:
-        angle_delta += math.pi / 2
+        angle_delta = math.atan2(transform[0, 0], transform[1, 0])
+        if angle_delta > 3 * math.pi / 4:
+            angle_delta -= math.pi
+        elif angle_delta > math.pi / 4:
+            angle_delta -= math.pi / 2
+        elif angle_delta < - 3 * math.pi / 4:
+            angle_delta += math.pi
+        elif angle_delta < - math.pi / 4:
+            angle_delta += math.pi / 2
 
-    scale = math.sqrt(transform[0, 0] ** 2 + transform[1, 0] ** 2)
-    dx = transform[0, 2]
-    dy = transform[1, 2]
+        scale = math.sqrt(transform[0, 0] ** 2 + transform[1, 0] ** 2)
+        dx = transform[0, 2]
+        dy = transform[1, 2]
 
-    print transform
+        print transform
     print "{0}, {1}".format(dx, dy)
 
     delta_rot = quaternion.from_euler_angles(0, 0, -angle_delta)
@@ -223,13 +237,7 @@ def get_tf_transform(source_frame, dest_frame, time, timeout):
     try:
         g_tf_listener.waitForTransform(source_frame, dest_frame, time, timeout)
     except Exception:
-        _, ex, traceback = sys.exc_info()
-        message = "Failed getting tf from '%s' to '%s': %s." % (
-            source_frame,
-            dest_frame,
-            ex.strerror
-        )
-        raise LocalizationUnavailableException, (ex.errno, message), traceback
+        raise LocalizationUnavailableException
 
     (trans, rot) = g_tf_listener.lookupTransform(source_frame, dest_frame, time)
     return np.array(trans), pt_manip.create_quaterion_from_tf(rot)
@@ -253,6 +261,9 @@ def initial_hack(initial_fcu_pose, initial_fcu_rot):
             g_fcu_last_pose = None
         r.sleep()
 
+
+def publish_fcu_if_no_pos():
+    pass
 
 
 def init_node():
