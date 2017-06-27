@@ -13,3 +13,9 @@ initial_drone_rot: [1, 0, 0, 0]
 arena_intersection_num: 6
 # mesure de côté de l'arère (en m)
 arena_size: 5
+
+
+# float : time spent publishing the initial transform after fcu is detected to allow stabilisation
+stabilization_time: 3.0
+# Si on publie la position du FCU
+publish_fcu_on_failure: On
