@@ -69,11 +69,14 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
         src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
     }
     cv::perspectiveTransform(src, dst, perspectiveTransform);
-
-    publishTransformedIntersections(imageIntersections,
-                                    transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
+    geometry_msgs::PoseArray intersections = transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
                                                                              state_.getFcu2Camera(), dst, imageSize,
-                                                                             cameraInfo_.hfov, cameraInfo_.vfov));
+                                                                             cameraInfo_.hfov, cameraInfo_.vfov);
+    for (int i = 0; i < intersections.poses.size(); ++i) {
+        intersections.poses[i].position.z = -z;    
+    }
+
+    publishTransformedIntersections(imageIntersections, intersections);
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
