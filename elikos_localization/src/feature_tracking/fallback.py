@@ -125,11 +125,8 @@ def no_estimate(time, global_state):
     if global_state.configuration.publish_fcu_on_failure:
         publish_fcu_transform(global_state.last_fcu_position[0], global_state.last_fcu_position[1], time)
 
-
 def input_localization_points(localization_msg, global_state):
     #type: (elikos_ros.IntersectionArray, GlobalState)->None
-
-    print "message"
 
     points_image, points_arena = msgs.deserialize_intersections(localization_msg)
     time = localization_msg.header.stamp
@@ -399,9 +396,9 @@ def run_state_machine(global_state):
             global_state,
             rospy.Time.now() - last_state_change_time
         )
+        rospy.logwarn("State is now %s", next_state)
         if next_state is not current_state:
             last_state_change_time = rospy.Time.now()
-            rospy.loginfo("State is now %s", next_state)
             current_state = next_state
         r.sleep()
 

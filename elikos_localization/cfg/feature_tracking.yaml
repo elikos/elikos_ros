@@ -6,16 +6,16 @@ fcu_frame_id: "elikos_fcu"
 output_position_fcu_frame_id: "elikos_vision_debug"
 
 #initial pose of the drone
-initial_drone_pos: [-1, -0.5, 0.14]
+initial_drone_pos: [0, 0, 0.14]
 initial_drone_rot: [1, 0, 0, 0]
 
 # Nombre d'intersection de l'arène sur une dimention
-arena_intersection_num: 6
+arena_intersection_num: 7
 # mesure de côté de l'arère (en m)
-arena_size: 5
+arena_size: 6
 
 
 # float : time spent publishing the initial transform after fcu is detected to allow stabilisation
-stabilization_time: 3.0
+stabilization_time: 0
 # Si on publie la position du FCU
-publish_fcu_on_failure: On
+publish_fcu_on_failure: Off
