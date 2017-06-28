@@ -60,7 +60,9 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
     if (imageIntersections.size() < 1) return;
 
     updateKDTree(imageIntersections);
-    double z = estimateAltitude(imageIntersections);
+    tf::Vector3 origin2camera = tf::quatRotate(state_.getOrigin2Fcu().getRotation(), state_.getFcu2Camera().getOrigin());
+
+    double z = -estimateAltitude(imageIntersections) + origin2camera.z();
 
     std::vector<cv::Point2f> dst;
     std::vector<cv::Point2f> src;
@@ -69,11 +71,14 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
         src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
     }
     cv::perspectiveTransform(src, dst, perspectiveTransform);
-
-    publishTransformedIntersections(imageIntersections,
-                                    transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
+    geometry_msgs::PoseArray intersections = transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
                                                                              state_.getFcu2Camera(), dst, imageSize,
-                                                                             cameraInfo_.hfov, cameraInfo_.vfov));
+                                                                             cameraInfo_.hfov, cameraInfo_.vfov);
+    for (int i = 0; i < intersections.poses.size(); ++i) {
+        intersections.poses[i].position.z = z;    
+    }
+
+    publishTransformedIntersections(imageIntersections, intersections);
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
