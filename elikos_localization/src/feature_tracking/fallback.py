@@ -14,6 +14,7 @@ import cv2
 
 import rospy
 import tf
+import message_filters
 
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose
@@ -43,9 +44,9 @@ class Configuration:
             "~publish_fcu_on_failure",
             False
         )
-        self.topic_localization_point_cloud = rospy.get_param(
-            "~topic_localization_points",
-            "/localization/features"
+        self.topic_localization_points_prefix = rospy.get_param(
+            "~topic_localization_points_prefix",
+            "localization/features_"
         )
 
         self.initial_drone_position = np.array(
@@ -60,16 +61,65 @@ class Configuration:
             "~stabilization_time",
             3.0
         )
+        self.camera_number = rospy.get_param(
+            "~camera_number",
+            1
+        )
+        self.frame_arena_center = rospy.get_param(
+            "~arena_center_frame_id",
+            "elikos_arena_origin"
+        )
 
 class GlobalState:
     def __init__(self):
         self.last_fcu_position = None
         self.configuration = Configuration()
+
+        if self.configuration.camera_number <= 0:
+            rospy.logwarn("Not listening on any camera. Have you checked the camera_number parameter?")
+
+        # Creating the message filters listeners.
+        self.camera_listeners = []
+
+        for i in xrange(self.configuration.camera_number):
+            subscriber_name = self.configuration.topic_localization_points_prefix + str(i)
+
+            message_filter_subscriber = message_filters.Subscriber(
+                subscriber_name,
+                elikos_ros.IntersectionArray
+            )
+
+            self.camera_listeners.append(message_filter_subscriber)
+
+        self.synchonyser = message_filters.ApproximateTimeSynchronizer(
+            self.camera_listeners,
+            30,
+            0.2
+        )
+
+        self.current_callback = None
+
+        self.total_messages_processed = 0
+
+
 ###
 #
 # Math methods
 #
 ###
+def mean_of_times(times):
+    u"""
+    Calculates the mean of times
+    :param times: the times (a generator)
+    :return: the time that is the mean of the time
+    """
+    base_time = next(times)
+    count = 1
+    sum_deltas = rospy.Duration()
+    for t in times:
+        sum_deltas += (t - base_time)
+        count += 1
+    return base_time + (sum_deltas / float(count))
 
 def closest_point(point_array, position):
     """
@@ -126,37 +176,61 @@ def no_estimate(time, global_state):
         publish_fcu_transform(global_state.last_fcu_position[0], global_state.last_fcu_position[1], time)
 
 
-def input_localization_points(localization_msg, global_state):
-    #type: (elikos_ros.IntersectionArray, GlobalState)->None
+def input_localization_points(*args):
+    #type: ((elikos_ros.IntersectionArray, GlobalState))->None
 
-    print "message"
+    #Last argument is the global state
+    global_state = args[-1]
 
-    points_image, points_arena = msgs.deserialize_intersections(localization_msg)
-    time = localization_msg.header.stamp
-    frame = localization_msg.header.frame_id
+    global_state.total_messages_processed += 1
 
-    if points_arena.shape[0] == 0:
+    time = mean_of_times(msg.header.stamp for msg in args[:-1])
+
+    #array of 3d points
+    all_points = np.empty((0, 3))
+
+    for localization_msg in args[:-1]:
+        points_image, points_arena = msgs.deserialize_intersections(localization_msg)
+
+        msg_time = localization_msg.header.stamp
+        msg_frame = localization_msg.header.frame_id
+
+        try:
+            transformed_points_arena = transform_points(points_arena, msg_frame, global_state.configuration.frame_arena_center, msg_time)
+            all_points = np.append(all_points, transformed_points_arena, axis=0)
+        except LocalizationUnavailableException:
+            rospy.logwarn("Localization unavailable for camera frame '{0}'".format(msg_frame))
+
+    if all_points.shape[0] == 0:
         no_estimate(time, global_state)
+        rospy.logwarn("Not a single camera was able to detect an intersection!")
         return
 
     try:
-        localize_drone(points_arena, frame, time, global_state)
+        localize_drone(all_points, time, global_state)
     except LocalizationUnavailableException:
         rospy.logwarn("Localization unavailable!")
         no_estimate(time, global_state)
 
 
-def localize_drone(input_points_3d, input_points_frame, frame_time, global_state):
-    # type: (np.ndarray, str, rospy.Time, GlobalState)->None
-
-    global g_tf_listener, g_frames, g_tf_broadcaster
-
-    (trans_ref2arena, rot_ref2arena) = get_tf_transform(
-        g_frames["arena_center_frame_id"],
+def transform_points(input_points_3d, input_points_frame, dest_frame, frame_time):
+    (trans_ref2dst, rot_ref2dst) = get_tf_transform(
+        dest_frame,
         input_points_frame,
         frame_time,
         rospy.Duration(3.0)
     )
+
+    input_points_3d = quaternion.rotate_vectors(rot_ref2dst, input_points_3d)
+    input_points_3d += trans_ref2dst
+
+    return input_points_3d
+
+
+def localize_drone(input_points_3d, frame_time, global_state):
+    # type: (np.ndarray, rospy.Time, GlobalState)->None
+
+    global g_tf_listener, g_frames, g_tf_broadcaster
 
     (trans_fcu2arena, rot_fcu2arena) = get_tf_transform(
         g_frames["arena_center_frame_id"],
@@ -167,16 +241,13 @@ def localize_drone(input_points_3d, input_points_frame, frame_time, global_state
     global_state.last_fcu_position = (trans_fcu2arena, rot_fcu2arena)
 
 
-    input_points_3d = quaternion.rotate_vectors(rot_ref2arena, input_points_3d)
-    input_points_3d += trans_ref2arena
-
     mask = np.ones(3, dtype=np.bool)
     mask[2] = False
 
     matched_areana_points = pt_match.match_points(input_points_3d, g_arena_points)
 
-    transform_arena_pts = matched_areana_points[:, mask] - np.array([trans_ref2arena[0], trans_ref2arena[1]])
-    transform_detected_pts = input_points_3d[:, mask] - np.array([trans_ref2arena[0], trans_ref2arena[1]])
+    transform_arena_pts = matched_areana_points[:, mask] - np.array([trans_fcu2arena[0], trans_fcu2arena[1]])
+    transform_detected_pts = input_points_3d[:, mask] - np.array([trans_fcu2arena[0], trans_fcu2arena[1]])
 
 
     tmp_publish(np.concatenate([transform_arena_pts, transform_detected_pts]))
@@ -211,12 +282,12 @@ def localize_drone(input_points_3d, input_points_frame, frame_time, global_state
         dx = transform[0, 2]
         dy = transform[1, 2]
 
-        print transform
-    print "{0}, {1}".format(dx, dy)
+
+    mean = np.mean(input_points_3d, axis=0)
 
     delta_rot = quaternion.from_euler_angles(0, 0, -angle_delta)
 
-    trans = trans_fcu2arena + np.array((dx, dy, 0))
+    trans = trans_fcu2arena + np.array((dx, dy, -mean[2]))
 
     publish_fcu_transform(trans, delta_rot * rot_fcu2arena, frame_time)
 
@@ -236,7 +307,7 @@ def publish_fcu_transform(trans, rot, frame_time):
 
 
 def tmp_publish(camera_points):
-    global g_pub_dbg, g_frames, g_arena_points
+    global g_frames, g_arena_points
     output_message = PoseArray()
 
     for i in xrange(np.size(camera_points, axis=0)):
@@ -285,7 +356,7 @@ def init_node():
     global g_tf_listener, g_frames, g_pub_dbg, g_tf_broadcaster
     rospy.init_node("feature_tracking")
 
-    #speed is from mavros vecause TF dosen't store that
+    #speed is from mavros because TF dosen't store that
     topic_mavros_speed = rospy.get_param("~mavros_speed_topic", "/mavros/global_position/local")
     topic_publication_pose = rospy.get_param("~topic_publication_pose", "/localization/drone_pose")
 
@@ -307,15 +378,14 @@ def init_node():
 
 
 def start_listening_for_localization(global_state):
-    if start_listening_for_localization.localization_subscriber is None:
+    if start_listening_for_localization.inited is False:
         print "Listen started"
-        start_listening_for_localization.localization_subscriber = rospy.Subscriber(
-                global_state.configuration.topic_localization_point_cloud,
-                elikos_ros.IntersectionArray,
-                callback=input_localization_points,
-                callback_args=global_state
-            )
-start_listening_for_localization.localization_subscriber = None
+        start_listening_for_localization.inited = True
+        global_state.synchonyser.registerCallback(
+            input_localization_points,
+            global_state
+        )
+start_listening_for_localization.inited = False
 
 
 ###
@@ -323,19 +393,6 @@ start_listening_for_localization.localization_subscriber = None
 # State machine
 #
 ###
-class State(object):
-    def __init__(self):
-        pass
-
-    def enter(self):
-        pass
-    def exit(self):
-        pass
-    def execute(self):
-        pass
-
-
-
 def state_init(global_state, time_since_state_begin):
     # type: (GlobalState, rospy.Duration)->function
 
@@ -373,11 +430,27 @@ def state_stablization(global_state, time_since_state_begin):
     else:
         return state_stablization
 
+
 def state_climb(global_state, time_since_state_begin):
     # type: (GlobalState, rospy.Duration)->function
     #TODO this state
     start_listening_for_localization(global_state)
-    return state_normal
+    return state_wait_for_message
+
+
+def state_wait_for_message(global_state, time_since_state_begin):
+    if global_state.total_messages_processed > 0:
+        return state_normal
+    elif time_since_state_begin.to_sec() > 2:
+        return state_warn_no_messages
+    else:
+        return state_wait_for_message
+
+
+def state_warn_no_messages(global_state, time_since_state_begin):
+    rospy.logwarn("No messagess were yet process. Check camera pipeline. Rechecking in 2 seconds")
+    return state_wait_for_message
+
 
 def state_normal(global_state, time_since_state_begin):
     # type: (GlobalState, rospy.Duration)->function
@@ -403,7 +476,10 @@ def run_state_machine(global_state):
             last_state_change_time = rospy.Time.now()
             rospy.loginfo("State is now %s", next_state)
             current_state = next_state
-        r.sleep()
+        try:
+            r.sleep()
+        except rospy.ROSInterruptException:
+            pass # Ros should be shutdown
 
 
 ###node_configuration
