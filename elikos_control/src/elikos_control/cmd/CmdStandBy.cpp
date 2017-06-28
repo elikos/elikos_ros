@@ -4,7 +4,7 @@ CmdStandBy::CmdStandBy(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)
 {
     cmdPriority_ = PriorityLevel::ALWAYS_ABORTABLE;
-    cmdCode_ = 5;
+    cmdCode_ = CmdCode::STANDBY;
 }
 
 CmdStandBy::~CmdStandBy()

@@ -4,7 +4,7 @@ CmdTopInteraction::CmdTopInteraction(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)  
 {
     cmdPriority_ = PriorityLevel::INTERACTING;
-    cmdCode_ = 3;
+    cmdCode_ = CmdCode::TOP_INTERACTION;
 
     double takeoff_altitude = 1;
     nh_->getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);

@@ -4,7 +4,7 @@ CmdOffBoard::CmdOffBoard(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)    
 {
     cmdPriority_ = PriorityLevel::OFFBOARD;
-    cmdCode_ = 0;
+    cmdCode_ = CmdCode::TAKEOFF;
 
     stateSub_ = nh_->subscribe<mavros_msgs::State>("mavros/state", 10, &CmdOffBoard::stateCallBack, this);
     armingClient_ = nh_->serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
@@ -35,6 +35,21 @@ void CmdOffBoard::execute()
     ROS_ERROR("Started offboard command");
 
     ros::Rate rate(30.0);
+
+    bool initialPositionFound = false;
+    while(!initialPositionFound)
+    {
+        try {
+            tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
+            initialPositionFound = true;
+        } catch (tf::TransformException e) {
+            ROS_ERROR("%s",e.what());
+        }
+    }
+
+    targetPosition_.getOrigin().setX(lastPosition_.getOrigin().x());
+    targetPosition_.getOrigin().setY(lastPosition_.getOrigin().y());
+    //targetPosition_.setOrigin(tf::Vector3(lastPosition_.getOrigin().x(), lastPosition_.getOrigin().y(), targetPosition_.getOrigin().z()));
 
     //send a few setpoints before starting
     for(int i = 0; ros::ok() && i < 100; ++i)

@@ -4,7 +4,7 @@ CmdFrontInteraction::CmdFrontInteraction(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id), SLEEP_TIME(4)    
 {
     cmdPriority_ = PriorityLevel::INTERACTING;
-    cmdCode_ = 2;
+    cmdCode_ = CmdCode::FRONT_INTERACTION;
     isSleeping_ = false;
 
     landingClient_ = nh_->serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/land");
