@@ -59,11 +59,18 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
 {
     if (imageIntersections.size() >= 1)
     {
-
 	    updateKDTree(imageIntersections);
-	    tf::Vector3 origin2camera = tf::quatRotate(state_.getOrigin2Fcu().getRotation(), state_.getFcu2Camera().getOrigin());
+	    tf::Vector3 fcu2camera = tf::quatRotate(state_.getOrigin2Fcu().getRotation(), state_.getFcu2Camera().getOrigin());
 
-	    double z = -estimateAltitude(imageIntersections) + origin2camera.z();
+        tf::Transform origin2camera = state_.getFcu2Camera();
+
+        tf::Vector3 camDirection = tf::quatRotate(origin2camera.getRotation(), tf::Vector3(0.0, 0.0, 1.0));
+
+        camDirection.normalize();
+
+        float S = std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
+
+	    double z = S * -estimateAltitude(imageIntersections) + fcu2camera.z();
 
 	    std::vector<cv::Point2f> dst;
 	    std::vector<cv::Point2f> src;
