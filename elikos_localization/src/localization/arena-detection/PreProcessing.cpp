@@ -66,7 +66,10 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Ma
     q.setRPY(CV_PI, 0.0, 0.0);
     tf::Transform z2x(q);
 
-    tf::Transform debug = state_.getOrigin2Fcu() * state_.getFcu2Camera() * z2x;
+    tf::Transform origin2fcu = tf::Transform(state_.getOrigin2Fcu().getRotation());
+    tf::Transform fcu2camera = tf::Transform(state_.getFcu2Camera().getRotation());
+
+    tf::Transform debug = origin2fcu * fcu2camera * z2x;
 
     tf::Matrix3x3 n(debug.getRotation());
     n.getRPY(roll, pitch, yaw);

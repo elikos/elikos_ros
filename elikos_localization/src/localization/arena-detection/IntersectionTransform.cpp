@@ -59,21 +59,35 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
 {
     if (imageIntersections.size() >= 1)
     {
-        updateKDTree(imageIntersections);
-        double z = estimateAltitude(imageIntersections);
 
-        std::vector<cv::Point2f> dst;
-        std::vector<cv::Point2f> src;
-        for (int i = 0; i < imageIntersections.size(); ++i)
-        {
-            src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
-        }
-        cv::perspectiveTransform(src, dst, perspectiveTransform);
+	    updateKDTree(imageIntersections);
+	    tf::Vector3 fcu2camera = tf::quatRotate(state_.getOrigin2Fcu().getRotation(), state_.getFcu2Camera().getOrigin());
 
-        publishTransformedIntersections(imageIntersections,
-                                        transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
-                                                                                 state_.getFcu2Camera(), dst, imageSize,
-                                                                                 cameraInfo_.hfov, cameraInfo_.vfov));
+        tf::Transform origin2camera = state_.getFcu2Camera();
+
+        tf::Vector3 camDirection = tf::quatRotate(origin2camera.getRotation(), tf::Vector3(0.0, 0.0, 1.0));
+
+        camDirection.normalize();
+
+        float S = std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
+
+	    double z = S * -estimateAltitude(imageIntersections) + fcu2camera.z();
+
+	    std::vector<cv::Point2f> dst;
+	    std::vector<cv::Point2f> src;
+	    for (int i = 0; i < imageIntersections.size(); ++i)
+	    {
+		src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
+	    }
+	    cv::perspectiveTransform(src, dst, perspectiveTransform);
+	    geometry_msgs::PoseArray intersections = transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
+										     state_.getFcu2Camera(), dst, imageSize,
+										     cameraInfo_.hfov, cameraInfo_.vfov);
+	    for (int i = 0; i < intersections.poses.size(); ++i) {
+		intersections.poses[i].position.z = z;    
+	    }
+
+	    publishTransformedIntersections(imageIntersections, intersections);
     } else {
         publishTransformedIntersections(std::vector<Eigen::Vector2f>(), geometry_msgs::PoseArray());
     }
