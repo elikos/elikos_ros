@@ -14,6 +14,11 @@ arena_intersection_num: 7
 # mesure de côté de l'arère (en m)
 arena_size: 6
 
+# Nombre de caméras. Les topics sont sous le nom "localization/features_N" où N est le numéro de la caméra qui commenca a un
+#  par exemple, pour 2 caméras, le noeud écoutera les topics
+#   - localization/features_0
+#   - localization/features_1
+camera_number: 2
 
 # float : time spent publishing the initial transform after fcu is detected to allow stabilisation
 stabilization_time: 0
