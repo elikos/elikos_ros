@@ -184,7 +184,7 @@ def input_localization_points(*args):
 
     global_state.total_messages_processed += 1
 
-    time = mean_of_times(msg.header.stamp for msg in args[:-1])
+    time = mean_oftimes(msg.header.stamp for msg in args[:-1])
 
     #array of 3d points
     all_points = np.empty((0, 3))

@@ -11,6 +11,7 @@
 #include <tf/transform_broadcaster.h>
 
 #include <Eigen/Core>
+#include <image_transport/image_transport.h>
 
 #include "CameraInfo.h"
 #include "QuadState.h"
@@ -36,6 +37,12 @@ public:
 private:
 
     Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength, double height, double length) const;
+
+    ros::NodeHandle nh_;
+    image_transport::ImageTransport it_;
+
+    image_transport::Subscriber imageSub_;
+    image_transport::Publisher imagePub_;
 
     tf::TransformListener tfListener_;
     tf::TransformBroadcaster tfPub_;
