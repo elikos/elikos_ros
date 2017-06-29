@@ -3,7 +3,7 @@ arena_center_frame_id: "elikos_arena_origin"
 #frame of the fcu
 fcu_frame_id: "elikos_fcu"
 #output frame of the vision
-output_position_fcu_frame_id: "elikos_vision_debug"
+output_position_fcu_frame_id: "elikos_vision"
 
 #initial pose of the drone
 initial_drone_pos: [0, 0, 0.14]
@@ -18,4 +18,4 @@ arena_size: 6
 # float : time spent publishing the initial transform after fcu is detected to allow stabilisation
 stabilization_time: 0
 # Si on publie la position du FCU
-publish_fcu_on_failure: Off
+publish_fcu_on_failure: Off 

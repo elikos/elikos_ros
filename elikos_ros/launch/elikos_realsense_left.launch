@@ -1,7 +1,7 @@
 <launch>
   <arg name="camera_left"              default="r200_left" />
   <arg name="camera_left_camera_type"  default="R200"    /> <!-- Type of camera -->
-  <arg name="camera_left_serial_no"    default="2401001385" /> <!-- Note: Replace with actual serial number -->
+  <arg name="camera_left_serial_no"    default="2451011005" /> <!-- Note: Replace with actual serial number -->
   <arg name="camera_left_enable_color"      default="true" />
   <arg name="camera_left_enable_pointcloud" default="true" />
   <arg name="camera_left_enable_tf"         default="true" />
