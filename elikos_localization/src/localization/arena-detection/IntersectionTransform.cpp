@@ -59,7 +59,6 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
 {
     if (imageIntersections.size() >= 1)
     {
-
 	    updateKDTree(imageIntersections);
 	    tf::Vector3 fcu2camera = tf::quatRotate(state_.getOrigin2Fcu().getRotation(), state_.getFcu2Camera().getOrigin());
 

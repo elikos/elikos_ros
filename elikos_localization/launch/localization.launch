@@ -1,6 +1,17 @@
 <launch>
     <arg name="camera_name" default="elikos_ffmv_bottom"/>
+
+
+
     <include file="$(find elikos_localization)/launch/camera_param.launch" pass_all_args="true"/>
+
+
     <node name="$(arg camera_name)_localization" pkg="elikos_localization" type="elikos_localization" args="$(arg camera_name)">
     </node>
- </launch> 
+
+    <node pkg="elikos_localization" type="fallback.py" name="feature_tracking" output="screen">
+        <rosparam command="load" file="$(find elikos_localization)/cfg/feature_tracking.yaml"/>
+        <remap from="localization/features" to="intersections"/>
+        <remap from="inverse_transform" to="elikos_ffmv_bottom_camera/image_preprocessed/inverse_transform"/>
+    </node>
+</launch>

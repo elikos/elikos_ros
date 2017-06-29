@@ -19,5 +19,6 @@
     </node>
     <node pkg="image_proc" type="image_proc" name="image_proc">
     </node>
+    <node name="dynparam" pkg="dynamic_reconfigure" type="dynparam" args="load camera_nodelet $(find elikos_detection)/cfg/pointgrey_config.yaml" />
   </group>
 </launch>

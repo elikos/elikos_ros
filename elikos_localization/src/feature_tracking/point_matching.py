@@ -16,7 +16,7 @@ def create_grid_mesh(side_points_number, side_mesure):
     y = np.linspace(0, side_mesure, num=side_points_number)
     z = np.array([0])
     xs, ys, zs = np.meshgrid(x, y, z)
-    return np.stack([xs.ravel(), ys.ravel(), zs.ravel()], axis=1)
+    return np.stack([xs.ravel(), ys.ravel(), zs.ravel()], axis=1) - np.array([side_mesure/2, side_mesure/2, 0])
 
 
 def closest_point(point_array, position):
