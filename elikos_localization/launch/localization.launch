@@ -1,22 +1,20 @@
 <launch>
     <arg name="camera_name" default="elikos_ffmv_bottom"/>
 
-
-
     <include file="$(find elikos_localization)/launch/camera_param.launch" pass_all_args="true"/>
-    <include file="$(find elikos_localization)/launch/camera_param.launch">
-        <arg name="camera_name" value="elikos_realsense_front"/>
-    </include>
+    <!--include file="$(find elikos_localization)/launch/camera_param.launch">
+        <arg name="camera_name" value="elikos_realsense_left"/>
+    </include-->
 
 
     <node name="$(arg camera_name)_localization" pkg="elikos_localization" type="elikos_localization" args="$(arg camera_name)">
         <remap from="intersections" to="$(arg camera_name)_intersections"/>
     </node>
 
-    <node name="elikos_realsense_front_localization" pkg="elikos_localization" type="elikos_localization" args="elikos_realsense_front">
+    <!--node name="elikos_realsense_front_localization" pkg="elikos_localization" type="elikos_localization" args="elikos_realsense_left">
         <remap from="intersections" to="elikos_realsense_front_intersections"/>
         <remap from="debug" to="debug_side"/>
-    </node>
+    </node-->
 
     <node pkg="elikos_localization" type="fallback.py" name="feature_tracking" output="screen">
         <rosparam command="load" file="$(find elikos_localization)/cfg/feature_tracking.yaml"/>

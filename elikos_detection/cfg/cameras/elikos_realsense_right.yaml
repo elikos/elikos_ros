@@ -1,5 +1,5 @@
-topic: "/r200_front/color/image_raw"
-frame: "r200_front_link"
+topic: "/r200_right/color/image_raw"
+frame: "r200_right_link"
 calibration: false
 file_in: "calib_poly"
 file_out: "new_calibration"

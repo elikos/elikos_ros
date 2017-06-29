@@ -1,7 +1,7 @@
 !!python/object/new:dynamic_reconfigure.encoding.Config
 dictitems:
   color_backlight_compensation: 1
-  color_brightness: 13
+  color_brightness: 50
   color_contrast: 27
   color_enable_auto_exposure: 1
   color_enable_auto_white_balance: 1

@@ -202,6 +202,17 @@ def input_localization_points(*args):
             rospy.logwarn("Localization unavailable for camera frame '{0}'".format(msg_frame))
 
     if all_points.shape[0] == 0:
+        try:
+	    (trans_fcu2arena, rot_fcu2arena) = get_tf_transform(
+		g_frames["arena_center_frame_id"],
+		g_frames["fcu_frame_id"],
+		frame_time,
+		rospy.Duration(3.0)
+	    )
+	    global_state.last_fcu_position = (trans_fcu2arena, rot_fcu2arena)
+	except Exception:
+		pass		
+
         no_estimate(time, global_state)
         rospy.logwarn("Not a single camera was able to detect an intersection!")
         return
@@ -472,7 +483,7 @@ def run_state_machine(global_state):
             global_state,
             rospy.Time.now() - last_state_change_time
         )
-        rospy.logwarn("State is now %s", next_state)
+#        rospy.logwarn("State is now %s", next_state)
         if next_state is not current_state:
             last_state_change_time = rospy.Time.now()
             current_state = next_state
