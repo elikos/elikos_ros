@@ -206,12 +206,10 @@ def input_localization_points(*args):
             (trans_fcu2arena, rot_fcu2arena) = get_tf_transform(
             g_frames["arena_center_frame_id"],
             g_frames["fcu_frame_id"],
-            frame_time,
-            rospy.Duration(3.0)
-            )
+            time,
+            rospy.Duration(3.0))
             global_state.last_fcu_position = (trans_fcu2arena, rot_fcu2arena)
-        except Exception:
-            rospy.logerror("***NO FCU POSITION***")
+        except LocalizationUnavailableException:
             pass
 
         no_estimate(time, global_state)

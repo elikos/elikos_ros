@@ -57,6 +57,7 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
                                                    const cv::Mat& perspectiveTransform,
                                                    cv::Size imageSize)
 {
+    ROS_ERROR("INTERSECTION BEGIN");
     if (imageIntersections.size() >= 1)
     {
 	    updateKDTree(imageIntersections);

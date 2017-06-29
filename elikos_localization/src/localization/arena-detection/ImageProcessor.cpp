@@ -94,10 +94,12 @@ void ImageProcessor::findLines(const cv::Mat& edges)
 
 void ImageProcessor::analyzeLineCluster(cv::Mat& debug, const cv::Size& size, const cv::Mat& perspectiveTransform)
 {
+    /*
     if (lineCluster_.size() == 0)
     {
         return;
     }
+    */
 
     for (int i = 0; i < lineCluster_.size(); ++i)
     {
