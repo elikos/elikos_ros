@@ -77,7 +77,7 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Ma
 
     tf::Matrix3x3 n(debug.getRotation());
     n.getRPY(roll, pitch, yaw);
-    tfPub_.sendTransform(tf::StampedTransform(debug, ros::Time::now(), "elikos_arena_origin", "debug"));        
+    // tfPub_.sendTransform(tf::StampedTransform(debug, ros::Time::now(), "elikos_arena_origin", "debug"));
 
     Eigen::Matrix3f r = (Eigen::AngleAxisf(roll,   Eigen::Vector3f::UnitX()) * 
                          Eigen::AngleAxisf(-pitch,  Eigen::Vector3f::UnitY()) *

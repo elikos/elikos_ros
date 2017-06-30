@@ -36,6 +36,7 @@ void ImageProcessor::processImage(cv::Mat& input, cv::Mat& result)
 
     result = cv::Mat(edges.size(), CV_8UC3, cv::Scalar(0, 0, 0));
     analyzeLineCluster(result, edges.size(), perspectiveTransform);
+
     /*
 
     cv::Mat debug;
