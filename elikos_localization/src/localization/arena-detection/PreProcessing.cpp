@@ -7,12 +7,13 @@
 #include <iostream>
 
 #include <cmath>
+#include <cv_bridge/cv_bridge.h>
 
 namespace localization 
 {
 
 PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& state)
-    : cameraInfo_(cameraInfo), state_(state)
+    : it_(nh_), cameraInfo_(cameraInfo), state_(state)
 {
     cv::Mat distortedCamera = (cv::Mat_<float>(3,3) << 422.918640,    0.000000,    350.119451,
             0.000000,  423.121112,    236.380265,
@@ -24,6 +25,7 @@ PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& stat
 
     cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
                                 cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
+    imagePub_ = it_.advertise(cameraInfo_.name + "/preprocessing", 1);
 }
 
 void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat& perspectiveTransform)
@@ -53,9 +55,11 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat
     cv::erode(blured, eroded, element, cv::Point(0), 8);
 
     cv::Mat thresholded;
-    cv::threshold(blured, thresholded, whiteThreshold_, 255, CV_THRESH_BINARY);
+    cv::threshold(blured, thresholded, cameraInfo_.threshold, 255, CV_THRESH_BINARY);
 
     preProcessed = thresholded;
+    sensor_msgs::ImagePtr image = cv_bridge::CvImage(std_msgs::Header(), "mono8", preProcessed).toImageMsg();
+    imagePub_.publish(image);
 }
 
 void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Mat& toPerspective)
@@ -73,7 +77,7 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Ma
 
     tf::Matrix3x3 n(debug.getRotation());
     n.getRPY(roll, pitch, yaw);
-    tfPub_.sendTransform(tf::StampedTransform(debug, ros::Time::now(), "elikos_arena_origin", "debug"));        
+    // tfPub_.sendTransform(tf::StampedTransform(debug, ros::Time::now(), "elikos_arena_origin", "debug"));
 
     Eigen::Matrix3f r = (Eigen::AngleAxisf(roll,   Eigen::Vector3f::UnitX()) * 
                          Eigen::AngleAxisf(-pitch,  Eigen::Vector3f::UnitY()) *

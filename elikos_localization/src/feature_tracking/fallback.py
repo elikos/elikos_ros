@@ -27,6 +27,7 @@ import message_interface as msgs
 import point_manipulation as pt_manip
 import point_matching as pt_match
 
+
 ###
 #
 # Classes
@@ -36,7 +37,10 @@ class LocalizationUnavailableException(Exception):
     u"""
     Excepition thrown when the drone cannot localize itself.
     """
-    pass
+    def __init__(self, message = "localization was unavailable", cause=None):
+        super(LocalizationUnavailableException, self).__init__(message + u', caused by ' + (repr(cause) if cause is not None else ''))
+        self.cause = cause
+
 
 class Configuration:
     def __init__(self):
@@ -69,6 +73,11 @@ class Configuration:
             "~arena_center_frame_id",
             "elikos_arena_origin"
         )
+        self.watchdog_max_message_delay = rospy.get_param(
+            "~watchdog_max_message_delay",
+            1.0
+        )
+
 
 class GlobalState:
     def __init__(self):
@@ -81,25 +90,36 @@ class GlobalState:
         # Creating the message filters listeners.
         self.camera_listeners = []
 
+
         for i in xrange(self.configuration.camera_number):
             subscriber_name = self.configuration.topic_localization_points_prefix + str(i)
 
             message_filter_subscriber = message_filters.Subscriber(
                 subscriber_name,
-                elikos_ros.IntersectionArray
+                elikos_ros.IntersectionArray,
+                queue_size=1
             )
 
             self.camera_listeners.append(message_filter_subscriber)
 
         self.synchonyser = message_filters.ApproximateTimeSynchronizer(
             self.camera_listeners,
-            30,
+            1,
             0.2
         )
 
         self.current_callback = None
 
         self.total_messages_processed = 0
+        self.last_message_time = rospy.Time(0)
+
+    def register_a_processed_message(self):
+        u"""
+        Call to notify the global state that a messages is being processed, will be soon processed or was just processed.
+        :return: None
+        """
+        self.total_messages_processed += 1
+        self.last_message_time = rospy.Time.now()
 
 
 ###
@@ -182,7 +202,7 @@ def input_localization_points(*args):
     #Last argument is the global state
     global_state = args[-1]
 
-    global_state.total_messages_processed += 1
+    global_state.register_a_processed_message()
 
     time = mean_of_times(msg.header.stamp for msg in args[:-1])
 
@@ -199,7 +219,7 @@ def input_localization_points(*args):
             transformed_points_arena = transform_points(points_arena, msg_frame, global_state.configuration.frame_arena_center, msg_time)
             all_points = np.append(all_points, transformed_points_arena, axis=0)
         except LocalizationUnavailableException:
-            rospy.logwarn("Localization unavailable for camera frame '{0}'".format(msg_frame))
+            rospy.logwarn("Localization unavailable for camera frame '{0}' at time {1}".format(msg_frame, msg_time))
 
     if all_points.shape[0] == 0:
         try:
@@ -207,12 +227,13 @@ def input_localization_points(*args):
             g_frames["arena_center_frame_id"],
             g_frames["fcu_frame_id"],
             time,
-            rospy.Duration(3.0))
+            rospy.Duration(0, 500000000))
             global_state.last_fcu_position = (trans_fcu2arena, rot_fcu2arena)
         except LocalizationUnavailableException:
             pass
 
         no_estimate(time, global_state)
+
         rospy.logwarn("Not a single camera was able to detect an intersection!")
         return
 
@@ -228,7 +249,7 @@ def transform_points(input_points_3d, input_points_frame, dest_frame, frame_time
         dest_frame,
         input_points_frame,
         frame_time,
-        rospy.Duration(3.0)
+        rospy.Duration(0, 5000000)#5ms
     )
 
     input_points_3d = quaternion.rotate_vectors(rot_ref2dst, input_points_3d)
@@ -347,8 +368,8 @@ def get_tf_transform(source_frame, dest_frame, time, timeout):
     global g_tf_listener
     try:
         g_tf_listener.waitForTransform(source_frame, dest_frame, time, timeout)
-    except Exception:
-        raise LocalizationUnavailableException
+    except tf.Exception as e:
+        raise LocalizationUnavailableException(message="Tf lookup failed", cause=e)
 
     (trans, rot) = g_tf_listener.lookupTransform(source_frame, dest_frame, time)
     return np.array(trans), pt_manip.create_quaterion_from_tf(rot)
@@ -416,9 +437,10 @@ def state_init(global_state, time_since_state_begin):
             g_frames["arena_center_frame_id"],
             g_frames["fcu_frame_id"],
             rospy.Time.now(),
-            rospy.Duration(0, 50000000)
+            rospy.Duration(1)
         )
-    except Exception:
+    except LocalizationUnavailableException:
+        rospy.loginfo("no fcu at time {0}".format(rospy.Time.now()));
         global_state.last_fcu_position = None
 
     if global_state.last_fcu_position is not None:
@@ -458,13 +480,20 @@ def state_wait_for_message(global_state, time_since_state_begin):
 
 
 def state_warn_no_messages(global_state, time_since_state_begin):
-    rospy.logwarn("No messagess were yet process. Check camera pipeline. Rechecking in 2 seconds")
+    rospy.logwarn("No messagess were yet processed. Check camera pipeline. Rechecking in 2 seconds")
     return state_wait_for_message
 
 
 def state_normal(global_state, time_since_state_begin):
     # type: (GlobalState, rospy.Duration)->function
     #TODO this state
+
+    # watchdog
+    duration_since_last_message = (rospy.Time.now() - global_state.last_message_time).to_sec()
+    if duration_since_last_message > global_state.configuration.watchdog_max_message_delay:
+        rospy.logerr("No messages processed in the last {0} seconds".format(duration_since_last_message))
+
+
     return state_normal
 
 
@@ -475,7 +504,7 @@ def run_state_machine(global_state):
 
     last_state_change_time = rospy.Time.now()
 
-    r = rospy.Rate(10)
+    r = rospy.Rate(20)
 
     while not rospy.is_shutdown():
         next_state = current_state(

@@ -1,25 +1,28 @@
 <launch>
-    <arg name="camera_name" default="elikos_ffmv_bottom"/>
 
-    <include file="$(find elikos_localization)/launch/camera_param.launch" pass_all_args="true"/>
-    <!--include file="$(find elikos_localization)/launch/camera_param.launch">
-        <arg name="camera_name" value="elikos_realsense_left"/>
-    </include-->
-
-
-    <node name="$(arg camera_name)_localization" pkg="elikos_localization" type="elikos_localization" args="$(arg camera_name)">
-        <remap from="intersections" to="$(arg camera_name)_intersections"/>
-    </node>
-
-    <!--node name="elikos_realsense_front_localization" pkg="elikos_localization" type="elikos_localization" args="elikos_realsense_left">
-        <remap from="intersections" to="elikos_realsense_front_intersections"/>
-        <remap from="debug" to="debug_side"/>
-    </node-->
+    <include file="$(find elikos_localization)/launch/localization_detection.launch">
+        <arg name="camera_name" value="gazebo_ffmv_bottom"/>
+    </include>
+    <include file="$(find elikos_localization)/launch/localization_detection.launch">
+        <arg name="camera_name" value="gazebo_r200_front"/>
+    </include>
+    <include file="$(find elikos_localization)/launch/localization_detection.launch">
+        <arg name="camera_name" value="gazebo_r200_back"/>
+    </include>
+    <include file="$(find elikos_localization)/launch/localization_detection.launch">
+        <arg name="camera_name" value="gazebo_r200_left"/>
+    </include>
+    <include file="$(find elikos_localization)/launch/localization_detection.launch">
+        <arg name="camera_name" value="gazebo_r200_right"/>
+    </include>
 
     <node pkg="elikos_localization" type="fallback.py" name="feature_tracking" output="screen">
         <rosparam command="load" file="$(find elikos_localization)/cfg/feature_tracking.yaml"/>
-        <remap from="localization/features_0" to="$(arg camera_name)_intersections"/>
-        <remap from="localization/features_1" to="elikos_realsense_front_intersections"/>
-        <remap from="inverse_transform" to="elikos_ffmv_bottom_camera/image_preprocessed/inverse_transform"/>
+        <remap from="localization/features_0" to="gazebo_ffmv_bottom/intersections"/>
+        <remap from="localization/features_1" to="gazebo_r200_front/intersections"/>
+        <remap from="localization/features_2" to="gazebo_r200_left/intersections"/>
+        <remap from="localization/features_3" to="gazebo_r200_right/intersections"/>
+        <remap from="localization/features_4" to="gazebo_r200_back/intersections"/>
     </node>
+
 </launch>

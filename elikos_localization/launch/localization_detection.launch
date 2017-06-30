@@ -1,0 +1,13 @@
+<launch>
+
+    <arg name="camera_name" default="elikos_ffmv_bottom"/>
+
+    <include file="$(find elikos_localization)/launch/camera_param.launch">
+        <arg name="camera_name" value="$(arg camera_name)"/>
+    </include>
+
+    <node name="$(arg camera_name)_localization" pkg="elikos_localization" type="elikos_localization" args="$(arg camera_name)">
+        <remap from="intersections" to="$(arg camera_name)/intersections"/>
+    </node>
+
+</launch>

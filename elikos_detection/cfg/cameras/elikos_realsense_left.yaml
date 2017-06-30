@@ -8,3 +8,4 @@ cam_width: 640
 cam_fov_v: 43
 cam_fov_h: 70
 min_height: 0.1
+bw_threshold: 149

@@ -15,7 +15,7 @@ MessageHandler::MessageHandler(const CameraInfo& cameraInfo, QuadState& state, I
     : it_(nh_), state_(state), processor_(processor), cameraInfo_(cameraInfo)
 {
     imageSub_ = it_.subscribe(cameraInfo.topic, 1, &MessageHandler::cameraCallback, this);
-    imagePub_ = it_.advertise("/debug", 1);
+    imagePub_ = it_.advertise(cameraInfo.name + "/intersection_detection", 1);
 }
 
 MessageHandler::~MessageHandler()

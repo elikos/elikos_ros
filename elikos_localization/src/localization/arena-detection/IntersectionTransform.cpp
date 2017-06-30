@@ -17,8 +17,8 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     // TODO: Set epsilon for kdtree here maybe ? ...
     ros::NodeHandle nh;
 
-    intersectionPub_ = nh.advertise<elikos_ros::IntersectionArray>("intersections", 1);
-    debugPub_ = nh.advertise<visualization_msgs::MarkerArray>("intersection_debug", 1);
+    intersectionPub_ = nh.advertise<elikos_ros::IntersectionArray>(cameraInfo_.name + "/intersections", 1);
+    debugPub_ = nh.advertise<visualization_msgs::MarkerArray>(cameraInfo_.name + "/intersection_debug", 1);
 
     marker_.header.frame_id = "elikos_fcu";
     marker_.header.stamp = ros::Time::now();
@@ -57,7 +57,6 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
                                                    const cv::Mat& perspectiveTransform,
                                                    cv::Size imageSize)
 {
-    ROS_ERROR("INTERSECTION BEGIN");
     if (imageIntersections.size() >= 1)
     {
 	    updateKDTree(imageIntersections);

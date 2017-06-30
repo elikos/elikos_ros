@@ -10,12 +10,14 @@ class CameraInfo
 public:
     std::string frame;
     std::string topic;
+    std::string name;
 
     double hfov;
     double vfov;
     double height;
     double width;
     double focalLength;
+    double threshold;
 
     CameraInfo() = default;
     ~CameraInfo() = default;
