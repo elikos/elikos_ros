@@ -18,9 +18,14 @@ arena_size: 10
 #  par exemple, pour 2 caméras, le noeud écoutera les topics
 #   - localization/features_0
 #   - localization/features_1
-camera_number: 1
+camera_number: 5
 
 # float : time spent publishing the initial transform after fcu is detected to allow stabilisation
 stabilization_time: 0
 # Si on publie la position du FCU
-publish_fcu_on_failure: On 
+publish_fcu_on_failure: On
+
+
+# float : the max delay between two messages that won't trigger the watchdog.
+#  larger delays will trigger the watchdog.
+watchdog_max_message_delay: 5
