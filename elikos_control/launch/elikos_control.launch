@@ -1,3 +1,3 @@
 <launch>
-  <node name="elikos_control" pkg="elikos_control" type="elikos_control"/>
+  <node name="elikos_control" pkg="elikos_control" type="elikos_control"  output="log"/>
 </launch>
