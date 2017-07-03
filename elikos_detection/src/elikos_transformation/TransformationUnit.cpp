@@ -150,7 +150,7 @@ tf::Transform TransformationUnit::computeRobotTransform(tf::Transform origin2tur
 	tf::Transform robotFrame = tf::Transform::getIdentity();
 	robotFrame.setOrigin(tf::Vector3(0, 0, 0));
 
-	// Get distance from turret to target (using angle and altitude) Should we use a mavros topic?
+	// Get distance from turret to target (using angle and altitude) 
 	double altitude = origin2turret.getOrigin().getZ();
 	double distance_from_robot = altitude / cos(zAxis_turret_angle);
 	robotFrame.setOrigin(tf::Vector3(0, 0, distance_from_robot));
