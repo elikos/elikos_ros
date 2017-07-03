@@ -1,4 +1,4 @@
-dimension_c: 5
+dimension_c: 20
 research_altitude: 1.5
 takeoff_altitude: 1
 edge_tolerance: 0.5
@@ -7,6 +7,6 @@ aggressive_enabled: false
 preventive_enabled: false
 simulation: false
 max_altitude: 3
-min_step: 0.5
+min_step: 0.1
 max_step: 2
 has_reach_destination_threshold: 0.3

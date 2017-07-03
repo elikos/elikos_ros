@@ -46,7 +46,7 @@ protected:
     int id_ = -1;
     trajectory_msgs::MultiDOFJointTrajectory cmdTrajectory_;
     geometry_msgs::Pose cmdDestination_;
-    uint8_t cmdCode_;
+    int cmdCode_;
 
     bool isAborted_;
 

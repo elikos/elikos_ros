@@ -4,7 +4,7 @@ CmdLanding::CmdLanding(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)    
 {
     cmdPriority_ = PriorityLevel::LANDING;
-    cmdCode_ = 1;
+    cmdCode_ = CmdCode::LAND;
 
     landingClient_ = nh_->serviceClient<mavros_msgs::CommandTOL>("mavros/cmd/land");
     landingCmd_.request.min_pitch = 0.0;

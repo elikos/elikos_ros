@@ -4,7 +4,7 @@ CmdTravel::CmdTravel(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)    
 {
     cmdPriority_ = PriorityLevel::ALWAYS_ABORTABLE;
-	cmdCode_ = 4;
+	cmdCode_ = CmdCode::MOVE_TO_POINT;
 	
 	nh_->getParam("/elikos_ai/dimension_c", dimension_c_);
  	nh_->getParam("/elikos_ai/max_altitude", max_altitude_);
@@ -30,6 +30,8 @@ void CmdTravel::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocat
   tf::Transform tfTrajectoryPoint;
   tf::transformMsgToTF(trajectoryPoint, tfTrajectoryPoint);
 
+  ROS_ERROR_STREAM("DESTINATION: " << tfTrajectoryPoint.getOrigin().x() << " : " << tfTrajectoryPoint.getOrigin().y() << " : " << tfTrajectoryPoint.getOrigin().z());
+
   //Broadcast command
   tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), WORLD_FRAME, SETPOINT));
 }
@@ -45,12 +47,16 @@ void CmdTravel::execute()
 	double step_lenght = 0;
 	bool is_too_near = true;
 	bool is_outside_boundaries = false;
+
+    geometry_msgs::Vector3 dst = cmdTrajectory_.points[cmdTrajectory_.points.size() - 1].transforms[0].translation;
+    ROS_ERROR_STREAM("DESTINATION: " << dst.x << " : " << dst.y << " : " << dst.z);
+
 	while(is_too_near && !is_outside_boundaries && stepInTrajectory_ < cmdTrajectory_.points.size())
 	{
 		geometry_msgs::Vector3 targetTranslation = cmdTrajectory_.points[stepInTrajectory_].transforms[0].translation;
 		if ( targetTranslation.z > max_altitude_ ||
-			targetTranslation.x < -dimension_c_/2 || targetTranslation.x > dimension_c_/2 ||
-			targetTranslation.y < -dimension_c_/2 || targetTranslation.y > dimension_c_/2 )
+			std::abs(targetTranslation.x) > dimension_c_ / 2.0 ||
+			std::abs(targetTranslation.y) > dimension_c_ / 2.0 )
 			{
 				is_outside_boundaries = true;
 				ROS_ERROR("Setpoint outside the box!");
@@ -65,7 +71,7 @@ void CmdTravel::execute()
 		}
 		else
 		{
-			if ((stepInTrajectory_ = cmdTrajectory_.points.size() - 1) || is_outside_boundaries)
+			if ((stepInTrajectory_ == cmdTrajectory_.points.size() - 1) || is_outside_boundaries)
 			{
 				break;
 			}
@@ -80,7 +86,7 @@ void CmdTravel::execute()
 
 	if(step_lenght > pow(max_step_,2))
 	{
-		ROS_ERROR_STREAM("Step to big!! step_lenght:"<< step_lenght<<" max_step:"<<max_step_);
+		ROS_ERROR_STREAM("Step too big!! step_lenght:"<< step_lenght<<" max_step:"<<max_step_);
 		// Interpolation
 		double direction = cv::fastAtan2(trajectoryPoint_.translation.y - lastPosition_.getOrigin().y(), trajectoryPoint_.translation.x - lastPosition_.getOrigin().x()) / 360 * 2 *PI;
 		trajectoryPoint_.translation.x = lastPosition_.getOrigin().x() + max_step_ * std::cos(direction);
