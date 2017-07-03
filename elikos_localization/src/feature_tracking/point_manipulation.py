@@ -31,6 +31,14 @@ def transform_points(matrix, points):
     return normalize_points(transformed_points)[...,0:-1]
 
 
+def transform_points_simple(points, translation, rotation):
+    tranlation_matrix = create_translation_matrix(translation)
+    rotation_matrix = create_rotation_matrix(rotation)
+    return transform_points(
+        np.matmul(tranlation_matrix, rotation_matrix),
+        points
+    )
+
 def create_translation_matrix(translation):
     return np.array([
         [1, 0, 0, translation[0]],
@@ -42,8 +50,8 @@ def create_translation_matrix(translation):
 
 def create_rotation_matrix(quaterion):
     # type: (qt.quaterion)->np.ndarray
-    mat = np.identity(10, dtype=np.float)
-    mat[0:3][0:3] = qt.as_rotation_matrix(quaterion)
+    mat = np.identity(4, dtype=np.float)
+    mat[0:3, 0:3] = qt.as_rotation_matrix(quaterion)
     return mat
 
 
@@ -62,7 +70,6 @@ def tf_to_matrix(tf_translation, tf_quaterion):
     tranlation_matrix = create_translation_matrix(tf_translation)
     rotation_matrix = create_rotation_matrix(qt.quaternion(tf_quaterion[3], tf_quaterion[0], tf_quaterion[1], tf_quaterion[2]))
     return np.matmul(tranlation_matrix, rotation_matrix)
-
 
 
 def create_3d_projection_matrix(plane):
