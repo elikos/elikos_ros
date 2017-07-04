@@ -30,7 +30,7 @@ void CmdTravel::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocat
   tf::Transform tfTrajectoryPoint;
   tf::transformMsgToTF(trajectoryPoint, tfTrajectoryPoint);
 
-  ROS_ERROR_STREAM("DESTINATION: " << tfTrajectoryPoint.getOrigin().x() << " : " << tfTrajectoryPoint.getOrigin().y() << " : " << tfTrajectoryPoint.getOrigin().z());
+  ROS_ERROR_STREAM("setpoint envoyée: " << tfTrajectoryPoint.getOrigin().x() << " : " << tfTrajectoryPoint.getOrigin().y() << " : " << tfTrajectoryPoint.getOrigin().z());
 
   //Broadcast command
   tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), WORLD_FRAME, SETPOINT));
@@ -42,61 +42,66 @@ void CmdTravel::execute()
     isAborted_ = false;
 	ros::Rate rate(30.0);
     
-	tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
 	stepInTrajectory_ = 0;
-	double step_lenght = 0;
-	bool is_too_near = true;
-	bool is_outside_boundaries = false;
 
-    geometry_msgs::Vector3 dst = cmdTrajectory_.points[cmdTrajectory_.points.size() - 1].transforms[0].translation;
-    ROS_ERROR_STREAM("DESTINATION: " << dst.x << " : " << dst.y << " : " << dst.z);
-
-	while(is_too_near && !is_outside_boundaries && stepInTrajectory_ < cmdTrajectory_.points.size())
+	while(!isAborted_ && stepInTrajectory_ < cmdTrajectory_.points.size()-1)
 	{
-		geometry_msgs::Vector3 targetTranslation = cmdTrajectory_.points[stepInTrajectory_].transforms[0].translation;
-		if ( targetTranslation.z > max_altitude_ ||
-			std::abs(targetTranslation.x) > dimension_c_ / 2.0 ||
-			std::abs(targetTranslation.y) > dimension_c_ / 2.0 )
-			{
-				is_outside_boundaries = true;
-				ROS_ERROR("Setpoint outside the box!");
-			}
+		
+		tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
+		double step_lenght = 0;
+		bool is_too_near = true;
+		bool is_outside_boundaries = false;
 
-		step_lenght = pow(targetTranslation.x-lastPosition_.getOrigin().x(), 2)+
-			pow(targetTranslation.y-lastPosition_.getOrigin().y(), 2)+
-			pow(targetTranslation.z-lastPosition_.getOrigin().z(), 2);
-		if(step_lenght > pow(threshold_,2))
+		geometry_msgs::Vector3 dst = cmdTrajectory_.points[cmdTrajectory_.points.size() - 1].transforms[0].translation;
+		ROS_ERROR_STREAM("DESTINATION: " << dst.x << " : " << dst.y << " : " << dst.z);
+
+		while(is_too_near && !is_outside_boundaries && stepInTrajectory_ < cmdTrajectory_.points.size())
 		{
-			is_too_near = false;
-		}
-		else
-		{
-			if ((stepInTrajectory_ == cmdTrajectory_.points.size() - 1) || is_outside_boundaries)
+			geometry_msgs::Vector3 targetTranslation = cmdTrajectory_.points[stepInTrajectory_].transforms[0].translation;
+			if ( targetTranslation.z > max_altitude_ ||
+				std::abs(targetTranslation.x) > dimension_c_ / 2.0 ||
+				std::abs(targetTranslation.y) > dimension_c_ / 2.0 )
+				{
+					is_outside_boundaries = true;
+					ROS_ERROR("Setpoint outside the box!");
+				}
+
+			step_lenght = pow(targetTranslation.x-lastPosition_.getOrigin().x(), 2)+
+				pow(targetTranslation.y-lastPosition_.getOrigin().y(), 2)+
+				pow(targetTranslation.z-lastPosition_.getOrigin().z(), 2);
+			if(step_lenght > pow(threshold_,2))
 			{
-				break;
+				is_too_near = false;
 			}
 			else
 			{
-				stepInTrajectory_++;
+				if ((stepInTrajectory_ == cmdTrajectory_.points.size() - 1) || is_outside_boundaries)
+				{
+					break;
+				}
+				else
+				{
+					stepInTrajectory_++;
+				}
 			}
 		}
+		ROS_ERROR_STREAM("stepInTrajectory_:"<<stepInTrajectory_<<" cmdTrajectory_.points.size()"<<cmdTrajectory_.points.size()<<" THRESHOLD:"<<threshold_<<" step_lenght:"<<step_lenght);
+		trajectoryPoint_ = cmdTrajectory_.points[stepInTrajectory_].transforms[0];
+
+		if(step_lenght > pow(max_step_,2))
+		{
+			ROS_ERROR_STREAM("Step too big!! step_lenght:"<< step_lenght<<" max_step:"<<max_step_);
+			// Interpolation
+			double direction = cv::fastAtan2(trajectoryPoint_.translation.y - lastPosition_.getOrigin().y(), trajectoryPoint_.translation.x - lastPosition_.getOrigin().x()) / 360 * 2 *PI;
+			trajectoryPoint_.translation.x = lastPosition_.getOrigin().x() + max_step_ * std::cos(direction);
+			trajectoryPoint_.translation.y = lastPosition_.getOrigin().y() + max_step_ * std::sin(direction);
+		}
+
+		tf::Quaternion identity_rotation = tf::createIdentityQuaternion();
+		tf::quaternionTFToMsg(identity_rotation, trajectoryPoint_.rotation);
+
+		publishTrajectoryPosition(trajectoryPoint_);
 	}
-	ROS_ERROR_STREAM("stepInTrajectory_:"<<stepInTrajectory_<<" cmdTrajectory_.points.size()"<<cmdTrajectory_.points.size()<<" THRESHOLD:"<<threshold_<<" step_lenght:"<<step_lenght);
-	trajectoryPoint_ = cmdTrajectory_.points[stepInTrajectory_].transforms[0];
-
-	if(step_lenght > pow(max_step_,2))
-	{
-		ROS_ERROR_STREAM("Step too big!! step_lenght:"<< step_lenght<<" max_step:"<<max_step_);
-		// Interpolation
-		double direction = cv::fastAtan2(trajectoryPoint_.translation.y - lastPosition_.getOrigin().y(), trajectoryPoint_.translation.x - lastPosition_.getOrigin().x()) / 360 * 2 *PI;
-		trajectoryPoint_.translation.x = lastPosition_.getOrigin().x() + max_step_ * std::cos(direction);
-		trajectoryPoint_.translation.y = lastPosition_.getOrigin().y() + max_step_ * std::sin(direction);
-	}
-
-	tf::Quaternion identity_rotation = tf::createIdentityQuaternion();
-	tf::quaternionTFToMsg(identity_rotation, trajectoryPoint_.rotation);
-
-	publishTrajectoryPosition(trajectoryPoint_);
 }
 
 
