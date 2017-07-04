@@ -30,7 +30,7 @@ void CmdTravel::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocat
   tf::Transform tfTrajectoryPoint;
   tf::transformMsgToTF(trajectoryPoint, tfTrajectoryPoint);
 
-  ROS_ERROR_STREAM("setpoint envoyée: " << tfTrajectoryPoint.getOrigin().x() << " : " << tfTrajectoryPoint.getOrigin().y() << " : " << tfTrajectoryPoint.getOrigin().z());
+  ROS_ERROR_STREAM("setpoint envoyé: " << tfTrajectoryPoint.getOrigin().x() << " : " << tfTrajectoryPoint.getOrigin().y() << " : " << tfTrajectoryPoint.getOrigin().z());
 
   //Broadcast command
   tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), WORLD_FRAME, SETPOINT));
