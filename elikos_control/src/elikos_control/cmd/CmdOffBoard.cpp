@@ -34,7 +34,15 @@ void CmdOffBoard::execute()
 {
     ROS_ERROR("Started offboard command");
 
-    ros::Rate rate(30.0);
+    ros::Rate rate(5.0);
+
+    tf::StampedTransform fakeVision;
+    fakeVision.frame_id_ = "elikos_arena_origin";
+    fakeVision.child_frame_id_ = "elikos_vision";
+    fakeVision.getOrigin().setX(0);
+    fakeVision.getOrigin().setY(0);
+    fakeVision.getOrigin().setZ(0.14);
+    fakeVision.stamp_ = ros::Time::now();
 
     bool initialPositionFound = false;
     while(!initialPositionFound)
@@ -44,6 +52,7 @@ void CmdOffBoard::execute()
             initialPositionFound = true;
         } catch (tf::TransformException e) {
             ROS_ERROR("%s",e.what());
+            tf_broadcaster_.sendTransform(fakeVision);
         }
     }
 
@@ -65,19 +74,30 @@ void CmdOffBoard::execute()
     {
         ros::spinOnce();
         lastRequest_ = ros::Time::now();
+
+        try {
+            tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
+        } catch (tf::TransformException e) {
+            ROS_ERROR("Last position : %s",e.what());
+        }
+
+        fakeVision.getOrigin().setX(lastPosition_.getOrigin().x());
+        fakeVision.getOrigin().setY(lastPosition_.getOrigin().y());
+        fakeVision.getOrigin().setZ(0.14);
+
         if (currentState_.mode != "OFFBOARD")
         {
-            /*if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
+            if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
             {
                 ROS_INFO("Offboard enabled");
             } 
             else 
             {
                 ROS_INFO("Offboard request failed");
-            }*/
+            }
             lastRequest_ = ros::Time::now();
         } 
-        else if (!currentState_.armed)
+        if (!currentState_.armed)
         {
             /*if (armingClient_.call(armCmd_) &&
                 armCmd_.response.success)
@@ -87,14 +107,11 @@ void CmdOffBoard::execute()
             else 
             {
                 ROS_INFO("Vehicle armed request failed");
-            }*/
-            lastRequest_ = ros::Time::now();
-        }
-
-        try {
-            tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
-        } catch (tf::TransformException e) {
-            ROS_ERROR("%s",e.what());
+            }
+            lastRequest_ = ros::Time::now();*/
+            fakeVision.stamp_ = ros::Time::now();
+            tf_broadcaster_.sendTransform(fakeVision);
+            ROS_ERROR("Fake vision");
         }
 
         double distance = lastPosition_.getOrigin().distance(targetPosition_.getOrigin());
