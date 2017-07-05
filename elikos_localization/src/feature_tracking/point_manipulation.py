@@ -123,3 +123,12 @@ def unconvert_points_from_cv(input_points):
         (input_points.shape[0], input_points.shape[-1])
     )
 
+def normalize_vectors(vectors):
+    # type: (np.ndarray)->np.ndarray
+    """
+    The vectors are [[x,y,z][x,y,z],...,[x,y,z]]
+    :param vectors:
+    :return:
+    """
+    return vectors / np.sqrt((vectors ** 2).sum(-1))[..., np.newaxis]
+

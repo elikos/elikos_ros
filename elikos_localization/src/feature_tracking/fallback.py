@@ -11,6 +11,7 @@ import numpy as np
 import quaternion
 
 import cv2
+import opengv
 
 import rospy
 import tf
@@ -227,9 +228,10 @@ def input_localization_points(*args):
     time = mean_of_times(msg.header.stamp for msg in args[:-1])
 
     #array of 3d points
-    all_3d_points = np.empty((0, 3))
     camera_infos = []
     intersections_2d = []
+    points_3d = []
+    list_of_matches = []
 
     for full_msg in args[:-1]:
         points_image, points_arena = msgs.deserialize_intersections(full_msg.localization_msg)
@@ -245,22 +247,26 @@ def input_localization_points(*args):
                 msg_time
             )
 
-            all_3d_points = np.append(all_3d_points, transformed_points_arena, axis=0)
+            points_3d.append(transformed_points_arena)
 
             camera_infos.append(full_msg.camera_info)
             intersections_2d.append(points_image)
 
+            list_of_matches.append(pt_match.match_points(transformed_points_arena, g_arena_points))
+
         except LocalizationUnavailableException:
             rospy.logwarn("Localization unavailable for camera frame '{0}' at time {1}".format(msg_frame, msg_time))
 
+
+    all_3d_points = np.concatenate(points_3d)
     number_of_points = all_3d_points.shape[0]
 
     matched_areana_points = pt_match.match_points(all_3d_points, g_arena_points)
 
     try:
         (trans_fcu2arena, rot_fcu2arena) = get_tf_transform(
-            global_state.configuration.frames["arena_center"],
             global_state.configuration.frames["fcu"],
+            global_state.configuration.frames["arena_center"],
             time,
             rospy.Duration(0, 500000000)
         )
@@ -273,7 +279,9 @@ def input_localization_points(*args):
     try:
         drone_pose = estimate_drone_pnp(
             intersections_2d,
-            camera_infos
+            list_of_matches,
+            camera_infos,
+            global_state.configuration.frames["fcu"]
         )
     except LocalizationUnavailableException:
         try:
@@ -303,11 +311,42 @@ def input_localization_points(*args):
     )
 
 
-def estimate_drone_pnp(point_list_2d, camera_infos):
-    #type: (list[np.ndarray], list[CameraInfo])->None#
+def estimate_drone_pnp(point_list_2d, point_list_3d, camera_infos, fcu_frame):
+    #type: (list[np.ndarray], list[np.ndarray], list[CameraInfo], str)->tuple[np.ndarray, quaternion.quaternion]
+    bearings_list = []
+    camera_rotation_list = np.empty((len(camera_infos), 3, 3),np.float)
+    camera_translation_list = np.empty((len(camera_infos), 3),np.float)
 
+    for i, (points_2d, camera_info) in enumerate(zip(point_list_2d, camera_infos)):
+        camera_frame = camera_info.header.frame_id
+        try:
+            (trans_fcu2cam, rot_fcu2cam) = get_tf_transform(camera_frame, fcu_frame, camera_info.header.stamp, rospy.Duration.from_sec(0.01))
+            camera_rotation_list[i,:,:] = quaternion.as_rotation_matrix(rot_fcu2cam)
+            camera_translation_list[i,:] = trans_fcu2cam
+        except LocalizationUnavailableException:
+            continue
 
-    raise LocalizationUnavailableException
+        image2camera_center = np.array([-camera_info.width/2.0, -camera_info.height/2.0, camera_info.K[0]])
+
+        bearings = np.pad(points_2d, [(0, 0), (0, 1)], mode='constant') + image2camera_center
+        bearings = pt_manip.normalize_vectors(bearings)
+
+        bearings_list.append(bearings)#(quaternion.rotate_vectors(rot_fcu2cam, bearings))
+
+    if len(bearings_list) == 0:
+        raise LocalizationUnavailableException
+
+    #point_list_3d[0][0, 2] = 0.1;
+    fcu_pose_mat = opengv.epnp_multi_camera(bearings_list, point_list_3d, camera_translation_list, camera_rotation_list)[0]
+
+    if fcu_pose_mat[2,3] != fcu_pose_mat[2,3]:
+        raise LocalizationUnavailableException
+
+    rot = quaternion.from_rotation_matrix(fcu_pose_mat[0:3, 0:3])
+    trans = fcu_pose_mat[:, 3]
+
+    return trans, rot
+
 
 def estimate_drone_position_alone(detected_3d_points, matched_3d_points, fcu_pose):
     # type: (np.ndarray, np.ndarray,tuple[np.ndarray, quaternion.quaternion])->tuple[np.ndarray, quaternion.quaternion]
@@ -399,8 +438,8 @@ def estimate_drone_simple(points_in_3d, matched_points_in_3d, fcu_pose):
 
 def transform_points(input_points_3d, input_points_frame, dest_frame, frame_time):
     (trans_ref2dst, rot_ref2dst) = get_tf_transform(
-        dest_frame,
         input_points_frame,
+        dest_frame,
         frame_time,
         rospy.Duration(0, 5000000)#5ms
     )
@@ -455,11 +494,11 @@ def get_tf_transform(source_frame, dest_frame, time, timeout):
     # type: (str, str, rospy.Time, rospy.Duration)->(np.ndarray, quaternion.quaternion)
     global g_tf_listener
     try:
-        g_tf_listener.waitForTransform(source_frame, dest_frame, time, timeout)
+        g_tf_listener.waitForTransform(dest_frame, source_frame, time, timeout)
     except tf.Exception as e:
         raise LocalizationUnavailableException(message="Tf lookup failed", cause=e)
 
-    (trans, rot) = g_tf_listener.lookupTransform(source_frame, dest_frame, time)
+    (trans, rot) = g_tf_listener.lookupTransform(dest_frame, source_frame, time)
     return np.array(trans), pt_manip.create_quaterion_from_tf(rot)
 
 
@@ -515,8 +554,8 @@ def state_init(global_state, time_since_state_begin):
     )
     try:
         global_state.last_fcu_position = get_tf_transform(
-            global_state.configuration.frames["arena_center"],
             global_state.configuration.frames["fcu"],
+            global_state.configuration.frames["arena_center"],
             rospy.Time.now(),
             rospy.Duration(1)
         )

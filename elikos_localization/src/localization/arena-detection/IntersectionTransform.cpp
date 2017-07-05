@@ -86,9 +86,9 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
 		intersections.poses[i].position.z = z;    
 	    }
 
-	    publishTransformedIntersections(imageIntersections, intersections);
+	    publishTransformedIntersections(dst, intersections);
     } else {
-        publishTransformedIntersections(std::vector<Eigen::Vector2f>(), geometry_msgs::PoseArray());
+        publishTransformedIntersections(std::vector<cv::Point2f>(), geometry_msgs::PoseArray());
     }
 }
 
@@ -143,7 +143,7 @@ void IntersectionTransform::transformIntersectionXY(const Eigen::Vector2f& image
 
 
 
-void IntersectionTransform::publishTransformedIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
+void IntersectionTransform::publishTransformedIntersections(const std::vector<cv::Point2f>& imageIntersections,
                                                             const geometry_msgs::PoseArray& poseArray)
 {
     if (imageIntersections.size() == poseArray.poses.size())
@@ -157,8 +157,8 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<Ei
         for (int i = 0; i < imageIntersections.size(); ++i) 
         {
             elikos_ros::Intersection intersection;
-            intersection.imagePosition.x = imageIntersections[i].x();
-            intersection.imagePosition.y = imageIntersections[i].y();
+            intersection.imagePosition.x = imageIntersections[i].x;
+            intersection.imagePosition.y = imageIntersections[i].y;
 
             intersection.arenaPosition = poseArray.poses[i].position;
 
