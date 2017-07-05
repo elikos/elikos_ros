@@ -67,19 +67,19 @@ void CmdOffBoard::execute()
         lastRequest_ = ros::Time::now();
         if (currentState_.mode != "OFFBOARD")
         {
-            if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
+            /*if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
             {
                 ROS_INFO("Offboard enabled");
             } 
             else 
             {
                 ROS_INFO("Offboard request failed");
-            }
+            }*/
             lastRequest_ = ros::Time::now();
         } 
         else if (!currentState_.armed)
         {
-            if (armingClient_.call(armCmd_) &&
+            /*if (armingClient_.call(armCmd_) &&
                 armCmd_.response.success)
             {
                 ROS_INFO("Vehicle armed");
@@ -87,7 +87,7 @@ void CmdOffBoard::execute()
             else 
             {
                 ROS_INFO("Vehicle armed request failed");
-            }
+            }*/
             lastRequest_ = ros::Time::now();
         }
 
