@@ -1,20 +1,25 @@
-#include <geometry_msgs/Point.h>
-#include <stdlib.h>  //for using the function sleep
 #include <elikos_ros/RobotRaw.h>
 #include <elikos_ros/RobotRawArray.h>
+#include <geometry_msgs/Point.h>
+#include <stdlib.h>  //for using the function sleep
+#include <unordered_map>
 #include <vector>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
 #include "robot.h"
 #include "ros/ros.h"
 #include "std_msgs/Header.h"
+
+#define DEBUG 1
+
 #define RED 0
 #define GREEN 1
 const int NUM_ROBOTS_PER_COLOR = 1;
 
+std::unordered_map<int, cv::Vec3b> map_id_color;
+
 std::vector<Robot> redRobots(NUM_ROBOTS_PER_COLOR);
 std::vector<Robot> greenRobots(NUM_ROBOTS_PER_COLOR);
-
 
 int DoMatch(geometry_msgs::Point inputPoint, std::vector<Robot>& robots) {
     double dist = DBL_MAX;
@@ -51,21 +56,40 @@ int DoMatch(geometry_msgs::Point inputPoint, std::vector<Robot>& robots) {
                 break;
             }
     }
-    int x = robots.at(closestRobotIndex).getPos().pose.position.x;
-    int y = robots.at(closestRobotIndex).getPos().pose.position.y;
+    int x = robots.at(closestRobotIndex).getPos().x;
+    int y = robots.at(closestRobotIndex).getPos().y;
     ROS_INFO("Updated robot: %i", robots.at(closestRobotIndex).getId());
     ROS_INFO("Updated robot pos: %i, %i", x, y);
 
     // eturn robotGagnant;
 }
 void subCallback(const elikos_ros::RobotRawArray::ConstPtr& msg) {
-    ROS_INFO("In callback, num of robots =  %li", msg->robots.size());
-   
+    // Init result image
     cv::Mat_<cv::Vec3b> img(400, 400, cv::Vec3b(0, 0, 255));
 
+    ROS_INFO("In callback, num of robots =  %li", msg->robots.size());
+
+    int indexRobotGagnant = NUM_ROBOTS_PER_COLOR;
     for (int i = 0; i < msg->robots.size(); i++) {
-        ROS_INFO("I heard robot %d: [%f, %f]", i, msg->robots[i].point.x,
-                 msg->robots[i].point.y);
+        if (msg->robots[i].color == RED) {
+            indexRobotGagnant = DoMatch(msg->robots[i].point, redRobots);
+            ROS_INFO("Found red robot: %i",
+                     greenRobots.at(indexRobotGagnant).getId());
+            greenRobots.at(indexRobotGagnant).setPos(msg->robots[i].point);
+            //greenRobots.at(indexRobotGagnant).setFcu(msg->robots[i].poseFcu);
+
+        } else if (msg->robots[i].color == GREEN) {
+            indexRobotGagnant = DoMatch(msg->robots[i].point, greenRobots);
+            ROS_INFO("Found green robot: %i",
+                     greenRobots.at(indexRobotGagnant).getId());
+            greenRobots.at(indexRobotGagnant).setPos(msg->robots[i].point);
+            //greenRobots.at(indexRobotGagnant).setFcu(msg->robots[i].poseFcu);
+
+        } else {
+            ROS_ERROR("Color does not match, color is %i", msg->robots[i].color);
+        }
+
+        // Add result to image
         int x = msg->robots[i].point.x / 2;
         int y = msg->robots[i].point.y / 2;
 
@@ -74,32 +98,10 @@ void subCallback(const elikos_ros::RobotRawArray::ConstPtr& msg) {
                 img.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 255, 0);
             }
         }
-        cv::imshow("Tracking-results", img);
-        cv::waitKey(30);
-        /*int indexRobotGagnant = NUM_ROBOTS_PER_COLOR;
-        if (msg->targets[i].color == RED) {
-            indexRobotGagnant =
-                DoMatch(msg->robots[i].point, redRobots);
-            ROS_INFO("Found robot: %i",
-                     greenRobots.at(indexRobotGagnant).getId());
-            greenRobots.at(indexRobotGagnant)
-                .setPos(msg->robots[i].point);
-            greenRobots.at(indexRobotGagnant).setFcu(msg->targets[i].poseFcu);
-
-        } else if (msg->robots[i].color == GREEN) {
-            indexRobotGagnant =
-                DoMatch(msg->robots[i].point, greenRobots);
-            ROS_INFO("Found robot: %i",
-                     greenRobots.at(indexRobotGagnant).getId());
-            greenRobots.at(indexRobotGagnant)
-                .setPos(msg->robots[i].point);
-            greenRobots.at(indexRobotGagnant).setFcu(msg->targets[i].poseFcu);
-
-        } else {
-            ROS_INFO("Color does not match");
-            return;
-        }*/
     }
+    // Show image
+    cv::imshow("Tracking-results", img);
+    cv::waitKey(1);
 }
 
 void incertitudeCallback(const ros::TimerEvent& e) {
@@ -122,12 +124,9 @@ int main(int argc, char** argv) {
 
     // Create all robots
     for (int id = 0; id < NUM_ROBOTS_PER_COLOR; id++) {
-        ROS_INFO("Creating robot with id: %d", id);
-        redRobots.push_back(Robot(id, RED));
         // TODO: Decider si on fait un gros vecteur ou 2 petits pour chaque
         // couleur
-        ROS_INFO("Creating robot with id: %d", NUM_ROBOTS_PER_COLOR + id);
-
+        redRobots.push_back(Robot(id, RED));
         greenRobots.push_back(Robot(NUM_ROBOTS_PER_COLOR + id, GREEN));
     }
 
@@ -135,10 +134,11 @@ int main(int argc, char** argv) {
         n.subscribe("/elikos_robot_raw_array", 1000, subCallback);
 
     // Timer pour calcul de l'incertitude
-    //ros::Timer timer = n.createTimer(ros::Duration(0.1), incertitudeCallback);
+    // ros::Timer timer = n.createTimer(ros::Duration(0.1),
+    // incertitudeCallback);
     ros::spin();
 
-    cv::waitKey(30);
+    cv::waitKey(1);
 
     return 0;
 }

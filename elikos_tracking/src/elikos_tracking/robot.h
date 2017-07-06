@@ -11,11 +11,14 @@ public:
     Robot();
     ~Robot();
 
-    void setPos(geometry_msgs::PoseStamped pose);
+   /* void setPos(geometry_msgs::PoseStamped pose);
     geometry_msgs::PoseStamped getPos();
 
     void setFcu(geometry_msgs::PoseStamped pose);
     geometry_msgs::PoseStamped getFcu();
+    */
+    void setPos(geometry_msgs::Point point);
+    geometry_msgs::Point getPos();
 
     void setColor(uint8_t color);
     uint8_t getColor();
@@ -40,8 +43,10 @@ public:
 
 
 private:
-    geometry_msgs::PoseStamped poseOrigin;
-    geometry_msgs::PoseStamped fcu;
+    //geometry_msgs::PoseStamped poseOrigin;
+    //geometry_msgs::PoseStamped fcu;
+
+    geometry_msgs::Point poseOrigin;
     uint8_t id;
     uint8_t color;
     ros::Time time;
