@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="tf" type="static_transform_publisher" name="setpoint_publisher" args="0 0 2 0 0 0 1 elikos_arena_origin elikos_setpoint 100" />
+    <node pkg="rosservice" type="rosservice" name="offboard_service" args="call --wait /mavros/set_mode 216 OFFBOARD" />
+    <node pkg="rosservice" type="rosservice" name="arming_service" args="call --wait /mavros/cmd/arming 1" />
+</launch>

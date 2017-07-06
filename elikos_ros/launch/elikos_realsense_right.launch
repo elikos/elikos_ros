@@ -1,7 +1,7 @@
 <launch>
   <arg name="camera_right"              default="r200_right" />
   <arg name="camera_right_camera_type"  default="R200"    /> <!-- Type of camera -->
-  <arg name="camera_right_serial_no"    default="2411013612" /> <!-- Note: Replace with actual serial number -->
+  <arg name="camera_right_serial_no"    default="2401001385" /> <!-- Note: Replace with actual serial number -->
   <arg name="camera_right_enable_color"      default="true" />
   <arg name="camera_right_enable_pointcloud" default="true" />
   <arg name="camera_right_enable_tf"         default="true" />
@@ -16,6 +16,8 @@
       <arg name="serial_no"    value="$(arg camera_right_serial_no)" />
       <arg name="enable_color"      default="$(arg camera_right_enable_color)" />
       <arg name="enable_pointcloud" default="$(arg camera_right_enable_pointcloud)" />
-      <arg name="enable_tf"         default="$(arg camera_right_enable_tf)" />
+      <arg name="enable_tf"         default="$(arg camera_right_enable_tf)" />      
+      <arg name="color_width"  value="640" />
+      <arg name="color_height" value="480" />
   </include>
 </launch>

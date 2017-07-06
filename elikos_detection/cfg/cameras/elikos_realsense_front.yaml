@@ -1,0 +1,11 @@
+topic: "/r200_front/color/image_raw"
+frame: "r200_front_link"
+calibration: false
+file_in: "calib_poly"
+file_out: "new_calibration"
+cam_height: 480
+cam_width: 640
+cam_fov_v: 43
+cam_fov_h: 70
+min_height: 0.1
+bw_threshold: 149

@@ -5,10 +5,16 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
+
 #include <ros/time.h>
 #include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
 
 #include <Eigen/Core>
+#include <image_transport/image_transport.h>
+
+#include "CameraInfo.h"
+#include "QuadState.h"
 
 namespace localization
 {
@@ -16,11 +22,11 @@ namespace localization
 class PreProcessing
 {
 public:
-    PreProcessing();
+    PreProcessing(const CameraInfo& cameraInfo, const QuadState& state);
     ~PreProcessing() = default;
 
-    void preProcessImage(const cv::Mat& raw, const ros::Time& stamp, cv::Mat& preProcessed);
-    void removePerspective(const cv::Mat& input, cv::Mat& rectified) const;
+    void preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat& perspectiveTransform);
+    void removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Mat& perspectiveTransform);
     void showCalibTrackBars();
 
     Eigen::Vector2f translate(const Eigen::Vector2f& v, const Eigen::Vector2f& translation) const;
@@ -32,7 +38,17 @@ private:
 
     Eigen::Matrix4f getPerspectiveProjectionTransform(double focalLength, double height, double length) const;
 
+    ros::NodeHandle nh_;
+    image_transport::ImageTransport it_;
+
+    image_transport::Subscriber imageSub_;
+    image_transport::Publisher imagePub_;
+
     tf::TransformListener tfListener_;
+    tf::TransformBroadcaster tfPub_;
+
+    const CameraInfo& cameraInfo_;
+    const QuadState& state_;
 
     double blurSigma = 0.0;
     int whiteThreshold_ = 149;

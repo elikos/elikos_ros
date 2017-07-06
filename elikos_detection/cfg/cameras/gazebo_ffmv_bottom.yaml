@@ -5,6 +5,7 @@ file_in: "calibration_initial"
 file_out: "new_calibration"
 cam_height: 480
 cam_width: 640
-cam_fov_v: 63
-cam_fov_h: 89
+cam_fov_v: 67.5
+cam_fov_h: 90 
 min_height: 0.1
+bw_threshold: 149
