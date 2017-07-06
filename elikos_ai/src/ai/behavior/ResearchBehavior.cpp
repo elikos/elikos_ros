@@ -12,6 +12,19 @@ namespace ai
 ResearchBehavior::ResearchBehavior(AbstractArena* arena)
     : AbstractBehavior(arena)
 {
+   ros::NodeHandle nh;
+   double takeoff_altitude;
+   nh.getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);
+
+   tf::StampedTransform currentPosition;
+   tf::TransformListener tf_listener;
+   try {
+        tf_listener.lookupTransform("elikos_arena_origin", "elikos_fcu", ros::Time(0), currentPosition);
+    } catch (tf::TransformException e) {
+        ROS_ERROR("%s",e.what());
+    }
+
+   q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), {  currentPosition.getOrigin().getX(),  currentPosition.getOrigin().getY(), takeoff_altitude })));
 }
 
 ResearchBehavior::~ResearchBehavior()
@@ -28,14 +41,14 @@ void ResearchBehavior::generateCommands()
 
     if (q_.empty()) {
     	q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.6*dimension_c, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -0.6*dimension_c,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.6*dimension_c,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -0.6*dimension_c, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.6*dimension_c, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.6*dimension_c,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -0.6*dimension_c,  0.0, research_altitude })));
-        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -0.6*dimension_c, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.6*(dimension_c/2), research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -0.6*(dimension_c/2),  0.0, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.6*(dimension_c/2),  0.0, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -0.6*(dimension_c/2), research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0,  0.6*(dimension_c/2), research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.6*(dimension_c/2),  0.0, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), { -0.6*(dimension_c/2),  0.0, research_altitude })));
+        q_.push(std::unique_ptr<MovementCommand>(new MovementCommand(&arena_->getQuad(), {  0.0, -0.6*(dimension_c/2), research_altitude })));
     }
 }
 

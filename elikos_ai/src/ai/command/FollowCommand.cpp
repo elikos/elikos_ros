@@ -24,7 +24,7 @@ void FollowCommand::execute()
 {
     tf::Vector3 destination = target_->getPose().getOrigin();
     destination.setZ(FLIGHT_HEIGHT);
-    MessageHandler::getInstance()->sendDestination(destination);
+    MessageHandler::getInstance()->sendDestination(destination, CmdCode::MOVE_TO_POINT);
 }
 
 bool FollowCommand::isCommmandDone()

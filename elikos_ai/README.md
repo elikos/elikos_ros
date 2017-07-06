@@ -20,7 +20,20 @@
       node ai et simule également la restriction du champs de vision des caméras.
     
 ## Configuration   
-TODO
+* dimension_c: (default = 3)  
+    Dimension d'un côté de l'arène.
+* research_altitude: (default = 2)  
+    Altitude pour la recherche de cibles.
+* edge_tolerance: (default = 0.5)  
+    Distance la minimale du drone à un ligne de bordure.
+* research_enabled: (default = true)  
+    Permet au drone de chercher des cibles.
+* aggressive_enabled: (default = false)  
+    Permet au drone de faire passer les cibles de l'autre côté de la ligne verte.
+* preventive_enabled: (default = false)  
+    Permet au drone d'éviter les cibles de passer de l'autre côté d'une ligne rouge.
+* simulation: (default = false)  
+    Indique si on veut exécuter la simulation de l'AI.
 
 ## Nodes  
 * **elikos_ai** : Effectue la prise de décision haut niveau. Génère des destinations et devrait 

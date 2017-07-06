@@ -27,6 +27,7 @@ protected:
     QuadRobot* quad_;
     TargetRobot* target_;
     util::Timer timer_;
+    double has_reach_destination_threshold_;
 
     bool hasReachedDestination(const tf::Vector3& currentPosition, const tf::Vector3& destination);
     AbstractCommand() = default;
