@@ -67,6 +67,7 @@ add_message_files(
   TargetRobot.msg
   TargetRobotArray.msg
   TrajectoryCmd.msg
+  AICmd.msg
   Matrix3.msg
   StampedMatrix3.msg
   Intersection.msg

@@ -22,12 +22,13 @@ MovementCommand::~MovementCommand()
 
 void MovementCommand::execute()
 {
-    MessageHandler::getInstance()->sendDestination(destination_);
+    MessageHandler::getInstance()->sendDestination(destination_, CmdCode::MOVE_TO_POINT);
 }
 
 bool MovementCommand::isCommmandDone()
 {
-    return hasReachedDestination(quad_->getPose().getOrigin(), destination_) ||
+    bool has_reached_destination = hasReachedDestination(quad_->getPose().getOrigin(), destination_);
+    return  has_reached_destination ||
             timer_.getElapsedS() > WAIT_TIME;
 }
 

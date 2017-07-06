@@ -23,7 +23,9 @@ MessageHandler::MessageHandler()
 {
     agent_ = Agent::getInstance();
     trgtSub_ = nh_.subscribe<elikos_ros::TargetRobotArray>(TRGT_TOPIC, 1, &MessageHandler::handleTrgtMsg, this);
-    mavPub_ = nh_.advertise<geometry_msgs::PoseStamped>(SETPOINT_TOPIC, 1);
+    simPub_ = nh_.advertise<geometry_msgs::PoseStamped>(SETPOINT_TOPIC, 1);
+    cmdPub_ = nh_.advertise<elikos_ros::AICmd>(CMD_TOPIC, 1);
+    nh_.param<bool>("/elikos_ai/simulation", is_simulation_, false);
 }
 
 void MessageHandler::freeInstance()
@@ -67,13 +69,22 @@ void MessageHandler::lookForMav()
     Agent::getInstance()->updateQuadRobot(poseTf);
 }
 
-void MessageHandler::sendDestination(const tf::Vector3& destination)
+void MessageHandler::sendDestination(const tf::Vector3& destination, CmdCode cmd_code)
 {
     tf::Pose pose(tf::Quaternion(0.0, 0.0, 0.0, 1.0), destination);
     tf::Stamped<tf::Pose> stPose(pose, ros::Time::now(), WORLD_FRAME);
     geometry_msgs::PoseStamped msg;
     tf::poseStampedTFToMsg(stPose, msg);
-    mavPub_.publish(msg);
+
+
+    if (is_simulation_) simPub_.publish(msg);
+    else
+    {
+        elikos_ros::AICmd cmd_msg;
+        cmd_msg.pose = msg;
+        cmd_msg.cmdCode = cmd_code;
+        cmdPub_.publish(cmd_msg);
+    }
 }
 
 }
