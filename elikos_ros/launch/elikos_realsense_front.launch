@@ -17,5 +17,7 @@
       <arg name="enable_color"      default="$(arg camera_front_enable_color)" />
       <arg name="enable_pointcloud" default="$(arg camera_front_enable_pointcloud)" />
       <arg name="enable_tf"         default="$(arg camera_front_enable_tf)" />
+      <arg name="color_width"  value="640" />
+      <arg name="color_height" value="480" />
   </include>
 </launch>

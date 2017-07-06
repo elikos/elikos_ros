@@ -1,8 +1,24 @@
 <launch>
+     <node name="gazebo_tf_fix" pkg="elikos_sim" type="gazebo_tf_fix"/>
+
     <include file="$(find elikos_sim)/src/gazebo_sim/Firmware/launch/mavros_posix_sitl.launch">
         <arg name="world" value="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/worlds/stadium.world"/>
         <arg name="sdf" value="$(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/iris_realsense/iris_opt_flow.sdf"/>
         <arg name="config_yaml" value="$(find elikos_ros)/launch/px4_config_sim.yaml"/>
      </include>
-     <node name="gazebo_tf_fix" pkg="elikos_sim" type="gazebo_tf_fix"/>
+
+    <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/gazebo_ffmv_bottom.yaml" ns="gazebo_ffmv_bottom"/>
+    <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/gazebo_r200_front.yaml" ns="gazebo_r200_front"/>
+    <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/gazebo_r200_right.yaml" ns="gazebo_r200_right"/>
+    <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/gazebo_r200_left.yaml" ns="gazebo_r200_left"/>
+    <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/gazebo_r200_back.yaml" ns="gazebo_r200_back"/>
+
+	<!-- Static transforms -->
+	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0.024 0.147 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
+	<node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="r200_front_broadcaster" args="0.15 0 0 0.6029 -0.6029 0.3695 -0.3695 elikos_base_link r200_front 100" />
+    <node pkg="tf" type="static_transform_publisher" name="r200_left_broadcaster" args="0 0.15 0 -0.8526 0.0 0.0 0.5225 elikos_base_link r200_left 100" />
+    <node pkg="tf" type="static_transform_publisher" name="r200_right_broadcaster" args="0 -0.15 0 -0.0 -0.8526 0.5225 0.0 elikos_base_link r200_right 100" />
+    <node pkg="tf" type="static_transform_publisher" name="r200_back_broadcaster" args="-0.20 0 0 0.6029 0.6029 -0.3694 -0.3694 elikos_base_link r200_back 100" />
+    <node pkg="tf" type="static_transform_publisher" name="elikos_ffmv_bottom_broadcaster" args="-0.15 0 0.02 0.7071 -0.7071 0.0 -0.0 elikos_base_link elikos_ffmv_bottom 100" />
 </launch>

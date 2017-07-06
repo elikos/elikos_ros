@@ -1,0 +1,31 @@
+#frame in the center of the arena
+arena_center_frame_id: "elikos_arena_origin"
+#frame of the fcu
+fcu_frame_id: "elikos_fcu"
+#output frame of the vision
+output_position_fcu_frame_id: "elikos_vision_debug"
+
+#initial pose of the drone
+initial_drone_pos: [0, 0, 0.14]
+initial_drone_rot: [1, 0, 0, 0]
+
+# Nombre d'intersection de l'arène sur une dimention
+arena_intersection_num: 11
+# mesure de côté de l'arère (en m)
+arena_size: 10
+
+# Nombre de caméras. Les topics sont sous le nom "localization/features_N" où N est le numéro de la caméra qui commenca a un
+#  par exemple, pour 2 caméras, le noeud écoutera les topics
+#   - localization/features_0
+#   - localization/features_1
+camera_number: 5
+
+# float : time spent publishing the initial transform after fcu is detected to allow stabilisation
+stabilization_time: 0
+# Si on publie la position du FCU
+publish_fcu_on_failure: On
+
+
+# float : the max delay between two messages that won't trigger the watchdog.
+#  larger delays will trigger the watchdog.
+watchdog_max_message_delay: 5

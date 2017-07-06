@@ -36,5 +36,9 @@
   <node pkg="tf" type="static_transform_publisher" name="elikos_ffmv_bottom_broadcaster" args="-0.15 0 0.02 0.7071 -0.7071 0.0 -0.0 elikos_base_link elikos_ffmv_bottom 100" />
 
 
+	<!--include file="$(find elikos_sim)/launch/transforms_setup.launch"/-->
+  
+  <!-- Target and obstacle robots -->
+	<include file="$(find elikos_sim)/launch/robots_sim.launch"/>
 
 </launch>
