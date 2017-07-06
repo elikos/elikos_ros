@@ -23,6 +23,29 @@
         <remap from="localization/features_2" to="elikos_realsense_left/intersections"/>
         <remap from="localization/features_3" to="elikos_realsense_right/intersections"/>
         <!-- remap from="localization/features_4" to="elikos_realsense_back/intersections"/ -->
-    </node>
+        <remap from="localization/camera_info_0" to="/elikos_ffmv_bottom_camera/camera_info"/>
+        <remap from="localization/camera_info_1" to="/r200_front/camera_info"/>
+        <remap from="localization/camera_info_2" to="/r200_left/camera_info"/>
+        <remap from="localization/camera_info_3" to="/r200_right/camera_info"/>
+        <remap from="localization/camera_info_4" to="/r200_back/camera_info"/>
 
+    </node>
+<!--
+    <group ns="feature_tracking">
+        <rosparam command="load" file="$(find elikos_localization)/cfg/feature_tracking.yaml"/>
+
+        <remap from="localization/features_0" to="gazebo_ffmv_bottom/intersections"/>
+        <remap from="localization/features_1" to="gazebo_r200_front/intersections"/>
+        <remap from="localization/features_2" to="gazebo_r200_left/intersections"/>
+        <remap from="localization/features_3" to="gazebo_r200_right/intersections"/>
+        <remap from="localization/features_4" to="gazebo_r200_back/intersections"/>
+
+        <remap from="localization/camera_info_0" to="/elikos_ffmv_bottom_camera/camera_info"/>
+        <remap from="localization/camera_info_1" to="/r200_front/camera_info"/>
+        <remap from="localization/camera_info_2" to="/r200_left/camera_info"/>
+        <remap from="localization/camera_info_3" to="/r200_right/camera_info"/>
+        <remap from="localization/camera_info_4" to="/r200_back/camera_info"/>
+
+    </group>
+-->
 </launch>
