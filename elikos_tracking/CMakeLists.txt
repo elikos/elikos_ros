@@ -37,6 +37,7 @@ include_directories(
 add_executable( elikos_tracking
     src/elikos_tracking/elikos_tracking.cpp
     src/elikos_tracking/robot.cpp
+    src/elikos_tracking/TrackingHandler.cpp
    )
 
 target_link_libraries(elikos_tracking

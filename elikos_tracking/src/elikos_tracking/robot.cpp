@@ -3,18 +3,21 @@
 
 Robot::Robot()
 {
+    this->id = -1;
   this->isNew = true;
 //  this->incertitude = -1;
   this->incertitude = 0;
   this->speed = 0.33;
 }
 Robot::Robot(int id, uint8_t color) {
+
     this->id = id;
     this->color = color;
     this->isNew = true;
     //this->incertitude = -1;
       this->incertitude = 0;    
     this->speed = 0.33;
+
 }
 
 Robot::~Robot() {

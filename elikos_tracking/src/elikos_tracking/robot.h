@@ -24,7 +24,7 @@ public:
     uint8_t getColor();
 
     void setId(uint8_t id) {id = this->id;}
-    uint8_t getId() {return id;}
+    int getId() {return id;}
 
     void setTime(ros::Time time);
     ros::Time getTime();
@@ -47,7 +47,7 @@ private:
     //geometry_msgs::PoseStamped fcu;
 
     geometry_msgs::Point poseOrigin;
-    uint8_t id;
+    int id;
     uint8_t color;
     ros::Time time;
 
