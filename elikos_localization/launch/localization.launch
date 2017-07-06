@@ -1,28 +1,28 @@
 <launch>
 
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
-        <arg name="camera_name" value="gazebo_ffmv_bottom"/>
+        <arg name="camera_name" value="elikos_ffmv_bottom"/>
     </include>
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
-        <arg name="camera_name" value="gazebo_r200_front"/>
+        <arg name="camera_name" value="elikos_realsense_front"/>
     </include>
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
-        <arg name="camera_name" value="gazebo_r200_back"/>
+        <arg name="camera_name" value="elikos_realsense_back"/>
     </include>
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
-        <arg name="camera_name" value="gazebo_r200_left"/>
+        <arg name="camera_name" value="elikos_realsense_left"/>
     </include>
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
-        <arg name="camera_name" value="gazebo_r200_right"/>
+        <arg name="camera_name" value="elikos_realsense_right"/>
     </include>
 
     <node pkg="elikos_localization" type="fallback.py" name="feature_tracking" output="screen">
         <rosparam command="load" file="$(find elikos_localization)/cfg/feature_tracking.yaml"/>
-        <remap from="localization/features_0" to="gazebo_ffmv_bottom/intersections"/>
-        <remap from="localization/features_1" to="gazebo_r200_front/intersections"/>
-        <remap from="localization/features_2" to="gazebo_r200_left/intersections"/>
-        <remap from="localization/features_3" to="gazebo_r200_right/intersections"/>
-        <remap from="localization/features_4" to="gazebo_r200_back/intersections"/>
+        <remap from="localization/features_0" to="elikos_ffmv_bottom/intersections"/>
+        <remap from="localization/features_1" to="elikos_realsense_front/intersections"/>
+        <remap from="localization/features_2" to="elikos_realsense_left/intersections"/>
+        <remap from="localization/features_3" to="elikos_realsense_right/intersections"/>
+        <!-- remap from="localization/features_4" to="elikos_realsense_back/intersections"/ -->
     </node>
 
 </launch>
