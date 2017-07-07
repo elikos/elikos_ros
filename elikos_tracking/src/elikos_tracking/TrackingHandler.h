@@ -14,18 +14,21 @@ const int NUM_ROBOTS_PER_COLOR = 5;
 
 
 class TrackingHandler {
-
-//TODO: make singleton
     public:
 
+    static TrackingHandler* getInstance();
+
+    std::shared_ptr<Robot> getRobotAtIndex(int index);
+    void clearRobots();
     int DoMatch(geometry_msgs::Point inputPoint, uint8_t color);
     static void subCallback(const elikos_ros::RobotRawArray::ConstPtr& msg);
-    static TrackingHandler* getHandler() {return trackHandler;}
-    static void init();
+
    private:
-       TrackingHandler();
-    ~TrackingHandler();
-    static TrackingHandler* trackHandler;
-    std::vector<std::unique_ptr<Robot>> redRobots;
-    std::vector<std::unique_ptr<Robot>> greenRobots;
+
+    TrackingHandler();
+    static TrackingHandler* handlerInstance_;
+    //std::vector<std::unique_ptr<Robot>> redRobots_;
+    //std::vector<std::unique_ptr<Robot>> greenRobots_;
+    std::vector<std::shared_ptr<Robot>> robotsVec_;
+
 };

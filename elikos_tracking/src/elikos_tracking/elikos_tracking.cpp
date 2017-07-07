@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     cv::Mat_<cv::Vec3b> img(400, 400, cv::Vec3b(0, 0, 255));
     cv::namedWindow("Tracking-results", CV_WINDOW_AUTOSIZE);
     cv::imshow("Tracking-results", img);
-    TrackingHandler::init();
+    TrackingHandler::getInstance();
     ros::init(argc, argv, "tracking_node");
 
     ros::NodeHandle n;
