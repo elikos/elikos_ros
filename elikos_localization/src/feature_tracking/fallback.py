@@ -116,7 +116,7 @@ class GlobalState:
             camera_info_filter_subscriber = message_filters.Subscriber(
                 camera_info_subscriber_name,
                 CameraInfo,
-                queue_size=1
+                queue_size=8
             )
 
             message_filter_subscriber = message_filters.TimeSynchronizer(
@@ -124,7 +124,7 @@ class GlobalState:
                     points_filter_subscriber,
                     camera_info_filter_subscriber
                 ],
-                1
+                5
             )
 
             self.camera_listeners.append(
@@ -337,7 +337,10 @@ def estimate_drone_pnp(point_list_2d, point_list_3d, camera_infos, fcu_frame):
         raise LocalizationUnavailableException
 
     #point_list_3d[0][0, 2] = 0.1;
-    fcu_pose_mat = opengv.epnp_multi_camera(bearings_list, point_list_3d, camera_translation_list, camera_rotation_list)[0]
+    fcu_pose_mat = opengv.epnp_multi_camera(bearings_list, point_list_3d, camera_translation_list, camera_rotation_list)
+    if fcu_pose_mat is None:
+        raise LocalizationUnavailableException
+    fcu_pose_mat = fcu_pose_mat[0]
 
     if fcu_pose_mat[2,3] != fcu_pose_mat[2,3]:
         raise LocalizationUnavailableException

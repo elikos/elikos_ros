@@ -17,7 +17,6 @@ int main(int argc, char* argv[])
 
   tf::TransformListener tf_listener_;
   tf::TransformBroadcaster tf_broadcaster_;
-  tf::StampedTransform arenaOriginTransform;
 
 
   tf::StampedTransform fcuTransform;

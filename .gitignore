@@ -46,6 +46,8 @@
 elikos_sim/.vscode/*
 elikos_localization/.vscode/*
 elikos_localization/build/*
+elikos_control/.vscode/*
+elikos_control/build/*
 elikos_localization/cmake-build-debug/*
 
 #Le bytecode de python

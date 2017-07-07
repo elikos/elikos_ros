@@ -21,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
    pluginlib
    cmake_modules
    std_srvs
+   elikos_control
 )
 find_package(OpenCV REQUIRED)
 
@@ -33,6 +34,7 @@ CATKIN_DEPENDS
     moveit_core
     moveit_ros_planning_interface
     interactive_markers
+    elikos_control
 )
 
 include_directories(

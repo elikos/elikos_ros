@@ -29,7 +29,7 @@ public:
 				false),
 				has_active_goal_(false),
 				parent_frame_("elikos_arena_origin"),
-				child_frame_("elikos_setpoint"),
+				child_frame_("elikos_moveit_setpoint"),
 				toleranceNextGoal_(0.3),
 				toleranceAchieveGoal_(0.3),
 				toleranceFreeOctomap_(0.1)

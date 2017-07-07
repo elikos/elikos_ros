@@ -3,7 +3,7 @@
 
 Moveit_move_group::Moveit_move_group():
   parent_frame_("elikos_arena_origin"),
-  child_frame_("elikos_setpoint"),
+  child_frame_("elikos_moveit_setpoint"),
   toleranceAchieveGoal_(0.5),
   toleranceFreeOctomap_(0.1),
   safetyTime_(3.0)
@@ -12,22 +12,20 @@ Moveit_move_group::Moveit_move_group():
   group_.setPlanningTime(1.0);//In seconds
 
   //The workspace represents the boundaries of the planning volume.
-  group_.setWorkspace(-10,-10,0,10,10,3);
+  group_.setWorkspace(-10,-10,0,10,10,4);
 
   group_.allowReplanning(true);
 
   group_.setNumPlanningAttempts(20);
 
-  pub_ = nh_.advertise<elikos_ros::TrajectoryCmd>("elikos_trajectory", 1);
 }
 
 Moveit_move_group::~Moveit_move_group()
 {
 }
 
-void Moveit_move_group::move(geometry_msgs::PoseStamped target)
+trajectory_msgs::MultiDOFJointTrajectory Moveit_move_group::move(geometry_msgs::PoseStamped target)
 {
-
   std::vector<double> quad_variable_values;
 
   group_.getCurrentState()->copyJointGroupPositions(group_.getCurrentState()->getRobotModel()->getJointModelGroup(group_.getName()), quad_variable_values);
@@ -76,17 +74,9 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
         trajectory_processing::IterativeParabolicTimeParameterization iptp;
 
         bool success = iptp.computeTimeStamps(rt);
-        ROS_ERROR("Computed time stamp on trajectory %s",success?"SUCCEDED":"FAILED");
 
         rt.getRobotTrajectoryMsg(trajectory_msg);
-        trajectory_msgs::MultiDOFJointTrajectory trajectory = trajectory_msg.multi_dof_joint_trajectory;
-
-        //Publish TrajectoryCmd message on "elikos_trajectory".
-        elikos_ros::TrajectoryCmd cmd;
-        cmd.cmdCode = 0;
-        cmd.trajectory = trajectory;
-
-        pub_.publish(cmd);
+        return trajectory_msg.multi_dof_joint_trajectory;
       }
       else
       {
@@ -96,6 +86,8 @@ void Moveit_move_group::move(geometry_msgs::PoseStamped target)
         std_srvs::Empty::Request req;
         std_srvs::Empty::Response res;
         ros::service::call("/clear_octomap", req, res);
+        trajectory_msgs::MultiDOFJointTrajectory dumb_traj;
+        return dumb_traj;
       }
     }
 
