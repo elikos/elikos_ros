@@ -1,5 +1,5 @@
 <launch>
-    <arg name="speed" default="0.5"/>
+    <arg name="speed" default="0.01"/>
     <arg name="rotation_speed" default="0.785"/>
     <arg name="rotation_angle" default="0.785"/>
     <arg name="random_angle_time_lap" default="5"/>
