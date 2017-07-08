@@ -108,8 +108,8 @@ void TrackingHandler::drawResultImage() {
     for (int i = 0; i < robotsVec_.size(); i++) {
         if (!robotsVec_.at(i)->isNew) {
             // Add result to image
-            float x = robotsVec_.at(i)->getPos().x / 2;
-            float y = robotsVec_.at(i)->getPos().y / 2;
+            float x = robotsVec_.at(i)->getPos().x * 20 + 200;
+            float y = robotsVec_.at(i)->getPos().y * 20 + 200;
 
             cv::Scalar textColor;
             if (robotsVec_.at(i)->getColor() == GREEN) {

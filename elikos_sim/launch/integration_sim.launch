@@ -3,7 +3,7 @@
 	<include file="$(find elikos_sim)/launch/robots_sim.launch"/>
   
   <!-- Target detection -->
-	<!--include file="$(find elikos_detection)/launch/elikos_detection.launch">
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_front" />
       <arg name="cfg" value="gazebo_r200_front"/>
   </include>
@@ -18,10 +18,28 @@
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_back" />
       <arg name="cfg" value="gazebo_r200_back"/>
-  </include-->
+  </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_ffmv_bottom" />
       <arg name="cfg" value="gazebo_ffmv_bottom"/>
+  </include>
+
+    <!-- Target transformation -->
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="gazebo_r200_front" />
+      <arg name="cfg" value="gazebo_r200_front"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="gazebo_r200_right" />
+      <arg name="cfg" value="gazebo_r200_right"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="gazebo_r200_left" />
+      <arg name="cfg" value="gazebo_r200_left"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="gazebo_r200_back" />
+      <arg name="cfg" value="gazebo_r200_back"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
       <arg name="camera_name" value="gazebo_ffmv_bottom" />
