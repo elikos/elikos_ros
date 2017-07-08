@@ -33,7 +33,7 @@ TransformationUnit::TransformationUnit()
   	}
 }
 
-geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ros::RobotRawArray robotArray){
+geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(const elikos_ros::RobotRawArray& robotArray){
     elikos_ros::TargetRobotArray targetArray;
 
     //results for simulation in rviz
@@ -141,7 +141,7 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ro
 	}
   return results;
 }
-tf::Transform TransformationUnit::computeRobotTransform(tf::Transform origin2turret){
+tf::Transform TransformationUnit::computeRobotTransform(const tf::Transform& origin2turret){
 	// Get the smallest angle between the turret and the z axis
 	// - First get the vector pointing towards the z axis of the turret
 	tf::Vector3 vect_z = tf::quatRotate(origin2turret.getRotation(), tf::Vector3(0, 0, 1));
@@ -165,7 +165,7 @@ tf::Transform TransformationUnit::computeRobotTransform(tf::Transform origin2tur
 	return robotFrame;
 }
 
-tf::Quaternion TransformationUnit::computeTurretRotation(elikos_ros::RobotRaw robot){
+tf::Quaternion TransformationUnit::computeTurretRotation(const elikos_ros::RobotRaw& robot){
 	//initialization
 	tf::Quaternion rotation = tf::createIdentityQuaternion();
 	//compute angles

@@ -23,7 +23,10 @@
       <arg name="camera_name" value="gazebo_ffmv_bottom" />
       <arg name="cfg" value="gazebo_ffmv_bottom"/>
   </include>
-
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="gazebo_ffmv_bottom" />
+      <arg name="cfg" value="gazebo_ffmv_bottom"/>
+  </include>
 
 
 	<!-- Static transforms -->
