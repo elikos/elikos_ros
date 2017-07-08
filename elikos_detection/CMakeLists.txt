@@ -68,6 +68,18 @@ target_link_libraries(elikos_detection
   yaml-cpp
 )
 
+
+add_library(elikos_transformation_utils
+    STATIC
+    src/elikos_transformation_utils/TransformationUtils.cpp
+    src/elikos_transformation_utils/TransformationUtils.h)
+
+target_link_libraries(elikos_transformation_utils
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+
+
 add_executable( elikos_transformation
    src/elikos_transformation/elikos_transformation.cpp
    src/elikos_transformation/MessageHandler.h
@@ -75,29 +87,26 @@ add_executable( elikos_transformation
    src/elikos_transformation/TransformationUnit.h
    src/elikos_transformation/TransformationUnit.cpp)
 
-add_library( elikos_transformation_utils
-    STATIC
-    src/elikos_transformation_utils/TransformationUtils.cpp
-    src/elikos_transformation_utils/TransformationUtils.h)
-
 target_link_libraries(elikos_transformation
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
+  elikos_transformation_utils
 )
 
-add_executable( elikos_remotecalib
-   src/elikos_remotecalib/elikos_remotecalib.cpp
-   src/elikos_remotecalib/MessageHandler.h
-   src/elikos_remotecalib/MessageHandler.cpp
-   src/elikos_remotecalib/Colors.hpp
-   src/elikos_remotecalib/gui/headers/WindowCV.hpp
-   src/elikos_remotecalib/gui/headers/CalibrationWindow.hpp
-   src/elikos_remotecalib/gui/headers/ControlWindow.hpp
-   src/elikos_remotecalib/gui/CalibrationWindow.cpp
-   src/elikos_remotecalib/gui/ControlWindow.cpp
-   src/elikos_remotecalib/gui/WindowCV.cpp)
 
-target_link_libraries(elikos_remotecalib
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-)
+#add_executable( elikos_remotecalib
+#   src/elikos_remotecalib/elikos_remotecalib.cpp
+#   src/elikos_remotecalib/MessageHandler.h
+#   src/elikos_remotecalib/MessageHandler.cpp
+#   src/elikos_remotecalib/Colors.hpp
+#   src/elikos_remotecalib/gui/headers/WindowCV.hpp
+#   src/elikos_remotecalib/gui/headers/CalibrationWindow.hpp
+#   src/elikos_remotecalib/gui/headers/ControlWindow.hpp
+#   src/elikos_remotecalib/gui/CalibrationWindow.cpp
+#   src/elikos_remotecalib/gui/ControlWindow.cpp
+#   src/elikos_remotecalib/gui/WindowCV.cpp)
+#
+#target_link_libraries(elikos_remotecalib
+#  ${catkin_LIBRARIES}
+#  ${OpenCV_LIBRARIES}
+#)
