@@ -1,7 +1,7 @@
 #include <vector>
 #include "robot.h"
-#include <elikos_ros/RobotRaw.h>
-#include <elikos_ros/RobotRawArray.h>
+#include <elikos_ros/TargetRobot.h>
+#include <elikos_ros/TargetRobotArray.h>
 #include <geometry_msgs/Point.h>
 #include <stdlib.h>  //for using the function sleep
 #include <unordered_map>
@@ -22,7 +22,7 @@ class TrackingHandler {
     void clearRobots();
     void drawResultImage();
     int DoMatch(geometry_msgs::Point inputPoint, uint8_t color);
-    static void subCallback(const elikos_ros::RobotRawArray::ConstPtr& msg);
+    static void subCallback(const elikos_ros::TargetRobotArray::ConstPtr& msg);
 
    private:
 

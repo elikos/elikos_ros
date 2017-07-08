@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "tracking_node");
 
     ros::NodeHandle n;
-    ros::Subscriber sub = n.subscribe("/elikos_robot_raw_array", 1000,
+    ros::Subscriber sub = n.subscribe("/elikos_target_robot_array", 1000,
                                       TrackingHandler::subCallback);
 
     // Timer pour calcul de l'incertitude

@@ -68,10 +68,10 @@ int TrackingHandler::DoMatch(geometry_msgs::Point inputPoint, uint8_t color) {
         ROS_ERROR("No matching robot found.");
         return -1;
     }
-    int x = robotsVec_.at(closestRobotIndex)->getPos().x;
-    int y = robotsVec_.at(closestRobotIndex)->getPos().y;
+    float x = robotsVec_.at(closestRobotIndex)->getPos().x;
+    float y = robotsVec_.at(closestRobotIndex)->getPos().y;
     ROS_INFO("Updated robot: %i", robotsVec_.at(closestRobotIndex)->getId());
-    ROS_INFO("Updated robot pos: %i, %i", x, y);
+    ROS_INFO("Updated robot pos: %f, %f", x, y);
 
     return closestRobotIndex;
 }
@@ -81,20 +81,20 @@ std::shared_ptr<Robot> TrackingHandler::getRobotAtIndex(int index) {
 }
 
 void TrackingHandler::subCallback(
-    const elikos_ros::RobotRawArray::ConstPtr& msg) {
-    ROS_INFO("In callback, num of robots =  %li", msg->robots.size());
+    const elikos_ros::TargetRobotArray::ConstPtr& msg) {
+    ROS_INFO("In callback, num of robots =  %li", msg->targets.size());
 
-    for (int i = 0; i < msg->robots.size(); i++) {
-        ROS_INFO("here i = %i, color = %i", i, msg->robots[i].color);
+    for (int i = 0; i < msg->targets.size(); i++) {
+        ROS_INFO("here i = %i, color = %i", i, msg->targets[i].color);
         int indexRobotGagnant = NUM_ROBOTS_PER_COLOR;
         indexRobotGagnant =
-            getInstance()->DoMatch(msg->robots[i].point, msg->robots[i].color);
+            getInstance()->DoMatch(msg->targets[i].poseOrigin.pose.position, msg->targets[i].color);
         if (indexRobotGagnant != -1) {
             // Get robot
             std::shared_ptr<Robot> robotGagnant =
                 getInstance()->getRobotAtIndex(indexRobotGagnant);
             robotGagnant->setAssigned(true);
-            robotGagnant->setPos(msg->robots[i].point);
+            robotGagnant->setPos(msg->targets[i].poseOrigin.pose.position);
         }
     }
     getInstance()->clearRobots();
@@ -108,8 +108,8 @@ void TrackingHandler::drawResultImage() {
     for (int i = 0; i < robotsVec_.size(); i++) {
         if (!robotsVec_.at(i)->isNew) {
             // Add result to image
-            int x = robotsVec_.at(i)->getPos().x / 2;
-            int y = robotsVec_.at(i)->getPos().y / 2;
+            float x = robotsVec_.at(i)->getPos().x / 2;
+            float y = robotsVec_.at(i)->getPos().y / 2;
 
             cv::Scalar textColor;
             if (robotsVec_.at(i)->getColor() == GREEN) {
@@ -128,6 +128,7 @@ void TrackingHandler::drawResultImage() {
     // Show image
     cv::imshow("Tracking-results", img);
     cv::waitKey(1);
+    
 }
 void TrackingHandler::clearRobots() {
     // Removed all assigned tags
