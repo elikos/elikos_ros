@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   tf
+  elikos_remote_calib_client
 )
 find_package(Qt5Gui)
 find_package(Qt5Core)
@@ -24,9 +25,9 @@ find_package(OpenCV 2 REQUIRED)
 catkin_package(
    INCLUDE_DIRS src/elikos_transformation_utils
    LIBRARIES elikos_transformation_utils
-	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf
-#   DEPENDS system_lib
-)
+	 CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf elikos_remote_calib_client
+	)
+
 
 include_directories(
 	${catkin_INCLUDE_DIRS}
@@ -64,6 +65,7 @@ add_executable( elikos_detection
 target_link_libraries(elikos_detection
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
+  yaml-cpp
 )
 
 add_executable( elikos_transformation

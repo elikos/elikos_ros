@@ -25,9 +25,8 @@ find_package(Qt5Test)
 find_package(Qt5Concurrent)
 find_package(Qt5OpenGL)
 
-find_package(OpenCV 2 REQUIRED)
 find_package(Eigen3 REQUIRED)
-
+find_package(OpenCV 2 REQUIRED)
 
 catkin_package(
   CATKIN_DEPENDS image_transport cv_bridge elikos_ros elikos_detection geometry_msgs nav_msgs message_runtime roscpp rospy sensor_msgs std_msgs tf2 pcl_ros

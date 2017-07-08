@@ -1,6 +1,10 @@
 #include <memory>
 #include <ros/ros.h>
 #include <ros/package.h>
+#include <iostream>
+#include <elikos_remote_calib_client/Calibrator.h>
+#include <elikos_remote_calib_client/Calibratable.h>
+#include <elikos_remote_calib_client/CalibDetection.h>
 #include "MessageHandler.h"
 
 int main(int argc, char* argv[])
@@ -10,6 +14,7 @@ int main(int argc, char* argv[])
 
   	string extension = ".calib";
   	string inputFile, outputFile;
+
 
     ros::NodeHandle nh_;
 
@@ -26,10 +31,20 @@ int main(int argc, char* argv[])
   	{
   		outputFile = "new_calibration";
   	}
+
+    string calibPath;
+    if (!nh_.getParam("/"+ros::this_node::getName()+"/calib", calibPath))
+  	{
+  		calibPath = "Ffmv_bottem_calib.yaml";
+  	}
+
     MessageHandler messageHandler(calibFolderPath+inputFile+extension);
 
     bool calibrationOn;
     nh_.getParam("/"+ros::this_node::getName()+"/calibration", calibrationOn);
+
+    remote_calib::Calibrator<elikos_remote_calib_client::CalibDetection> calibrateur(messageHandler, calibFolderPath);
+    calibrateur.loadCalibration(calibPath);
 
     ros::Rate r(30);
     // Endless loop
