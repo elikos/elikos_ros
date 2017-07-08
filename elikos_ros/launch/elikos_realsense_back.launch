@@ -20,5 +20,6 @@
       <arg name="color_width"  value="640" />
       <arg name="color_height" value="480" />
   </include>
-
+  <node pkg="topic_tools" type="throttle" name="r200_back_throttle" args="messages /r200_back/color/image_raw 10.0" />
+  <node pkg="topic_tools" type="throttle" name="r200_dback_throttle" args="messages /r200_back/depth/points 10.0" />
 </launch>

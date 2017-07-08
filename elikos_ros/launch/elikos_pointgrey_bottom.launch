@@ -17,7 +17,13 @@
       <param name="camera_info_url" if="$(arg calibrated)"
              value="file://$(find elikos_ros)/param/cameras/camera_$(arg camera_number).yaml" />
     </node>
-    <node pkg="image_proc" type="image_proc" name="image_proc">
+    <node pkg="nodelet" type="nodelet" name="image_proc_debayer" args="load image_proc/debayer camera_nodelet_manager" >
+        <remap to="image_rect_color" from="image_color"/>
+    </node>
+    <node pkg="nodelet" type="nodelet" name="image_proc_rectify" args="load image_proc/rectify camera_nodelet_manager">
+        <remap to="image_color" from="image_mono"/>
+
+        <remap from="image_rect" to="image_rect_color"/>
     </node>
     <node name="dynparam" pkg="dynamic_reconfigure" type="dynparam" args="load camera_nodelet $(find elikos_detection)/cfg/pointgrey_config.yaml" />
   </group>

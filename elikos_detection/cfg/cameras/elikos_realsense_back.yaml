@@ -1,5 +1,5 @@
-topic: "/r200_back/color/image_raw"
-frame: "r200_back_link"
+topic: "/r200_back/color/image_raw_throttle"
+frame: "cam_r200_back_link"
 calibration: false
 file_in: "calib_poly"
 file_out: "new_calibration"
@@ -8,3 +8,4 @@ cam_width: 640
 cam_fov_v: 41
 cam_fov_h: 53
 min_height: 0.1
+undistort: false

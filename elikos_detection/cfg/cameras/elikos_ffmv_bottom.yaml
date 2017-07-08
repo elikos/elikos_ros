@@ -14,3 +14,4 @@ cam_fov_v: 63
 cam_fov_h: 89
 min_height: 0.1
 bw_threshold: 149
+undistort: true

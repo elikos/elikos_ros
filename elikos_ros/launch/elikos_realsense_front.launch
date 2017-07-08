@@ -20,4 +20,6 @@
       <arg name="color_width"  value="640" />
       <arg name="color_height" value="480" />
   </include>
+  <node pkg="topic_tools" type="throttle" name="r200_front_throttle" args="messages /r200_front/color/image_raw 10.0" /> 
+  <node pkg="topic_tools" type="throttle" name="r200_dfront_throttle" args="messages /r200_front/depth/points 10.0" />
 </launch>

@@ -1,27 +1,27 @@
 sensors:
   - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
-    point_cloud_topic: /r200_front/depth/points
+    point_cloud_topic: /r200_front/depth/points_throttle
     max_range: 4.0
     point_subsample: 10
     padding_offset: 0.1
     padding_scale: 1.0
     filtered_cloud_topic: filtered_cloud_front
   - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
-    point_cloud_topic: /r200_right/depth/points
+    point_cloud_topic: /r200_right/depth/points_throttle
     max_range: 4.0
     point_subsample: 10
     padding_offset: 0.1
     padding_scale: 1.0
     filtered_cloud_topic: filtered_cloud_right
   - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
-    point_cloud_topic: /r200_left/depth/points
+    point_cloud_topic: /r200_left/depth/points_throttle
     max_range: 4.0
     point_subsample: 10
     padding_offset: 0.1
     padding_scale: 1.0
     filtered_cloud_topic: filtered_cloud_left
   - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
-    point_cloud_topic: /r200_back/depth/points
+    point_cloud_topic: /lol_r200_back/depth/points_throttle
     max_range: 4.0
     point_subsample: 10
     padding_offset: 0.1

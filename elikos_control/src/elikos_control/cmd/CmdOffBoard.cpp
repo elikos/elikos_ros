@@ -52,7 +52,7 @@ void CmdOffBoard::execute()
             initialPositionFound = true;
         } catch (tf::TransformException e) {
             ROS_ERROR("%s",e.what());
-            tf_broadcaster_.sendTransform(fakeVision);
+            //tf_broadcaster_.sendTransform(fakeVision);
         }
     }
 
@@ -87,7 +87,7 @@ void CmdOffBoard::execute()
 
         if (currentState_.mode != "OFFBOARD")
         {
-            if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
+            /*if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
             {
                 ROS_INFO("Offboard enabled");
             } 
@@ -95,7 +95,7 @@ void CmdOffBoard::execute()
             {
                 ROS_INFO("Offboard request failed");
             }
-            lastRequest_ = ros::Time::now();
+            lastRequest_ = ros::Time::now();*/
         } 
         if (!currentState_.armed)
         {
@@ -110,8 +110,8 @@ void CmdOffBoard::execute()
             }
             lastRequest_ = ros::Time::now();*/
             fakeVision.stamp_ = ros::Time::now();
-            tf_broadcaster_.sendTransform(fakeVision);
-            ROS_ERROR("Fake vision");
+            //tf_broadcaster_.sendTransform(fakeVision);
+            // ROS_ERROR("Fake vision");
         }
 
         double distance = lastPosition_.getOrigin().distance(targetPosition_.getOrigin());
