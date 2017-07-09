@@ -42,13 +42,11 @@ add_executable(elikos_localization
     context/line/Line.h
     context/line/LineGroup.cpp
     context/line/LineGroup.h
-    context/CameraInfo.h
-    context/CameraInfo.cpp
     context/Grid.h
     context/Grid.cpp)
 
 target_link_libraries(elikos_localization
-                      ${catkin_LIBRARIES}
-                      ${OpenCV_LIBRARIES}
-                      ${elikos_detection_LIBRARIES}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    ${elikos_detection_LIBRARIES}
 )

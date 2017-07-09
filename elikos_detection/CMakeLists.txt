@@ -22,20 +22,21 @@ find_package(OpenCV 2 REQUIRED)
 
 
 catkin_package(
-   INCLUDE_DIRS src/elikos_transformation_utils
-   LIBRARIES elikos_transformation_utils
+    INCLUDE_DIRS src/elikos_transformation_utils src/elikos_camera_info
+    LIBRARIES elikos_transformation_utils elikos_camera_info
 	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf
 #   DEPENDS system_lib
 )
 
 include_directories(
 	${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
-  src/elikos_detection/TargetDetection/CVWrapper
-  src/elikos_transformation_utils
+    ${OpenCV_INCLUDE_DIRS}
+    src/elikos_detection/TargetDetection/CVWrapper
+    src/elikos_transformation_utils
+    src/elikos_camera_info
 )
 
-add_executable( elikos_detection
+add_executable(elikos_detection
     src/elikos_detection/elikos_detection.cpp
     src/elikos_detection/MessageHandler.h
     src/elikos_detection/MessageHandler.cpp
@@ -62,40 +63,45 @@ add_executable( elikos_detection
     src/elikos_detection/TargetDetection/CVWrapper/GpuCV.h)
 
 target_link_libraries(elikos_detection
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
 )
 
-add_executable( elikos_transformation
-   src/elikos_transformation/elikos_transformation.cpp
-   src/elikos_transformation/MessageHandler.h
-   src/elikos_transformation/MessageHandler.cpp
-   src/elikos_transformation/TransformationUnit.h
-   src/elikos_transformation/TransformationUnit.cpp)
+add_executable(elikos_transformation
+    src/elikos_transformation/elikos_transformation.cpp
+    src/elikos_transformation/MessageHandler.h
+    src/elikos_transformation/MessageHandler.cpp
+    src/elikos_transformation/TransformationUnit.h
+    src/elikos_transformation/TransformationUnit.cpp)
 
-add_library( elikos_transformation_utils
+add_library(elikos_transformation_utils
     STATIC
     src/elikos_transformation_utils/TransformationUtils.cpp
     src/elikos_transformation_utils/TransformationUtils.h)
 
+add_library(elikos_camera_info 
+    STATIC
+    src/elikos_camera_info/CameraInfo.h
+    src/elikos_camera_info/CameraInfo.cpp)
+
 target_link_libraries(elikos_transformation
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
 )
 
-add_executable( elikos_remotecalib
-   src/elikos_remotecalib/elikos_remotecalib.cpp
-   src/elikos_remotecalib/MessageHandler.h
-   src/elikos_remotecalib/MessageHandler.cpp
-   src/elikos_remotecalib/Colors.hpp
-   src/elikos_remotecalib/gui/headers/WindowCV.hpp
-   src/elikos_remotecalib/gui/headers/CalibrationWindow.hpp
-   src/elikos_remotecalib/gui/headers/ControlWindow.hpp
-   src/elikos_remotecalib/gui/CalibrationWindow.cpp
-   src/elikos_remotecalib/gui/ControlWindow.cpp
-   src/elikos_remotecalib/gui/WindowCV.cpp)
+add_executable(elikos_remotecalib
+    src/elikos_remotecalib/elikos_remotecalib.cpp
+    src/elikos_remotecalib/MessageHandler.h
+    src/elikos_remotecalib/MessageHandler.cpp
+    src/elikos_remotecalib/Colors.hpp
+    src/elikos_remotecalib/gui/headers/WindowCV.hpp
+    src/elikos_remotecalib/gui/headers/CalibrationWindow.hpp
+    src/elikos_remotecalib/gui/headers/ControlWindow.hpp
+    src/elikos_remotecalib/gui/CalibrationWindow.cpp
+    src/elikos_remotecalib/gui/ControlWindow.cpp
+    src/elikos_remotecalib/gui/WindowCV.cpp)
 
 target_link_libraries(elikos_remotecalib
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
 )

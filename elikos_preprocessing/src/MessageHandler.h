@@ -11,6 +11,8 @@
 #include <elikos_ros/StampedMatrix3.h>
 #include "PreProcessing.h"
 
+#include "CameraInfo.h"
+
 namespace preprocessing {
 
 class MessageHandler
