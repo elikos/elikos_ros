@@ -284,7 +284,9 @@ def input_localization_points(*args):
             global_state.configuration.frames["fcu"]
         )
     except LocalizationUnavailableException:
+
         try:
+            rospy.logwarn('No pnp')
             drone_pose = estimate_drone_position_alone(
                 all_3d_points,
                 matched_areana_points,
