@@ -42,7 +42,7 @@
 .cproject
 
 # vscode files
-.vscode/*
+.vscode/
 elikos_sim/.vscode/*
 elikos_localization/.vscode/*
 elikos_localization/build/*

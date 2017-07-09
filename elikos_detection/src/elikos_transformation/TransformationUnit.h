@@ -24,11 +24,11 @@ class TransformationUnit
 	public:
 		TransformationUnit();
 		//Turret: frame coordinate referencing the camera to robot vector.
-		geometry_msgs::PoseArray computeTransformForRobots(elikos_ros::RobotRawArray);
+		geometry_msgs::PoseArray computeTransformForRobots(const elikos_ros::RobotRawArray&);
 
 	private:
-		tf::Quaternion computeTurretRotation(elikos_ros::RobotRaw);
-		tf::Transform computeRobotTransform(tf::Transform);
+		tf::Quaternion computeTurretRotation(const elikos_ros::RobotRaw&);
+		tf::Transform computeRobotTransform(const tf::Transform&);
 
 		tf::TransformBroadcaster tf_broadcaster_;
 		tf::TransformListener tf_listener_;

@@ -1,4 +1,4 @@
-RClistenTopic: "/elikos_remotecalib/input"
+RClistenTopic: "elikos_remote_calib/input"
 CommandOutputListenTopic : "/elikos_remotecalib/cmdOutListenTopic"
 # RClistenTopic: "/elikos_ffmv_bottom_camera/image_raw"
 RCpublishTopic: "/elikos_remotecalib/output"

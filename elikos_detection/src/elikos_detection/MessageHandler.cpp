@@ -12,38 +12,41 @@
 
 #include <cassert>
 
-MessageHandler::MessageHandler(string calibrationFilename) : it_(nh_) {
+
+MessageHandler::MessageHandler(string calibrationFilename) 
+    : nh_("~")
+    , it_(nh_)
+{
     std::string inputTopic, RCinputTopic, RCdebugTopic, RCCommandOutputTopic;
 
     if (!nh_.getParam("/" + ros::this_node::getName() + "/topic", inputTopic)) {
         inputTopic = "";
     }
 
-    if (!nh_.getParam("/" + ros::this_node::getName() + "/RCpublishTopic",
-                      RCinputTopic)) {
+    if (!nh_.getParam("/" + ros::this_node::getName() + "/RCpublishTopic", RCinputTopic)) {
         RCinputTopic = "elikos_remotecalib_publishTopic";
     }
 
-    if (!nh_.getParam("/" + ros::this_node::getName() + "/RClistenTopic",
-                      RCdebugTopic)) {
+    if (!nh_.getParam("/" + ros::this_node::getName() + "/RClistenTopic", RCdebugTopic)) {
         RCdebugTopic = "elikos_remotecalib_listenTopic";
     }
-    if (!nh_.getParam(
-            "/" + ros::this_node::getName() + "/CommandOutputListenTopic",
-            RCCommandOutputTopic)) {
+    if (!nh_.getParam("/" + ros::this_node::getName() + "/CommandOutputListenTopic", RCCommandOutputTopic)) {
         RCCommandOutputTopic = "elikos_remotecalib_cmdOutputListenTopic";
     }
+    
     is_ = it_.subscribe(inputTopic, 1, &MessageHandler::dispatchMessage, this);
     subRC_ = nh_.subscribe(RCinputTopic, 100, &MessageHandler::dispatchCommand,
                            this);
+    std::string cam_name = ros::this_node::getName();
+    cam_name = cam_name.substr(0, cam_name.size()-std::string("_detection").size());
     pub_ =
-        nh_.advertise<elikos_ros::RobotRawArray>("elikos_robot_raw_array", 1);
+        nh_.advertise<elikos_ros::RobotRawArray>("/"+cam_name+"/elikos_robot_raw_array", 1);
     pubCommandOutput_ =
         nh_.advertise<std_msgs::String>(RCCommandOutputTopic, 100);
     // pubImages_ = it_.advertise(inputTopic + "/debug", 1); //debug only
     pubImages_ = it_.advertise(RCdebugTopic, 1);  // debug only
-    // pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
-    // pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
+    pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
+    pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
 
     detection_.loadCalibration(calibrationFilename);
 
@@ -87,7 +90,7 @@ void MessageHandler::dispatchCommand(const std_msgs::String::ConstPtr& input) {
         iss >> color >> h_max >> h_min >> s_max >> s_min >> v_max >> v_min >>
             preErode >> dilate >> postErode;
         detection_.fetchRemoteParams(color, h_max, h_min, s_max, s_min, v_max,
-                                     v_min, preErode, dilate, postErode);
+                                     v_min, preErode, dilate, postErode, 6);
     } else if (command == "getCurrentState") {
         std_msgs::String msg;  // OutputCommand to be sent
         msg.data = "getCurrentState\t" + detection_.getAllParams();
@@ -108,17 +111,17 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr& input) {
     detection_.detect(currentImage, threshold_w, threshold_r, threshold_g,
                       robotsMat, robotsArray);
 
-    // debug images
-    sensor_msgs::ImagePtr msgDebug =
-        cv_bridge::CvImage(std_msgs::Header(), "bgr8", robotsMat).toImageMsg();
-    pubImages_.publish(msgDebug);
-    
-    // sensor_msgs::ImagePtr msgDebug2 = cv_bridge::CvImage(std_msgs::Header(),
-    // "bgr8", threshold_r).toImageMsg();
-    // pubRed_.publish(msgDebug2);
-    // sensor_msgs::ImagePtr msgDebug3 = cv_bridge::CvImage(std_msgs::Header(),
-    // "bgr8", threshold_g).toImageMsg();
-    // pubGreen_.publish(msgDebug3);
+    //debug images
+    if (isCalibrating) {
+        sensor_msgs::ImagePtr msgDebug = cv_bridge::CvImage(std_msgs::Header(), "bgr8", robotsMat).toImageMsg();
+        pubImages_.publish(msgDebug);
+
+        sensor_msgs::ImagePtr msgDebug2 = cv_bridge::CvImage(std_msgs::Header(), "mono8", threshold_r).toImageMsg();
+        pubRed_.publish(msgDebug2);
+
+        sensor_msgs::ImagePtr msgDebug3 = cv_bridge::CvImage(std_msgs::Header(), "mono8", threshold_g).toImageMsg();
+        pubGreen_.publish(msgDebug3);
+    }
 
     // publishing data
     elikos_ros::RobotRawArray output;
@@ -137,4 +140,130 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr& input) {
 
 void MessageHandler::saveCalibration(string filename) {
     detection_.saveCalibration(filename);
+}
+
+
+
+
+
+void MessageHandler::calibrate(const elikos_remote_calib_client::CalibDetection* const message)
+{
+    const elikos_remote_calib_client::ColorDetectionInfo* colors[3] = {&message->red, &message->green, &message->white};
+    for(int i = 0; i < 3; ++i){
+        detection_.fetchRemoteParams(
+            i,
+            colors[i]->col.max.h, 
+            colors[i]->col.min.h, 
+            colors[i]->col.max.s, 
+            colors[i]->col.min.s, 
+            colors[i]->col.max.v, 
+            colors[i]->col.min.v, 
+            colors[i]->deflate, 
+            colors[i]->inflate, 
+            colors[i]->postDeflate,
+            colors[i]->blur
+        );
+    }
+}
+
+void MessageHandler::loadCalibration(const YAML::Node& fileContent)
+{
+    elikos_remote_calib_client::CalibDetection message;
+    //valeurs par défaut
+    message.red.col.max.h  = 170;
+    message.red.col.min.h  = 10;
+    message.red.col.max.s  = 170;
+    message.red.col.min.s  = 10;
+    message.red.col.max.v  = 170;
+    message.red.col.min.v  = 10;
+    message.red.deflate = 10;
+    message.red.inflate = 170;
+    message.red.postDeflate = 170;
+    message.red.blur = 6;
+
+    message.green.col.max.h  = 170;
+    message.green.col.min.h  = 10;
+    message.green.col.max.s  = 170;
+    message.green.col.min.s  = 10;
+    message.green.col.max.v  = 170;
+    message.green.col.min.v  = 10;
+    message.green.deflate = 10;
+    message.green.inflate = 170;
+    message.green.postDeflate = 170;
+    message.green.blur = 6;
+
+    message.white.col.max.h  = 170;
+    message.white.col.min.h  = 10;
+    message.white.col.max.s  = 170;
+    message.white.col.min.s  = 10;
+    message.white.col.max.v  = 170;
+    message.white.col.min.v  = 10;
+    message.white.deflate = 10;
+    message.white.inflate = 170;
+    message.white.postDeflate = 170;
+    message.white.blur = 6;
+
+
+    elikos_remote_calib_client::ColorDetectionInfo* colors[3] = {&message.red, &message.green, &message.white};
+    std::string names[3] = {"red","green","white"};
+    //chargement des valeurs
+    for(int i = 0; i < 3; ++i){
+        if(fileContent[ names[i]+"_max_h"])        colors[i]->col.max.h   = (uint8_t)fileContent[ names[i]+"_max_h"].as<int>();
+        if(fileContent[ names[i]+"_min_h"])        colors[i]->col.min.h   = (uint8_t)fileContent[ names[i]+"_min_h"].as<int>();
+        if(fileContent[ names[i]+"_max_s"])        colors[i]->col.max.s   = (uint8_t)fileContent[ names[i]+"_max_s"].as<int>();
+        if(fileContent[ names[i]+"_min_s"])        colors[i]->col.min.s   = (uint8_t)fileContent[ names[i]+"_min_s"].as<int>();
+        if(fileContent[ names[i]+"_max_v"])        colors[i]->col.max.v   = (uint8_t)fileContent[ names[i]+"_max_v"].as<int>();
+        if(fileContent[ names[i]+"_min_v"])        colors[i]->col.min.v   = (uint8_t)fileContent[ names[i]+"_min_v"].as<int>();
+        if(fileContent[ names[i]+"_deflate"])      colors[i]->deflate     = (uint8_t)fileContent[ names[i]+"_deflate"].as<int>();
+        if(fileContent[ names[i]+"_inflate"])      colors[i]->inflate     = (uint8_t)fileContent[ names[i]+"_inflate"].as<int>();
+        if(fileContent[ names[i]+"_post_deflate"]) colors[i]->postDeflate = (uint8_t)fileContent[ names[i]+"_post_deflate"].as<int>();
+        if(fileContent[ names[i]+"_blur"])         colors[i]->blur        = (uint8_t)fileContent[ names[i]+"_blur"].as<int>();
+    }
+
+    //fire du event
+    loadRemoteCalibration(message);
+}
+
+
+void MessageHandler::saveCalibration(YAML::Node& fileContent)
+{
+    int max_h;
+    int min_h;
+    int max_s;
+    int min_s;
+    int max_v;
+    int min_v;
+    int deflate;
+    int inflate;
+    int postDeflate;
+    int blur;
+
+    std::string colorNames[3] = {"red","green","white"};
+    for (int i = 0; i < 3; ++i) {
+        detection_.getRemoteParams(
+            i,
+            max_h,
+            min_h,
+            max_s,
+            min_s,
+            max_v,
+            min_v,
+            deflate,
+            inflate,
+            postDeflate,
+            blur
+        );
+
+        fileContent[colorNames[i] + "_max_h"] = max_h;
+        fileContent[colorNames[i] + "_min_h"] = min_h;
+        fileContent[colorNames[i] + "_max_s"] = max_s;
+        fileContent[colorNames[i] + "_min_s"] = min_s;
+        fileContent[colorNames[i] + "_max_v"] = max_v;
+        fileContent[colorNames[i] + "_min_v"] = min_v;
+        fileContent[colorNames[i] + "_inflate"] = inflate;
+        fileContent[colorNames[i] + "_deflate"] = deflate;
+        fileContent[colorNames[i] + "_post_deflate"] = postDeflate;
+        fileContent[colorNames[i] + "_blur"] = postDeflate;
+    }
+  
 }

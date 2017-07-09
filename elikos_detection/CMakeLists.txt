@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   tf
+  elikos_remote_calib_client
 )
 find_package(Qt5Gui)
 find_package(Qt5Core)
@@ -34,6 +35,7 @@ include_directories(
     src/elikos_detection/TargetDetection/CVWrapper
     src/elikos_context_utils
     src/elikos_camera_info
+    src/elikos_transformation_utils
 )
 
 add_executable(elikos_detection
@@ -65,6 +67,7 @@ add_executable(elikos_detection
 target_link_libraries(elikos_detection
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
+    yaml-cpp
 )
 
 add_executable(elikos_transformation
@@ -78,6 +81,11 @@ add_library(elikos_transformation_utils
     STATIC
     src/elikos_transformation_utils/TransformationUtils.cpp
     src/elikos_transformation_utils/TransformationUtils.h)
+    
+target_link_libraries(elikos_transformation_utils
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+  )
 
 add_library(elikos_context_utils
     SHARED
@@ -89,6 +97,7 @@ add_library(elikos_context_utils
 target_link_libraries(elikos_transformation
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
+    elikos_transformation_utils
 )
 
 add_executable(elikos_remotecalib

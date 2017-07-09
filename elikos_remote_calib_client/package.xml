@@ -1,29 +1,31 @@
-<?xml version="3.0"?>
+<?xml version="1.0"?>
 <package>
-  <name>elikos_detection</name>
-  <version>3.0.0</version>
-  <description>The elikos_detection package</description>
+  <name>elikos_remote_calib_client</name>
+  <version>0.0.1</version>
+  <description>
+    Le package qui contient une librarie, permettant d'implementer la calibration a distance dans n'importe quel package.
+  </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="lajoiepy@gmail.com">py</maintainer>
+  <maintainer email="arnaud.pare-vogt@polymtl.ca">Arnaud Pare-Vogt</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>Celle d'elikos</license>
 
 
-  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+  <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/elikos_detection</url> -->
+  <!-- <url type="website">http://wiki.ros.org/elikos_remote_calib_client</url> -->
 
 
-  <!-- Author tags are optional, mutiple are allowed, one per tag -->
-  <!-- Authors do not have to be maintianers, but could be -->
+  <!-- Author tags are optional, multiple are allowed, one per tag -->
+  <!-- Authors do not have to be maintainers, but could be -->
   <!-- Example: -->
   <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
 
@@ -41,26 +43,11 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>elikos_ros</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>message_generation</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>elikos_remote_calib_client</build_depend>
-
   <run_depend>roscpp</run_depend>
-  <run_depend>cv_bridge</run_depend>
-  <run_depend>elikos_ros</run_depend>
-  <run_depend>image_transport</run_depend>
-  <run_depend>sensor_msgs</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>message_runtime</run_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>elikos_remote_calib_client</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

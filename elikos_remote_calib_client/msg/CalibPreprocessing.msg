@@ -1,0 +1,2 @@
+uint8 gaussianKernelSize
+uint8 gaussianRepetitions

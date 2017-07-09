@@ -34,13 +34,13 @@ public:
     int* DILATIONS;
     int* POST_EROSIONS;
     
+    int PRE_BLUR = 8;
 protected:
     Mat threshold;
     Mat hsv;
     vector<RobotDesc> foundObjects;
 	CVWrapperInterface* cvWrapper;
 
-    int PRE_BLUR = 2;
     int BLUR_AMOUNT;
 
     const int FRAME_WIDTH = 640;
