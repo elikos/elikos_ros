@@ -18,6 +18,7 @@ public:
     double width;
     double focalLength;
     double threshold;
+    bool   undistort;
 
     CameraInfo() = default;
     ~CameraInfo() = default;

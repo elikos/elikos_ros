@@ -52,7 +52,7 @@ private:
 
     double blurSigma = 0.0;
     int whiteThreshold_ = 149;
-    int undistortType_ = 1;
+    int undistortType_ = 0;
 
     cv::Mat distortionMap1_;
     cv::Mat distortionMap2_;

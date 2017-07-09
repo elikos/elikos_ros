@@ -12,8 +12,9 @@ bool CameraInfo::load(const std::string& cameraName)
               ros::param::get(cameraName + "/cam_fov_v", vfov)    &&
               ros::param::get(cameraName + "/cam_height", height) &&
               ros::param::get(cameraName + "/cam_width", width)   &&
-              ros::param::get(cameraName + "/frame", frame)       &&
-              ros::param::get(cameraName + "/bw_threshold", threshold);
+              ros::param::get(cameraName + "/frame", frame)            &&
+              ros::param::get(cameraName + "/bw_threshold", threshold) &&
+	      ros::param::get(cameraName + "/undistort", undistort);
 
     hfov *= M_PI / 180.0;
     vfov *= M_PI / 180.0;

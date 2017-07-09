@@ -40,7 +40,7 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat
     }
 
     cv::Mat undistorted = typeConverted;
-    if (!undistortType_) {
+    if (cameraInfo_.undistort) {
         cv::remap(typeConverted, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
     }
 

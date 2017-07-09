@@ -284,6 +284,7 @@ def input_localization_points(*args):
             global_state.configuration.frames["fcu"]
         )
     except LocalizationUnavailableException:
+        rospy.logwarn("Not using PnP")
         try:
             drone_pose = estimate_drone_position_alone(
                 all_3d_points,
@@ -303,6 +304,7 @@ def input_localization_points(*args):
                 no_estimate(time, global_state)
                 return
 
+    drone_pose[0][2] = global_state.last_fcu_position[0][2]
     publish_fcu_transform(
         global_state,
         drone_pose[0],
@@ -549,12 +551,6 @@ start_listening_for_localization.inited = False
 def state_init(global_state, time_since_state_begin):
     # type: (GlobalState, rospy.Duration)->function
 
-    publish_fcu_transform(
-        global_state,
-        global_state.configuration.initial_drone_position,
-        global_state.configuration.initial_drone_rotation,
-        rospy.Time.now()
-    )
     try:
         global_state.last_fcu_position = get_tf_transform(
             global_state.configuration.frames["fcu"],
