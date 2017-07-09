@@ -13,9 +13,10 @@
 
 #include "CameraInfo.h"
 
+class QuadState;
+
 namespace localization {
 
-class QuadState;
 class ImageProcessor;
 
 class MessageHandler

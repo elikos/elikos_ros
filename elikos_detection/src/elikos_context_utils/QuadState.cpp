@@ -1,7 +1,5 @@
 #include "QuadState.h"
 
-namespace localization {
-
 QuadState::QuadState(const std::string& cameraFrame)
     : cameraFrame_(cameraFrame)
 {
@@ -21,7 +19,5 @@ void QuadState::update(ros::Time stamp)
     {
         ROS_ERROR("%s", e.what());
     }
-}
-
 }
 

@@ -7,14 +7,14 @@
 
 #include "tf/tf.h"
 
-namespace localization
-{
-
 class QuadState
 {
 public:
+    QuadState() = default;
     QuadState(const std::string& cameraFrame);
     ~QuadState() = default;
+
+    inline void setCameraFrame(const std::string& cameraFrame);
 
     void update(ros::Time stamp);
 
@@ -23,7 +23,7 @@ public:
     tf::StampedTransform getFcu2Camera() const;
 
 private:
-    const std::string cameraFrame_;
+    std::string cameraFrame_;
 
     tf::TransformListener tfListener_;
 
@@ -47,7 +47,9 @@ inline tf::StampedTransform QuadState::getFcu2Camera() const
     return fcu2camera_;
 }
 
-
+inline void QuadState::setCameraFrame(const std::string& cameraFrame)
+{
+    cameraFrame_ = cameraFrame;
 }
 
 #endif // QUAD_STATE_H

@@ -22,8 +22,8 @@ find_package(OpenCV 2 REQUIRED)
 
 
 catkin_package(
-    INCLUDE_DIRS src/elikos_transformation_utils src/elikos_camera_info
-    LIBRARIES elikos_transformation_utils elikos_camera_info
+    INCLUDE_DIRS src/elikos_transformation_utils src/elikos_context_utils
+    LIBRARIES elikos_transformation_utils elikos_context_utils
 	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf
 #   DEPENDS system_lib
 )
@@ -32,7 +32,7 @@ include_directories(
 	${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     src/elikos_detection/TargetDetection/CVWrapper
-    src/elikos_transformation_utils
+    src/elikos_context_utils
     src/elikos_camera_info
 )
 
@@ -79,10 +79,12 @@ add_library(elikos_transformation_utils
     src/elikos_transformation_utils/TransformationUtils.cpp
     src/elikos_transformation_utils/TransformationUtils.h)
 
-add_library(elikos_camera_info 
-    STATIC
-    src/elikos_camera_info/CameraInfo.h
-    src/elikos_camera_info/CameraInfo.cpp)
+add_library(elikos_context_utils
+    SHARED
+    src/elikos_context_utils/CameraInfo.h
+    src/elikos_context_utils/CameraInfo.cpp
+    src/elikos_context_utils/QuadState.h
+    src/elikos_context_utils/QuadState.cpp)
 
 target_link_libraries(elikos_transformation
     ${catkin_LIBRARIES}
