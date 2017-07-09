@@ -4,3 +4,6 @@
 [submodule "elikos_sim/src/gazebo_sim/elikos_gazebo_models"]
 	path = elikos_sim/src/gazebo_sim/elikos_gazebo_models
 	url = https://github.com/elikos/elikos_gazebo_models.git
+[submodule "elikos_localization/lib/opengv"]
+	path = elikos_localization/lib/opengv
+	url = https://github.com/ArnaudPare-Vogt/opengv.git
