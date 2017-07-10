@@ -1,6 +1,6 @@
 <launch>
-	  <!-- Target and obstacle robots -->
-	<include file="$(find elikos_sim)/launch/robots_sim.launch"/>
+	<!-- Target and obstacle robots -->
+	<!--include file="$(find elikos_sim)/launch/robots_sim.launch"/-->
   
   <!-- Target detection -->
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
@@ -24,7 +24,7 @@
       <arg name="cfg" value="gazebo_ffmv_bottom"/>
   </include>
 
-    <!-- Target transformation -->
+  <!-- Target transformation -->
 	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
       <arg name="camera_name" value="gazebo_r200_front" />
       <arg name="cfg" value="gazebo_r200_front"/>
@@ -46,6 +46,27 @@
       <arg name="cfg" value="gazebo_ffmv_bottom"/>
   </include>
 
+  <!-- Preprocessing -->
+	<include file="$(find elikos_preprocessing)/launch/preprocessing.launch">
+      <arg name="camera_name" value="gazebo_r200_front" />
+      <arg name="camera_manager_nodelet" value="camera_manager_right"/>
+  </include>
+	<include file="$(find elikos_preprocessing)/launch/preprocessing.launch">
+      <arg name="camera_name" value="gazebo_r200_right" />
+      <arg name="camera_manager_nodelet" value="camera_manager_left"/>
+  </include>
+	<include file="$(find elikos_preprocessing)/launch/preprocessing.launch">
+      <arg name="camera_name" value="gazebo_r200_left" />
+      <arg name="camera_manager_nodelet" value="camera_manager_front"/>
+  </include>
+	<include file="$(find elikos_preprocessing)/launch/preprocessing.launch">
+      <arg name="camera_name" value="gazebo_r200_back" />
+      <arg name="camera_manager_nodelet" value="camera_manager_back"/>
+  </include>
+	<include file="$(find elikos_preprocessing)/launch/preprocessing.launch">
+      <arg name="camera_name" value="gazebo_ffmv_bottom" />
+      <arg name="camera_manager_nodelet" value="camera_manager_bottom"/>
+  </include>
 
 	<!-- Static transforms -->
 	<!--node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
