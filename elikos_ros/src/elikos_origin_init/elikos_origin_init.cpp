@@ -48,20 +48,25 @@ int main(int argc, char* argv[])
       if(!lookupDone)
       {
         try {
-    			tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), arenaOriginTransform);
+          tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), arenaOriginTransform);
           tf::Vector3 origin = initialFcu.getOrigin();
           origin.setZ(0);
           tf::Quaternion rotation = initialFcu.getRotation();
           double yaw = tf::getYaw(rotation);
           rotation.setRPY(0,0,yaw);
           ROS_INFO_STREAM("Initialisation : Yaw diff is : "<<yaw);
-          arenaOriginTransform.setOrigin(origin);
-          arenaOriginTransform.setRotation(rotation);
-          lookupDone = true;
-    		}
-    		catch (tf::TransformException &ex) {
-    			ROS_ERROR("Origin init failed!!!! Exception : %s",ex.what());
-    		}
+
+          if(yaw != yaw){
+            ROS_INFO("Yaw was Nan. Skipping transform.");
+          }else{
+            arenaOriginTransform.setOrigin(origin);
+            arenaOriginTransform.setRotation(rotation);
+            lookupDone = true;
+          }
+    	}
+    	catch (tf::TransformException &ex) {
+          ROS_ERROR("Origin init failed!!!! Exception : %s",ex.what());
+    	}
       }
       tf_broadcaster_.sendTransform(tf::StampedTransform(arenaOriginTransform.inverse(), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_LOCAL_ORIGIN));
     }
