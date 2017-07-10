@@ -102,11 +102,6 @@ void doShapeReco(const cv::Mat& input, const cv::Mat& targetimg,
 }
 
 TargetDetection::TargetDetection() {
-    targetRobot_ =
-        cv::imread("/home/elikos/riad_ws/PythonTest/test2/robot_green.png",
-                   CV_LOAD_IMAGE_COLOR);
-    // cv::namedWindow("HelloWorldWindow", CV_GUI_NORMAL);
-    // cv::namedWindow("circlePreview", CV_GUI_NORMAL);
 }
 /*
  * This method is the first step of the tracking algorithm
@@ -120,24 +115,12 @@ void TargetDetection::detect(const cv::Mat& input, cv::Mat& output_w,
     // Shape detection
     shapeDetection_.detect(input, output_w, output_r, output_g, output,
                           outputRobotsArray, blobDetection_);
-    // detectShape(input, output);
-    // cv::imshow("HelloWorldWindow", output);
-    // cv::waitKey(1);
 
     // Color detection
     blobDetection_.detect(input, output_w, output_r, output_g, output,
                           outputRobotsArray);
 
-  
 
-    // filterDuplicated(outputRobotsArray);
-
-    // Test shape method (pre alpha :D)
-    // try {
-    //     doShapeReco(input, targetRobot_, output, 0.05);
-    //     cv::imshow("HelloWorldWindow", output);
-    // } catch (cv::Exception ex) {
-    // }
 
     displayRobots(outputRobotsArray, output);
 }

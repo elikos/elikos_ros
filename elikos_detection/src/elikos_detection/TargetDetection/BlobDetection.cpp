@@ -93,58 +93,10 @@ void BlobDetection::detectColor(const cv::Mat& input, cv::Mat& output_w,
 
     for (auto object : greenObjects) {
         object.setColor(GREEN);
-        object.setWindow(RotatedRect(
-            Point2f(object.getXPos(), object.getYPos()),
-            Size2f(sqrt(object.getArea()), sqrt(object.getArea())), 0));
-        // set ID
-        bool found = false;
-        for (auto old : blobObjects) {
-            double old_ray = sqrt(old.getArea() / PI);
-            double distance = sqrt(abs(object.getXPos() - old.getXPos()) +
-                                   abs(object.getYPos() - old.getYPos()));
-            object.setDistance(distance);
-            // if(distance < old_ray && !old.getAlreadyFound()){
-            if (object.getXPos() < old.getXPos() + old_ray &&
-                object.getXPos() > old.getXPos() - old_ray &&
-                object.getYPos() < old.getYPos() + old_ray &&
-                object.getYPos() > old.getYPos() - old_ray &&
-                !old.getAlreadyFound() && old.getColor() == object.getColor()) {
-                found = true;
-                object.setID(old.getID());
-                old.setAlreadyFound(true);
-            }
-        }
-        if (!found) {
-            object.setID(++maxID);
-        }
         robotsArray.emplace_back(object);
     }
     for (auto object : redObjects) {
         object.setColor(RED);
-        object.setWindow(RotatedRect(
-            Point2f(object.getXPos(), object.getYPos()),
-            cv::Size2f(sqrt(object.getArea()), sqrt(object.getArea())), 0));
-        // set IDColor
-        bool found = false;
-        for (auto old : blobObjects) {
-            double old_ray = sqrt(old.getArea() / PI);
-            double distance = sqrt(abs(object.getXPos() - old.getXPos()) +
-                                   abs(object.getYPos() - old.getYPos()));
-            object.setDistance(distance);
-            // if(distance < old_ray && !old.getAlreadyFound()){
-            if (object.getXPos() < old.getXPos() + old_ray &&
-                object.getXPos() > old.getXPos() - old_ray &&
-                object.getYPos() < old.getYPos() + old_ray &&
-                object.getYPos() > old.getYPos() - old_ray &&
-                !old.getAlreadyFound() && old.getColor() == object.getColor()) {
-                found = true;
-                object.setID(old.getID());
-                old.setAlreadyFound(true);
-            }
-        }
-        if (!found) {
-            object.setID(++maxID);
-        }
         robotsArray.emplace_back(object);
     }
     blobObjects = robotsArray;
