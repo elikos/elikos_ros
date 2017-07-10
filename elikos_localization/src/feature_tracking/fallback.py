@@ -14,6 +14,7 @@ import cv2
 import opengv
 
 import rospy
+import tf
 import tf2_ros
 import message_filters
 
@@ -322,11 +323,8 @@ def estimate_drone_pnp(point_list_2d, point_list_3d, camera_infos, fcu_frame):
     for i, (points_2d, camera_info) in enumerate(zip(point_list_2d, camera_infos)):
         camera_frame = camera_info.header.frame_id
         try:
-            print camera_frame
-            print fcu_frame
             (trans_fcu2cam, rot_fcu2cam) = get_tf_transform(camera_frame, fcu_frame, camera_info.header.stamp, rospy.Duration.from_sec(1))
             camera_rotation_list[i,:,:] = quaternion.as_rotation_matrix(rot_fcu2cam)
-            print camera_rotation_list
             camera_translation_list[i,:] = trans_fcu2cam
         except LocalizationUnavailableException as exe:
             rospy.loginfo("Not able to get tf of camera {0} time {1}".format(camera_frame, camera_info.header.stamp))
@@ -508,8 +506,10 @@ def get_tf_transform(source_frame, dest_frame, time, timeout):
     # type: (str, str, rospy.Time, rospy.Duration)->(np.ndarray, quaternion.quaternion)
     global g_tf_listener
     try:
-        (trans, rot) = g_tf_listener.lookup_transform(dest_frame, source_frame, time, timeout)
-        return np.array(trans), pt_manip.create_quaterion_from_tf(rot)
+        transform = g_tf_listener.lookup_transform(dest_frame, source_frame, time, timeout).transform
+        trans = np.array([transform.translation.x, transform.translation.y, transform.translation.z])
+        rot = quaternion.quaternion(transform.rotation.w, transform.rotation.x, transform.rotation.y, transform.rotation.z)
+        return trans, rot
     except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
         raise LocalizationUnavailableException(message="Tf lookup failed", cause=e)
 
@@ -531,8 +531,8 @@ def init_node():
     rospy.loginfo("Publishing on %s", global_state.configuration.frames["output"])
 
     g_tf_listener = tf2_ros.Buffer()
-    tf_actual_listener = tf2_ros.TransformListener(g_tf_listener)
-    g_tf_broadcaster = tf2_ros.TransformBroadcaster()
+    tf2_ros.TransformListener(g_tf_listener)
+    g_tf_broadcaster = tf.TransformBroadcaster()
 
     g_pub_dbg = rospy.Publisher("/localization/features_debug", PoseArray, queue_size=10)
 
