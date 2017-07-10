@@ -14,7 +14,7 @@ import cv2
 import opengv
 
 import rospy
-import tf
+import tf2_ros
 import message_filters
 
 from geometry_msgs.msg import Pose
@@ -316,17 +316,21 @@ def input_localization_points(*args):
 def estimate_drone_pnp(point_list_2d, point_list_3d, camera_infos, fcu_frame):
     #type: (list[np.ndarray], list[np.ndarray], list[CameraInfo], str)->tuple[np.ndarray, quaternion.quaternion]
     bearings_list = []
-    camera_rotation_list = np.empty((len(camera_infos), 3, 3),np.float)
-    camera_translation_list = np.empty((len(camera_infos), 3),np.float)
+    camera_rotation_list = np.empty((len(camera_infos), 3, 3),np.float64)
+    camera_translation_list = np.empty((len(camera_infos), 3),np.float64)
 
     for i, (points_2d, camera_info) in enumerate(zip(point_list_2d, camera_infos)):
         camera_frame = camera_info.header.frame_id
         try:
-            (trans_fcu2cam, rot_fcu2cam) = get_tf_transform(camera_frame, fcu_frame, camera_info.header.stamp, rospy.Duration.from_sec(0.01))
+            print camera_frame
+            print fcu_frame
+            (trans_fcu2cam, rot_fcu2cam) = get_tf_transform(camera_frame, fcu_frame, camera_info.header.stamp, rospy.Duration.from_sec(1))
             camera_rotation_list[i,:,:] = quaternion.as_rotation_matrix(rot_fcu2cam)
+            print camera_rotation_list
             camera_translation_list[i,:] = trans_fcu2cam
-        except LocalizationUnavailableException:
-            continue
+        except LocalizationUnavailableException as exe:
+            rospy.loginfo("Not able to get tf of camera {0} time {1}".format(camera_frame, camera_info.header.stamp))
+            rospy.logdebug("Exception : %s", exe)
 
         image2camera_center = np.array([-camera_info.width/2.0, -camera_info.height/2.0, camera_info.K[0]])
 
@@ -341,6 +345,11 @@ def estimate_drone_pnp(point_list_2d, point_list_3d, camera_infos, fcu_frame):
     #point_list_3d[0][0, 2] = 0.1;
     fcu_pose_mat = opengv.epnp_multi_camera(bearings_list, point_list_3d, camera_translation_list, camera_rotation_list)
     if fcu_pose_mat is None:
+        print bearings_list
+        print point_list_3d
+        print camera_translation_list
+        print camera_rotation_list
+        rospy.logwarn("None detected")
         raise LocalizationUnavailableException
     fcu_pose_mat = fcu_pose_mat[0]
 
@@ -499,12 +508,10 @@ def get_tf_transform(source_frame, dest_frame, time, timeout):
     # type: (str, str, rospy.Time, rospy.Duration)->(np.ndarray, quaternion.quaternion)
     global g_tf_listener
     try:
-        g_tf_listener.waitForTransform(dest_frame, source_frame, time, timeout)
-    except tf.Exception as e:
+        (trans, rot) = g_tf_listener.lookup_transform(dest_frame, source_frame, time, timeout)
+        return np.array(trans), pt_manip.create_quaterion_from_tf(rot)
+    except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
         raise LocalizationUnavailableException(message="Tf lookup failed", cause=e)
-
-    (trans, rot) = g_tf_listener.lookupTransform(dest_frame, source_frame, time)
-    return np.array(trans), pt_manip.create_quaterion_from_tf(rot)
 
 
 def publish_fcu_if_no_pos():
@@ -523,8 +530,9 @@ def init_node():
 
     rospy.loginfo("Publishing on %s", global_state.configuration.frames["output"])
 
-    g_tf_listener = tf.TransformListener()
-    g_tf_broadcaster = tf.TransformBroadcaster()
+    g_tf_listener = tf2_ros.Buffer()
+    tf_actual_listener = tf2_ros.TransformListener(g_tf_listener)
+    g_tf_broadcaster = tf2_ros.TransformBroadcaster()
 
     g_pub_dbg = rospy.Publisher("/localization/features_debug", PoseArray, queue_size=10)
 
