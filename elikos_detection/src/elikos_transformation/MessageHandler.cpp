@@ -24,5 +24,5 @@ void MessageHandler::dispatchMessageRobotRaw(const elikos_ros::RobotRawArray::Co
 	//geometry_msgs::PoseArray results = transformationUnit_.computeTransformForRobots(*input);
 
 	//publish results
-	pubTest_.publish(results);
+	//pubTest_.publish(results);
 }

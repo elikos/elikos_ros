@@ -35,15 +35,12 @@ MessageHandler::MessageHandler(string calibrationFilename)
     }
     
     is_ = it_.subscribe(inputTopic, 1, &MessageHandler::dispatchMessage, this);
-    subRC_ = nh_.subscribe(RCinputTopic, 100, &MessageHandler::dispatchCommand,
-                           this);
+    subRC_ = nh_.subscribe(RCinputTopic, 100, &MessageHandler::dispatchCommand, this);
     std::string cam_name = ros::this_node::getName();
     cam_name = cam_name.substr(0, cam_name.size()-std::string("_detection").size());
-    pub_ =
-        nh_.advertise<elikos_ros::RobotRawArray>("/"+cam_name+"/elikos_robot_raw_array", 1);
-    pubCommandOutput_ =
-        nh_.advertise<std_msgs::String>(RCCommandOutputTopic, 100);
-    // pubImages_ = it_.advertise(inputTopic + "/debug", 1); //debug only
+    pub_ = nh_.advertise<elikos_ros::RobotRawArray>("/"+cam_name+"/elikos_robot_raw_array", 1);
+    pubCommandOutput_ = nh_.advertise<std_msgs::String>(RCCommandOutputTopic, 100);
+    
     pubImages_ = it_.advertise(RCdebugTopic, 1);  // debug only
     pubRed_ = it_.advertise("camera/image_opencv_red", 1);//debug only
     pubGreen_ = it_.advertise("camera/image_opencv_green", 1);//debug only
@@ -52,8 +49,7 @@ MessageHandler::MessageHandler(string calibrationFilename)
 
     // Calibration trackbars
     bool calibrationOn;
-    if (nh_.getParam("/" + ros::this_node::getName() + "/calibration",
-                     calibrationOn)) {
+    if (nh_.getParam("/" + ros::this_node::getName() + "/calibration",calibrationOn)) {
         if (calibrationOn) detection_.createTrackbars();
     }
 }
@@ -99,8 +95,7 @@ void MessageHandler::dispatchCommand(const std_msgs::String::ConstPtr& input) {
 }
 
 void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr& input) {
-    cv::Mat currentImage =
-        cv_bridge::toCvCopy(input, sensor_msgs::image_encodings::BGR8)->image;
+    cv::Mat currentImage = cv_bridge::toCvCopy(input, sensor_msgs::image_encodings::BGR8)->image;
 
     Mat threshold_w;
     Mat threshold_r;
@@ -108,8 +103,7 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr& input) {
     Mat robotsMat;
 
     vector<RobotDesc> robotsArray;
-    detection_.detect(currentImage, threshold_w, threshold_r, threshold_g,
-                      robotsMat, robotsArray);
+    detection_.detect(currentImage, threshold_w, threshold_r, threshold_g, robotsMat, robotsArray);
 
     //debug images
     if (isCalibrating) {

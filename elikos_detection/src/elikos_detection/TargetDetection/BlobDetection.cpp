@@ -61,7 +61,7 @@ void BlobDetection::detect(const cv::Mat& input, cv::Mat& output_w,
                            cv::Mat& output,
                            std::vector<RobotDesc>& robotsArray) {
     detectColor(input, output_w, output_r, output_g, output, robotsArray);
-    detectCircles(input, output_w, output_r, output_g, output, robotsArray);
+    //detectCircles(input, output_w, output_r, output_g, output, robotsArray);
 }
 
 // Color detection algorithm
@@ -161,7 +161,7 @@ void BlobDetection::detectCircles(const cv::Mat& input, cv::Mat& output_w,
         cv::circle(output, center, radius, cv::Scalar(0, 0, 255), 3, 8, 0);
     }
 
-    cv::waitKey(10);  // FOR TRACKBARS (TODO: remove)
+    //cv::waitKey(10);  // FOR TRACKBARS (TODO: remove)
 }
 
 void BlobDetection::createTrackbars() {
