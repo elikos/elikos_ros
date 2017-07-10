@@ -19,9 +19,9 @@ public:
 private:
     ros::NodeHandle nh_;
     ros::Subscriber sub_;
+    ros::Publisher pub_;
     ros::Publisher pubTest_;
     elikos_ros::RobotRawArray newArray_;
-	TransformationUnit transformationUnit_;
 };
 
 #endif /// MESSAGE_HANDLER_TTF

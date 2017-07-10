@@ -73,9 +73,7 @@ target_link_libraries(elikos_detection
 add_executable(elikos_transformation
     src/elikos_transformation/elikos_transformation.cpp
     src/elikos_transformation/MessageHandler.h
-    src/elikos_transformation/MessageHandler.cpp
-    src/elikos_transformation/TransformationUnit.h
-    src/elikos_transformation/TransformationUnit.cpp)
+    src/elikos_transformation/MessageHandler.cpp)
 
 add_library(elikos_transformation_utils
     STATIC
