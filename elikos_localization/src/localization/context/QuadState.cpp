@@ -22,7 +22,7 @@ bool QuadState::update(ros::Time stamp)
     catch (tf::TransformException e)
     {
         ROS_ERROR("%s", "No fcu, publishing static vision");
-        tfBroadcaster_.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion::getIdentity(), tf::Vector3()),
+        tfBroadcaster_.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion::getIdentity(), tf::Vector3(0.0, 0.0, 0.14)),
                                      stamp,
                                      "elikos_arena_origin",
                                      "elikos_vision"));
