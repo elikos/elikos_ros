@@ -1,6 +1,6 @@
 <launch>
   <!-- AI -->
-  <!--include file="$(find elikos_ai)/launch/ai.launch"/-->
+  <include file="$(find elikos_ai)/launch/ai.launch"/>
 
   <!-- Path planning -->
   <include file="$(find elikos_path_planning)/launch/path_planning.launch"/>

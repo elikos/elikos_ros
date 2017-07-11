@@ -113,8 +113,8 @@ void TargetDetection::detect(const cv::Mat& input, cv::Mat& output_w,
                              cv::Mat& output,
                              std::vector<RobotDesc>& outputRobotsArray) {
     // Shape detection
-    shapeDetection_.detect(input, output_w, output_r, output_g, output,
-                          outputRobotsArray, blobDetection_);
+    //shapeDetection_.detect(input, output_w, output_r, output_g, output,
+    //                      outputRobotsArray, blobDetection_);
 
     // Color detection
     blobDetection_.detect(input, output_w, output_r, output_g, output,

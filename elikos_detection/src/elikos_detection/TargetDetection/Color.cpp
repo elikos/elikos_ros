@@ -90,7 +90,7 @@ void Color::trackFilteredObjects(Mat &cameraFeed) {
                 //if the area is the same as the 3/2 of the image size, probably just a bad filter
                 //we only want the object with the largest area so we safe a reference area each
                 //iteration and compare it to the area in the next iteration.
-                if (area > MIN_OBJECT_AREA) {
+                //if (area > MIN_OBJECT_AREA) {
 
                     myRobot.setXPos(moment.m10 / area);
                     myRobot.setYPos(moment.m01 / area);
@@ -98,7 +98,7 @@ void Color::trackFilteredObjects(Mat &cameraFeed) {
 
                     foundObjects.emplace_back(myRobot);
 
-                }
+                //}
             }
         }
         else putText(cameraFeed, "TOO MUCH NOISE! ADJUST FILTER", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);

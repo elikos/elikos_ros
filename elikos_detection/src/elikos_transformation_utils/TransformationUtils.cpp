@@ -44,6 +44,21 @@ geometry_msgs::PoseStamped getFcu2Target(const tf::StampedTransform& origin2fcu,
     return pose;
 }
 
+geometry_msgs::PoseStamped getOrigin2Target(const tf::StampedTransform& origin2fcu,
+                                         const tf::StampedTransform& fcu2camera,
+                                         cv::Point2f point,
+                                         cv::Size dimensions,
+                                         float hfov,
+                                         float vfov)
+{
+    tf::Transform origin2camera = origin2fcu * fcu2camera;
+    geometry_msgs::PoseStamped pose;
+    pose.header.frame_id = origin2fcu.frame_id_;
+    pose.header.stamp = origin2fcu.stamp_;
+    pose.pose = computeOrigin2Target(fcu2camera, origin2camera, origin2fcu, point, dimensions, hfov, vfov);
+    return pose;
+}
+
 geometry_msgs::Pose computeFcu2Target(const tf::StampedTransform& fcu2camera,
                                       const tf::Transform& origin2camera,
                                       cv::Point2f point,
@@ -73,6 +88,39 @@ geometry_msgs::Pose computeFcu2Target(const tf::StampedTransform& fcu2camera,
     geometry_msgs::Pose pose;
     tf::quaternionTFToMsg(fcu2target.getRotation(), pose.orientation);
     tf::pointTFToMsg(fcu2target.getOrigin(), pose.position);
+    return pose;
+}
+
+geometry_msgs::Pose computeOrigin2Target(const tf::StampedTransform& fcu2camera,
+                                      const tf::Transform& origin2camera,
+                                      const tf::Transform& origin2fcu,
+                                      cv::Point2f point,
+                                      cv::Size dimensions,
+                                      float hfov,
+                                      float vfov)
+{
+    //Define the camera2turret turret transform
+    tf::Transform camera2turret = tf::Transform::getIdentity();
+
+    //Same origin than the camera
+    camera2turret.setOrigin(tf::Vector3(0, 0, 0));
+
+    //Rotation in function of the detection with computer vision
+    tf::Quaternion rotation = computeTurretRotation(point, dimensions, hfov, vfov);
+    camera2turret.setRotation(rotation);
+
+    // Compute the origin to turret transform
+    tf::Transform origin2turret = origin2camera * camera2turret;
+
+    // Find the robot2turret transform
+    tf::Transform turret2target = computeTurret2Target(origin2turret);
+
+    //Compute the robot poses
+    tf::Transform origin2target = origin2fcu * fcu2camera * camera2turret * turret2target ;
+
+    geometry_msgs::Pose pose;
+    tf::quaternionTFToMsg(origin2target.getRotation(), pose.orientation);
+    tf::pointTFToMsg(origin2target.getOrigin(), pose.position);
     return pose;
 }
 
