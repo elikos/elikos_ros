@@ -1,4 +1,5 @@
 #include <iostream>
+#include <tf/transform_broadcaster.h>
 
 #include "tf/tf.h"
 
@@ -12,7 +13,7 @@
 namespace localization {
 
 IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const QuadState& state)
-    : cameraInfo_(cameraInfo), state_(state), pointCloud_(new pcl::PointCloud<pcl::PointXY>())
+    : cameraInfo_(cameraInfo), state_(state), imageIntersectionsPointCloud_(new pcl::PointCloud<pcl::PointXY>()), lastDetectionPointCloud_(new pcl::PointCloud<pcl::PointXY>())
 {
     // TODO: Set epsilon for kdtree here maybe ? ...
     ros::NodeHandle nh;
@@ -45,12 +46,12 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
 
 void IntersectionTransform::updateKDTree(const std::vector<Eigen::Vector2f>& imageIntersections)
 {
-    pointCloud_->clear();
+    imageIntersectionsPointCloud_->clear();
     for (int i = 0; i < imageIntersections.size(); ++i)
     {
-        pointCloud_->push_back({ imageIntersections[i].x(), imageIntersections[i].y() });
+        imageIntersectionsPointCloud_->push_back({ imageIntersections[i].x(), imageIntersections[i].y() });
     }
-    kdTree_.setInputCloud(pointCloud_);
+    imageIntersectionsTree_.setInputCloud(imageIntersectionsPointCloud_);
 }
 
 void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vector2f>& imageIntersections,
@@ -76,16 +77,17 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
 	    std::vector<cv::Point2f> src;
 	    for (int i = 0; i < imageIntersections.size(); ++i)
 	    {
-		src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
+		    src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
 	    }
 	    cv::perspectiveTransform(src, dst, perspectiveTransform);
 	    geometry_msgs::PoseArray intersections = transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
 										     state_.getFcu2Camera(), dst, imageSize,
 										     cameraInfo_.hfov, cameraInfo_.vfov);
 	    for (int i = 0; i < intersections.poses.size(); ++i) {
-		intersections.poses[i].position.z = z;    
+		    intersections.poses[i].position.z = z;
 	    }
 
+        estimateQuadState(intersections);
 	    publishTransformedIntersections(dst, intersections);
     } else {
         publishTransformedIntersections(std::vector<cv::Point2f>(), geometry_msgs::PoseArray());
@@ -106,7 +108,7 @@ double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f
         std::vector<float> distances(2);
         for (int i = 0; i < imageIntersections.size(); ++i)
         {
-            kdTree_.nearestKSearch(pointCloud_->at(i), 2, indices, distances);
+            imageIntersectionsTree_.nearestKSearch(imageIntersectionsPointCloud_->at(i), 2, indices, distances);
             // Take the greatest since the smallest is the same point
             double imageDistance = (distances[0] > distances[1]) ? distances[0] : distances[1];
 
@@ -171,6 +173,57 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<cv
         intersectionPub_.publish(msg);
         debugPub_.publish(array);
     }
+}
+
+void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &intersections) {
+
+    if (!lastDetection_.poses.empty())
+    {
+        tf::Vector3 translationEstimate = state_.getOrigin2Fcu().getOrigin() - lastState_.getOrigin();
+        lastDetectionPointCloud_->clear();
+        for (int i = 0; i < lastDetection_.poses.size(); ++i)
+        {
+            geometry_msgs::Point position = lastDetection_.poses[i].position;
+            pcl::PointXY point;
+            point.x = (float) (position.x + translationEstimate.x());
+            point.y = (float) (position.y + translationEstimate.y());
+            lastDetectionPointCloud_->push_back(point);
+        }
+        lastDetectionTree_.setInputCloud(lastDetectionPointCloud_);
+
+        std::vector<bool> matched(intersections.poses.size(), false);
+        std::vector<int> indices(1);
+        std::vector<float> distances(1);
+
+        tf::Vector3 averageTranslation;
+        int nMatched = 0;
+
+        for (int i = 0; i < intersections.poses.size(); ++i)
+        {
+            pcl::PointXY point;
+            geometry_msgs::Point position = intersections.poses[i].position;
+            point.x = (float) position.x;
+            point.y = (float) position.y;
+            lastDetectionTree_.nearestKSearch(point, 1, indices, distances);
+            if (!matched[i])
+            {
+                matched[i] = true;
+                ++nMatched;
+                averageTranslation.setX(averageTranslation.x() + (intersections.poses[i].position.x - lastDetection_.poses[i].position.x));
+                averageTranslation.setY(averageTranslation.y() + (intersections.poses[i].position.y - lastDetection_.poses[i].position.y));
+            }
+        }
+        averageTranslation.setX(averageTranslation.x() / (float) nMatched);
+        averageTranslation.setY(averageTranslation.y() / (float) nMatched);
+        averageTranslation.setZ(0.0);
+
+        tf::StampedTransform transform(tf::Transform(tf::Quaternion::getIdentity(), state_.getOrigin2Fcu().getOrigin() + averageTranslation),
+                                       state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision_debug");
+        tfPub_.sendTransform(transform);
+    }
+
+    lastDetection_ = intersections;
+    lastState_ = state_.getOrigin2Fcu();
 }
 
 }

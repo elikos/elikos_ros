@@ -49,6 +49,8 @@ private:
     void publishTransformedIntersections(const std::vector<cv::Point2f>& imageIntersections,
                                          const geometry_msgs::PoseArray& poseArray);
 
+    void estimateQuadState(const geometry_msgs::PoseArray& intersections);
+
     visualization_msgs::Marker marker_;
 
     const CameraInfo& cameraInfo_;
@@ -56,10 +58,16 @@ private:
 
     ros::Publisher intersectionPub_;
     ros::Publisher debugPub_;
+    tf::TransformBroadcaster tfPub_;
 
-    pcl::KdTreeFLANN<pcl::PointXY> kdTree_;
-    pcl::PointCloud<pcl::PointXY>::Ptr pointCloud_;
+    pcl::KdTreeFLANN<pcl::PointXY> imageIntersectionsTree_;
+    pcl::PointCloud<pcl::PointXY>::Ptr imageIntersectionsPointCloud_;
 
+    pcl::KdTreeFLANN<pcl::PointXY> lastDetectionTree_;
+    pcl::PointCloud<pcl::PointXY>::Ptr lastDetectionPointCloud_;
+    geometry_msgs::PoseArray lastDetection_;
+
+    tf::StampedTransform lastState_;
 };
 
 }
