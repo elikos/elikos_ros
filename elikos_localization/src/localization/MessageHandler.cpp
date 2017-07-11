@@ -32,17 +32,17 @@ void MessageHandler::lookForMessages()
     }
 }
 
-void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
-{
-    state_.update(msg->header.stamp);
+void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
+    if (state_.update(msg->header.stamp))
+    {
+        cv::Mat input = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8)->image;
 
-    cv::Mat input = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8)->image;
+        cv::Mat result;
+        processor_->processImage(input, result);
 
-    cv::Mat result;
-    processor_->processImage(input, result);
-
-    sensor_msgs::ImagePtr image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", result).toImageMsg();
-    imagePub_.publish(image);
+        sensor_msgs::ImagePtr image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", result).toImageMsg();
+        imagePub_.publish(image);
+    }
 }
 
 }

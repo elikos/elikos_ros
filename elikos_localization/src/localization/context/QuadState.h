@@ -4,6 +4,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
 
 #include "tf/tf.h"
 
@@ -16,7 +17,7 @@ public:
     QuadState(const std::string& cameraFrame);
     ~QuadState() = default;
 
-    void update(ros::Time stamp);
+    bool update(ros::Time stamp);
 
     ros::Time getTimeStamp() const;
     tf::StampedTransform getOrigin2Fcu() const;
@@ -26,6 +27,7 @@ private:
     const std::string cameraFrame_;
 
     tf::TransformListener tfListener_;
+    tf::TransformBroadcaster tfBroadcaster_;
 
     tf::StampedTransform origin2fcu_;
     tf::StampedTransform fcu2camera_;
