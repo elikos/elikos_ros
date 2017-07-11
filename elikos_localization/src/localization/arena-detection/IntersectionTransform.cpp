@@ -206,26 +206,30 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             point.x = (float) position.x;
             point.y = (float) position.y;
             lastDetectionTree_.nearestKSearch(point, 1, indices, distances);
+            int positionIndice = indices[0];
             double error = std::abs(translationNormEstimate - std::sqrt(distances[0]));
-                std::string message = "Intersection [" + std::to_string(position.x) + ", " +
-                        std::to_string(position.y) + "] match with [" +
-                        std::to_string(lastDetection_.poses[indices[0]].position.x) + ", " +
-                        std::to_string(lastDetection_.poses[indices[0]].position.y) + "] and error " +
-                        std::to_string(error);
-                ROS_WARN(message.c_str());
-            if (!matched[i])
+
+            if (!matched[i] && error < 0.2)
             {
                 matched[i] = true;
                 ++nMatched;
-                averageTranslation.setX(averageTranslation.x() + (intersections.poses[i].position.x - lastDetection_.poses[i].position.x));
-                averageTranslation.setY(averageTranslation.y() + (intersections.poses[i].position.y - lastDetection_.poses[i].position.y));
+                averageTranslation.setX(averageTranslation.x() + (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
+                averageTranslation.setY(averageTranslation.y() + (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
+            } else {
+                std::string message = "Intersection [" + std::to_string(position.x) + ", " +
+                                      std::to_string(position.y) + "] match with [" +
+                                      std::to_string(lastDetection_.poses[positionIndice].position.x) + ", " +
+                                      std::to_string(lastDetection_.poses[positionIndice].position.y) + "] and error " +
+                                      std::to_string(error);
+                ROS_WARN("%s", message.c_str());
             }
         }
         averageTranslation.setX(averageTranslation.x() / (float) nMatched);
         averageTranslation.setY(averageTranslation.y() / (float) nMatched);
         averageTranslation.setZ(0.0);
 
-        tf::StampedTransform transform(tf::Transform(tf::Quaternion::getIdentity(), state_.getOrigin2Fcu().getOrigin() + averageTranslation),
+        // TODO: Add elikos_vision_debug as a parameter.
+        tf::StampedTransform transform(tf::Transform(state_.getOrigin2Fcu().getRotation(), state_.getOrigin2Fcu().getOrigin() + averageTranslation),
                                        state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision_debug");
         tfPub_.sendTransform(transform);
     }
