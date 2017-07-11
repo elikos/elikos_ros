@@ -198,6 +198,7 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
         tf::Vector3 averageTranslation;
         int nMatched = 0;
 
+        double translationNormEstimate = translationEstimate.length();
         for (int i = 0; i < intersections.poses.size(); ++i)
         {
             pcl::PointXY point;
@@ -205,6 +206,13 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             point.x = (float) position.x;
             point.y = (float) position.y;
             lastDetectionTree_.nearestKSearch(point, 1, indices, distances);
+            double error = std::abs(translationNormEstimate - std::sqrt(distances[0]));
+                std::string message = "Intersection [" + std::to_string(position.x) + ", " +
+                        std::to_string(position.y) + "] match with [" +
+                        std::to_string(lastDetection_.poses[indices[0]].position.x) + ", " +
+                        std::to_string(lastDetection_.poses[indices[0]].position.y) + "] and error " +
+                        std::to_string(error);
+                ROS_WARN(message.c_str());
             if (!matched[i])
             {
                 matched[i] = true;
