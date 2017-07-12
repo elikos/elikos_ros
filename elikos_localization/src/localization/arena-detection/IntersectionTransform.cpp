@@ -18,6 +18,8 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     // TODO: Set epsilon for kdtree here maybe ? ...
     ros::NodeHandle nh;
 
+    pivot_ = tf::Vector3(0.0, 0.0, 0.14);
+
     intersectionPub_ = nh.advertise<elikos_ros::IntersectionArray>(cameraInfo_.name + "/intersections", 1);
     debugPub_ = nh.advertise<visualization_msgs::MarkerArray>(cameraInfo_.name + "/intersection_debug", 1);
 
@@ -41,6 +43,7 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     marker_.color.r = 1.0;
     marker_.color.g = 0.0;
     marker_.color.b = 0.0;
+    marker_.lifetime.sec = 0;
 }
 
 
@@ -175,6 +178,8 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<cv
     }
 }
 
+
+
 void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &intersections) {
 
     if (!lastDetection_.poses.empty())
@@ -185,8 +190,8 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
         {
             geometry_msgs::Point position = lastDetection_.poses[i].position;
             pcl::PointXY point;
-            point.x = (float) (position.x + translationEstimate.x());
-            point.y = (float) (position.y + translationEstimate.y());
+            point.x = (float) (position.x - translationEstimate.x());
+            point.y = (float) (position.y - translationEstimate.y());
             lastDetectionPointCloud_->push_back(point);
         }
         lastDetectionTree_.setInputCloud(lastDetectionPointCloud_);
@@ -216,36 +221,52 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
                 averageTranslation.setX(averageTranslation.x() + (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
                 averageTranslation.setY(averageTranslation.y() + (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
             } else {
+
                 std::string message = "Intersection [" + std::to_string(position.x) + ", " +
                               std::to_string(position.y) + "] match with [" +
                               std::to_string(lastDetection_.poses[positionIndice].position.x) + ", " +
                               std::to_string(lastDetection_.poses[positionIndice].position.y) + "] and error " +
                               std::to_string(error);
                 ROS_ERROR("%s", message.c_str());
-	     }
+            }
         }
-	if (nMatched > 0)
-	{
-		averageTranslation.setX(averageTranslation.x() / (float) nMatched);
-		averageTranslation.setY(averageTranslation.y() / (float) nMatched);
-		averageTranslation.setZ(0.0);
+        if (nMatched > 0)
+        {
+            averageTranslation.setX(averageTranslation.x() / (float) nMatched);
+            averageTranslation.setY(averageTranslation.y() / (float) nMatched);
+            averageTranslation.setZ(0.0);
 
-        totalTranslation_ += averageTranslation;
+            totalTranslation_ += averageTranslation;
 
-		// TODO: Add elikos_vision_debug as a parameter.
-		tf::StampedTransform transform(tf::Transform(state_.getOrigin2Fcu().getRotation(), totalTranslation_),
-					       state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
-		tfPub_.sendTransform(transform);
+            tf::Vector3 estimate = pivot_ - totalTranslation_;
 
-		std::string message = "Transform: [" + std::to_string(transform.getOrigin().y()) + ", " +
-				      std::to_string(transform.getOrigin().y()) + "] on fcu [" +
-				      std::to_string(state_.getOrigin2Fcu().getOrigin().x()) + ", " + std::to_string(state_.getOrigin2Fcu().getOrigin().y());
-		ROS_ERROR("%s", message.c_str());
-	}
+            // TODO: Add elikos_vision_debug as a parameter.
+            tf::StampedTransform transform(tf::Transform(state_.getOrigin2Fcu().getRotation(), estimate),
+                               state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
+            tfPub_.sendTransform(transform);
+
+            tf::Vector3 offset = estimate - state_.getOrigin2Fcu().getOrigin();
+            if (offset.length() > 0.1)
+            {
+                resetPivot();
+                ROS_WARN("RESET PIVOT");
+                std::string message = "Transform: [" + std::to_string(averageTranslation.x()) + ", " +
+                                      std::to_string(averageTranslation.y()) + "] with offset [" +
+                                      std::to_string(offset.x()) + ", " + std::to_string(offset.y());
+                ROS_ERROR("%s", message.c_str());
+            }
+
+        }
     }
 
     lastDetection_ = intersections;
     lastState_ = state_.getOrigin2Fcu();
+}
+
+void IntersectionTransform::resetPivot()
+{
+    pivot_ = state_.getOrigin2Fcu().getOrigin();
+    totalTranslation_ = tf::Vector3(0.0, 0.0, 0.0);
 }
 
 }

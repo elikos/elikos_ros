@@ -43,6 +43,8 @@ private:
     const double GRID_SIDE_LENGTH_M = 1.0;
     const double ALT_ERROR_THRESHOLD = 0.3;
 
+    void resetPivot();
+
     void updateKDTree(const std::vector<Eigen::Vector2f>& imageIntersections);
     double estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections);
     void transformIntersectionXY(const Eigen::Vector2f& imageIntersection, tf::Vector3& intersection, tf::Vector3& offset) const;
@@ -70,6 +72,7 @@ private:
     tf::StampedTransform lastState_;
 
     tf::Vector3 totalTranslation_;
+    tf::Vector3 pivot_;
 };
 
 }
