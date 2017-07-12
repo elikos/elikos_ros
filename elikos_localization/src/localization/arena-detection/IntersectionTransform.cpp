@@ -216,12 +216,12 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
                 averageTranslation.setX(averageTranslation.x() + (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
                 averageTranslation.setY(averageTranslation.y() + (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
             } else {
-		std::string message = "Intersection [" + std::to_string(position.x) + ", " +
-				      std::to_string(position.y) + "] match with [" +
-				      std::to_string(lastDetection_.poses[positionIndice].position.x) + ", " +
-				      std::to_string(lastDetection_.poses[positionIndice].position.y) + "] and error " +
-				      std::to_string(error);
-		ROS_ERROR("%s", message.c_str());
+                std::string message = "Intersection [" + std::to_string(position.x) + ", " +
+                              std::to_string(position.y) + "] match with [" +
+                              std::to_string(lastDetection_.poses[positionIndice].position.x) + ", " +
+                              std::to_string(lastDetection_.poses[positionIndice].position.y) + "] and error " +
+                              std::to_string(error);
+                ROS_ERROR("%s", message.c_str());
 	     }
         }
 	if (nMatched > 0)
@@ -230,8 +230,10 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
 		averageTranslation.setY(averageTranslation.y() / (float) nMatched);
 		averageTranslation.setZ(0.0);
 
+        totalTranslation_ += averageTranslation;
+
 		// TODO: Add elikos_vision_debug as a parameter.
-		tf::StampedTransform transform(tf::Transform(state_.getOrigin2Fcu().getRotation(), state_.getOrigin2Fcu().getOrigin() + averageTranslation),
+		tf::StampedTransform transform(tf::Transform(state_.getOrigin2Fcu().getRotation(), totalTranslation_),
 					       state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
 		tfPub_.sendTransform(transform);
 

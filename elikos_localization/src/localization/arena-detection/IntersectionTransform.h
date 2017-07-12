@@ -68,6 +68,8 @@ private:
     geometry_msgs::PoseArray lastDetection_;
 
     tf::StampedTransform lastState_;
+
+    tf::Vector3 totalTranslation_;
 };
 
 }
