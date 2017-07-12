@@ -16,13 +16,14 @@
         <arg name="camera_name" value="elikos_realsense_right"/>
     </include>
 
+<!--
     <node pkg="elikos_localization" type="fallback.py" name="feature_tracking" output="screen">
         <rosparam command="load" file="$(find elikos_localization)/cfg/feature_tracking.yaml"/>
         <remap from="localization/features_0" to="elikos_ffmv_bottom/intersections"/>
         <remap from="localization/features_1" to="elikos_realsense_front/intersections"/>
         <remap from="localization/features_2" to="elikos_realsense_left/intersections"/>
         <remap from="localization/features_3" to="elikos_realsense_right/intersections"/>
-        <!-- remap from="localization/features_4" to="elikos_realsense_back/intersections"/ -->
+        <remap from="localization/features_4" to="elikos_realsense_back/intersections"/ >
         <remap from="localization/camera_info_0" to="/camera_bottom/camera_info"/>
         <remap from="localization/camera_info_1" to="/r200_front/color/camera_info"/>
         <remap from="localization/camera_info_2" to="/r200_left/color/camera_info"/>
@@ -30,7 +31,6 @@
         <remap from="localization/camera_info_4" to="/r200_back/color/camera_info"/>
 
     </node>
-<!--
     <group ns="feature_tracking">
         <rosparam command="load" file="$(find elikos_localization)/cfg/feature_tracking.yaml"/>
 

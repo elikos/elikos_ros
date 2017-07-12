@@ -195,7 +195,7 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
         std::vector<int> indices(1);
         std::vector<float> distances(1);
 
-        tf::Vector3 averageTranslation;
+        tf::Vector3 averageTranslation(0.0, 0.0, 0.0);
         int nMatched = 0;
 
         double translationNormEstimate = translationEstimate.length();
@@ -216,22 +216,30 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
                 averageTranslation.setX(averageTranslation.x() + (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
                 averageTranslation.setY(averageTranslation.y() + (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
             } else {
-                std::string message = "Intersection [" + std::to_string(position.x) + ", " +
-                                      std::to_string(position.y) + "] match with [" +
-                                      std::to_string(lastDetection_.poses[positionIndice].position.x) + ", " +
-                                      std::to_string(lastDetection_.poses[positionIndice].position.y) + "] and error " +
-                                      std::to_string(error);
-                ROS_WARN("%s", message.c_str());
-            }
+		std::string message = "Intersection [" + std::to_string(position.x) + ", " +
+				      std::to_string(position.y) + "] match with [" +
+				      std::to_string(lastDetection_.poses[positionIndice].position.x) + ", " +
+				      std::to_string(lastDetection_.poses[positionIndice].position.y) + "] and error " +
+				      std::to_string(error);
+		ROS_ERROR("%s", message.c_str());
+	     }
         }
-        averageTranslation.setX(averageTranslation.x() / (float) nMatched);
-        averageTranslation.setY(averageTranslation.y() / (float) nMatched);
-        averageTranslation.setZ(0.0);
+	if (nMatched > 0)
+	{
+		averageTranslation.setX(averageTranslation.x() / (float) nMatched);
+		averageTranslation.setY(averageTranslation.y() / (float) nMatched);
+		averageTranslation.setZ(0.0);
 
-        // TODO: Add elikos_vision_debug as a parameter.
-        tf::StampedTransform transform(tf::Transform(state_.getOrigin2Fcu().getRotation(), state_.getOrigin2Fcu().getOrigin() + averageTranslation),
-                                       state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
-        tfPub_.sendTransform(transform);
+		// TODO: Add elikos_vision_debug as a parameter.
+		tf::StampedTransform transform(tf::Transform(state_.getOrigin2Fcu().getRotation(), state_.getOrigin2Fcu().getOrigin() + averageTranslation),
+					       state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
+		tfPub_.sendTransform(transform);
+
+		std::string message = "Transform: [" + std::to_string(transform.getOrigin().y()) + ", " +
+				      std::to_string(transform.getOrigin().y()) + "] on fcu [" +
+				      std::to_string(state_.getOrigin2Fcu().getOrigin().x()) + ", " + std::to_string(state_.getOrigin2Fcu().getOrigin().y());
+		ROS_ERROR("%s", message.c_str());
+	}
     }
 
     lastDetection_ = intersections;
