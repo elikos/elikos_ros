@@ -3,7 +3,7 @@ arena_center_frame_id: "elikos_arena_origin"
 #frame of the fcu
 fcu_frame_id: "elikos_fcu"
 #output frame of the vision
-output_position_fcu_frame_id: "elikos_vision"
+output_position_fcu_frame_id: "elikos_vision_debug"
 
 #initial pose of the drone
 initial_drone_pos: [0, 0, 0.14]

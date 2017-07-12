@@ -278,6 +278,8 @@ def input_localization_points(*args):
         return
 
     try:
+        if number_of_points < 4:
+            raise LocalizationUnavailableException
         drone_pose = estimate_drone_pnp(
             intersections_2d,
             list_of_matches,

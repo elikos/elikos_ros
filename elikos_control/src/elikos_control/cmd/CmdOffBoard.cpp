@@ -42,17 +42,20 @@ void CmdOffBoard::execute()
     fakeVision.getOrigin().setX(0);
     fakeVision.getOrigin().setY(0);
     fakeVision.getOrigin().setZ(0.14);
+    fakeVision.setRotation(tf::Quaternion::getIdentity());
     fakeVision.stamp_ = ros::Time::now();
 
     bool initialPositionFound = false;
     while(!initialPositionFound)
     {
         try {
+            tf_broadcaster_.sendTransform(fakeVision);
             tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
             initialPositionFound = true;
+            ROS_ERROR("CONTROL FOUND FCU ");
+	    rate.sleep();
         } catch (tf::TransformException e) {
-            ROS_ERROR("%s",e.what());
-            //tf_broadcaster_.sendTransform(fakeVision);
+            ROS_ERROR("CONTROL: %s",e.what());
         }
     }
 
