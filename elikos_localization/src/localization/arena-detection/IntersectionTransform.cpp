@@ -203,6 +203,8 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
         tf::Vector3 averageTranslation(0.0, 0.0, 0.0);
         int nMatched = 0;
 
+        double totalWeight = 0.0;
+
         double translationNormEstimate = translationEstimate.length();
         for (int i = 0; i < intersections.poses.size(); ++i)
         {
@@ -218,22 +220,18 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             {
                 matched[i] = true;
                 ++nMatched;
-                averageTranslation.setX(averageTranslation.x() + (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
-                averageTranslation.setY(averageTranslation.y() + (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
-            } else {
 
-                std::string message = "Intersection [" + std::to_string(position.x) + ", " +
-                              std::to_string(position.y) + "] match with [" +
-                              std::to_string(lastDetection_.poses[positionIndice].position.x) + ", " +
-                              std::to_string(lastDetection_.poses[positionIndice].position.y) + "] and error " +
-                              std::to_string(error);
-                ROS_ERROR("%s", message.c_str());
+                double weight = 1.0 / tf::Vector3(position.x ,position.y, 0.0).length();
+                totalWeight += weight;
+                averageTranslation.setX(averageTranslation.x() + weight * (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
+                averageTranslation.setY(averageTranslation.y() + weight * (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
             }
         }
+
         if (nMatched > 0)
         {
-            averageTranslation.setX(averageTranslation.x() / (float) nMatched);
-            averageTranslation.setY(averageTranslation.y() / (float) nMatched);
+            averageTranslation.setX(averageTranslation.x() / totalWeight);
+            averageTranslation.setY(averageTranslation.y() / totalWeight);
             averageTranslation.setZ(0.0);
 
             totalTranslation_ += averageTranslation;
@@ -246,16 +244,19 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             tfPub_.sendTransform(transform);
 
             tf::Vector3 offset = estimate - state_.getOrigin2Fcu().getOrigin();
+
             if (offset.length() > 0.1)
             {
                 resetPivot();
-                ROS_WARN("RESET PIVOT");
+                ROS_WARN("OFFSET > 0.1 - RESET PIVOT");
                 std::string message = "Transform: [" + std::to_string(averageTranslation.x()) + ", " +
                                       std::to_string(averageTranslation.y()) + "] with offset [" +
                                       std::to_string(offset.x()) + ", " + std::to_string(offset.y());
                 ROS_ERROR("%s", message.c_str());
             }
-
+        } else {
+            ROS_WARN("NO MATCH - RESET PIVOT");
+            resetPivot();
         }
     }
 
