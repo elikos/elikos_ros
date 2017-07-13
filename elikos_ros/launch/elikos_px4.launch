@@ -2,6 +2,7 @@
   	<include file="$(find elikos_ros)/launch/px4.launch">
       <arg name="fcu_url" value="/dev/ttyUSB0:921600" />
       <!--arg name="fcu_url" value="/dev/ttyACM0:57600" /-->
+      <arg name="gcs_url" value="tcp-l://192.168.1.185:5760" />
       <arg name="config_yaml" value="$(find elikos_ros)/launch/elikos_px4_config.yaml" />
     </include>
 	<include file="$(find elikos_ros)/launch/elikos_origin_init.launch"/>
