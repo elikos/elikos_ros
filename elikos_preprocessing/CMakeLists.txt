@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   elikos_ros
+  elikos_detection
   image_transport
   roscpp
   std_msgs
@@ -17,17 +18,25 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 find_package(OpenCV 2 REQUIRED)
+find_package(Qt5Gui)
+find_package(Qt5Core)
+find_package(Qt5Widgets)
+find_package(Qt5Test)
+find_package(Qt5Concurrent)
+find_package(Qt5OpenGL)
+find_package(OpenCV 2 REQUIRED)
 
 catkin_package(
 #   INCLUDE_DIRS include
-  LIBRARIES elikos_preprocessing
-  CATKIN_DEPENDS image_transport cv_bridge geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros
+    LIBRARIES elikos_preprocessing
+    CATKIN_DEPENDS elikos_ros elikos_detection image_transport cv_bridge geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros
 #   DEPENDS system_lib
 )
 
 include_directories(
 	${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    ${elikos_detection_INCLUDE_DIR}
 )
 
 add_library(elikos_preprocessing
@@ -38,8 +47,9 @@ add_library(elikos_preprocessing
     src/PreProcessing.h)
 
 target_link_libraries(elikos_preprocessing
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    ${elikos_detection_LIBRARIES}
 )
 
 if(catkin_EXPORTED_LIBRARIES)

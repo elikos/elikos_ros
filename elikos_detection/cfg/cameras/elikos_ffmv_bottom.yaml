@@ -12,6 +12,6 @@ cam_height: 480
 cam_width: 640
 cam_fov_v: 63
 cam_fov_h: 89
-min_height: 0.1
+min_height: 0.5
 bw_threshold: 149
 undistort: true

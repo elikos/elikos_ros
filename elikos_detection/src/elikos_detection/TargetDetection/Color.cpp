@@ -32,10 +32,21 @@ Mat Color::generateThreshold(const Mat& image)
     cvtColor(image, hsv, COLOR_BGR2HSV);
     BLUR_AMOUNT = PRE_BLUR + 1;
     blur(hsv, hsv, Size(BLUR_AMOUNT, BLUR_AMOUNT), Point(-1, -1));
-    // No inRange implementation for gpu module.
-    // This should not cause performance problems on the jetson.
 
-    inRange(hsv, Scalar(*H_MIN, *S_MIN, *V_MIN), Scalar(*H_MAX, *S_MAX, *V_MAX), threshold);
+
+
+    //TODO optimize
+    if(*H_MIN > *H_MAX){
+        Mat1b maxCol, minCol;
+        inRange(hsv, Scalar(0, *S_MIN, *V_MIN), Scalar(*H_MAX, *S_MAX, *V_MAX), maxCol);
+        inRange(hsv, Scalar(*H_MIN, *S_MIN, *V_MIN), Scalar(180, *S_MAX, *V_MAX), minCol);
+        threshold = maxCol | minCol;
+    }else{
+        // No inRange implementation for gpu module.
+        // This should not cause performance problems on the jetson.
+
+        inRange(hsv, Scalar(*H_MIN, *S_MIN, *V_MIN), Scalar(*H_MAX, *S_MAX, *V_MAX), threshold);
+    }
     // Consolidate the colored parts into one big blob to delimit the robot
     erode(threshold, threshold, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1),
           *PRE_EROSIONS);
@@ -79,7 +90,7 @@ void Color::trackFilteredObjects(Mat &cameraFeed) {
                 //if the area is the same as the 3/2 of the image size, probably just a bad filter
                 //we only want the object with the largest area so we safe a reference area each
                 //iteration and compare it to the area in the next iteration.
-                if (area > MIN_OBJECT_AREA) {
+                //if (area > MIN_OBJECT_AREA) {
 
                     myRobot.setXPos(moment.m10 / area);
                     myRobot.setYPos(moment.m01 / area);
@@ -87,7 +98,7 @@ void Color::trackFilteredObjects(Mat &cameraFeed) {
 
                     foundObjects.emplace_back(myRobot);
 
-                }
+                //}
             }
         }
         else putText(cameraFeed, "TOO MUCH NOISE! ADJUST FILTER", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);

@@ -46,7 +46,7 @@ void CmdTravel::execute()
 
 	while(!isAborted_ && stepInTrajectory_ < cmdTrajectory_.points.size()-1)
 	{
-		
+        ros::spinOnce();
 		tf_listener_.lookupTransform(WORLD_FRAME, MAV_FRAME, ros::Time(0), lastPosition_);
 		double step_lenght = 0;
 		bool is_too_near = true;

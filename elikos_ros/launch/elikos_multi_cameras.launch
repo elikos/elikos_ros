@@ -1,0 +1,50 @@
+<launch>  
+  <!-- Target detection -->
+  <include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="elikos_realsense_front" />
+      <arg name="cfg" value="elikos_realsense_front"/>
+      <arg name="calib" value="front_calib_poly.yaml"/>
+  </include>
+  <include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="elikos_realsense_right" />
+      <arg name="cfg" value="elikos_realsense_right"/>
+      <arg name="calib" value="right_calib_poly.yaml"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="elikos_realsense_left" />
+      <arg name="cfg" value="elikos_realsense_left"/>
+      <arg name="calib" value="left_calib_poly.yaml"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="elikos_realsense_back" />
+      <arg name="cfg" value="elikos_realsense_back"/>
+      <arg name="calib" value="back_calib_poly.yaml"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
+      <arg name="camera_name" value="elikos_ffmv_bottom" />
+      <arg name="cfg" value="elikos_ffmv_bottom"/>
+      <arg name="calib" value="bottom_calib_poly.yaml"/>
+  </include>
+
+  <!-- Target transformation -->
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="elikos_realsense_front" />
+      <arg name="cfg" value="elikos_realsense_front"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="elikos_realsense_right" />
+      <arg name="cfg" value="elikos_realsense_right"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="elikos_realsense_left" />
+      <arg name="cfg" value="elikos_realsense_left"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="elikos_realsense_back" />
+      <arg name="cfg" value="elikos_realsense_back"/>
+  </include>
+	<include file="$(find elikos_detection)/launch/elikos_transformation.launch">
+      <arg name="camera_name" value="elikos_ffmv_bottom" />
+      <arg name="cfg" value="elikos_ffmv_bottom"/>
+  </include>
+</launch>

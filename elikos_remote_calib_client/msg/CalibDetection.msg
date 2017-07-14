@@ -1,0 +1,4 @@
+ColorDetectionInfo red
+ColorDetectionInfo green
+ColorDetectionInfo white
+

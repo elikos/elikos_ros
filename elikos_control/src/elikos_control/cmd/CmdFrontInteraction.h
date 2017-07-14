@@ -32,6 +32,8 @@ public:
     void ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory);
     CmdFrontInteraction::InteractionState getStatus();
 
+    void stateCallBack(const mavros_msgs::State::ConstPtr& msg);
+
 private:
     CmdFrontInteraction() = delete;
 
@@ -45,6 +47,14 @@ private:
 
     tf::StampedTransform targetPosition_;
     tf::StampedTransform lastPosition_;
+
+    ros::Subscriber stateSub_;
+    ros::ServiceClient armingClient_;
+    ros::ServiceClient setModeClient_;
+    mavros_msgs::SetMode offbSetMode_;
+    mavros_msgs::CommandBool armCmd_;
+
+    mavros_msgs::State currentState_;
 
     const double THRESHOLD = 0.05;  //TODO fichier de config
     const double HIGH_OF_GROUND = 0.1;
