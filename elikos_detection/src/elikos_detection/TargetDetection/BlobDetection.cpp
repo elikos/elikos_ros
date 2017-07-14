@@ -34,13 +34,13 @@ BlobDetection::BlobDetection() {
     trackbarsGreenMat_ = Mat3b(1, 300, Vec3b(0, 0, 0));
     maxID = 0;
 
-    const std::string windowName_ = "Calib Circle Radius";
+    /*const std::string windowName_ = "Calib Circle Radius";
     cv::namedWindow(windowName_, CV_GUI_NORMAL);
     cv::createTrackbar("Max", windowName_, &MAX_CIRCLE_RADIUS, 200);
-    cv::createTrackbar("Min", windowName_, &MIN_CIRCLE_RADIUS, 200);
+    cv::createTrackbar("Min", windowName_, &MIN_CIRCLE_RADIUS, 200);*/
 
     /* ToDO: REMOVE*/
-    _tfListener = &tfListener_;
+    /*_tfListener = &tfListener_;
     cv::Mat distortedCamera =
         (cv::Mat_<float>(3, 3) << 422.918640, 0.000000, 350.119451, 0.000000,
          423.121112, 236.380265, 0.000000, 0.000000, 1.000000);
@@ -49,7 +49,7 @@ BlobDetection::BlobDetection() {
                                 0.001090, -0.000489, 0.000000);
 
     cv::Mat undistortedCamera = cv::getOptimalNewCameraMatrix(
-        distortedCamera, cameraDistortion, cv::Size(640, 480), 0);
+        distortedCamera, cameraDistortion, cv::Size(640, 480), 0);*/
 
     // cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(),
     // undistortedCamera,
