@@ -8,14 +8,15 @@
 const std::string ELIKOS_ARENA_ORIGIN = "elikos_arena_origin";
 const std::string ELIKOS_LOCAL_ORIGIN = "elikos_local_origin";
 const std::string ELIKOS_FCU = "elikos_fcu";
+const std::string ELIKOS_VISION = "elikos_vision";
 
 bool isInit_ = false;
 bool initialize(std_srvs::Empty::Request  &req,
          std_srvs::Empty::Response &res)
-    {
-      isInit_ = true;
-      return true;
-    }
+{
+  isInit_ = true;
+  return true;
+}
 
 int main(int argc, char* argv[])
 {
@@ -48,6 +49,8 @@ int main(int argc, char* argv[])
       if(!lookupDone)
       {
         try {
+          // Prevent console spam.
+          tf_listener_.waitForTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), ros::Duration(1.0));
     			tf_listener_.lookupTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0), arenaOriginTransform);
           tf::Vector3 origin = initialFcu.getOrigin();
           origin.setZ(0);
@@ -61,6 +64,8 @@ int main(int argc, char* argv[])
     		}
     		catch (tf::TransformException &ex) {
     			ROS_ERROR("Origin init failed!!!! Exception : %s",ex.what());
+          tf_broadcaster_.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion::getIdentity(), tf::Vector3(0.0, 0.0, 0.14)), 
+              ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_VISION));
     		}
       }
       tf_broadcaster_.sendTransform(tf::StampedTransform(arenaOriginTransform.inverse(), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_LOCAL_ORIGIN));
