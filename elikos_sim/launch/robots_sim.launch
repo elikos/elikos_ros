@@ -1,5 +1,5 @@
 <launch>
-    <arg name="speed" default="0.5"/>
+    <arg name="speed" default="0.01"/>
     <arg name="rotation_speed" default="0.785"/>
     <arg name="rotation_angle" default="0.785"/>
     <arg name="random_angle_time_lap" default="5"/>
@@ -10,15 +10,15 @@
     <arg name="obstacle_20" default="false"/>
 
     <arg name="red_1" default="true"/>
-    <arg name="green_1" default="false"/>
-    <arg name="red_2" default="false"/>
-    <arg name="green_2" default="false"/>
-    <arg name="red_3" default="false"/>
-    <arg name="green_3" default="false"/>
-    <arg name="red_4" default="false"/>
-    <arg name="green_4" default="false"/>
-    <arg name="red_5" default="false"/>
-    <arg name="green_5" default="false"/>
+    <arg name="green_1" default="true"/>
+    <arg name="red_2" default="true"/>
+    <arg name="green_2" default="true"/>
+    <arg name="red_3" default="true"/>
+    <arg name="green_3" default="true"/>
+    <arg name="red_4" default="true"/>
+    <arg name="green_4" default="true"/>
+    <arg name="red_5" default="true"/>
+    <arg name="green_5" default="true"/>
 
     <node if="$(arg obstacle_05)" name="spawn_sdf1" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_0_75/model.sdf -sdf -model obstacle1 -x 0 -y 5" />
     <node if="$(arg obstacle_10)" name="spawn_sdf3" pkg="gazebo_ros" type="spawn_model" args="-file $(find elikos_sim)/src/gazebo_sim/elikos_gazebo_models/models/obstacle_1_0/model.sdf -sdf -model obstacle2 -x 0 -y -5" />

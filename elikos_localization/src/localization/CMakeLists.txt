@@ -34,21 +34,17 @@ add_executable(elikos_localization
     arena-detection/algorithm/RANSAC.cpp
     arena-tracking/filter/KalmanFilter.h
     arena-tracking/filter/AbstractKalmanFilter.h
-    context/QuadState.h
-    context/QuadState.cpp
     context/intersection/DetectedIntersection.cpp
     context/intersection/DetectedIntersection.h
     context/line/Line.cpp
     context/line/Line.h
     context/line/LineGroup.cpp
     context/line/LineGroup.h
-    context/CameraInfo.h
-    context/CameraInfo.cpp
     context/Grid.h
     context/Grid.cpp)
 
 target_link_libraries(elikos_localization
-                      ${catkin_LIBRARIES}
-                      ${OpenCV_LIBRARIES}
-                      ${elikos_detection_LIBRARIES}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    ${elikos_detection_LIBRARIES}
 )

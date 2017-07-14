@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
         cameraInfo.load(camera_name);
     }
 
-    localization::QuadState state(cameraInfo.frame);
+    QuadState state(cameraInfo.frame);
     localization::ImageProcessor processor(cameraInfo, state);
     localization::MessageHandler msgHdl(cameraInfo, state, &processor);
 

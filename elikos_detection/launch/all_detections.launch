@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find elikos_detection)/launch/elikos_detection">
+        <arg name="calib" value="Calibration_vicon.yaml"/>
+    </include>
+</launch>

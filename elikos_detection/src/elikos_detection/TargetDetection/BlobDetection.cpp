@@ -34,13 +34,13 @@ BlobDetection::BlobDetection() {
     trackbarsGreenMat_ = Mat3b(1, 300, Vec3b(0, 0, 0));
     maxID = 0;
 
-    const std::string windowName_ = "Calib Circle Radius";
+    /*const std::string windowName_ = "Calib Circle Radius";
     cv::namedWindow(windowName_, CV_GUI_NORMAL);
     cv::createTrackbar("Max", windowName_, &MAX_CIRCLE_RADIUS, 200);
-    cv::createTrackbar("Min", windowName_, &MIN_CIRCLE_RADIUS, 200);
+    cv::createTrackbar("Min", windowName_, &MIN_CIRCLE_RADIUS, 200);*/
 
     /* ToDO: REMOVE*/
-    _tfListener = &tfListener_;
+    /*_tfListener = &tfListener_;
     cv::Mat distortedCamera =
         (cv::Mat_<float>(3, 3) << 422.918640, 0.000000, 350.119451, 0.000000,
          423.121112, 236.380265, 0.000000, 0.000000, 1.000000);
@@ -49,7 +49,7 @@ BlobDetection::BlobDetection() {
                                 0.001090, -0.000489, 0.000000);
 
     cv::Mat undistortedCamera = cv::getOptimalNewCameraMatrix(
-        distortedCamera, cameraDistortion, cv::Size(640, 480), 0);
+        distortedCamera, cameraDistortion, cv::Size(640, 480), 0);*/
 
     // cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(),
     // undistortedCamera,
@@ -61,7 +61,7 @@ void BlobDetection::detect(const cv::Mat& input, cv::Mat& output_w,
                            cv::Mat& output,
                            std::vector<RobotDesc>& robotsArray) {
     detectColor(input, output_w, output_r, output_g, output, robotsArray);
-    detectCircles(input, output_w, output_r, output_g, output, robotsArray);
+    //detectCircles(input, output_w, output_r, output_g, output, robotsArray);
 }
 
 // Color detection algorithm
@@ -93,58 +93,10 @@ void BlobDetection::detectColor(const cv::Mat& input, cv::Mat& output_w,
 
     for (auto object : greenObjects) {
         object.setColor(GREEN);
-        object.setWindow(RotatedRect(
-            Point2f(object.getXPos(), object.getYPos()),
-            Size2f(sqrt(object.getArea()), sqrt(object.getArea())), 0));
-        // set ID
-        bool found = false;
-        for (auto old : blobObjects) {
-            double old_ray = sqrt(old.getArea() / PI);
-            double distance = sqrt(abs(object.getXPos() - old.getXPos()) +
-                                   abs(object.getYPos() - old.getYPos()));
-            object.setDistance(distance);
-            // if(distance < old_ray && !old.getAlreadyFound()){
-            if (object.getXPos() < old.getXPos() + old_ray &&
-                object.getXPos() > old.getXPos() - old_ray &&
-                object.getYPos() < old.getYPos() + old_ray &&
-                object.getYPos() > old.getYPos() - old_ray &&
-                !old.getAlreadyFound() && old.getColor() == object.getColor()) {
-                found = true;
-                object.setID(old.getID());
-                old.setAlreadyFound(true);
-            }
-        }
-        if (!found) {
-            object.setID(++maxID);
-        }
         robotsArray.emplace_back(object);
     }
     for (auto object : redObjects) {
         object.setColor(RED);
-        object.setWindow(RotatedRect(
-            Point2f(object.getXPos(), object.getYPos()),
-            cv::Size2f(sqrt(object.getArea()), sqrt(object.getArea())), 0));
-        // set IDColor
-        bool found = false;
-        for (auto old : blobObjects) {
-            double old_ray = sqrt(old.getArea() / PI);
-            double distance = sqrt(abs(object.getXPos() - old.getXPos()) +
-                                   abs(object.getYPos() - old.getYPos()));
-            object.setDistance(distance);
-            // if(distance < old_ray && !old.getAlreadyFound()){
-            if (object.getXPos() < old.getXPos() + old_ray &&
-                object.getXPos() > old.getXPos() - old_ray &&
-                object.getYPos() < old.getYPos() + old_ray &&
-                object.getYPos() > old.getYPos() - old_ray &&
-                !old.getAlreadyFound() && old.getColor() == object.getColor()) {
-                found = true;
-                object.setID(old.getID());
-                old.setAlreadyFound(true);
-            }
-        }
-        if (!found) {
-            object.setID(++maxID);
-        }
         robotsArray.emplace_back(object);
     }
     blobObjects = robotsArray;
@@ -171,7 +123,7 @@ void BlobDetection::detectCircles(const cv::Mat& input, cv::Mat& output_w,
     vector<Vec3f> circles;
 
     tf::StampedTransform sTrans;
-    tfListener_.lookupTransform("local_origin", "fcu", ros::Time(0), sTrans);
+    tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), sTrans);
 
     cv::putText(output, "X: " + std::to_string(sTrans.getOrigin().x()),
                 cv::Point(10, 50), cv::FONT_HERSHEY_PLAIN, 1.0,
@@ -209,7 +161,7 @@ void BlobDetection::detectCircles(const cv::Mat& input, cv::Mat& output_w,
         cv::circle(output, center, radius, cv::Scalar(0, 0, 255), 3, 8, 0);
     }
 
-    cv::waitKey(10);  // FOR TRACKBARS (TODO: remove)
+    //cv::waitKey(10);  // FOR TRACKBARS (TODO: remove)
 }
 
 void BlobDetection::createTrackbars() {
@@ -347,7 +299,7 @@ void BlobDetection::removePerspective(const cv::Mat& input,
     Eigen::Vector3f direction;
     try {
         tf::StampedTransform tf;
-        tfListener_.lookupTransform("local_origin", "fcu", ros::Time(0), tf);
+        tfListener_.lookupTransform("elikos_local_origin", "elikos_fcu", ros::Time(0), tf);
 
         tf::Matrix3x3 m(tf.getRotation());
         m.getRPY(roll, pitch, yaw);

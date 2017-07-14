@@ -21,10 +21,10 @@ AbstractArena::AbstractArena()
     double edge_tolerance;
     nh.getParam("/elikos_ai/edge_tolerance", edge_tolerance);
 
-    TOP_RIGHT_CORNER = tf::Point( dimension_c,  dimension_c, 0.0 );
-    TOP_LEFT_CORNER = tf::Point(-dimension_c,  dimension_c, 0.0 );
-    BOTTOM_LEFT_CORNER = tf::Point(-dimension_c, -dimension_c, 0.0 );
-    BOTTOM_RIGHT_CORNER = tf::Point( dimension_c, -dimension_c, 0.0 );
+    TOP_RIGHT_CORNER = tf::Point( dimension_c/2,  dimension_c/2, 0.0 );
+    TOP_LEFT_CORNER = tf::Point(-dimension_c/2,  dimension_c/2, 0.0 );
+    BOTTOM_LEFT_CORNER = tf::Point(-dimension_c/2, -dimension_c/2, 0.0 );
+    BOTTOM_RIGHT_CORNER = tf::Point( dimension_c/2, -dimension_c/2, 0.0 );
     EDGE_TOLERANCE = edge_tolerance;
 }
 

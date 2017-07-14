@@ -1,15 +1,12 @@
 <launch>
-    <arg name="camera_name" default="elikos_ffmv_bottom"/>
-    <arg name="camera_namespace" default="elikos_ffmv_bottom_camera"/>
+    <arg name="camera_name" default="gazebo_r200_front"/>
     <arg name="camera_manager_nodelet" default="camera_manager"/>
 
-    <group ns="$(arg camera_namespace)">
-        <node name="$(arg camera_manager_nodelet)" type="nodelet" pkg="nodelet" args="manager"/>
-        <node name="image_rect" type="nodelet" pkg="nodelet" args="load image_proc/rectify $(arg camera_manager_nodelet)" output="screen">
-            <remap from="image_mono" to="image_raw"/>
-        </node>
-        <node name="preprocessing" type="nodelet" pkg="nodelet" args="load elikos_preprocessing/preprocessing $(arg camera_manager_nodelet)" output="screen">
-            <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg camera_name).yaml"/>
-        </node>
-    </group>
+    <include file="$(find elikos_detection)/launch/camera_param.launch">
+        <arg name="camera_name" value="$(arg camera_name)"/>
+    </include>
+
+    <node name="$(arg camera_manager_nodelet)" type="nodelet" pkg="nodelet" args="manager" output="screen"/>
+    <node name="$(arg camera_name)_preprocessing" type="nodelet" pkg="nodelet" args="load elikos_preprocessing/preprocessing $(arg camera_manager_nodelet) $(arg camera_name)" output="screen"/>
+
 </launch>

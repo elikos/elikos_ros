@@ -34,6 +34,21 @@ namespace transformation_utils {
 
     tf::Transform computeTurret2Target(tf::Transform origin2turret);
 
+    geometry_msgs::PoseStamped getOrigin2Target(const tf::StampedTransform& origin2fcu,
+                                         const tf::StampedTransform& fcu2camera,
+                                         cv::Point2f point,
+                                         cv::Size dimensions,
+                                         float hfov,
+                                         float vfov);
+
+    geometry_msgs::Pose computeOrigin2Target(const tf::StampedTransform& fcu2camera,
+                                      const tf::Transform& origin2camera,
+                                      const tf::Transform& origin2fcu,
+                                      cv::Point2f point,
+                                      cv::Size dimensions,
+                                      float hfov,
+                                      float vfov);
+
 
 };
 

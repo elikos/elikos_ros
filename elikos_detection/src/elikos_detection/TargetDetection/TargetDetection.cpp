@@ -2,6 +2,7 @@
 // Created by ta11e4rand on 10/02/16.
 //
 #include "TargetDetection.h"
+#include <functional>
 
 void doDetect(const cv::Mat& input, const cv::Mat& targetimg, cv::Mat& output) {
     if (input.empty() || targetimg.empty()) {
@@ -101,11 +102,6 @@ void doShapeReco(const cv::Mat& input, const cv::Mat& targetimg,
 }
 
 TargetDetection::TargetDetection() {
-    targetRobot_ =
-        cv::imread("/home/elikos/riad_ws/PythonTest/test2/robot_green.png",
-                   CV_LOAD_IMAGE_COLOR);
-    // cv::namedWindow("HelloWorldWindow", CV_GUI_NORMAL);
-    // cv::namedWindow("circlePreview", CV_GUI_NORMAL);
 }
 /*
  * This method is the first step of the tracking algorithm
@@ -117,26 +113,14 @@ void TargetDetection::detect(const cv::Mat& input, cv::Mat& output_w,
                              cv::Mat& output,
                              std::vector<RobotDesc>& outputRobotsArray) {
     // Shape detection
-    shapeDetection_.detect(input, output_w, output_r, output_g, output,
-                          outputRobotsArray, blobDetection_);
-    // detectShape(input, output);
-    // cv::imshow("HelloWorldWindow", output);
-    // cv::waitKey(1);
+    //shapeDetection_.detect(input, output_w, output_r, output_g, output,
+    //                      outputRobotsArray, blobDetection_);
 
     // Color detection
     blobDetection_.detect(input, output_w, output_r, output_g, output,
                           outputRobotsArray);
 
-  
 
-    // filterDuplicated(outputRobotsArray);
-
-    // Test shape method (pre alpha :D)
-    // try {
-    //     doShapeReco(input, targetRobot_, output, 0.05);
-    //     cv::imshow("HelloWorldWindow", output);
-    // } catch (cv::Exception ex) {
-    // }
 
     displayRobots(outputRobotsArray, output);
 }
@@ -176,54 +160,63 @@ void TargetDetection::updateHSV(int color, int h, int s, int v, int delta) {
     }
 }
 
+
+void TargetDetection::getRemoteParams(int color, int& h_max, int& h_min, int& s_max, int& s_min, int& v_max, int& v_min,int& preErode, int& dilate, int& postErode, int& blur)
+{
+    std::function<Color*()> fun;
+    switch (color)
+    {
+        case 0: //RED
+            fun = [this](){return this->blobDetection_.getRed();};
+            break;
+        case 1: //GREEN
+            fun = [this](){return this->blobDetection_.getGreen();};
+            break;
+        case 2: //WHITE
+            fun = [this](){return this->blobDetection_.getWhite();};
+            break;
+    }
+    h_min = *(fun()->H_MIN);
+    h_max = *(fun()->H_MAX);
+    s_min = *(fun()->S_MIN);
+    s_max = *(fun()->S_MAX);
+    v_min = *(fun()->V_MIN);
+    v_max = *(fun()->V_MAX);
+    preErode = *(fun()->PRE_EROSIONS);
+    dilate = *(fun()->DILATIONS);
+    postErode = *(fun()->POST_EROSIONS);
+    blur = (fun()->PRE_BLUR);
+}
+
 void TargetDetection::fetchRemoteParams(int color, int h_max, int h_min,
                                         int s_max, int s_min, int v_max,
                                         int v_min, int preErode, int dilate,
-                                        int postErode) {
-    switch (color) {
-        case 0:  // RED
-            *(blobDetection_.getRed()->H_MIN) = h_min;
-            *(blobDetection_.getRed()->H_MAX) = h_max;
-
-            *(blobDetection_.getRed()->S_MIN) = s_min;
-            *(blobDetection_.getRed()->S_MAX) = s_max;
-
-            *(blobDetection_.getRed()->V_MIN) = v_min;
-            *(blobDetection_.getRed()->V_MAX) = v_max;
-
-            *(blobDetection_.getRed()->PRE_EROSIONS) = preErode;
-            *(blobDetection_.getRed()->DILATIONS) = dilate;
-            *(blobDetection_.getRed()->POST_EROSIONS) = postErode;
+                                        int postErode, int blur) {
+    std::function<Color*()> fun;
+    switch (color)
+    {
+        case 0: //RED
+            fun = [this](){return this->blobDetection_.getRed();};
             break;
-        case 1:  // GREEN
-            *(blobDetection_.getGreen()->H_MIN) = h_min;
-            *(blobDetection_.getGreen()->H_MAX) = h_max;
-
-            *(blobDetection_.getGreen()->S_MIN) = s_min;
-            *(blobDetection_.getGreen()->S_MAX) = s_max;
-
-            *(blobDetection_.getGreen()->V_MIN) = v_min;
-            *(blobDetection_.getGreen()->V_MAX) = v_max;
-
-            *(blobDetection_.getGreen()->PRE_EROSIONS) = preErode;
-            *(blobDetection_.getGreen()->DILATIONS) = dilate;
-            *(blobDetection_.getGreen()->POST_EROSIONS) = postErode;
+        case 1: //GREEN
+            fun = [this](){return this->blobDetection_.getGreen();};
             break;
-        case 2:  // WHITE
-            *(blobDetection_.getWhite()->H_MIN) = h_min;
-            *(blobDetection_.getWhite()->H_MAX) = h_max;
-
-            *(blobDetection_.getWhite()->S_MIN) = s_min;
-            *(blobDetection_.getWhite()->S_MAX) = s_max;
-
-            *(blobDetection_.getWhite()->V_MIN) = v_min;
-            *(blobDetection_.getWhite()->V_MAX) = v_max;
-
-            *(blobDetection_.getWhite()->PRE_EROSIONS) = preErode;
-            *(blobDetection_.getWhite()->DILATIONS) = dilate;
-            *(blobDetection_.getWhite()->POST_EROSIONS) = postErode;
+        case 2: //WHITE
+            fun = [this](){return this->blobDetection_.getWhite();};
             break;
     }
+
+    *(fun()->H_MIN) = h_min;
+    *(fun()->H_MAX) = h_max;
+    *(fun()->S_MIN) = s_min;
+    *(fun()->S_MAX) = s_max;
+    *(fun()->V_MIN) = v_min;
+    *(fun()->V_MAX) = v_max;
+    *(fun()->PRE_EROSIONS) = preErode;
+    *(fun()->DILATIONS) = dilate;
+    *(fun()->POST_EROSIONS) = postErode;
+    (fun()->PRE_BLUR) = blur;
+
 }
 
 void TargetDetection::displayRobots(const std::vector<RobotDesc>& robotsArray,

@@ -22,10 +22,10 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <visualization_msgs/Marker.h>
 
+class QuadState;
+
 namespace localization
 {
-
-class QuadState;
 
 class IntersectionTransform
 {

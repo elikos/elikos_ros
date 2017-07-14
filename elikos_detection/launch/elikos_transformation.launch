@@ -1,0 +1,8 @@
+<launch>
+  <arg name="camera_name" default="elikos_ffmv_bottom"/>  
+  <arg name="cfg" default="elikos_ffmv_bottom"/>
+
+  <node name="$(arg camera_name)_transformation" pkg="elikos_detection" type="elikos_transformation">
+      <rosparam command="load" file="$(find elikos_detection)/cfg/cameras/$(arg cfg).yaml" />
+  </node>>
+</launch>
