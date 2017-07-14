@@ -17,6 +17,17 @@ CmdFrontInteraction::CmdFrontInteraction(ros::NodeHandle* nh, int id)
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 0.0 }));
     targetPosition_.child_frame_id_ = SETPOINT;
     targetPosition_.frame_id_ = WORLD_FRAME;
+
+    armingClient_ = nh_->serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
+    setModeClient_ = nh_->serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
+    stateSub_ = nh_->subscribe<mavros_msgs::State>("mavros/state", 10, &CmdFrontInteraction::stateCallBack, this);
+    offbSetMode_.request.custom_mode = "OFFBOARD";
+    armCmd_.request.value = true;
+}
+
+void CmdFrontInteraction::stateCallBack(const mavros_msgs::State::ConstPtr& msg)
+{
+    currentState_ = *msg;
 }
 
 CmdFrontInteraction::~CmdFrontInteraction()
@@ -77,14 +88,35 @@ void CmdFrontInteraction::execute()
             else
             {
                 interactionStatus_ = InteractionState::HAS_TOUCHED_GROUND;
-                // TODO atterrir
+                
                 landingClient_.call(landingCmd_);
+                ROS_ERROR("LANDING!");
                 if(landingCmd_.response.success)
                 {
                     //faire une pause au sol. Éventuellement remplacer par signal capteur.
                     TakeABreak();
                     //demander un CmdOffBoard.
                     interactionStatus_ = InteractionState::ASKS_FOR_OFFBOARD;
+                    /*while (currentState_.mode == "LAND")
+                    {
+                        ROS_ERROR("LANDED!");
+                    }
+                    if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
+                    {
+                        ROS_ERROR("CmdFrontInteraction : Offboard enabled");
+                    } 
+                    else 
+                    {
+                        ROS_ERROR("CmdFrontInteraction : Offboard request failed");
+                    }
+                    if (armingClient_.call(armCmd_) && armCmd_.response.success)
+                    {
+                        ROS_ERROR("CmdFrontInteraction : Vehicle armed");
+                    }
+                    else 
+                    {
+                        ROS_ERROR("CmdFrontInteraction : Vehicle armed request failed");
+                    }*/
                 }
                 else
                 {
