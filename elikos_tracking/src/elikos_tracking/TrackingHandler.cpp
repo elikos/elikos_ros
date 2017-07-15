@@ -24,7 +24,7 @@ TrackingHandler* TrackingHandler::getInstance() {
     }
     return handlerInstance_;
 }
-
+/*
 int TrackingHandler::DoMatch(geometry_msgs::Point inputPoint, uint8_t color) {
     // Check color
     if (!(color == RED || color == GREEN)) {
@@ -75,95 +75,109 @@ int TrackingHandler::DoMatch(geometry_msgs::Point inputPoint, uint8_t color) {
 
     return closestRobotIndex;
 }
-
+*/
 std::shared_ptr<Robot> TrackingHandler::getRobotAtIndex(int index) {
     return robotsVec_.at(index);
 }
-void TrackingHandler::AssignRobots(const elikos_ros::TargetRobotArray::ConstPtr& msg)
-{
-    std::vector<double> ModelMsgDistancesForRedRobots(NUM_ROBOTS_PER_COLOR * msg->targets.size());
-    std::vector<double> ModelMsgDistancesForGreenRobots(NUM_ROBOTS_PER_COLOR * msg->targets.size());
+void TrackingHandler::AssignRobots(
+    const elikos_ros::TargetRobotArray::ConstPtr& msg) {
+    std::vector<double> ModelMsgDistancesForRedRobots(NUM_ROBOTS_PER_COLOR *
+                                                      msg->targets.size());
+    std::vector<double> ModelMsgDistancesForGreenRobots(NUM_ROBOTS_PER_COLOR *
+                                                        msg->targets.size());
 
     for (int i = 0; i < msg->targets.size(); i++) {
         ROS_INFO("here i = %i, color = %i", i, msg->targets[i].color);
-        //Creation de tableaux indiquant la distance de chaque robot du modele a chaque robot du message
-        for (int j = 0; j < NUM_ROBOTS_PER_COLOR; j++)
-        {
-            if (msg->targets[i].color == RED)
-            {
-                ModelMsgDistancesForRedRobots.at(i * NUM_ROBOTS_PER_COLOR + j) = 
-                    robotsVec_.at(j)->getDistanceFrom(msg->targets[i].poseOrigin.pose.position);
-            }
-            else if (msg->targets[i].color == GREEN)
-            {
-                ModelMsgDistancesForGreenRobots.at(i * NUM_ROBOTS_PER_COLOR + j) = 
-                    robotsVec_.at(NUM_ROBOTS_PER_COLOR + j)->getDistanceFrom(msg->targets[i].poseOrigin.pose.position);
-            }
-            else
-            {
+        // Creation de tableaux indiquant la distance de chaque robot du modele
+        // a chaque robot du message
+        for (int j = 0; j < NUM_ROBOTS_PER_COLOR; j++) {
+            if (msg->targets[i].color == RED) {
+                ModelMsgDistancesForRedRobots.at(i * NUM_ROBOTS_PER_COLOR + j) =
+                    robotsVec_.at(j)->getDistanceFrom(
+                        msg->targets[i].poseOrigin.pose.position);
+            } else if (msg->targets[i].color == GREEN) {
+                ModelMsgDistancesForGreenRobots.at(i * NUM_ROBOTS_PER_COLOR +
+                                                   j) =
+                    robotsVec_.at(NUM_ROBOTS_PER_COLOR + j)
+                        ->getDistanceFrom(
+                            msg->targets[i].poseOrigin.pose.position);
+            } else {
                 ROS_ERROR("Color is neither green nor red.");
             }
         }
     }
 
-    //On prend le plus petit de chaque tableau, puis on elimine la colonne et la ligne correspondante, jusqu'a temps que le tableau soit vide
-    //Rouge
+    // On prend le plus petit de chaque tableau, puis on elimine la colonne et
+    // la ligne correspondante, jusqu'a temps que le tableau soit vide
+    // Rouge
     for (int i = 0; i < msg->targets.size(); i++) {
         int idxMinDist = -1;
         double minDist = DBL_MAX;
-        for (int j = 0; j < NUM_ROBOTS_PER_COLOR * msg->targets.size(); j++)
-        {
-            if (ModelMsgDistancesForRedRobots.at(j) > 0
-            && ModelMsgDistancesForRedRobots.at(j) < minDist)
-            {
+        for (int j = 0; j < ModelMsgDistancesForRedRobots.size(); j++) {
+            if ((ModelMsgDistancesForRedRobots.at(j) > 0) &&
+                (ModelMsgDistancesForRedRobots.at(j) < minDist)) {
                 idxMinDist = j;
                 minDist = ModelMsgDistancesForRedRobots.at(j);
             }
         }
-        int idxRobotModel = idxMinDist % NUM_ROBOTS_PER_COLOR; //Reste de la division entiere
-        int idxRobotMsg = (int)(idxMinDist/NUM_ROBOTS_PER_COLOR); //Division entiere
-        //On update la position du robot correspondant dans le modele
-        robotsVec_.at(idxRobotModel)->setPos(msg->targets[idxRobotMsg].poseOrigin.pose.position);
-        //On elimine la colonne et la ligne
-        for (int ligne = 0; ligne < NUM_ROBOTS_PER_COLOR; ligne ++)
-        {
-            for (int colonne = 0; colonne < msg->targets.size(); colonne++)
-            {
-                if (ligne == idxRobotModel || colonne == idxRobotMsg)
-                {
-                    ModelMsgDistancesForRedRobots.at(ligne + colonne * NUM_ROBOTS_PER_COLOR) = -1;   
+        if (idxMinDist != -1) {
+            int idxRobotModel =
+                idxMinDist %
+                NUM_ROBOTS_PER_COLOR;  // Reste de la division entiere
+            int idxRobotMsg =
+                (int)(idxMinDist / NUM_ROBOTS_PER_COLOR);  // Division entiere
+            // On update la position du robot correspondant dans le modele
+            robotsVec_.at(idxRobotModel)
+                ->setPos(msg->targets[idxRobotMsg].poseOrigin.pose.position);
+            // On elimine la colonne et la ligne
+            for (int ligne = 0; ligne < NUM_ROBOTS_PER_COLOR; ligne++) {
+                for (int colonne = 0; colonne < msg->targets.size();
+                     colonne++) {
+                    if (ligne == idxRobotModel || colonne == idxRobotMsg) {
+                        ModelMsgDistancesForRedRobots.at(
+                            ligne + colonne * NUM_ROBOTS_PER_COLOR) = -1;
+                    }
                 }
             }
+        } else {
+            ROS_ERROR("Did not match any robot for i = %i", i);
         }
     }
 
-      //Vert
+    // Vert
     for (int i = 0; i < msg->targets.size(); i++) {
         int idxMinDist = -1;
         double minDist = DBL_MAX;
-        for (int j = 0; j < NUM_ROBOTS_PER_COLOR * msg->targets.size(); j++)
-        {
-            if (ModelMsgDistancesForGreenRobots.at(j) > 0
-            && ModelMsgDistancesForGreenRobots.at(j) < minDist)
-            {
+        for (int j = 0; j < ModelMsgDistancesForGreenRobots.size(); j++) {
+            if (ModelMsgDistancesForGreenRobots.at(j) > 0 &&
+                ModelMsgDistancesForGreenRobots.at(j) < minDist) {
                 idxMinDist = j;
-                minDist = ModelMsgDistancesForRedRobots.at(j);
+                minDist = ModelMsgDistancesForGreenRobots.at(j);
             }
         }
-        int idxRobotModel = idxMinDist % NUM_ROBOTS_PER_COLOR; //Reste de la division entiere
-        int idxRobotMsg = (int)(idxMinDist/NUM_ROBOTS_PER_COLOR); //Division entiere
-        //On update la position du robot correspondant dans le modele
-        robotsVec_.at(NUM_ROBOTS_PER_COLOR + idxRobotModel)->setPos(msg->targets[idxRobotMsg].poseOrigin.pose.position);
-        //On elimine la colonne et la ligne
-        for (int ligne = 0; ligne < NUM_ROBOTS_PER_COLOR; ligne ++)
+        if (idxMinDist != -1)
         {
-            for (int colonne = 0; colonne < msg->targets.size(); colonne++)
-            {
-                if (ligne == idxRobotModel || colonne == idxRobotMsg)
-                {
-                    ModelMsgDistancesForGreenRobots.at(ligne + colonne * NUM_ROBOTS_PER_COLOR) = -1;   
+int idxRobotModel =
+            idxMinDist % NUM_ROBOTS_PER_COLOR;  // Reste de la division entiere
+        int idxRobotMsg =
+            (int)(idxMinDist / NUM_ROBOTS_PER_COLOR);  // Division entiere
+        // On update la position du robot correspondant dans le modele
+        robotsVec_.at(NUM_ROBOTS_PER_COLOR + idxRobotModel)
+            ->setPos(msg->targets[idxRobotMsg].poseOrigin.pose.position);
+        // On elimine la colonne et la ligne
+        for (int ligne = 0; ligne < NUM_ROBOTS_PER_COLOR; ligne++) {
+            for (int colonne = 0; colonne < msg->targets.size(); colonne++) {
+                if (ligne == idxRobotModel || colonne == idxRobotMsg) {
+                    ModelMsgDistancesForGreenRobots.at(
+                        ligne + colonne * NUM_ROBOTS_PER_COLOR) = -1;
                 }
             }
+        }
+        }
+        
+                else
+        {
+            ROS_ERROR("Did not match any robot for i = %i", i);
         }
     }
 }
@@ -174,8 +188,8 @@ void TrackingHandler::subCallback(
 
     getInstance()->AssignRobots(msg);
 
-    //getInstance()->clearRobots();
-    //getInstance()->drawResultImage();
+    // getInstance()->clearRobots();
+    getInstance()->drawResultImage();
 }
 
 void TrackingHandler::drawResultImage() {
@@ -183,29 +197,29 @@ void TrackingHandler::drawResultImage() {
     cv::Mat_<cv::Vec3b> img(400, 400, cv::Vec3b(255, 255, 255));
 
     for (int i = 0; i < robotsVec_.size(); i++) {
-        if (!robotsVec_.at(i)->isNew) {
-            // Add result to image
-            float x = robotsVec_.at(i)->getPos().x * 20 + 200;
-            float y = robotsVec_.at(i)->getPos().y * 20 + 200;
+        // if (!robotsVec_.at(i)->isNew) {
+        // Add result to image
+        float x = robotsVec_.at(i)->getPos().x * 20 + 200;
+        float y = robotsVec_.at(i)->getPos().y * 20 + 200;
 
-            cv::Scalar textColor;
-            if (robotsVec_.at(i)->getColor() == GREEN) {
-                textColor = cv::Scalar(0, 255, 0);
+        cv::Scalar textColor;
+        if (robotsVec_.at(i)->getColor() == GREEN) {
+            textColor = cv::Scalar(0, 255, 0);
 
-            } else if (robotsVec_.at(i)->getColor() == RED) {
-                textColor = cv::Scalar(0, 0, 255);
-            } else {
-                // Write in black
-                textColor = cv::Scalar(255, 255, 255);
-            }
-            cv::putText(img, std::to_string(robotsVec_.at(i)->getId()), cv::Point(x, y),
-                        CV_FONT_HERSHEY_SIMPLEX, 1.0, textColor, 2);
+        } else if (robotsVec_.at(i)->getColor() == RED) {
+            textColor = cv::Scalar(0, 0, 255);
+        } else {
+            // Write in black
+            textColor = cv::Scalar(255, 255, 255);
         }
+        cv::putText(img, std::to_string(robotsVec_.at(i)->getId()),
+                    cv::Point(x, y), CV_FONT_HERSHEY_SIMPLEX, 1.0, textColor,
+                    2);
+        // }
     }
     // Show image
     cv::imshow("Tracking-results", img);
     cv::waitKey(1);
-    
 }
 void TrackingHandler::clearRobots() {
     // Removed all assigned tags
