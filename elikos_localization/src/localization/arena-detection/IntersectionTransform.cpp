@@ -245,7 +245,7 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
 
             tf::Vector3 offset = estimate - state_.getOrigin2Fcu().getOrigin();
 
-            if (offset.length() > 0.1)
+            if (offset.length() > 0.3)
             {
                 resetPivot();
                 ROS_WARN("OFFSET > 0.1 - RESET PIVOT");
@@ -256,7 +256,7 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             }
         } else {
             ROS_WARN("NO MATCH - RESET PIVOT");
-            resetPivot();
+            //resetPivot();
         }
     }
 
