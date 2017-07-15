@@ -6,22 +6,27 @@
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_front" />
       <arg name="cfg" value="gazebo_r200_front"/>
+      <arg name="calib" value="gazebo_front.yaml"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_right" />
       <arg name="cfg" value="gazebo_r200_right"/>
+      <arg name="calib" value="gazebo_front.yaml"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_left" />
       <arg name="cfg" value="gazebo_r200_left"/>
+      <arg name="calib" value="gazebo_front.yaml"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_back" />
       <arg name="cfg" value="gazebo_r200_back"/>
+      <arg name="calib" value="gazebo_front.yaml"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_ffmv_bottom" />
       <arg name="cfg" value="gazebo_ffmv_bottom"/>
+      <arg name="calib" value="gazebo_bottom.yaml"/>
   </include>
 
   <!-- Target transformation -->
