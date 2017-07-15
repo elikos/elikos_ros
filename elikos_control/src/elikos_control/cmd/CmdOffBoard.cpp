@@ -72,7 +72,7 @@ void CmdOffBoard::execute()
     bool isDone = false;
     while (!isDone)
     {
-        ros::spinOnce();
+       
         lastRequest_ = ros::Time::now();
 
         try {
@@ -125,6 +125,8 @@ void CmdOffBoard::execute()
         {
             isDone = true;
         }
+         ros::spinOnce();
+         rate.sleep();
     }
     ROS_ERROR("Finished offboard command");
 }
