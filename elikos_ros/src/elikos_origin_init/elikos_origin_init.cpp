@@ -28,6 +28,13 @@ int main(int argc, char* argv[])
   tf::TransformBroadcaster tf_broadcaster_;
   tf::StampedTransform arenaOriginTransform;
 
+
+  while (!tf_listener_.canTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time(0))) 
+  {
+      tf_broadcaster_.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion::getIdentity(), tf::Vector3(0.0, 0.0, 0.17)), 
+          ros::Time::now(), ELIKOS_LOCAL_ORIGIN, ELIKOS_VISION));
+  }
+
   tf::StampedTransform initialFcu;
   try {
     tf_listener_.waitForTransform(ELIKOS_LOCAL_ORIGIN, ELIKOS_FCU, ros::Time::now(), ros::Duration(5.0));
@@ -40,6 +47,7 @@ int main(int argc, char* argv[])
   bool lookupDone = false;
 
   ros::ServiceServer service = n.advertiseService("elikos_origin_init", initialize);
+  
 
   ros::Rate r(10);
   while(ros::ok())
@@ -64,7 +72,7 @@ int main(int argc, char* argv[])
     		}
     		catch (tf::TransformException &ex) {
     			ROS_ERROR("Origin init failed!!!! Exception : %s",ex.what());
-          tf_broadcaster_.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion::getIdentity(), tf::Vector3(0.0, 0.0, 0.14)), 
+          tf_broadcaster_.sendTransform(tf::StampedTransform(tf::Transform(tf::Quaternion::getIdentity(), tf::Vector3(0.0, 0.0, 0.17)), 
               ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_VISION));
     		}
       }
