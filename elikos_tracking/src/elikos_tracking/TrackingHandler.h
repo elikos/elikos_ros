@@ -23,7 +23,7 @@ class TrackingHandler {
     std::shared_ptr<Robot> getRobotAtIndex(int index);
     void clearRobots();
     void drawResultImage();
-    int DoMatch(geometry_msgs::Point inputPoint, uint8_t color);
+    void MatchRobots(std::vector<double>& ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr& msg);
     void AssignRobots(const elikos_ros::TargetRobotArray::ConstPtr& msg);
     static void subCallback(const elikos_ros::TargetRobotArray::ConstPtr& msg);
     static void incertitudeCallback(const ros::TimerEvent& e);
