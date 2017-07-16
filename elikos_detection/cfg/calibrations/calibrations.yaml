@@ -6,3 +6,5 @@
 - front_calib_poly.yaml
 - left_calib_poly.yaml
 - back_calib_poly.yaml
+- gazebo_front.yaml
+- gazebo_bottom.yaml
