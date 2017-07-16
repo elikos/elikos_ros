@@ -26,6 +26,7 @@ class TrackingHandler {
     int DoMatch(geometry_msgs::Point inputPoint, uint8_t color);
     void AssignRobots(const elikos_ros::TargetRobotArray::ConstPtr& msg);
     static void subCallback(const elikos_ros::TargetRobotArray::ConstPtr& msg);
+    static void incertitudeCallback(const ros::TimerEvent& e);
     void publishTargets();
 
    private:

@@ -7,7 +7,7 @@
 class Robot {
    public:
     Robot(int id, uint8_t color);
-    Robot();
+   // Robot();
     ~Robot();
 
     /* void setPos(geometry_msgs::PoseStamped pose);
@@ -28,7 +28,7 @@ class Robot {
     void setTime(ros::Time time);
     ros::Time getTime();
 
-    void setIncertitude(double incertitude);
+   // void setIncertitude(double incertitude);
     double getIncertitude();
 
     void setSpeed(double speed);
