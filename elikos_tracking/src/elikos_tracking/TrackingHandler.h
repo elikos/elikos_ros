@@ -9,6 +9,8 @@
 #include <vector>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
+#include <visualization_msgs/MarkerArray.h>
+#include <visualization_msgs/Marker.h>
 
 const int NUM_ROBOTS_PER_COLOR = 5;
 
@@ -24,11 +26,16 @@ class TrackingHandler {
     int DoMatch(geometry_msgs::Point inputPoint, uint8_t color);
     void AssignRobots(const elikos_ros::TargetRobotArray::ConstPtr& msg);
     static void subCallback(const elikos_ros::TargetRobotArray::ConstPtr& msg);
+    void publishTargets();
 
    private:
 
     TrackingHandler();
     static TrackingHandler* handlerInstance_;
+    ros::Publisher targetsPub_;
+    ros::Publisher debugPub_;
+    visualization_msgs::Marker marker_;
+
     //std::vector<std::unique_ptr<Robot>> redRobots_;
     //std::vector<std::unique_ptr<Robot>> greenRobots_;
     std::vector<std::shared_ptr<Robot>> robotsVec_;

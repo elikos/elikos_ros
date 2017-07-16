@@ -26,12 +26,13 @@ int main(int argc, char** argv) {
     cv::Mat_<cv::Vec3b> img(400, 400, cv::Vec3b(0, 0, 255));
     cv::namedWindow("Tracking-results", CV_WINDOW_AUTOSIZE);
     cv::imshow("Tracking-results", img);
-    TrackingHandler::getInstance();
     ros::init(argc, argv, "tracking_node");
 
     ros::NodeHandle n;
     ros::Subscriber sub = n.subscribe("/elikos_target_robot_array", 1000,
                                       TrackingHandler::subCallback);
+
+    TrackingHandler::getInstance();
 
     // Timer pour calcul de l'incertitude
     // ros::Timer timer = n.createTimer(ros::Duration(0.1),
