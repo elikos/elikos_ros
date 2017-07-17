@@ -27,7 +27,7 @@ private:
     ros::ServiceClient landingClient_;
     mavros_msgs::CommandTOL landingCmd_;
 
-    double threshold_ = 0.2;
+    double threshold_;
     
 };
 

@@ -16,6 +16,9 @@ CmdLanding::CmdLanding(ros::NodeHandle* nh, int id)
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 0.0 }));
     targetPosition_.child_frame_id_ = SETPOINT;
     targetPosition_.frame_id_ = WORLD_FRAME;
+
+	threshold_ = 0.8;
+	nh_->getParam("/elikos_ai/min_step", threshold_);
 }
 
 CmdLanding::~CmdLanding()

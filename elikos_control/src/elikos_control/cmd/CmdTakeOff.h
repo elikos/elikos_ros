@@ -8,11 +8,11 @@
 
 #include "CmdAbs.h"
 
-class CmdOffBoard : public CmdAbs
+class CmdTakeOff : public CmdAbs
 {
 public:
-    CmdOffBoard(ros::NodeHandle* nh, int id);
-    virtual ~CmdOffBoard();
+    CmdTakeOff(ros::NodeHandle* nh, int id);
+    virtual ~CmdTakeOff();
 
     virtual void execute();
     virtual void abort();
@@ -20,7 +20,7 @@ public:
     void stateCallBack(const mavros_msgs::State::ConstPtr& msg);
 
 private:
-    CmdOffBoard() = delete;
+    CmdTakeOff() = delete;
 
     ros::ServiceClient armingClient_;
     ros::ServiceClient setModeClient_;
@@ -36,7 +36,7 @@ private:
     tf::StampedTransform targetPosition_;
     tf::StampedTransform lastPosition_;
 
-    double threshold_ = 0.2;
+    double threshold_;
     
 };
 

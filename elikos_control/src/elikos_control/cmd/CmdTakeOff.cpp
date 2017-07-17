@@ -1,16 +1,16 @@
-#include "CmdOffBoard.h"
+#include "CmdTakeOff.h"
 
-CmdOffBoard::CmdOffBoard(ros::NodeHandle* nh, int id)
+CmdTakeOff::CmdTakeOff(ros::NodeHandle* nh, int id)
     : CmdAbs(nh, id)    
 {
-    cmdPriority_ = PriorityLevel::OFFBOARD;
+    cmdPriority_ = PriorityLevel::TAKEOFF_PRIORITY;
     cmdCode_ = CmdCode::TAKEOFF;
 
-    stateSub_ = nh_->subscribe<mavros_msgs::State>("mavros/state", 10, &CmdOffBoard::stateCallBack, this);
+    stateSub_ = nh_->subscribe<mavros_msgs::State>("mavros/state", 10, &CmdTakeOff::stateCallBack, this);
     armingClient_ = nh_->serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
     setModeClient_ = nh_->serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
     
-    offbSetMode_.request.custom_mode = "OFFBOARD";
+    offbSetMode_.request.custom_mode = "TakeOff";
     armCmd_.request.value = true;
 
     double takeoff_altitude = 1;
@@ -18,19 +18,22 @@ CmdOffBoard::CmdOffBoard(ros::NodeHandle* nh, int id)
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, takeoff_altitude }));
     targetPosition_.child_frame_id_ = SETPOINT;
     targetPosition_.frame_id_ = WORLD_FRAME;
+
+	threshold_ = 0.8;
+	nh_->getParam("/elikos_ai/min_step", threshold_);
 }
 
-CmdOffBoard::~CmdOffBoard()
+CmdTakeOff::~CmdTakeOff()
 {
     int i = 0;
 }
 
-void CmdOffBoard::stateCallBack(const mavros_msgs::State::ConstPtr& msg)
+void CmdTakeOff::stateCallBack(const mavros_msgs::State::ConstPtr& msg)
 {
     currentState_ = *msg;
 }
 
-void CmdOffBoard::execute()
+void CmdTakeOff::execute()
 {
     std_msgs::String msg;
     msg.data = "Take off";
@@ -91,7 +94,7 @@ void CmdOffBoard::execute()
 }
 
 
-void CmdOffBoard::abort()
+void CmdTakeOff::abort()
 {
     ///
 }

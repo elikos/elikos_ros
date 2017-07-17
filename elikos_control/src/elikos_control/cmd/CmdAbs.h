@@ -14,7 +14,7 @@
 
 enum PriorityLevel {
         LANDING,
-        OFFBOARD,
+        TAKEOFF_PRIORITY,
         INTERACTING,
         ALWAYS_ABORTABLE
     };
