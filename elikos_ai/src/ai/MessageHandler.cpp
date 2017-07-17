@@ -26,6 +26,8 @@ MessageHandler::MessageHandler()
     simPub_ = nh_.advertise<geometry_msgs::PoseStamped>(SETPOINT_TOPIC, 1);
     cmdPub_ = nh_.advertise<elikos_ros::AICmd>(CMD_TOPIC, 1);
     nh_.param<bool>("/elikos_ai/simulation", is_simulation_, false);
+    statePubBehavior_ = nh_.advertise<std_msgs::String>("/elikos_ai_state_behavior", 1);
+    statePubCommand_ = nh_.advertise<std_msgs::String>("/elikos_ai_state_command", 1);
 }
 
 void MessageHandler::freeInstance()
@@ -85,6 +87,20 @@ void MessageHandler::sendDestination(const tf::Vector3& destination, CmdCode cmd
         cmd_msg.cmdCode = cmd_code;
         cmdPub_.publish(cmd_msg);
     }
+}
+
+void MessageHandler::publishAiStateBehavior(std::string state)
+{
+    std_msgs::String msg;
+    msg.data = state;
+    statePubBehavior_.publish(msg);
+}
+
+void MessageHandler::publishAiStateCommand(std::string state)
+{
+    std_msgs::String msg;
+    msg.data = state;
+    statePubCommand_.publish(msg);
 }
 
 }

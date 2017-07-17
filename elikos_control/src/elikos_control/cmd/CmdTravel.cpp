@@ -30,15 +30,16 @@ void CmdTravel::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocat
   tf::Transform tfTrajectoryPoint;
   tf::transformMsgToTF(trajectoryPoint, tfTrajectoryPoint);
 
-  ROS_ERROR_STREAM("setpoint envoyé: " << tfTrajectoryPoint.getOrigin().x() << " : " << tfTrajectoryPoint.getOrigin().y() << " : " << tfTrajectoryPoint.getOrigin().z());
-
   //Broadcast command
   tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), WORLD_FRAME, SETPOINT));
 }
 
 void CmdTravel::execute()
 {
-    ROS_ERROR("CmdTravel");
+    std_msgs::String msg;
+    msg.data = "Travel";
+    statePubCommand_.publish(msg);
+
     isAborted_ = false;
 	ros::Rate rate(30.0);
     

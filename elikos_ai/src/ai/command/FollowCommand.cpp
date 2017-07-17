@@ -24,6 +24,7 @@ FollowCommand::~FollowCommand()
 
 void FollowCommand::execute()
 {
+    ai::MessageHandler::getInstance()->publishAiStateCommand("Follow target command");
     tf::Vector3 destination = target_->getPose().getOrigin();
     destination.setZ(flight_height_);
     MessageHandler::getInstance()->sendDestination(destination, CmdCode::MOVE_TO_POINT);

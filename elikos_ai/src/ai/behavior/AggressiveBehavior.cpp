@@ -64,6 +64,7 @@ void AggressiveBehavior::generateCommands()
 
 int AggressiveBehavior::resolveCurrentStateLevelConcrete()
 {
+    ai::MessageHandler::getInstance()->publishAiStateBehavior("Aggressive Behavior");
     currentTarget_ = arena_->findClosestTargetToGoodLine();
 
     if (currentTarget_ == nullptr)

@@ -32,17 +32,12 @@ void CmdOffBoard::stateCallBack(const mavros_msgs::State::ConstPtr& msg)
 
 void CmdOffBoard::execute()
 {
-    ROS_ERROR("Started offboard command");
+    std_msgs::String msg;
+    msg.data = "Take off";
+    statePubCommand_.publish(msg);
 
     ros::Rate rate(5.0);
 
-    tf::StampedTransform fakeVision;
-    fakeVision.frame_id_ = "elikos_arena_origin";
-    fakeVision.child_frame_id_ = "elikos_vision";
-    fakeVision.getOrigin().setX(0);
-    fakeVision.getOrigin().setY(0);
-    fakeVision.getOrigin().setZ(0.14);
-    fakeVision.stamp_ = ros::Time::now();
 
     bool initialPositionFound = false;
     while(!initialPositionFound)
@@ -52,13 +47,11 @@ void CmdOffBoard::execute()
             initialPositionFound = true;
         } catch (tf::TransformException e) {
             ROS_ERROR("%s",e.what());
-            //tf_broadcaster_.sendTransform(fakeVision);
         }
     }
 
     targetPosition_.getOrigin().setX(lastPosition_.getOrigin().x());
     targetPosition_.getOrigin().setY(lastPosition_.getOrigin().y());
-    //targetPosition_.setOrigin(tf::Vector3(lastPosition_.getOrigin().x(), lastPosition_.getOrigin().y(), targetPosition_.getOrigin().z()));
 
     //send a few setpoints before starting
     for(int i = 0; ros::ok() && i < 100; ++i)
@@ -81,39 +74,6 @@ void CmdOffBoard::execute()
             ROS_ERROR("Last position : %s",e.what());
         }
 
-        fakeVision.getOrigin().setX(lastPosition_.getOrigin().x());
-        fakeVision.getOrigin().setY(lastPosition_.getOrigin().y());
-        fakeVision.getOrigin().setZ(0.14);
-
-        if (currentState_.mode != "OFFBOARD")
-        {
-            /*if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
-            {
-                ROS_INFO("Offboard enabled");
-            } 
-            else 
-            {
-                ROS_INFO("Offboard request failed");
-            }
-            lastRequest_ = ros::Time::now();*/
-        } 
-        if (!currentState_.armed)
-        {
-            /*if (armingClient_.call(armCmd_) &&
-                armCmd_.response.success)
-            {
-                ROS_INFO("Vehicle armed");
-            }
-            else 
-            {
-                ROS_INFO("Vehicle armed request failed");
-            }
-            lastRequest_ = ros::Time::now();*/
-            fakeVision.stamp_ = ros::Time::now();
-            //tf_broadcaster_.sendTransform(fakeVision);
-            // ROS_ERROR("Fake vision");
-        }
-
         double distance = lastPosition_.getOrigin().distance(targetPosition_.getOrigin());
         if (distance > threshold_)
         {
@@ -128,7 +88,6 @@ void CmdOffBoard::execute()
          ros::spinOnce();
          rate.sleep();
     }
-    ROS_ERROR("Finished offboard command");
 }
 
 

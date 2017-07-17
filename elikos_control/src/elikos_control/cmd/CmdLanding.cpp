@@ -25,7 +25,10 @@ CmdLanding::~CmdLanding()
 
 void CmdLanding::execute()
 {
-    ROS_ERROR("Started landing command");
+    std_msgs::String msg;
+    msg.data = "Landing";
+    statePubCommand_.publish(msg);
+
     ros::Rate rate(30.0);
     // TODO: Essayer a nouveau si le lookup echoue.
     tf::StampedTransform currentPosition;

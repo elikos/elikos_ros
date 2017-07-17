@@ -18,6 +18,8 @@ TakeOffCommand::~TakeOffCommand()
 
 void TakeOffCommand::execute()
 {
+   ai::MessageHandler::getInstance()->publishAiStateCommand("Take off command");
+
    ros::NodeHandle nh;
    double takeoff_altitude;
    nh.getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);

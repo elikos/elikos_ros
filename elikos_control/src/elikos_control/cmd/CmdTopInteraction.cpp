@@ -20,7 +20,10 @@ CmdTopInteraction::~CmdTopInteraction()
 
 void CmdTopInteraction::execute()
 {
-    ROS_ERROR("WATCH OUT!!! TOP INTERACTION!! :O");
+    std_msgs::String msg;
+    msg.data = "Top Interaction";
+    statePubCommand_.publish(msg);
+
     isAborted_ =false;
 
     interactionStatus_ = InteractionState::LANDING;

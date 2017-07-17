@@ -45,7 +45,10 @@ void CmdFrontInteraction::TakeABreak()
 
 void CmdFrontInteraction::execute()
 {
-    ROS_ERROR("WATCH OUT!!! FRONT INTERACTION!! :O");
+    std_msgs::String msg;
+    msg.data = "Front Interaction";
+    statePubCommand_.publish(msg);
+
     interactionStatus_ = InteractionState::LANDING;
     ros::Rate rate(30.0);
     isSleeping_ = false;

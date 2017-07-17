@@ -5,6 +5,7 @@
 #include <memory>
 #include "Timer.h"
 #include <tf/transform_listener.h>
+#include "MessageHandler.h"
 
 namespace ai
 {

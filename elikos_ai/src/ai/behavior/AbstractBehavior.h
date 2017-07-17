@@ -9,6 +9,7 @@
 #include "CommandQueue.h"
 #include "AbstractBehavior.h"
 #include <tf/transform_listener.h>
+#include "MessageHandler.h"
 
 namespace ai
 {

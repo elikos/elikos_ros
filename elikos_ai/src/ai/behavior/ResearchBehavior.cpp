@@ -12,7 +12,6 @@ namespace ai
 ResearchBehavior::ResearchBehavior(AbstractArena* arena)
     : AbstractBehavior(arena)
 {
-   
    q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), &tf_listener_)));
 }
 
@@ -43,6 +42,7 @@ void ResearchBehavior::generateCommands()
 
 int ResearchBehavior::resolveCurrentStateLevelConcrete()
 {
+    ai::MessageHandler::getInstance()->publishAiStateBehavior("Research Behavior");
     int stateLevel = 2;
     if (arena_->getNbrOfUpdatedTargets() > 0) {
         stateLevel = 1;

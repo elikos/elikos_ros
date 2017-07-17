@@ -10,6 +10,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <elikos_ros/TrajectoryCmd.h>
 #include "../../../include/CmdDefines.h"
+#include "std_msgs/String.h"
 
 enum PriorityLevel {
         LANDING,
@@ -56,6 +57,8 @@ protected:
 
     tf::TransformListener tf_listener_;
     tf::TransformBroadcaster tf_broadcaster_;
+    
+    ros::Publisher statePubCommand_;
 
 private:
     CmdAbs() = delete;

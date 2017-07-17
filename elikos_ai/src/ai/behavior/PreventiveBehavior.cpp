@@ -37,6 +37,7 @@ void PreventiveBehavior::generateCommands()
 
 int PreventiveBehavior::resolveCurrentStateLevelConcrete()
 {
+    ai::MessageHandler::getInstance()->publishAiStateBehavior("Preventive Behavior");
     int stateLevel = 1;
     TargetRobot* target = arena_->findHighestPriorityTarget();
     if (target != nullptr)
