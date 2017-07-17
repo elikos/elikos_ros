@@ -27,6 +27,7 @@ public:
 private:
     ObservationCommand() = delete;
     util::Timer timer_;
+    tf::Point observation_position_;
 };
 
 }

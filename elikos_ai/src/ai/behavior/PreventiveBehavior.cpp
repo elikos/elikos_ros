@@ -5,7 +5,7 @@
 #include "AbstractArena.h"
 #include "CommandTypes.h"
 #include "FollowCommand.h"
-#include "FrontInteractionCommand.h"
+#include "TopInteractionCommand.h"
 #include "Configuration.h"
 
 #include "PreventiveBehavior.h"
@@ -29,7 +29,8 @@ void PreventiveBehavior::generateCommands()
 
     if (target != nullptr) {
         q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, target)));
-        q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, target)));
+        q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, target)));
+        //q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), &tf_listener_)));
         q_.push(std::unique_ptr<ObservationCommand>(new ObservationCommand(quad, target)));
     }
 }

@@ -45,7 +45,7 @@ void CmdFrontInteraction::TakeABreak()
 
 void CmdFrontInteraction::execute()
 {
-    ROS_ERROR("CmdFrontInteraction");
+    ROS_ERROR("WATCH OUT!!! FRONT INTERACTION!! :O");
     interactionStatus_ = InteractionState::LANDING;
     ros::Rate rate(30.0);
     isSleeping_ = false;
@@ -90,7 +90,6 @@ void CmdFrontInteraction::execute()
                 interactionStatus_ = InteractionState::HAS_TOUCHED_GROUND;
                 
                 landingClient_.call(landingCmd_);
-                ROS_ERROR("LANDING!");
                 if(landingCmd_.response.success)
                 {
                     //faire une pause au sol. Éventuellement remplacer par signal capteur.

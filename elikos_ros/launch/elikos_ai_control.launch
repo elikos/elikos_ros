@@ -1,4 +1,7 @@
 <launch>
+  <!-- Tracking -->
+	<include file="$(find elikos_tracking)/launch/elikos_tracking.launch"/>
+
   <!-- AI -->
   <include file="$(find elikos_ai)/launch/ai.launch"/>
 

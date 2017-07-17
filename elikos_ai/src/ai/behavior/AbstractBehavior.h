@@ -8,6 +8,7 @@
 #include <context/AbstractArena.h>
 #include "CommandQueue.h"
 #include "AbstractBehavior.h"
+#include <tf/transform_listener.h>
 
 namespace ai
 {
@@ -32,6 +33,8 @@ protected:
     std::vector<AbstractConsideration*> considerations_;
 
     virtual int resolveCurrentStateLevelConcrete() = 0;
+
+    tf::TransformListener tf_listener_;
 
 private:
     bool isEnabled_{ true };

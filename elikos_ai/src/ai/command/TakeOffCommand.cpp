@@ -7,8 +7,8 @@
 namespace ai
 {
 
-TakeOffCommand::TakeOffCommand(QuadRobot* quad, const tf::Point& destination)
-    : AbstractCommand(quad, nullptr), destination_(destination)
+TakeOffCommand::TakeOffCommand(QuadRobot* quad, tf::TransformListener* tf_listener)
+    : AbstractCommand(quad, nullptr), tf_listener_(tf_listener)
 {
 }
 
@@ -18,6 +18,20 @@ TakeOffCommand::~TakeOffCommand()
 
 void TakeOffCommand::execute()
 {
+   ros::NodeHandle nh;
+   double takeoff_altitude;
+   nh.getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);
+
+   tf::StampedTransform currentPosition;
+   try {
+        tf_listener_->lookupTransform("elikos_arena_origin", "elikos_fcu", ros::Time(0), currentPosition);
+    } catch (tf::TransformException e) {
+        ROS_ERROR("TAKEOFF : %s",e.what());
+    }
+    destination_.setX(currentPosition.getOrigin().x());
+    destination_.setY(currentPosition.getOrigin().y());
+    destination_.setZ(takeoff_altitude);
+
     MessageHandler::getInstance()->sendDestination(destination_, CmdCode::TAKEOFF);
 }
 

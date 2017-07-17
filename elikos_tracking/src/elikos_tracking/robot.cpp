@@ -19,6 +19,7 @@ double Robot::getDistanceFrom(geometry_msgs::Point pos) {
 }
 
 void Robot::setPos(geometry_msgs::Point point) {
+    this->isNew = false;
     this->poseOrigin = point;
     // this->poseOrigin.header.stamp = ros::Time::now();
     this->incertitude = 1.0;

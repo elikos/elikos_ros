@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: elikos_tracking
+Description: Description of elikos_tracking
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: roscpp cv_bridge elikos_ros geometry_msgs std_msgs tf

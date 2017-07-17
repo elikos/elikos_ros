@@ -1,4 +1,4 @@
-dimension_c: 4
+dimension_c: 20
 research_altitude: 1
 takeoff_altitude: 1
 edge_tolerance: 0.1

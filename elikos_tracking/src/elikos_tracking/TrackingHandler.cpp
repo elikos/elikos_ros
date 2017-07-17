@@ -5,15 +5,18 @@
 #define RED 2
 #define GREEN 1
 
-TrackingHandler* TrackingHandler::handlerInstance_ = 0;
+TrackingHandler *TrackingHandler::handlerInstance_ = 0;
 
-TrackingHandler::TrackingHandler() {
+TrackingHandler::TrackingHandler()
+{
     // Init all robots
     // TODO : assign initial position ?
-    for (int id = 0; id < NUM_ROBOTS_PER_COLOR; id++) {
+    for (int id = 0; id < NUM_ROBOTS_PER_COLOR; id++)
+    {
         robotsVec_.push_back(std::make_shared<Robot>(id, RED));
     }
-    for (int id = NUM_ROBOTS_PER_COLOR; id < NUM_ROBOTS_PER_COLOR * 2; id++) {
+    for (int id = NUM_ROBOTS_PER_COLOR; id < NUM_ROBOTS_PER_COLOR * 2; id++)
+    {
         robotsVec_.push_back(std::make_shared<Robot>(id, GREEN));
     }
 
@@ -39,91 +42,110 @@ TrackingHandler::TrackingHandler() {
     marker_.scale.x = 0.2;
     marker_.scale.y = 0.2;
     marker_.scale.z = 0.2;
-    marker_.color.a = 1.0;  // Don't forget to set the alpha!
+    marker_.color.a = 1.0; // Don't forget to set the alpha!
     marker_.color.r = 1.0;
     marker_.color.g = 0.0;
     marker_.color.b = 0.0;
     marker_.lifetime.sec = 0;
 }
 
-TrackingHandler* TrackingHandler::getInstance() {
-    if (!handlerInstance_) {
+TrackingHandler *TrackingHandler::getInstance()
+{
+    if (!handlerInstance_)
+    {
         handlerInstance_ = new TrackingHandler();
     }
     return handlerInstance_;
 }
-std::shared_ptr<Robot> TrackingHandler::getRobotAtIndex(int index) {
+std::shared_ptr<Robot> TrackingHandler::getRobotAtIndex(int index)
+{
     return robotsVec_.at(index);
 }
 
-void TrackingHandler::MatchRobots(std::vector<double>& ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr& msg)
+void TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr &msg)
 {
     int idxMinDist = -1;
     double minDist = DBL_MAX;
-    for (int j = 0; j < ModelMsgDistances.size(); j++) {
-            if ((ModelMsgDistances.at(j) >= 0) &&
-                (ModelMsgDistances.at(j) < minDist)) {
-                idxMinDist = j;
-                minDist = ModelMsgDistances.at(j);
-            }
+    for (int j = 0; j < ModelMsgDistances.size(); j++)
+    {
+        if ((ModelMsgDistances.at(j) >= 0) &&
+            (ModelMsgDistances.at(j) < minDist))
+        {
+            idxMinDist = j;
+            minDist = ModelMsgDistances.at(j);
         }
-        if (idxMinDist != -1) {
-            int idxRobotModel =
-                idxMinDist %
-                NUM_ROBOTS_PER_COLOR;  // Reste de la division entiere
-            int idxRobotMsg =
-                (int)(idxMinDist / NUM_ROBOTS_PER_COLOR);  // Division entiere
-            // Si la nouvelle position n'est pas comprise dans lincertitude du
-            // modele, on laisse tomber le message
-            if (robotsVec_.at(idxRobotModel)->getIncertitude() > minDist) {
-                // On update la position du robot correspondant dans le modele
-                robotsVec_.at(idxRobotModel)
-                    ->setPos(
-                        msg->targets[idxRobotMsg].poseOrigin.pose.position);
-                // On elimine la colonne et la ligne
-                for (int ligne = 0; ligne < NUM_ROBOTS_PER_COLOR; ligne++) {
-                    for (int colonne = 0; colonne < msg->targets.size();
-                         colonne++) {
-                        if (ligne == idxRobotModel || colonne == idxRobotMsg) {
-                            ModelMsgDistances.at(
-                                ligne + colonne * NUM_ROBOTS_PER_COLOR) = -1;
-                        }
+    }
+    if (idxMinDist != -1)
+    {
+        int idxRobotModel =
+            idxMinDist %
+            NUM_ROBOTS_PER_COLOR; // Reste de la division entiere
+        int idxRobotMsg =
+            (int)(idxMinDist / NUM_ROBOTS_PER_COLOR); // Division entiere
+        // Si la nouvelle position n'est pas comprise dans lincertitude du
+        // modele, on laisse tomber le message
+        if (robotsVec_.at(idxRobotModel)->getIncertitude() > minDist)
+        {
+            // On update la position du robot correspondant dans le modele
+            robotsVec_.at(idxRobotModel)
+                ->setPos(
+                    msg->targets[idxRobotMsg].poseOrigin.pose.position);
+            // On elimine la colonne et la ligne
+            for (int ligne = 0; ligne < NUM_ROBOTS_PER_COLOR; ligne++)
+            {
+                for (int colonne = 0; colonne < msg->targets.size();
+                     colonne++)
+                {
+                    if (ligne == idxRobotModel || colonne == idxRobotMsg)
+                    {
+                        ModelMsgDistances.at(
+                            ligne + colonne * NUM_ROBOTS_PER_COLOR) = -1;
                     }
                 }
             }
-            else {
-                ROS_ERROR("Found robot outside of incertitude range, dist is %f, incertitude is %f.", minDist, robotsVec_.at(idxRobotModel)->getIncertitude());
-            }
-
-        } else {
-            ROS_ERROR("Did not match any robot.");
         }
+        else
+        {
+            //ROS_ERROR("Found robot outside of incertitude range, dist is %f, incertitude is %f.", minDist, robotsVec_.at(idxRobotModel)->getIncertitude());
+        }
+    }
+    else
+    {
+        //ROS_ERROR("Did not match any robot.");
+    }
 }
 void TrackingHandler::AssignRobots(
-    const elikos_ros::TargetRobotArray::ConstPtr& msg) {
+    const elikos_ros::TargetRobotArray::ConstPtr &msg)
+{
     std::vector<double> ModelMsgDistancesForRedRobots(NUM_ROBOTS_PER_COLOR *
                                                       msg->targets.size());
     std::vector<double> ModelMsgDistancesForGreenRobots(NUM_ROBOTS_PER_COLOR *
                                                         msg->targets.size());
 
-    for (int i = 0; i < msg->targets.size(); i++) {
+    for (int i = 0; i < msg->targets.size(); i++)
+    {
         // Creation de tableaux indiquant la distance de chaque robot du modele
         // a chaque robot du message
-        for (int j = 0; j < NUM_ROBOTS_PER_COLOR; j++) {
-            if (msg->targets[i].color == RED) {
+        for (int j = 0; j < NUM_ROBOTS_PER_COLOR; j++)
+        {
+            if (msg->targets[i].color == RED)
+            {
                 ModelMsgDistancesForRedRobots.at(i * NUM_ROBOTS_PER_COLOR + j) =
                     robotsVec_.at(j)->getDistanceFrom(
                         msg->targets[i].poseOrigin.pose.position);
-            } 
-            else if (msg->targets[i].color == GREEN) {
-            ROS_INFO("YAHOO green robots!!!!!!!!!!!");
+            }
+            else if (msg->targets[i].color == GREEN)
+            {
+                //ROS_INFO("YAHOO green robots!!!!!!!!!!!");
 
                 ModelMsgDistancesForGreenRobots.at(i * NUM_ROBOTS_PER_COLOR +
                                                    j) =
                     robotsVec_.at(NUM_ROBOTS_PER_COLOR + j)
                         ->getDistanceFrom(
                             msg->targets[i].poseOrigin.pose.position);
-            } else {
+            }
+            else
+            {
                 ROS_ERROR("Color is neither green nor red.");
             }
         }
@@ -132,45 +154,52 @@ void TrackingHandler::AssignRobots(
     // On prend le plus petit de chaque tableau, puis on elimine la colonne et
     // la ligne correspondante, jusqu'a temps que le tableau soit vide
     // Rouge
-    for (int i = 0; i < msg->targets.size(); i++) {
+    for (int i = 0; i < msg->targets.size(); i++)
+    {
 
         if (msg->targets[i].color == GREEN)
         {
-        MatchRobots(ModelMsgDistancesForGreenRobots, msg);
-
+            MatchRobots(ModelMsgDistancesForGreenRobots, msg);
         }
         else if (msg->targets[i].color == RED)
         {
-        MatchRobots(ModelMsgDistancesForRedRobots, msg);
-
+            MatchRobots(ModelMsgDistancesForRedRobots, msg);
         }
     }
 }
 
 void TrackingHandler::subCallback(
-    const elikos_ros::TargetRobotArray::ConstPtr& msg) {
+    const elikos_ros::TargetRobotArray::ConstPtr &msg)
+{
     getInstance()->AssignRobots(msg);
 
     getInstance()->drawResultImage();
     getInstance()->publishTargets();
 }
 
-void TrackingHandler::drawResultImage() {
+void TrackingHandler::drawResultImage()
+{
     // Init result image
     cv::Mat_<cv::Vec3b> img(400, 400, cv::Vec3b(255, 255, 255));
 
-    for (int i = 0; i < robotsVec_.size(); i++) {
+    for (int i = 0; i < robotsVec_.size(); i++)
+    {
         // if (!robotsVec_.at(i)->isNew) {
         // Add result to image
         float x = robotsVec_.at(i)->getPos().x * 20 + 200;
         float y = robotsVec_.at(i)->getPos().y * 20 + 200;
 
         cv::Scalar textColor;
-        if (robotsVec_.at(i)->getColor() == GREEN) {
+        if (robotsVec_.at(i)->getColor() == GREEN)
+        {
             textColor = cv::Scalar(0, 255, 0);
-        } else if (robotsVec_.at(i)->getColor() == RED) {
+        }
+        else if (robotsVec_.at(i)->getColor() == RED)
+        {
             textColor = cv::Scalar(0, 0, 255);
-        } else {
+        }
+        else
+        {
             // Write in black
             textColor = cv::Scalar(255, 255, 255);
         }
@@ -180,48 +209,57 @@ void TrackingHandler::drawResultImage() {
         // }
     }
     // Show image
-    cv::imshow("Tracking-results", img);
-    cv::waitKey(1);
+    //cv::imshow("Tracking-results", img);
+    //cv::waitKey(1);
 }
 
-void TrackingHandler::publishTargets() {
+void TrackingHandler::publishTargets()
+{
     elikos_ros::TargetRobotArray msgTargetArray;
     // Debug
     visualization_msgs::MarkerArray msgDebugArray;
-    for (int i = 0; i < robotsVec_.size(); i++) {
-        elikos_ros::TargetRobot msg;
-        msg.id = robotsVec_.at(i)->getId();
-        msg.color = robotsVec_.at(i)->getColor();
-        msg.poseOrigin.pose.position = robotsVec_.at(i)->getPos();
-        msg.poseOrigin.header.stamp = ros::Time::now();
-        msg.poseOrigin.header.frame_id = "elikos_arena_origin";
+    for (int i = 0; i < robotsVec_.size(); i++)
+    {
+        if (!robotsVec_.at(i)->isNew)
+        {
+            elikos_ros::TargetRobot msg;
+            msg.id = robotsVec_.at(i)->getId();
+            msg.color = robotsVec_.at(i)->getColor();
+            msg.poseOrigin.pose.position = robotsVec_.at(i)->getPos();
+            msg.poseOrigin.header.stamp = ros::Time::now();
+            msg.poseOrigin.header.frame_id = "elikos_arena_origin";
 
-        msgTargetArray.targets.push_back(msg);
+            msgTargetArray.targets.push_back(msg);
 
-        // Debug publisher
-        // marker_.pose.position = robotsVec_.at(i)->getPos();
-        marker_.id = i;
-        marker_.pose.position = robotsVec_.at(i)->getPos();
-        marker_.header.stamp = ros::Time::now();
-        marker_.color.r = 255 * (i % 2);
-        marker_.color.g = 255 * ((i / 2) % 2);
-        marker_.color.b = 255 * ((i / 4) % 2);
+            // Debug publisher
+            // marker_.pose.position = robotsVec_.at(i)->getPos();
+            marker_.id = i;
+            marker_.pose.position = robotsVec_.at(i)->getPos();
+            marker_.header.stamp = ros::Time::now();
+            marker_.color.r = 255 * (i % 2);
+            marker_.color.g = 255 * ((i / 2) % 2);
+            marker_.color.b = 255 * ((i / 4) % 2);
 
-        if (i == robotsVec_.size() - 1) {
-            marker_.color.r = 0;
-            marker_.color.g = 120;
-            marker_.color.b = 255;
+            if (i == robotsVec_.size() - 1)
+            {
+                marker_.color.r = 0;
+                marker_.color.g = 120;
+                marker_.color.b = 255;
+            }
+            msgDebugArray.markers.push_back(marker_);
         }
-        msgDebugArray.markers.push_back(marker_);
     }
+
     targetsPub_.publish(msgTargetArray);
     debugPub_.publish(msgDebugArray);
 }
 
-void TrackingHandler::incertitudeCallback(const ros::TimerEvent& e) {
+void TrackingHandler::incertitudeCallback(const ros::TimerEvent &e)
+{
     ros::Duration diffTime = e.current_real - e.last_real;
 
-    for (int i = 0; i < NUM_ROBOTS_PER_COLOR; i++) {
-       getInstance()->getRobotAtIndex(i)->updateIncertitude(diffTime.nsec);
+    for (int i = 0; i < NUM_ROBOTS_PER_COLOR; i++)
+    {
+        getInstance()->getRobotAtIndex(i)->updateIncertitude(diffTime.nsec);
     }
 }
