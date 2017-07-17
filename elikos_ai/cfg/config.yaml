@@ -10,3 +10,4 @@ max_altitude: 2
 min_step: 0.3
 max_step: 2
 has_reach_destination_threshold: 0.5
+interaction_altitude: 0.1

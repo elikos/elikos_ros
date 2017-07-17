@@ -10,7 +10,7 @@ CmdTakeOff::CmdTakeOff(ros::NodeHandle* nh, int id)
     armingClient_ = nh_->serviceClient<mavros_msgs::CommandBool>("mavros/cmd/arming");
     setModeClient_ = nh_->serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
     
-    offbSetMode_.request.custom_mode = "TakeOff";
+    offbSetMode_.request.custom_mode = "OffBoard";
     armCmd_.request.value = true;
 
     double takeoff_altitude = 1;
@@ -20,7 +20,7 @@ CmdTakeOff::CmdTakeOff(ros::NodeHandle* nh, int id)
     targetPosition_.frame_id_ = WORLD_FRAME;
 
 	threshold_ = 0.8;
-	nh_->getParam("/elikos_ai/min_step", threshold_);
+	nh_->getParam("/elikos_ai/has_reach_destination_threshold", threshold_);
 }
 
 CmdTakeOff::~CmdTakeOff()
@@ -57,7 +57,7 @@ void CmdTakeOff::execute()
     targetPosition_.getOrigin().setY(lastPosition_.getOrigin().y());
 
     //send a few setpoints before starting
-    for(int i = 0; ros::ok() && i < 100; ++i)
+    for(int i = 0; ros::ok() && i < 10; ++i)
     {
         targetPosition_.stamp_ = ros::Time::now();
         tf_broadcaster_.sendTransform(targetPosition_);

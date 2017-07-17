@@ -24,7 +24,6 @@ private:
     tf::StampedTransform targetPosition_;
     tf::StampedTransform lastPosition_;
 
-    const double THRESHOLD = 0.05;  //TODO fichier de config
     const double HIGH_OF_ROBOT = 0.1;
 
     enum InteractionState {
@@ -35,6 +34,9 @@ private:
 
     InteractionState interactionStatus_ = InteractionState::LANDING;
     
+    double threshold_;
+    double takeoff_altitude_;
+    double interaction_altitude_;
 };
 
 #endif /// CMD_TOP_INTERACTION_H
