@@ -95,6 +95,8 @@ trajectory_msgs::MultiDOFJointTrajectory Moveit_move_group::move(geometry_msgs::
   catch (tf::TransformException ex){
    ROS_ERROR("%s",ex.what());
    ros::Duration(1.0).sleep();
+   trajectory_msgs::MultiDOFJointTrajectory dumb_traj;
+   return dumb_traj;
   }
 }
 
