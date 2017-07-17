@@ -5,8 +5,6 @@
 #define RED 2
 #define GREEN 1
 
-TrackingHandler *TrackingHandler::handlerInstance_ = 0;
-
 TrackingHandler::TrackingHandler()
 {
     // Init all robots
@@ -23,7 +21,7 @@ TrackingHandler::TrackingHandler()
     // Init publishers & subscriber
     ros::NodeHandle n;
     targetsSub_ = n.subscribe("/elikos_target_robot_array", 1000,
-        TrackingHandler::subCallback);
+      &TrackingHandler::subCallback, this);
     targetsPub_ = n.advertise<elikos_ros::TargetRobotArray>(
         "/elikos_track_robot_array", 1000);
     debugPub_ =  n.advertise<visualization_msgs::MarkerArray>(
@@ -31,7 +29,7 @@ TrackingHandler::TrackingHandler()
 
     // Timer pour calcul de l'incertitude
     ros::Timer timer = n.createTimer(ros::Duration(0.1),
-        TrackingHandler::incertitudeCallback);
+        &TrackingHandler::incertitudeCallback, this);
 
     //Init marker member so we don't have to fill these fields again
     marker_.header.frame_id = "elikos_arena_origin";
@@ -156,13 +154,13 @@ void TrackingHandler::AssignRobots(
 void TrackingHandler::subCallback(
     const elikos_ros::TargetRobotArray::ConstPtr &msg)
 {
-    getInstance()->AssignRobots(msg);
+    AssignRobots(msg);
 
     #if IMG_DEBUG
-    getInstance()->drawResultImage();
+    drawResultImage();
     #endif
 
-    getInstance()->publishTargets();
+    publishTargets();
 }
 
 void TrackingHandler::drawResultImage()
@@ -212,7 +210,7 @@ void TrackingHandler::publishTargets()
             msg.id = robotsVec_.at(i)->getId();
             msg.color = robotsVec_.at(i)->getColor();
             msg.poseOrigin.pose.position = robotsVec_.at(i)->getPos();
-            msg.incertitude = robotsVec_.at(i)->getIncertitude();
+            //msg.incertitude = robotsVec_.at(i)->getIncertitude();
             msg.poseOrigin.header.stamp = ros::Time::now();
             msg.poseOrigin.header.frame_id = "elikos_arena_origin";
             msgTargetArray.targets.push_back(msg);
@@ -246,6 +244,6 @@ void TrackingHandler::incertitudeCallback(const ros::TimerEvent &e)
     for (int i = 0; i < NUM_ROBOTS_PER_COLOR; i++)
     {
       //  getInstance()->getRobotAtIndex(i)->updateIncertitude(diffTime.nsec);
-      robotsVec_(i)->updateIncertitude(diffTime.nsec);
+      robotsVec_.at(i)->updateIncertitude(diffTime.nsec);
     }
 }
