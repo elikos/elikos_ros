@@ -226,9 +226,9 @@ void TrackingHandler::publishTargets()
             msg.id = robotsVec_.at(i)->getId();
             msg.color = robotsVec_.at(i)->getColor();
             msg.poseOrigin.pose.position = robotsVec_.at(i)->getPos();
+            msg.incertitude = robotsVec_.at(i)->getIncertitude();
             msg.poseOrigin.header.stamp = ros::Time::now();
             msg.poseOrigin.header.frame_id = "elikos_arena_origin";
-
             msgTargetArray.targets.push_back(msg);
 
             // Debug publisher
