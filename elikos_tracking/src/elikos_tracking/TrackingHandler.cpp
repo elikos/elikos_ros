@@ -1,6 +1,6 @@
 #include "TrackingHandler.h"
 
-#define DEBUG 1
+#define IMG_DEBUG 0
 
 #define RED 2
 #define GREEN 1
@@ -22,10 +22,16 @@ TrackingHandler::TrackingHandler()
 
     // Init publisher
     ros::NodeHandle n;
+    targetsSub_ = n.subscribe("/elikos_target_robot_array", 1000,
+                                      TrackingHandler::subCallback);
     targetsPub_ = n.advertise<elikos_ros::TargetRobotArray>(
         "/elikos_track_robot_array", 1000);
     debugPub_ =
         n.advertise<visualization_msgs::MarkerArray>("/elikos_track_debug", 1);
+
+    // Timer pour calcul de l'incertitude
+    ros::Timer timer = n.createTimer(ros::Duration(0.1), TrackingHandler::incertitudeCallback);
+
 
     marker_.header.frame_id = "elikos_arena_origin";
 
@@ -136,9 +142,7 @@ void TrackingHandler::AssignRobots(
             }
             else if (msg->targets[i].color == GREEN)
             {
-                //ROS_INFO("YAHOO green robots!!!!!!!!!!!");
-
-                ModelMsgDistancesForGreenRobots.at(i * NUM_ROBOTS_PER_COLOR +
+              ModelMsgDistancesForGreenRobots.at(i * NUM_ROBOTS_PER_COLOR +
                                                    j) =
                     robotsVec_.at(NUM_ROBOTS_PER_COLOR + j)
                         ->getDistanceFrom(
@@ -153,10 +157,8 @@ void TrackingHandler::AssignRobots(
 
     // On prend le plus petit de chaque tableau, puis on elimine la colonne et
     // la ligne correspondante, jusqu'a temps que le tableau soit vide
-    // Rouge
     for (int i = 0; i < msg->targets.size(); i++)
     {
-
         if (msg->targets[i].color == GREEN)
         {
             MatchRobots(ModelMsgDistancesForGreenRobots, msg);
@@ -173,7 +175,10 @@ void TrackingHandler::subCallback(
 {
     getInstance()->AssignRobots(msg);
 
+    #if IMG_DEBUG
     getInstance()->drawResultImage();
+    #endif
+
     getInstance()->publishTargets();
 }
 
@@ -184,7 +189,6 @@ void TrackingHandler::drawResultImage()
 
     for (int i = 0; i < robotsVec_.size(); i++)
     {
-        // if (!robotsVec_.at(i)->isNew) {
         // Add result to image
         float x = robotsVec_.at(i)->getPos().x * 20 + 200;
         float y = robotsVec_.at(i)->getPos().y * 20 + 200;
@@ -206,11 +210,10 @@ void TrackingHandler::drawResultImage()
         cv::putText(img, std::to_string(robotsVec_.at(i)->getId()),
                     cv::Point(x, y), CV_FONT_HERSHEY_SIMPLEX, 1.0, textColor,
                     2);
-        // }
     }
     // Show image
-    //cv::imshow("Tracking-results", img);
-    //cv::waitKey(1);
+    cv::imshow("Tracking-results", img);
+    cv::waitKey(1);
 }
 
 void TrackingHandler::publishTargets()
@@ -232,7 +235,6 @@ void TrackingHandler::publishTargets()
             msgTargetArray.targets.push_back(msg);
 
             // Debug publisher
-            // marker_.pose.position = robotsVec_.at(i)->getPos();
             marker_.id = i;
             marker_.pose.position = robotsVec_.at(i)->getPos();
             marker_.header.stamp = ros::Time::now();
@@ -260,6 +262,7 @@ void TrackingHandler::incertitudeCallback(const ros::TimerEvent &e)
 
     for (int i = 0; i < NUM_ROBOTS_PER_COLOR; i++)
     {
-        getInstance()->getRobotAtIndex(i)->updateIncertitude(diffTime.nsec);
+      //  getInstance()->getRobotAtIndex(i)->updateIncertitude(diffTime.nsec);
+      robotsVec_(i)->updateIncertitude(diffTime.nsec);
     }
 }
