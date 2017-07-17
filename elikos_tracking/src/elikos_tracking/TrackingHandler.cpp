@@ -20,27 +20,23 @@ TrackingHandler::TrackingHandler()
         robotsVec_.push_back(std::make_shared<Robot>(id, GREEN));
     }
 
-    // Init publisher
+    // Init publishers & subscriber
     ros::NodeHandle n;
     targetsSub_ = n.subscribe("/elikos_target_robot_array", 1000,
-                                      TrackingHandler::subCallback);
+        TrackingHandler::subCallback);
     targetsPub_ = n.advertise<elikos_ros::TargetRobotArray>(
         "/elikos_track_robot_array", 1000);
-    debugPub_ =
-        n.advertise<visualization_msgs::MarkerArray>("/elikos_track_debug", 1);
+    debugPub_ =  n.advertise<visualization_msgs::MarkerArray>(
+        "/elikos_track_debug", 1);
 
     // Timer pour calcul de l'incertitude
-    ros::Timer timer = n.createTimer(ros::Duration(0.1), TrackingHandler::incertitudeCallback);
+    ros::Timer timer = n.createTimer(ros::Duration(0.1),
+        TrackingHandler::incertitudeCallback);
 
-
+    //Init marker member so we don't have to fill these fields again
     marker_.header.frame_id = "elikos_arena_origin";
-
-    marker_.id = 0;
     marker_.type = visualization_msgs::Marker::SPHERE;
     marker_.action = visualization_msgs::Marker::ADD;
-    marker_.pose.position.x = 0;
-    marker_.pose.position.y = 0;
-    marker_.pose.position.z = 0;
     marker_.pose.orientation.x = 0.0;
     marker_.pose.orientation.y = 0.0;
     marker_.pose.orientation.z = 0.0;
@@ -53,19 +49,6 @@ TrackingHandler::TrackingHandler()
     marker_.color.g = 0.0;
     marker_.color.b = 0.0;
     marker_.lifetime.sec = 0;
-}
-
-TrackingHandler *TrackingHandler::getInstance()
-{
-    if (!handlerInstance_)
-    {
-        handlerInstance_ = new TrackingHandler();
-    }
-    return handlerInstance_;
-}
-std::shared_ptr<Robot> TrackingHandler::getRobotAtIndex(int index)
-{
-    return robotsVec_.at(index);
 }
 
 void TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr &msg)
