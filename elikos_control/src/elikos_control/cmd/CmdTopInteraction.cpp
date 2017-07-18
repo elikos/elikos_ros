@@ -40,6 +40,8 @@ void CmdTopInteraction::execute()
     groundPosition.setY(cmdDestination_.position.y);
     groundPosition.setX(cmdDestination_.position.x);
     targetPosition_.setOrigin(groundPosition);
+
+    bool has_reached_in_xy = false;
     
     while (interactionStatus_ != InteractionState::DONE  && !isAborted_)
     {
@@ -57,7 +59,7 @@ void CmdTopInteraction::execute()
         tf::StampedTransform aboveTargetPosition = targetPosition_;
         aboveTargetPosition.getOrigin().setZ(takeoff_altitude_);
         double distance = lastPosition_.getOrigin().distance(aboveTargetPosition.getOrigin());
-        if (distance > threshold_)
+        if (distance > threshold_ && !has_reached_in_xy)
         {
             aboveTargetPosition.stamp_ = ros::Time::now();
             tf_broadcaster_.sendTransform(aboveTargetPosition);
@@ -68,6 +70,7 @@ void CmdTopInteraction::execute()
             targetPosition_.stamp_ = ros::Time::now();
             tf_broadcaster_.sendTransform(targetPosition_);
             rate.sleep();
+            has_reached_in_xy = true;
         }
         else 
         {
@@ -81,6 +84,7 @@ void CmdTopInteraction::execute()
                 tf::Vector3 securityPosition = targetPosition_.getOrigin();
                 securityPosition.setZ( 1.0 );
                 targetPosition_.setOrigin(securityPosition);
+                tf_broadcaster_.sendTransform(targetPosition_);
             }
         }
     }
