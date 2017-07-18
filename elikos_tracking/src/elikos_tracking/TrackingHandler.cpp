@@ -49,8 +49,9 @@ TrackingHandler::TrackingHandler()
     marker_.lifetime.sec = 0;
 }
 
-void TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr &msg)
+std::vector<int> TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr &msg)
 {
+    std::vector<int> foundRobotsIdx;
     int idxMinDist = -1;
     double minDist = DBL_MAX;
     for (int j = 0; j < ModelMsgDistances.size(); j++)
@@ -77,6 +78,7 @@ void TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const 
             robotsVec_.at(idxRobotModel)
                 ->setPos(
                     msg->targets[idxRobotMsg].poseOrigin.pose.position);
+            foundRobotsIdx.push_back(idxRobotModel);
             // On elimine la colonne et la ligne
             for (int ligne = 0; ligne < NUM_ROBOTS_PER_COLOR; ligne++)
             {
@@ -101,7 +103,7 @@ void TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const 
         //ROS_ERROR("Did not match any robot.");
     }
 }
-void TrackingHandler::AssignRobots(
+std::vector<int> TrackingHandler::AssignRobots(
     const elikos_ros::TargetRobotArray::ConstPtr &msg)
 {
     std::vector<double> ModelMsgDistancesForRedRobots(NUM_ROBOTS_PER_COLOR *
@@ -138,15 +140,16 @@ void TrackingHandler::AssignRobots(
 
     // On prend le plus petit de chaque tableau, puis on elimine la colonne et
     // la ligne correspondante, jusqu'a temps que le tableau soit vide
+    std::vector<int> foundRobotsIdx;
     for (int i = 0; i < msg->targets.size(); i++)
     {
         if (msg->targets[i].color == GREEN)
         {
-            MatchRobots(ModelMsgDistancesForGreenRobots, msg);
+           foundRobotsIdx = MatchRobots(ModelMsgDistancesForGreenRobots, msg);
         }
         else if (msg->targets[i].color == RED)
         {
-            MatchRobots(ModelMsgDistancesForRedRobots, msg);
+           foundRobotsIdx = MatchRobots(ModelMsgDistancesForRedRobots, msg);
         }
     }
 }
@@ -154,13 +157,14 @@ void TrackingHandler::AssignRobots(
 void TrackingHandler::subCallback(
     const elikos_ros::TargetRobotArray::ConstPtr &msg)
 {
-    AssignRobots(msg);
+    std::vector<int> foundRobotsIdx;
+    foundRobotsIdx = AssignRobots(msg);
 
     #if IMG_DEBUG
     drawResultImage();
     #endif
 
-    publishTargets();
+    publishTargets(foundRobotsIdx);
 }
 
 void TrackingHandler::drawResultImage()
@@ -197,33 +201,34 @@ void TrackingHandler::drawResultImage()
     cv::waitKey(1);
 }
 
-void TrackingHandler::publishTargets()
+void TrackingHandler::publishTargets(std::vector<int>& idsToPublish)
 {
     elikos_ros::TargetRobotArray msgTargetArray;
     // Debug
     visualization_msgs::MarkerArray msgDebugArray;
-    for (int i = 0; i < robotsVec_.size(); i++)
+    for (int j = 0; j < idsToPublish.size(); j++)
     {
-        if (!robotsVec_.at(i)->isNew)
+        int idx = idsToPublish.at(j);
+        if (!robotsVec_.at(idx)->isNew)
         {
             elikos_ros::TargetRobot msg;
-            msg.id = robotsVec_.at(i)->getId();
-            msg.color = robotsVec_.at(i)->getColor();
-            msg.poseOrigin.pose.position = robotsVec_.at(i)->getPos();
+            msg.id = robotsVec_.at(idx)->getId();
+            msg.color = robotsVec_.at(idx)->getColor();
+            msg.poseOrigin.pose.position = robotsVec_.at(idx)->getPos();
             //msg.incertitude = robotsVec_.at(i)->getIncertitude();
             msg.poseOrigin.header.stamp = ros::Time::now();
             msg.poseOrigin.header.frame_id = "elikos_arena_origin";
             msgTargetArray.targets.push_back(msg);
 
             // Debug publisher
-            marker_.id = i;
-            marker_.pose.position = robotsVec_.at(i)->getPos();
+            marker_.id = idx;
+            marker_.pose.position = robotsVec_.at(idx)->getPos();
             marker_.header.stamp = ros::Time::now();
-            marker_.color.r = 255 * (i % 2);
-            marker_.color.g = 255 * ((i / 2) % 2);
-            marker_.color.b = 255 * ((i / 4) % 2);
+            marker_.color.r = 255 * (idx % 2);
+            marker_.color.g = 255 * ((idx / 2) % 2);
+            marker_.color.b = 255 * ((idx / 4) % 2);
 
-            if (i == robotsVec_.size() - 1)
+            if (idx == robotsVec_.size() - 1)
             {
                 marker_.color.r = 0;
                 marker_.color.g = 120;
