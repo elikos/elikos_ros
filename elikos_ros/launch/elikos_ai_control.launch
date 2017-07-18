@@ -11,3 +11,4 @@
   <!-- Control -->
   <include file="$(find elikos_control)/launch/elikos_control.launch" />
 </launch>
+-

@@ -5,8 +5,7 @@
 int main(int argc, char** argv) {
 
     ros::init(argc, argv, "tracking_node");
-
-    TrackingHandler trackHandler();
+    TrackingHandler trackHandler;
 
     ros::spin();
 

@@ -22,18 +22,18 @@ class TrackingHandler {
 
     void drawResultImage();
 
-    std::vector<int> MatchRobots(std::vector<double>& ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr& msg);
-    std::vector<int> AssignRobots(const elikos_ros::TargetRobotArray::ConstPtr& msg);
+    void MatchRobots(std::vector<double>& ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr& msg);
+    void AssignRobots(const elikos_ros::TargetRobotArray::ConstPtr& msg);
 
     void subCallback(const elikos_ros::TargetRobotArray::ConstPtr& msg);
     void incertitudeCallback(const ros::TimerEvent& e);
-    void publishTargets(std::vector<int>& idsToPublish);
+    void publishTargets();
 
    private:
 
     ros::Publisher targetsPub_;
     ros::Subscriber targetsSub_;
-
+ros::Timer timer;
     //Debug purposes
     visualization_msgs::Marker marker_;
     ros::Publisher debugPub_;
