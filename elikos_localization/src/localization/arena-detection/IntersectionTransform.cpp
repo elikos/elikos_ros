@@ -237,26 +237,28 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             totalTranslation_ += averageTranslation;
 
             tf::Vector3 estimate = pivot_ - totalTranslation_;
-
-            // TODO: Add elikos_vision_debug as a parameter.
-            tf::StampedTransform transform(tf::Transform(tf::Quaternion::getIdentity(), estimate),
-                               state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
-            tfPub_.sendTransform(transform);
+            estimate.setZ(state_.getOrigin2Fcu().getOrigin().z());
 
             tf::Vector3 offset = estimate - state_.getOrigin2Fcu().getOrigin();
+            offset.setZ(0.0);
 
-            if (offset.length() > 0.3)
+            double offsetLength = offset.length();
+            if (offsetLength < 0.3)
+            {
+                // TODO: Add elikos_vision_debug as a parameter.
+                tf::StampedTransform transform(tf::Transform(tf::Quaternion::getIdentity(), estimate),
+                                state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
+                tfPub_.sendTransform(transform);
+            }
+            else 
             {
                 resetPivot();
-                ROS_WARN("OFFSET > 0.1 - RESET PIVOT");
-                std::string message = "Transform: [" + std::to_string(averageTranslation.x()) + ", " +
-                                      std::to_string(averageTranslation.y()) + "] with offset [" +
-                                      std::to_string(offset.x()) + ", " + std::to_string(offset.y());
+                std::string message( "OFFSET " + std::to_string(offsetLength));
                 ROS_ERROR("%s", message.c_str());
             }
         } else {
-            ROS_WARN("NO MATCH - RESET PIVOT");
-            //resetPivot();
+            resetPivot();
+            ROS_WARN("%s", "NO MATCH - RESET PIVOT");
         }
     }
 
