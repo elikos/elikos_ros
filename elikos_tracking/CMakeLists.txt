@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   tf
+  message_generation
 )
 find_package(Qt5Gui)
 find_package(Qt5Core)
@@ -36,7 +37,7 @@ include_directories(
 
 add_executable( elikos_tracking
     src/elikos_tracking/elikos_tracking.cpp
-    src/elikos_tracking/robot.cpp
+    src/elikos_tracking/modele/robot.cpp
     src/elikos_tracking/TrackingHandler.cpp
    )
 

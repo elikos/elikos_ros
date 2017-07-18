@@ -1,5 +1,5 @@
 #include <vector>
-#include "robot.h"
+#include "modele/robot.h"
 #include <elikos_ros/TargetRobot.h>
 #include <elikos_ros/TargetRobotArray.h>
 #include <geometry_msgs/Point.h>
@@ -18,27 +18,26 @@ const int NUM_ROBOTS_PER_COLOR = 5;
 class TrackingHandler {
     public:
 
-    static TrackingHandler* getInstance();
+    TrackingHandler();
 
-    std::shared_ptr<Robot> getRobotAtIndex(int index);
-    void clearRobots();
     void drawResultImage();
-    void MatchRobots(std::vector<double>& ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr& msg);
-    void AssignRobots(const elikos_ros::TargetRobotArray::ConstPtr& msg);
-    static void subCallback(const elikos_ros::TargetRobotArray::ConstPtr& msg);
-    static void incertitudeCallback(const ros::TimerEvent& e);
-    void publishTargets();
+
+    std::vector<int> MatchRobots(std::vector<double>& ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr& msg);
+    std::vector<int> AssignRobots(const elikos_ros::TargetRobotArray::ConstPtr& msg);
+
+    void subCallback(const elikos_ros::TargetRobotArray::ConstPtr& msg);
+    void incertitudeCallback(const ros::TimerEvent& e);
+    void publishTargets(std::vector<int>& idsToPublish);
 
    private:
 
-    TrackingHandler();
-    static TrackingHandler* handlerInstance_;
     ros::Publisher targetsPub_;
-    ros::Publisher debugPub_;
-    visualization_msgs::Marker marker_;
+    ros::Subscriber targetsSub_;
 
-    //std::vector<std::unique_ptr<Robot>> redRobots_;
-    //std::vector<std::unique_ptr<Robot>> greenRobots_;
+    //Debug purposes
+    visualization_msgs::Marker marker_;
+    ros::Publisher debugPub_;
+
     std::vector<std::shared_ptr<Robot>> robotsVec_;
 
 };
