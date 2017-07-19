@@ -11,8 +11,6 @@
 class QuadState
 {
 public:
-    tf::Quaternion rotationEstimate;
-
     QuadState() = default;
     QuadState(const std::string& cameraFrame);
     ~QuadState() = default;
@@ -22,8 +20,9 @@ public:
     bool update(ros::Time stamp);
 
     ros::Time getTimeStamp() const;
-    tf::StampedTransform getOrigin2Fcu() const;
-    tf::StampedTransform getFcu2Camera() const;
+    inline tf::StampedTransform getOrigin2Fcu() const;
+    inline tf::StampedTransform getFcu2Camera() const;
+    inline tf::StampedTransform getOrigin2Attitude() const;
 
 private:
     std::string cameraFrame_;
@@ -33,6 +32,7 @@ private:
 
     tf::StampedTransform origin2fcu_;
     tf::StampedTransform fcu2camera_;
+    tf::StampedTransform origin2attitude_;
     ros::Time timeStamp_;
 
 };
@@ -50,6 +50,11 @@ inline tf::StampedTransform QuadState::getOrigin2Fcu() const
 inline tf::StampedTransform QuadState::getFcu2Camera() const
 {
     return fcu2camera_;
+}
+
+inline tf::StampedTransform QuadState::getOrigin2Attitude() const 
+{
+    return origin2attitude_;
 }
 
 inline void QuadState::setCameraFrame(const std::string& cameraFrame)
