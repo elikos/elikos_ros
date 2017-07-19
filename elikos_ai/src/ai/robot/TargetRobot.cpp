@@ -16,7 +16,6 @@ void TargetRobot::prepareForUpdate()
 {
     priority_ = 0.0;
     nMissedUpdates_++;
-    ROS_ERROR_STREAM("nMissedUpdates_="<<nMissedUpdates_<<" id="<<(int)id_);
 }
 
 };
