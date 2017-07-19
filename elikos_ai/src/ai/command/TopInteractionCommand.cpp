@@ -25,7 +25,7 @@ TopInteractionCommand::~TopInteractionCommand()
 
 void TopInteractionCommand::execute()
 {
-    ROS_ERROR("WATCH OUT!!! TOP INTERACTION!! :O");
+    ai::MessageHandler::getInstance()->publishAiStateCommand("Top interaction command");
     tf::Vector3 destination = target_->getPose().getOrigin();
     destination.setZ(0.0);
     MessageHandler::getInstance()->sendDestination(destination, CmdCode::TOP_INTERACTION);

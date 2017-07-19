@@ -23,6 +23,12 @@ CmdFrontInteraction::CmdFrontInteraction(ros::NodeHandle* nh, int id)
     stateSub_ = nh_->subscribe<mavros_msgs::State>("mavros/state", 10, &CmdFrontInteraction::stateCallBack, this);
     offbSetMode_.request.custom_mode = "OFFBOARD";
     armCmd_.request.value = true;
+
+    interaction_altitude_ = 0.1;
+    nh_->getParam("/elikos_ai/interaction_altitude", interaction_altitude_);
+
+	threshold_ = 0.8;
+	nh_->getParam("/elikos_ai/has_reach_destination_threshold", threshold_);
 }
 
 void CmdFrontInteraction::stateCallBack(const mavros_msgs::State::ConstPtr& msg)
@@ -45,7 +51,10 @@ void CmdFrontInteraction::TakeABreak()
 
 void CmdFrontInteraction::execute()
 {
-    ROS_ERROR("CmdFrontInteraction");
+    std_msgs::String msg;
+    msg.data = "Front Interaction";
+    statePubCommand_.publish(msg);
+
     interactionStatus_ = InteractionState::LANDING;
     ros::Rate rate(30.0);
     isSleeping_ = false;
@@ -71,14 +80,21 @@ void CmdFrontInteraction::execute()
             ROS_ERROR("%s",e.what());
         }
 
-        double distance = lastPosition_.getOrigin().distance(targetPosition_.getOrigin());
-        if (distance > THRESHOLD)
+        tf::StampedTransform aboveTargetPosition = targetPosition_;
+        aboveTargetPosition.getOrigin().setZ(takeoff_altitude_);
+        double distance = lastPosition_.getOrigin().distance(aboveTargetPosition.getOrigin());
+        if (distance > threshold_)
+        {
+            aboveTargetPosition.stamp_ = ros::Time::now();
+            tf_broadcaster_.sendTransform(aboveTargetPosition);
+            rate.sleep();
+        }
+        else if(lastPosition_.getOrigin().getZ() > interaction_altitude_)
         {
             targetPosition_.stamp_ = ros::Time::now();
             tf_broadcaster_.sendTransform(targetPosition_);
             rate.sleep();
-        }
-        
+        }        
         else 
         {
             if(interactionStatus_ == InteractionState::HAS_TOUCHED_GROUND)
@@ -90,33 +106,12 @@ void CmdFrontInteraction::execute()
                 interactionStatus_ = InteractionState::HAS_TOUCHED_GROUND;
                 
                 landingClient_.call(landingCmd_);
-                ROS_ERROR("LANDING!");
                 if(landingCmd_.response.success)
                 {
                     //faire une pause au sol. Éventuellement remplacer par signal capteur.
                     TakeABreak();
                     //demander un CmdOffBoard.
                     interactionStatus_ = InteractionState::ASKS_FOR_OFFBOARD;
-                    /*while (currentState_.mode == "LAND")
-                    {
-                        ROS_ERROR("LANDED!");
-                    }
-                    if (setModeClient_.call(offbSetMode_) && offbSetMode_.response.success)
-                    {
-                        ROS_ERROR("CmdFrontInteraction : Offboard enabled");
-                    } 
-                    else 
-                    {
-                        ROS_ERROR("CmdFrontInteraction : Offboard request failed");
-                    }
-                    if (armingClient_.call(armCmd_) && armCmd_.response.success)
-                    {
-                        ROS_ERROR("CmdFrontInteraction : Vehicle armed");
-                    }
-                    else 
-                    {
-                        ROS_ERROR("CmdFrontInteraction : Vehicle armed request failed");
-                    }*/
                 }
                 else
                 {
@@ -140,7 +135,7 @@ void CmdFrontInteraction::abort()
 void CmdFrontInteraction::ajustement(geometry_msgs::Pose destination, trajectory_msgs::MultiDOFJointTrajectory trajectory)
 {
     std::unique_lock<std::mutex>(sleepLock_);
-    if(!isSleeping_ && lastPosition_.getOrigin().getZ() > THRESHOLD)
+    if(!isSleeping_ && lastPosition_.getOrigin().getZ() > threshold_)
     {
         setDestination(destination);
         tf::Vector3 groundPosition = targetPosition_.getOrigin();

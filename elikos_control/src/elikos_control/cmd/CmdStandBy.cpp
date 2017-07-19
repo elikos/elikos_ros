@@ -13,7 +13,10 @@ CmdStandBy::~CmdStandBy()
 
 void CmdStandBy::execute()
 {
-    ROS_ERROR("Started standby command");
+    std_msgs::String msg;
+    msg.data = "Stand by";
+    statePubCommand_.publish(msg);
+
     isAborted_ = false;
     // TODO: Essayer a nouveau si le lookup echoue.
     try {
@@ -29,7 +32,6 @@ void CmdStandBy::execute()
         ros::spinOnce();
         rate.sleep();
     }
-    ROS_ERROR("Finished standby command");
 }
 
 void CmdStandBy::abort()

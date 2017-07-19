@@ -28,7 +28,7 @@ FrontInteractionCommand::~FrontInteractionCommand()
 
 void FrontInteractionCommand::execute()
 {
-    ROS_ERROR("WATCH OUT!!! FRONT INTERACTION!! :O");
+    ai::MessageHandler::getInstance()->publishAiStateCommand("Front interaction command");
     MessageHandler::getInstance()->sendDestination(destination_, CmdCode::FRONT_INTERACTION);
 }
 

@@ -11,10 +11,10 @@ class CommandQueue;
 class TakeOffCommand : public AbstractCommand
 {
 public:
-    static constexpr double FLIGHT_HEIGHT{ 2.0 };
-    static constexpr double WAIT_TIME { 5.0 };
 
-    TakeOffCommand(QuadRobot* quad, const tf::Point& destination);
+    static constexpr double WAIT_TIME { 5.0 };
+    
+    TakeOffCommand(QuadRobot* quad, tf::TransformListener* tf_listener);
     virtual ~TakeOffCommand();
     virtual bool isCommmandDone();
     virtual void execute();
@@ -22,6 +22,8 @@ public:
 private:
     TakeOffCommand() = delete;
     tf::Point destination_;
+
+    tf::TransformListener* tf_listener_;
 };
 
 }

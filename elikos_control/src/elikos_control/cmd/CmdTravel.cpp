@@ -30,15 +30,16 @@ void CmdTravel::publishTrajectoryPosition(geometry_msgs::Transform_<std::allocat
   tf::Transform tfTrajectoryPoint;
   tf::transformMsgToTF(trajectoryPoint, tfTrajectoryPoint);
 
-  ROS_ERROR_STREAM("setpoint envoyé: " << tfTrajectoryPoint.getOrigin().x() << " : " << tfTrajectoryPoint.getOrigin().y() << " : " << tfTrajectoryPoint.getOrigin().z());
-
   //Broadcast command
   tf_broadcaster_.sendTransform(tf::StampedTransform(tfTrajectoryPoint, ros::Time::now(), WORLD_FRAME, SETPOINT));
 }
 
 void CmdTravel::execute()
 {
-    ROS_ERROR("CmdTravel");
+    std_msgs::String msg;
+    msg.data = "Travel";
+    statePubCommand_.publish(msg);
+
     isAborted_ = false;
 	ros::Rate rate(30.0);
     
@@ -53,7 +54,6 @@ void CmdTravel::execute()
 		bool is_outside_boundaries = false;
 
 		geometry_msgs::Vector3 dst = cmdTrajectory_.points[cmdTrajectory_.points.size() - 1].transforms[0].translation;
-		ROS_ERROR_STREAM("DESTINATION: " << dst.x << " : " << dst.y << " : " << dst.z);
 
 		while(is_too_near && !is_outside_boundaries && stepInTrajectory_ < cmdTrajectory_.points.size())
 		{
@@ -63,7 +63,6 @@ void CmdTravel::execute()
 				std::abs(targetTranslation.y) > dimension_c_ / 2.0 )
 				{
 					is_outside_boundaries = true;
-					ROS_ERROR("Setpoint outside the box!");
 				}
 
 			step_lenght = pow(targetTranslation.x-lastPosition_.getOrigin().x(), 2)+
@@ -85,12 +84,10 @@ void CmdTravel::execute()
 				}
 			}
 		}
-		ROS_ERROR_STREAM("stepInTrajectory_:"<<stepInTrajectory_<<" cmdTrajectory_.points.size()"<<cmdTrajectory_.points.size()<<" THRESHOLD:"<<threshold_<<" step_lenght:"<<step_lenght);
 		trajectoryPoint_ = cmdTrajectory_.points[stepInTrajectory_].transforms[0];
 
 		if(step_lenght > pow(max_step_,2))
 		{
-			ROS_ERROR_STREAM("Step too big!! step_lenght:"<< step_lenght<<" max_step:"<<max_step_);
 			// Interpolation
 			double direction = cv::fastAtan2(trajectoryPoint_.translation.y - lastPosition_.getOrigin().y(), trajectoryPoint_.translation.x - lastPosition_.getOrigin().x()) / 360 * 2 *PI;
 			trajectoryPoint_.translation.x = lastPosition_.getOrigin().x() + max_step_ * std::cos(direction);

@@ -53,8 +53,8 @@ add_executable( elikos_control
     src/elikos_control/cmd/CmdTopInteraction.cpp
     src/elikos_control/cmd/CmdAbs.h
     src/elikos_control/cmd/CmdAbs.cpp
-    src/elikos_control/cmd/CmdOffBoard.cpp
-    src/elikos_control/cmd/CmdOffBoard.cpp
+    src/elikos_control/cmd/CmdTakeOff.cpp
+    src/elikos_control/cmd/CmdTakeOff.cpp
     src/elikos_control/MessageHandler.h
     src/elikos_control/MessageHandler.cpp
     src/elikos_control/elikos_control.cpp

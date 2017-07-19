@@ -1,7 +1,7 @@
 #include <string>
 
 #include <ros/ros.h>
-#include "CmdOffBoard.h"
+#include "CmdTakeOff.h"
 #include "CmdLanding.h"
 #include "CmdFrontInteraction.h"
 #include "CmdTopInteraction.h"
@@ -13,7 +13,7 @@
 CmdExecutor::CmdExecutor()
 {
 
-    commands_.insert(std::pair<int, std::unique_ptr<CmdOffBoard>>(CmdCode::TAKEOFF, std::unique_ptr<CmdOffBoard>(new CmdOffBoard(&nh_, -1))));
+    commands_.insert(std::pair<int, std::unique_ptr<CmdTakeOff>>(CmdCode::TAKEOFF, std::unique_ptr<CmdTakeOff>(new CmdTakeOff(&nh_, -1))));
     commands_.insert(std::pair<int, std::unique_ptr<CmdLanding>>(CmdCode::LAND, std::unique_ptr<CmdLanding>(new CmdLanding(&nh_, -1))));
     commands_.insert(std::pair<int, std::unique_ptr<CmdFrontInteraction>>(CmdCode::FRONT_INTERACTION, std::unique_ptr<CmdFrontInteraction>(new CmdFrontInteraction(&nh_, -1))));
     commands_.insert(std::pair<int, std::unique_ptr<CmdTopInteraction>>(CmdCode::TOP_INTERACTION, std::unique_ptr<CmdTopInteraction>(new CmdTopInteraction(&nh_, -1))));

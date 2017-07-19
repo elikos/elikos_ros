@@ -11,7 +11,6 @@ class CommandQueue;
 class MovementCommand : public AbstractCommand
 {
 public:
-    static constexpr double FLIGHT_HEIGHT{ 2.0 };
     static constexpr double WAIT_TIME { 5.0 };
 
     MovementCommand(QuadRobot* quad, const tf::Point& destination);

@@ -21,6 +21,7 @@ public:
 
 private:
     FollowCommand() = delete;
+    double flight_height_;
 };
 
 }

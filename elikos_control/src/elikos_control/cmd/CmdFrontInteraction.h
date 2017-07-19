@@ -56,8 +56,10 @@ private:
 
     mavros_msgs::State currentState_;
 
-    const double THRESHOLD = 0.05;  //TODO fichier de config
+    double threshold_;
     const double HIGH_OF_GROUND = 0.1;
+    double interaction_altitude_;
+    double takeoff_altitude_;
 
     InteractionState interactionStatus_ = InteractionState::LANDING;
     

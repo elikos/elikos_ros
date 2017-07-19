@@ -16,6 +16,9 @@ CmdLanding::CmdLanding(ros::NodeHandle* nh, int id)
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, 0.0 }));
     targetPosition_.child_frame_id_ = SETPOINT;
     targetPosition_.frame_id_ = WORLD_FRAME;
+
+	threshold_ = 0.8;
+	nh_->getParam("/elikos_ai/has_reach_destination_threshold", threshold_);
 }
 
 CmdLanding::~CmdLanding()
@@ -25,7 +28,10 @@ CmdLanding::~CmdLanding()
 
 void CmdLanding::execute()
 {
-    ROS_ERROR("Started landing command");
+    std_msgs::String msg;
+    msg.data = "Landing";
+    statePubCommand_.publish(msg);
+
     ros::Rate rate(30.0);
     // TODO: Essayer a nouveau si le lookup echoue.
     tf::StampedTransform currentPosition;

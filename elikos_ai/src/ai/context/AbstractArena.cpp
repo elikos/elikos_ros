@@ -39,7 +39,7 @@ TargetRobot* AbstractArena::findHighestPriorityTarget()
     for (int i = 0; i < targets_.size(); ++i)
     {
         if (targets_[i].getPriority() > maxPriority &&
-            targets_[i].getNMissedUpdates() < 100)
+            targets_[i].getNMissedUpdates() < 10)
         {
             maxPriority = targets_[i].getPriority();
             highestPriorityTarget = &targets_[i];
@@ -138,7 +138,7 @@ int AbstractArena::getNbrOfUpdatedTargets()
 {
     int nTargets = 0;
     for (int i = 0; i < targets_.size(); ++i) {
-        if (targets_[i].getNMissedUpdates() < 100) {
+        if (targets_[i].getNMissedUpdates() < 10) {
             nTargets++;
         }
     }
