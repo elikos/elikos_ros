@@ -11,38 +11,39 @@
 
 namespace localization {
 
-MessageHandler::MessageHandler(const CameraInfo& cameraInfo, QuadState& state, ImageProcessor* processor)
-    : it_(nh_), state_(state), processor_(processor), cameraInfo_(cameraInfo)
-{
-    imageSub_ = it_.subscribe(cameraInfo.topic, 1, &MessageHandler::cameraCallback, this);
-    imagePub_ = it_.advertise(cameraInfo.name + "/intersection_detection", 1);
-}
-
-MessageHandler::~MessageHandler()
-{
-}
-
-void MessageHandler::lookForMessages()
-{
-    ros::Rate rate(30);
-    while(ros::ok())
-    {
-        ros::spinOnce();
-        rate.sleep();
+    MessageHandler::MessageHandler(const CameraInfo &cameraInfo, QuadState &state, ImageProcessor *processor)
+            : it_(nh_), state_(state), processor_(processor), cameraInfo_(cameraInfo) {
+        imageSub_ = it_.subscribe(cameraInfo.topic, 1, &MessageHandler::cameraCallback, this);
+        imagePub_ = it_.advertise(cameraInfo.name + "/intersection_detection", 1);
+        imuSub_ = nh_.subscribe("vn100/imu/imu", 1, &MessageHandler::imuCallback, this);
     }
-}
 
-void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
-    if (state_.update(msg->header.stamp))
-    {
-        cv::Mat input = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8)->image;
-
-        cv::Mat result;
-        processor_->processImage(input, result);
-
-        sensor_msgs::ImagePtr image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", result).toImageMsg();
-        imagePub_.publish(image);
+    MessageHandler::~MessageHandler() {
     }
+
+    void MessageHandler::lookForMessages() {
+        ros::Rate rate(30);
+        while (ros::ok()) {
+            ros::spinOnce();
+            rate.sleep();
+        }
+    }
+
+    void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr &msg) {
+        if (state_.update(msg->header.stamp)) {
+            cv::Mat input = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8)->image;
+
+            cv::Mat result;
+            processor_->processImage(input, result);
+
+            sensor_msgs::ImagePtr image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", result).toImageMsg();
+            imagePub_.publish(image);
+        }
+    }
+
+void MessageHandler::imuCallback(const sensor_msgs::ImuConstPtr &msg)
+{
+    tf::quaternionMsgToTF(msg->orientation, state_.rotationEstimate);
 }
 
 }

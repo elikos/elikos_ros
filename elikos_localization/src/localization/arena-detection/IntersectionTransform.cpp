@@ -185,13 +185,30 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
     if (!lastDetection_.poses.empty())
     {
         tf::Vector3 translationEstimate = state_.getOrigin2Fcu().getOrigin() - lastState_.getOrigin();
+        tf::Transform currentFcu2lastFcu = state_.getOrigin2Fcu().inverse() * lastState_;
+        tf::Vector3 axis = currentFcu2lastFcu.getRotation().getAxis();
+        axis.setX(0.0);
+        axis.setY(0.0);
+        currentFcu2lastFcu.setRotation(tf::Quaternion(axis, currentFcu2lastFcu.getRotation().getAngle()));
+
+        tf::StampedTransform transform(currentFcu2lastFcu, state_.getTimeStamp(), "elikos_arena_origin", "elikos_debug");
+        tfPub_.sendTransform(transform);
+
+        tf::Vector3 test = tf::quatRotate(currentFcu2lastFcu.getRotation(), tf::Vector3(0.0, 0.0, 1.0));
+        tf::Vector3 test2 = tf::quatRotate(currentFcu2lastFcu.getRotation(), tf::Vector3(1.0, 0.0, 0.0));
+
+        ROS_ERROR("%f", currentFcu2lastFcu.getRotation().getAngle());
+
         lastDetectionPointCloud_->clear();
         for (int i = 0; i < lastDetection_.poses.size(); ++i)
         {
             geometry_msgs::Point position = lastDetection_.poses[i].position;
             pcl::PointXY point;
-            point.x = (float) (position.x - translationEstimate.x());
-            point.y = (float) (position.y - translationEstimate.y());
+
+            tf::Vector3 estimate = currentFcu2lastFcu * tf::Vector3(position.x, position.y, position.z);
+            point.x = (float) estimate.x();
+            point.y = (float) estimate.y();
+
             lastDetectionPointCloud_->push_back(point);
         }
         lastDetectionTree_.setInputCloud(lastDetectionPointCloud_);
@@ -234,29 +251,36 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             averageTranslation.setY(averageTranslation.y() / totalWeight);
             averageTranslation.setZ(0.0);
 
-            totalTranslation_ += averageTranslation;
+            axis = state_.getOrigin2Fcu().getRotation().getAxis();
+            axis.setX(0.0);
+            axis.setY(0.0);
+
+            // Rotate the translation around the fcu.
+            totalTranslation_ += tf::quatRotate(tf::Quaternion(axis, state_.getOrigin2Fcu().getRotation().getAngle()), averageTranslation);
 
             tf::Vector3 estimate = pivot_ - totalTranslation_;
-
-            // TODO: Add elikos_vision_debug as a parameter.
-            tf::StampedTransform transform(tf::Transform(tf::Quaternion::getIdentity(), estimate),
-                               state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
-            tfPub_.sendTransform(transform);
+            estimate.setZ(state_.getOrigin2Fcu().getOrigin().z());
 
             tf::Vector3 offset = estimate - state_.getOrigin2Fcu().getOrigin();
+            offset.setZ(0.0);
 
-            if (offset.length() > 0.3)
+            double offsetLength = offset.length();
+            if (offsetLength < 0.3)
+            {
+                // TODO: Add elikos_vision_debug as a parameter.
+                tf::StampedTransform transform(tf::Transform(state_.rotationEstimate, estimate),
+                                state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
+                tfPub_.sendTransform(transform);
+            }
+            else 
             {
                 resetPivot();
-                ROS_WARN("OFFSET > 0.1 - RESET PIVOT");
-                std::string message = "Transform: [" + std::to_string(averageTranslation.x()) + ", " +
-                                      std::to_string(averageTranslation.y()) + "] with offset [" +
-                                      std::to_string(offset.x()) + ", " + std::to_string(offset.y());
+                std::string message( "OFFSET " + std::to_string(offsetLength));
                 ROS_ERROR("%s", message.c_str());
             }
         } else {
-            ROS_WARN("NO MATCH - RESET PIVOT");
-            //resetPivot();
+            resetPivot();
+            ROS_WARN("%s", "NO MATCH - RESET PIVOT");
         }
     }
 

@@ -11,6 +11,8 @@
 class QuadState
 {
 public:
+    tf::Quaternion rotationEstimate;
+
     QuadState() = default;
     QuadState(const std::string& cameraFrame);
     ~QuadState() = default;
@@ -32,6 +34,7 @@ private:
     tf::StampedTransform origin2fcu_;
     tf::StampedTransform fcu2camera_;
     ros::Time timeStamp_;
+
 };
 
 inline ros::Time QuadState::getTimeStamp() const

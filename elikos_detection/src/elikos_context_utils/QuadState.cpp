@@ -1,7 +1,7 @@
 #include "QuadState.h"
 
 QuadState::QuadState(const std::string& cameraFrame)
-    : cameraFrame_(cameraFrame)
+    : cameraFrame_(cameraFrame), rotationEstimate(tf::Quaternion::getIdentity())
 {
 }
 
@@ -24,4 +24,5 @@ bool QuadState::update(ros::Time stamp)
     }
     return success;
 }
+
 
