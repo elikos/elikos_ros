@@ -30,14 +30,12 @@ public:
 private:
 
     void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
-    void imuCallback(const sensor_msgs::ImuConstPtr& msg);
 
     ros::NodeHandle nh_;
     image_transport::ImageTransport it_;
 
     image_transport::Subscriber imageSub_;
     image_transport::Publisher imagePub_;
-    ros::Subscriber imuSub_;
 
     ImageProcessor* const processor_;
     QuadState& state_;

@@ -15,7 +15,6 @@ namespace localization {
             : it_(nh_), state_(state), processor_(processor), cameraInfo_(cameraInfo) {
         imageSub_ = it_.subscribe(cameraInfo.topic, 1, &MessageHandler::cameraCallback, this);
         imagePub_ = it_.advertise(cameraInfo.name + "/intersection_detection", 1);
-        imuSub_ = nh_.subscribe("vn100/imu/imu", 1, &MessageHandler::imuCallback, this);
     }
 
     MessageHandler::~MessageHandler() {
@@ -40,10 +39,4 @@ namespace localization {
             imagePub_.publish(image);
         }
     }
-
-void MessageHandler::imuCallback(const sensor_msgs::ImuConstPtr &msg)
-{
-    tf::quaternionMsgToTF(msg->orientation, state_.rotationEstimate);
-}
-
 }

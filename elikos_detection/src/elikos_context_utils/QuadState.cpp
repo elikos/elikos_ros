@@ -1,7 +1,7 @@
 #include "QuadState.h"
 
 QuadState::QuadState(const std::string& cameraFrame)
-    : cameraFrame_(cameraFrame), rotationEstimate(tf::Quaternion::getIdentity())
+    : cameraFrame_(cameraFrame)
 {
 }
 
@@ -13,8 +13,12 @@ bool QuadState::update(ros::Time stamp)
         tfListener_.waitForTransform("elikos_arena_origin", "elikos_fcu",  stamp, ros::Duration(1.0));
         tfListener_.lookupTransform("elikos_arena_origin", "elikos_fcu", stamp, origin2fcu_);
 
+        tfListener_.waitForTransform("elikos_arena_origin", "elikos_attitude", stamp, ros::Duration(1.0));
+        tfListener_.lookupTransform("elikos_arena_origin", "elikos_attitude", stamp, origin2attitude_);
+
         tfListener_.waitForTransform("elikos_fcu", cameraFrame_, stamp, ros::Duration(1.0));
         tfListener_.lookupTransform("elikos_fcu", cameraFrame_, stamp, fcu2camera_);
+
         success = true;
     }
     catch (tf::TransformException e)

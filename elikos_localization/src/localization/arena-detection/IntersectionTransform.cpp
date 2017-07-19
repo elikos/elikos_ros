@@ -268,7 +268,7 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             if (offsetLength < 0.3)
             {
                 // TODO: Add elikos_vision_debug as a parameter.
-                tf::StampedTransform transform(tf::Transform(state_.rotationEstimate, estimate),
+                tf::StampedTransform transform(tf::Transform(state_.getOrigin2Attitude().getRotation(), estimate),
                                 state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
                 tfPub_.sendTransform(transform);
             }
