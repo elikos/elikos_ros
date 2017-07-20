@@ -187,11 +187,6 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
     if (!lastDetection_.poses.empty())
     {
         tf::Vector3 translationEstimate = state_.getOrigin2Fcu().getOrigin() - lastState_.getOrigin();
-        tf::Transform currentFcu2lastFcu = state_.getOrigin2Fcu().inverse() * lastState_;
-        tf::Vector3 axis = currentFcu2lastFcu.getRotation().getAxis();
-        axis.setX(0.0);
-        axis.setY(0.0);
-        currentFcu2lastFcu.setRotation(tf::Quaternion(axis, currentFcu2lastFcu.getRotation().getAngle()));
 
         lastDetectionPointCloud_->clear();
         for (int i = 0; i < lastDetection_.poses.size(); ++i)
@@ -199,9 +194,8 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             geometry_msgs::Point position = lastDetection_.poses[i].position;
             pcl::PointXY point;
 
-            tf::Vector3 estimate = currentFcu2lastFcu * tf::Vector3(position.x, position.y, position.z);
-            point.x = (float) estimate.x();
-            point.y = (float) estimate.y();
+            point.x = (float) (position.x - translationEstimate.x());
+            point.y = (float) (position.y - translationEstimate.y());
 
             lastDetectionPointCloud_->push_back(point);
         }
@@ -249,12 +243,8 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             averageTranslation.setY(averageTranslation.y() / totalWeight);
             averageTranslation.setZ(0.0);
 
-            axis = state_.getOrigin2Fcu().getRotation().getAxis();
-            axis.setX(0.0);
-            axis.setY(0.0);
-
             // Rotate the translation around the fcu.
-            totalTranslation_ += tf::quatRotate(tf::Quaternion(axis, state_.getOrigin2Fcu().getRotation().getAngle()), averageTranslation);
+            totalTranslation_ += averageTranslation;
 
             tf::Vector3 estimate = pivot_ - totalTranslation_;
             estimate.setZ(state_.getOrigin2Fcu().getOrigin().z());

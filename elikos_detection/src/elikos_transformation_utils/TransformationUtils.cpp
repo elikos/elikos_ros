@@ -80,10 +80,8 @@ geometry_msgs::Pose computeFcu2Target(const tf::StampedTransform& fcu2camera,
     // Find the robot2turret transform
     tf::Transform turret2target = computeTurret2Target(origin2turret);
 
-    tf::Transform origin2fcuRotation(origin2fcu.getRotation(), tf::Vector3());
-
     //Compute the robot poses
-    tf::Transform fcu2target = origin2fcuRotation * fcu2camera * camera2turret * turret2target ;
+    tf::Transform fcu2target = tf::Transform(tf::Quaternion::getIdentity(), -origin2fcu.getOrigin()) * origin2fcu * fcu2camera * camera2turret * turret2target ;
 
     geometry_msgs::Pose pose;
     tf::quaternionTFToMsg(fcu2target.getRotation(), pose.orientation);
