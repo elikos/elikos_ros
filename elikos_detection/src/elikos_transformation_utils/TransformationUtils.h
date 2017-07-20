@@ -15,6 +15,13 @@ namespace transformation_utils {
                                                 float hfov,
                                                 float vfov);
 
+    geometry_msgs::PoseArray getOrigin2TargetArray(const tf::StampedTransform& origin2fcu,
+                                                   const tf::StampedTransform& fcu2camera,
+                                                   const std::vector<cv::Point2f>& points,
+                                                   cv::Size dimensions,
+                                                   float hfov,
+                                                   float vfov);
+
     geometry_msgs::PoseStamped getFcu2Target(const tf::StampedTransform& origin2fcu,
                                              const tf::StampedTransform& fcu2camera,
                                              cv::Point2f point,

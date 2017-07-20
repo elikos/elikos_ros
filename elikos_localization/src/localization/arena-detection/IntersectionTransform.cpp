@@ -24,7 +24,7 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     intersectionPub_ = nh.advertise<elikos_ros::IntersectionArray>(cameraInfo_.name + "/intersections", 1);
     debugPub_ = nh.advertise<visualization_msgs::MarkerArray>(cameraInfo_.name + "/intersection_debug", 1);
 
-    marker_.header.frame_id = "elikos_fcu";
+    marker_.header.frame_id = "elikos_arena_origin";
     marker_.header.stamp = ros::Time::now();
 
     marker_.id = 0;
@@ -85,11 +85,14 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
 		    src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
 	    }
 	    cv::perspectiveTransform(src, dst, perspectiveTransform);
-	    geometry_msgs::PoseArray intersections = transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
+	    geometry_msgs::PoseArray intersections = transformation_utils::getOrigin2TargetArray(state_.getOrigin2Fcu(),
 										     state_.getFcu2Camera(), dst, imageSize,
 										     cameraInfo_.hfov, cameraInfo_.vfov);
+        tf::Vector3 fcu2originT = -state_.getOrigin2Fcu().getOrigin();
 	    for (int i = 0; i < intersections.poses.size(); ++i) {
-		    intersections.poses[i].position.z = z;
+		    intersections.poses[i].position.z += fcu2originT.z();
+            intersections.poses[i].position.y += fcu2originT.y();
+            intersections.poses[i].position.x += fcu2originT.x();
 	    }
 
         estimateQuadState(intersections);
