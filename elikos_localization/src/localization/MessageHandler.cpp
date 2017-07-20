@@ -29,11 +29,13 @@ namespace localization {
     }
 
     void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr &msg) {
-        if (state_.update(msg->header.stamp)) {
+        if (state_.update(msg->header.stamp) && !isProcessing_) {
             cv::Mat input = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8)->image;
 
             cv::Mat result;
+            isProcessing_ = true;
             processor_->processImage(input, result);
+            isProcessing_ = false;
 
             sensor_msgs::ImagePtr image = cv_bridge::CvImage(std_msgs::Header(), "bgr8", result).toImageMsg();
             imagePub_.publish(image);
