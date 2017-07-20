@@ -24,7 +24,7 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     intersectionPub_ = nh.advertise<elikos_ros::IntersectionArray>(cameraInfo_.name + "/intersections", 1);
     debugPub_ = nh.advertise<visualization_msgs::MarkerArray>(cameraInfo_.name + "/intersection_debug", 1);
 
-    marker_.header.frame_id = "elikos_arena_origin";
+    marker_.header.frame_id = "elikos_fcu";
     marker_.header.stamp = ros::Time::now();
 
     marker_.id = 0;
@@ -266,12 +266,12 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             else 
             {
                 resetPivot();
-                std::string message( "OFFSET " + std::to_string(offsetLength));
+                std::string message( "RESET PIVOT - OFFSET " + std::to_string(offsetLength));
                 ROS_ERROR("%s", message.c_str());
             }
         } else {
             resetPivot();
-            ROS_WARN("%s", "NO MATCH - RESET PIVOT");
+            ROS_WARN("%s", "RESET PIVOT - NO MATCH");
         }
     }
 
