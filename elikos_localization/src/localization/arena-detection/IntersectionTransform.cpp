@@ -2,9 +2,6 @@
 #include <tf/transform_broadcaster.h>
 #include <pcl/registration/icp.h>
 
-#include "tf/tf.h"
-
-
 #include "QuadState.h"
 
 #include "TransformationUtils.h"
@@ -188,6 +185,7 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray& in
 
     if (!lastDetection_.poses.empty())
     {
+        tf::Transform currentFcu2lastFcu = state_.getOrigin2Fcu().inverse() * lastState_;
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in (new pcl::PointCloud<pcl::PointXYZ>);
         cloud_in->resize(lastDetection_.poses.size());
         for (int i = 0; i < lastDetection_.poses.size(); ++i)
@@ -206,9 +204,24 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray& in
             cloud_out->points[i].z = (float) intersections.poses[i].position.z;
         }
 
+        Eigen::Matrix4f transformHint;
+        tf::Vector3 translationHint = currentFcu2lastFcu.getOrigin();
+        tf::Matrix3x3 rotationHint = currentFcu2lastFcu.getBasis();
+
+        transformHint(0, 3) = (float) translationHint.x();
+        transformHint(1, 3) = (float) translationHint.y();
+        transformHint(2, 3) = (float) translationHint.z();
+
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                transformHint(i, j) = (float) rotationHint.getRow(i).m_floats[j];
+            }
+        }
 
         pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
-        /*
+        icp.setMaxCorrespondenceDistance(0.05);
         icp.setInputSource(cloud_in);
         icp.setInputTarget(cloud_out);
 
@@ -217,11 +230,45 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray& in
         icp.align(final);
         if (icp.hasConverged())
         {
-            std::cout << icp.getFinalTransformation() << std::endl;
+            Eigen::Matrix4f T = icp.getFinalTransformation();
+
+            tf::Vector3 origin(T(0, 3),
+                               T(1, 3),
+                               T(2, 3));
+
+            tf::Matrix3x3 rotation(T(0, 0), T(0, 1), T(0, 2),
+                                   T(1, 0), T(1, 1), T(1, 2),
+                                   T(2, 0), T(2, 1), T(2, 2));
+
+            tf::Transform transform(rotation, origin);
+            totalTranslation_ +=  transform.getOrigin();
+
+            tf::Vector3 estimate = pivot_ - totalTranslation_;
+            estimate.setZ(state_.getOrigin2Fcu().getOrigin().z());
+
+            tf::Vector3 offset = estimate - state_.getOrigin2Fcu().getOrigin();
+            offset.setZ(0.0);
+
+            double offsetLength = offset.length();
+            if (offsetLength < 0.3)
+            {
+                // TODO: Add elikos_vision_debug as a parameter.
+                tf::StampedTransform transform(tf::Transform(state_.getOrigin2Attitude().getRotation(), estimate),
+                                               state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
+                tfPub_.sendTransform(transform);
+            }
+            else
+            {
+                std::string message( "RESET PIVOT - OFFSET " + std::to_string(offsetLength));
+                ROS_ERROR("%s", message.c_str());
+                resetPivot();
+            }
+
         } else {
             ROS_ERROR("%s", "ICP DID NOT CONVERGE");
+            resetPivot();
         }
-         */ }
+    }
 
     lastDetection_ = intersections;
     lastState_ = state_.getOrigin2Fcu();
