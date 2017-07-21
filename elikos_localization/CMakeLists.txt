@@ -16,7 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     tf2
     eigen_conversions
-    pcl_ros
 )
 find_package(Qt5Gui)
 find_package(Qt5Core)
@@ -27,6 +26,7 @@ find_package(Qt5OpenGL)
 
 find_package(Eigen3 REQUIRED)
 find_package(OpenCV 2 REQUIRED)
+find_package(PCL 1.8 REQUIRED)
 
 catkin_package(
     CATKIN_DEPENDS

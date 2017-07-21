@@ -69,8 +69,6 @@ private:
     pcl::KdTreeFLANN<pcl::PointXY> imageIntersectionsTree_;
     pcl::PointCloud<pcl::PointXY>::Ptr imageIntersectionsPointCloud_;
 
-    pcl::KdTreeFLANN<pcl::PointXY> lastDetectionTree_;
-    pcl::PointCloud<pcl::PointXY>::Ptr lastDetectionPointCloud_;
     geometry_msgs::PoseArray lastDetection_;
 
     tf::StampedTransform lastState_;

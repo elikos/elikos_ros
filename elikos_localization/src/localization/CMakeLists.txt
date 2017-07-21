@@ -2,6 +2,7 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${EIGEN_INCLUDE_DIR}
+    ${PCL_INCLUDE_DIRS}
     ${elikos_detection_INCLUDE_DIR}
     arena-detection
     arena-detection/algorithm
@@ -11,6 +12,8 @@ include_directories(
     arena-tracking
     arena-tracking/filter
 )
+
+add_definitions(${PCL_DEFINITIONS})
 
 add_executable(elikos_localization
     Localization.cpp
@@ -46,5 +49,7 @@ add_executable(elikos_localization
 target_link_libraries(elikos_localization
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
+    ${PCL_LIBRARIES}
     ${elikos_detection_LIBRARIES}
 )
+

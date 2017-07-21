@@ -10,8 +10,12 @@ bool QuadState::update(ros::Time stamp)
     timeStamp_ = stamp;
     bool success = false;
     try {
-        tfListener_.waitForTransform("elikos_arena_origin", "elikos_fcu",  stamp, ros::Duration(1.0));
-        tfListener_.lookupTransform("elikos_arena_origin", "elikos_fcu", stamp, origin2fcu_);
+        //tfListener_.waitForTransform("elikos_arena_origin", "elikos_fcu",  stamp, ros::Duration(1.0));
+        //tfListener_.lookupTransform("elikos_arena_origin", "elikos_fcu", stamp, origin2fcu_);
+
+        tfListener_.waitForTransform("elikos_arena_origin", "elikos_real_base_link",  stamp, ros::Duration(1.0));
+        tfListener_.lookupTransform("elikos_arena_origin", "elikos_real_base_link", stamp, origin2fcu_);
+
 
         if (tfListener_.canTransform("elikos_arena_origin", "elikos_attitude", stamp))
         {

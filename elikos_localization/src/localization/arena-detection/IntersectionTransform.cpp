@@ -1,5 +1,6 @@
 #include <iostream>
 #include <tf/transform_broadcaster.h>
+#include <pcl/registration/icp.h>
 
 #include "tf/tf.h"
 
@@ -13,10 +14,9 @@
 namespace localization {
 
 IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const QuadState& state)
-    : cameraInfo_(cameraInfo), state_(state), imageIntersectionsPointCloud_(new pcl::PointCloud<pcl::PointXY>()), lastDetectionPointCloud_(new pcl::PointCloud<pcl::PointXY>())
+    : cameraInfo_(cameraInfo), state_(state), imageIntersectionsPointCloud_(new pcl::PointCloud<pcl::PointXY>())
 {
     // TODO: Set epsilon for kdtree here maybe ? ...
-    lastDetectionTree_.setEpsilon(0.0);
     ros::NodeHandle nh;
 
     pivot_ = tf::Vector3(0.0, 0.0, 0.14);
@@ -184,96 +184,44 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<cv
 }
 
 
-
-void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &intersections) {
+void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray& intersections) {
 
     if (!lastDetection_.poses.empty())
     {
-        tf::Vector3 translationEstimate = state_.getOrigin2Fcu().getOrigin() - lastState_.getOrigin();
-
-        lastDetectionPointCloud_->clear();
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in (new pcl::PointCloud<pcl::PointXYZ>);
+        cloud_in->resize(lastDetection_.poses.size());
         for (int i = 0; i < lastDetection_.poses.size(); ++i)
         {
-            geometry_msgs::Point position = lastDetection_.poses[i].position;
-            pcl::PointXY point;
-
-            point.x = (float) (position.x - translationEstimate.x());
-            point.y = (float) (position.y - translationEstimate.y());
-
-            lastDetectionPointCloud_->push_back(point);
+            cloud_in->points[i].x = (float) lastDetection_.poses[i].position.x;
+            cloud_in->points[i].y = (float) lastDetection_.poses[i].position.y;
+            cloud_in->points[i].z = (float) lastDetection_.poses[i].position.z;
         }
-        lastDetectionTree_.setInputCloud(lastDetectionPointCloud_);
 
-        std::vector<bool> matched(intersections.poses.size(), false);
-
-
-        tf::Vector3 averageTranslation(0.0, 0.0, 0.0);
-        int nMatched = 0;
-
-        double totalWeight = 0.0;
-
-        double translationNormEstimate = translationEstimate.length();
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_out (new pcl::PointCloud<pcl::PointXYZ>);
+        cloud_out->resize(intersections.poses.size());
         for (int i = 0; i < intersections.poses.size(); ++i)
         {
-
-            pcl::PointXY point;
-            geometry_msgs::Point position = intersections.poses[i].position;
-            point.x = (float) position.x;
-            point.y = (float) position.y;
-
-            std::vector<int> indices(1, 0);
-            std::vector<float> distances(1, 0.0);
-            if (lastDetectionTree_.nearestKSearchT(point, 1, indices, distances) == 1) {
-                int positionIndice = indices[0];
-                double error = std::abs(translationNormEstimate - std::sqrt(distances[0]));
-
-                if (!matched[i] && error < 0.2)
-                {
-                    matched[i] = true;
-                    ++nMatched;
-
-                    double weight = 1.0 / tf::Vector3(position.x ,position.y, 0.0).length();
-                    totalWeight += weight;
-                    averageTranslation.setX(averageTranslation.x() + weight * (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
-                    averageTranslation.setY(averageTranslation.y() + weight * (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
-                }
-            }
+            cloud_out->points[i].x = (float) intersections.poses[i].position.x;
+            cloud_out->points[i].y = (float) intersections.poses[i].position.y;
+            cloud_out->points[i].z = (float) intersections.poses[i].position.z;
         }
 
-        if (nMatched > 0)
+
+        pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+        /*
+        icp.setInputSource(cloud_in);
+        icp.setInputTarget(cloud_out);
+
+        pcl::PointCloud<pcl::PointXYZ> final;
+        // TODO: compute initial guess.
+        icp.align(final);
+        if (icp.hasConverged())
         {
-            averageTranslation.setX(averageTranslation.x() / totalWeight);
-            averageTranslation.setY(averageTranslation.y() / totalWeight);
-            averageTranslation.setZ(0.0);
-
-            // Rotate the translation around the fcu.
-            totalTranslation_ += averageTranslation;
-
-            tf::Vector3 estimate = pivot_ - totalTranslation_;
-            estimate.setZ(state_.getOrigin2Fcu().getOrigin().z());
-
-            tf::Vector3 offset = estimate - state_.getOrigin2Fcu().getOrigin();
-            offset.setZ(0.0);
-
-            double offsetLength = offset.length();
-            if (offsetLength < 0.3)
-            {
-                // TODO: Add elikos_vision_debug as a parameter.
-                tf::StampedTransform transform(tf::Transform(state_.getOrigin2Attitude().getRotation(), estimate),
-                                state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
-                tfPub_.sendTransform(transform);
-            }
-            else 
-            {
-                resetPivot();
-                std::string message( "RESET PIVOT - OFFSET " + std::to_string(offsetLength));
-                ROS_ERROR("%s", message.c_str());
-            }
+            std::cout << icp.getFinalTransformation() << std::endl;
         } else {
-            resetPivot();
-            ROS_WARN("%s", "RESET PIVOT - NO MATCH");
+            ROS_ERROR("%s", "ICP DID NOT CONVERGE");
         }
-    }
+         */ }
 
     lastDetection_ = intersections;
     lastState_ = state_.getOrigin2Fcu();
