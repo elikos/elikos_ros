@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
     		}
       }
       tf_broadcaster_.sendTransform(tf::StampedTransform(arenaOriginTransform.inverse(), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_LOCAL_ORIGIN));
-      tf_broadcaster_.sendTransform(tf::StampedTransform(tf::Transform(attitude_offset_.inverse() * attitude_, tf::Vector3()), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_ATTITUDE));
+      tf_broadcaster_.sendTransform(tf::StampedTransform(tf::Transform(attitude_offset_.inverse() * attitude_, tf::Vector3(0,0,0)), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_ATTITUDE));
     }
     else
     {

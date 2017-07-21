@@ -51,6 +51,10 @@ private:
     void publishTransformedIntersections(const std::vector<cv::Point2f>& imageIntersections,
                                          const geometry_msgs::PoseArray& poseArray);
 
+    void distanceMatrix(const geometry_msgs::PoseArray& lastDetection_,
+                        const geometry_msgs::PoseArray& currentDetection,
+                        const std::vector<std::vector<float>>& distanceMatrix);
+
     void estimateQuadState(const geometry_msgs::PoseArray& intersections);
 
     visualization_msgs::Marker marker_;

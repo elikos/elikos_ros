@@ -16,6 +16,7 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     : cameraInfo_(cameraInfo), state_(state), imageIntersectionsPointCloud_(new pcl::PointCloud<pcl::PointXY>()), lastDetectionPointCloud_(new pcl::PointCloud<pcl::PointXY>())
 {
     // TODO: Set epsilon for kdtree here maybe ? ...
+    lastDetectionTree_.setEpsilon(0.0);
     ros::NodeHandle nh;
 
     pivot_ = tf::Vector3(0.0, 0.0, 0.14);
@@ -28,7 +29,7 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
 
     marker_.id = 0;
     marker_.type = visualization_msgs::Marker::SPHERE;
-    marker_.action = visualization_msgs::Marker::ADD;
+    marker_.action = visualization_msgs::Marker::MODIFY;
     marker_.pose.position.x = 0;
     marker_.pose.position.y = 0;
     marker_.pose.position.z = 0;
@@ -44,6 +45,7 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
     marker_.color.g = 0.0;
     marker_.color.b = 0.0;
     marker_.lifetime.sec = 0;
+    marker_.lifetime.nsec = 30000;
 }
 
 
@@ -83,11 +85,14 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
 		    src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
 	    }
 	    cv::perspectiveTransform(src, dst, perspectiveTransform);
-	    geometry_msgs::PoseArray intersections = transformation_utils::getFcu2TargetArray(state_.getOrigin2Fcu(),
+	    geometry_msgs::PoseArray intersections = transformation_utils::getOrigin2TargetArray(state_.getOrigin2Fcu(),
 										     state_.getFcu2Camera(), dst, imageSize,
 										     cameraInfo_.hfov, cameraInfo_.vfov);
+        tf::Vector3 fcu2originT = -state_.getOrigin2Fcu().getOrigin();
 	    for (int i = 0; i < intersections.poses.size(); ++i) {
-		    intersections.poses[i].position.z = z;
+		    intersections.poses[i].position.z += fcu2originT.z();
+            intersections.poses[i].position.y += fcu2originT.y();
+            intersections.poses[i].position.x += fcu2originT.x();
 	    }
 
         estimateQuadState(intersections);
@@ -185,19 +190,6 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
     if (!lastDetection_.poses.empty())
     {
         tf::Vector3 translationEstimate = state_.getOrigin2Fcu().getOrigin() - lastState_.getOrigin();
-        tf::Transform currentFcu2lastFcu = state_.getOrigin2Fcu().inverse() * lastState_;
-        tf::Vector3 axis = currentFcu2lastFcu.getRotation().getAxis();
-        axis.setX(0.0);
-        axis.setY(0.0);
-        currentFcu2lastFcu.setRotation(tf::Quaternion(axis, currentFcu2lastFcu.getRotation().getAngle()));
-
-        tf::StampedTransform transform(currentFcu2lastFcu, state_.getTimeStamp(), "elikos_arena_origin", "elikos_debug");
-        tfPub_.sendTransform(transform);
-
-        tf::Vector3 test = tf::quatRotate(currentFcu2lastFcu.getRotation(), tf::Vector3(0.0, 0.0, 1.0));
-        tf::Vector3 test2 = tf::quatRotate(currentFcu2lastFcu.getRotation(), tf::Vector3(1.0, 0.0, 0.0));
-
-        ROS_ERROR("%f", currentFcu2lastFcu.getRotation().getAngle());
 
         lastDetectionPointCloud_->clear();
         for (int i = 0; i < lastDetection_.poses.size(); ++i)
@@ -205,17 +197,15 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             geometry_msgs::Point position = lastDetection_.poses[i].position;
             pcl::PointXY point;
 
-            tf::Vector3 estimate = currentFcu2lastFcu * tf::Vector3(position.x, position.y, position.z);
-            point.x = (float) estimate.x();
-            point.y = (float) estimate.y();
+            point.x = (float) (position.x - translationEstimate.x());
+            point.y = (float) (position.y - translationEstimate.y());
 
             lastDetectionPointCloud_->push_back(point);
         }
         lastDetectionTree_.setInputCloud(lastDetectionPointCloud_);
 
         std::vector<bool> matched(intersections.poses.size(), false);
-        std::vector<int> indices(1);
-        std::vector<float> distances(1);
+
 
         tf::Vector3 averageTranslation(0.0, 0.0, 0.0);
         int nMatched = 0;
@@ -225,23 +215,28 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
         double translationNormEstimate = translationEstimate.length();
         for (int i = 0; i < intersections.poses.size(); ++i)
         {
+
             pcl::PointXY point;
             geometry_msgs::Point position = intersections.poses[i].position;
             point.x = (float) position.x;
             point.y = (float) position.y;
-            lastDetectionTree_.nearestKSearch(point, 1, indices, distances);
-            int positionIndice = indices[0];
-            double error = std::abs(translationNormEstimate - std::sqrt(distances[0]));
 
-            if (!matched[i] && error < 0.2)
-            {
-                matched[i] = true;
-                ++nMatched;
+            std::vector<int> indices(1, 0);
+            std::vector<float> distances(1, 0.0);
+            if (lastDetectionTree_.nearestKSearchT(point, 1, indices, distances) == 1) {
+                int positionIndice = indices[0];
+                double error = std::abs(translationNormEstimate - std::sqrt(distances[0]));
 
-                double weight = 1.0 / tf::Vector3(position.x ,position.y, 0.0).length();
-                totalWeight += weight;
-                averageTranslation.setX(averageTranslation.x() + weight * (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
-                averageTranslation.setY(averageTranslation.y() + weight * (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
+                if (!matched[i] && error < 0.2)
+                {
+                    matched[i] = true;
+                    ++nMatched;
+
+                    double weight = 1.0 / tf::Vector3(position.x ,position.y, 0.0).length();
+                    totalWeight += weight;
+                    averageTranslation.setX(averageTranslation.x() + weight * (intersections.poses[i].position.x - lastDetection_.poses[positionIndice].position.x));
+                    averageTranslation.setY(averageTranslation.y() + weight * (intersections.poses[i].position.y - lastDetection_.poses[positionIndice].position.y));
+                }
             }
         }
 
@@ -251,12 +246,8 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             averageTranslation.setY(averageTranslation.y() / totalWeight);
             averageTranslation.setZ(0.0);
 
-            axis = state_.getOrigin2Fcu().getRotation().getAxis();
-            axis.setX(0.0);
-            axis.setY(0.0);
-
             // Rotate the translation around the fcu.
-            totalTranslation_ += tf::quatRotate(tf::Quaternion(axis, state_.getOrigin2Fcu().getRotation().getAngle()), averageTranslation);
+            totalTranslation_ += averageTranslation;
 
             tf::Vector3 estimate = pivot_ - totalTranslation_;
             estimate.setZ(state_.getOrigin2Fcu().getOrigin().z());
@@ -275,12 +266,12 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             else 
             {
                 resetPivot();
-                std::string message( "OFFSET " + std::to_string(offsetLength));
+                std::string message( "RESET PIVOT - OFFSET " + std::to_string(offsetLength));
                 ROS_ERROR("%s", message.c_str());
             }
         } else {
             resetPivot();
-            ROS_WARN("%s", "NO MATCH - RESET PIVOT");
+            ROS_WARN("%s", "RESET PIVOT - NO MATCH");
         }
     }
 
