@@ -63,43 +63,38 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
                                                    const cv::Mat& perspectiveTransform,
                                                    cv::Size imageSize)
 {
-    if (imageIntersections.size() >= 1)
+    updateKDTree(imageIntersections);
+    tf::Vector3 fcu2camera = tf::quatRotate(state_.getOrigin2Fcu().getRotation(), state_.getFcu2Camera().getOrigin());
+
+    tf::Transform origin2camera = state_.getFcu2Camera();
+
+    tf::Vector3 camDirection = tf::quatRotate(origin2camera.getRotation(), tf::Vector3(0.0, 0.0, 1.0));
+
+    camDirection.normalize();
+
+    float S = std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
+
+    double z = S * -estimateAltitude(imageIntersections) + fcu2camera.z();
+
+    std::vector<cv::Point2f> dst;
+    std::vector<cv::Point2f> src;
+    for (int i = 0; i < imageIntersections.size(); ++i)
     {
-	    updateKDTree(imageIntersections);
-	    tf::Vector3 fcu2camera = tf::quatRotate(state_.getOrigin2Fcu().getRotation(), state_.getFcu2Camera().getOrigin());
-
-        tf::Transform origin2camera = state_.getFcu2Camera();
-
-        tf::Vector3 camDirection = tf::quatRotate(origin2camera.getRotation(), tf::Vector3(0.0, 0.0, 1.0));
-
-        camDirection.normalize();
-
-        float S = std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
-
-	    double z = S * -estimateAltitude(imageIntersections) + fcu2camera.z();
-
-	    std::vector<cv::Point2f> dst;
-	    std::vector<cv::Point2f> src;
-	    for (int i = 0; i < imageIntersections.size(); ++i)
-	    {
-		    src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
-	    }
-	    cv::perspectiveTransform(src, dst, perspectiveTransform);
-	    geometry_msgs::PoseArray intersections = transformation_utils::getOrigin2TargetArray(state_.getOrigin2Fcu(),
-										     state_.getFcu2Camera(), dst, imageSize,
-										     cameraInfo_.hfov, cameraInfo_.vfov);
-        tf::Vector3 fcu2originT = -state_.getOrigin2Fcu().getOrigin();
-	    for (int i = 0; i < intersections.poses.size(); ++i) {
-		    intersections.poses[i].position.z += fcu2originT.z();
-            intersections.poses[i].position.y += fcu2originT.y();
-            intersections.poses[i].position.x += fcu2originT.x();
-	    }
-
-        estimateQuadState(intersections);
-	    publishTransformedIntersections(dst, intersections);
-    } else {
-        publishTransformedIntersections(std::vector<cv::Point2f>(), geometry_msgs::PoseArray());
+        src.push_back(cv::Point2f(imageIntersections[i].x(), imageIntersections[i].y()));
     }
+    cv::perspectiveTransform(src, dst, perspectiveTransform);
+    geometry_msgs::PoseArray intersections = transformation_utils::getOrigin2TargetArray(state_.getOrigin2Fcu(),
+                                            state_.getFcu2Camera(), dst, imageSize,
+                                            cameraInfo_.hfov, cameraInfo_.vfov);
+    tf::Vector3 fcu2originT = -state_.getOrigin2Fcu().getOrigin();
+    for (int i = 0; i < intersections.poses.size(); ++i) {
+        intersections.poses[i].position.z += fcu2originT.z();
+        intersections.poses[i].position.y += fcu2originT.y();
+        intersections.poses[i].position.x += fcu2originT.x();
+    }
+
+    estimateQuadState(intersections);
+    publishTransformedIntersections(dst, intersections);
 }
 
 double IntersectionTransform::estimateAltitude(const std::vector<Eigen::Vector2f>& imageIntersections)
@@ -187,7 +182,15 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<cv
 
 void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &intersections) {
 
-    if (!lastDetection_.poses.empty())
+    if (intersections.poses.empty()) 
+    {
+        publishTransformedIntersections(std::vector<cv::Point2f>(), geometry_msgs::PoseArray());
+        tf::StampedTransform transform(tf::Transform(state_.getOrigin2Attitude().getRotation(), state_.getOrigin2Fcu().getOrigin()),
+                        state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
+        tfPub_.sendTransform(transform);
+        resetPivot();
+    }
+    else if (!lastDetection_.poses.empty())
     {
         tf::Vector3 translationEstimate = state_.getOrigin2Fcu().getOrigin() - lastState_.getOrigin();
 
@@ -269,10 +272,16 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
                 std::string message( "RESET PIVOT - OFFSET " + std::to_string(offsetLength));
                 ROS_ERROR("%s", message.c_str());
             }
-        } else {
+        } 
+        else 
+        {
             resetPivot();
             ROS_WARN("%s", "RESET PIVOT - NO MATCH");
         }
+    }
+    else 
+    {
+        resetPivot();
     }
 
     lastDetection_ = intersections;
