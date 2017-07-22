@@ -183,7 +183,7 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<cv
 
 void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray& intersections) {
 
-    if (!lastDetection_.poses.empty())
+    if (!lastDetection_.poses.empty() && !intersections.poses.empty())
     {
         tf::Transform currentFcu2lastFcu = state_.getOrigin2Fcu().inverse() * lastState_;
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in (new pcl::PointCloud<pcl::PointXYZ>);
@@ -268,6 +268,8 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray& in
             ROS_ERROR("%s", "ICP DID NOT CONVERGE");
             resetPivot();
         }
+    } else {
+        resetPivot();
     }
 
     lastDetection_ = intersections;
