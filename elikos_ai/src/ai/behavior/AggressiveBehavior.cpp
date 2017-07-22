@@ -6,7 +6,7 @@
 #include "CommandTypes.h"
 
 #include "AggressiveBehavior.h"
-#include "FrontInteractionCommand.h"
+#include "TopInteractionCommand.h"
 
 namespace ai
 {
@@ -34,22 +34,27 @@ void AggressiveBehavior::generateCommands()
     {
         case 1:
             // 180 rotation then right 90 rotation
-            //q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
-            q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), &tf_listener_)));
             q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, currentTarget_)));
-            q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), &tf_listener_)));
             break;
 
         case 2:
             // 180 rotation
-            //q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
-            q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), &tf_listener_)));
             q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(quad, currentTarget_)));
-            q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), &tf_listener_)));
             break;
         case 3:
             // single 90 rotation
-            q_.push(std::unique_ptr<FrontInteractionCommand>(new FrontInteractionCommand(quad, currentTarget_)));
+            q_.push(std::unique_ptr<TopInteractionCommand>(new TopInteractionCommand(quad, currentTarget_)));
+            //q_.push(std::unique_ptr<TakeOffCommand>(new TakeOffCommand(&arena_->getQuad(), &tf_listener_)));
             break;
         default:
             // do nothing
@@ -59,6 +64,7 @@ void AggressiveBehavior::generateCommands()
 
 int AggressiveBehavior::resolveCurrentStateLevelConcrete()
 {
+    ai::MessageHandler::getInstance()->publishAiStateBehavior("Aggressive Behavior");
     currentTarget_ = arena_->findClosestTargetToGoodLine();
 
     if (currentTarget_ == nullptr)

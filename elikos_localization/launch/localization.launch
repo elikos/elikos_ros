@@ -1,8 +1,8 @@
 <launch>
 
-    <!--include file="$(find elikos_localization)/launch/localization_detection.launch">
+    <include file="$(find elikos_localization)/launch/localization_detection.launch">
         <arg name="camera_name" value="elikos_ffmv_bottom"/>
-    </include-->
+    </include>
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
         <arg name="camera_name" value="elikos_realsense_front"/>
     </include>

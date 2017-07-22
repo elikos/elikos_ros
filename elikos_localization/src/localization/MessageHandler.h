@@ -31,6 +31,8 @@ private:
 
     void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
 
+    bool isProcessing_ = false;
+
     ros::NodeHandle nh_;
     image_transport::ImageTransport it_;
 

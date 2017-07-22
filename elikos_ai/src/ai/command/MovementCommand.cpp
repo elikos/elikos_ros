@@ -22,6 +22,7 @@ MovementCommand::~MovementCommand()
 
 void MovementCommand::execute()
 {
+    ai::MessageHandler::getInstance()->publishAiStateCommand("Movement command");
     MessageHandler::getInstance()->sendDestination(destination_, CmdCode::MOVE_TO_POINT);
 }
 

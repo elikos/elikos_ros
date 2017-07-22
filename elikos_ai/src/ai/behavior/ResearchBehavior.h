@@ -6,7 +6,6 @@
 #define AI_TARGET_RESEARCH_H
 
 #include "AbstractBehavior.h"
-#include <tf/transform_listener.h>
 
 namespace ai
 {

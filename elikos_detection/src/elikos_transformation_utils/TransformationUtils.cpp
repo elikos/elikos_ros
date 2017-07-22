@@ -18,13 +18,31 @@ geometry_msgs::PoseArray getFcu2TargetArray(const tf::StampedTransform& origin2f
                                                 float hfov,
                                                 float vfov)
 {
-    tf::Transform origin2camera = origin2fcu * fcu2camera;
     geometry_msgs::PoseArray poseArray;
     poseArray.header.frame_id = origin2fcu.child_frame_id_;
     poseArray.header.stamp = origin2fcu.stamp_;
     for (int i = 0; i  < points.size(); ++i)
     {
-        poseArray.poses.push_back(computeFcu2Target(fcu2camera, origin2camera, points[i], dimensions, hfov, vfov));
+        poseArray.poses.push_back(computeFcu2Target(fcu2camera, origin2fcu, points[i], dimensions, hfov, vfov));
+    }
+    return poseArray;
+}
+
+geometry_msgs::PoseArray getOrigin2TargetArray(const tf::StampedTransform& origin2fcu,
+                                               const tf::StampedTransform& fcu2camera,
+                                               const std::vector<cv::Point2f>& points,
+                                               cv::Size dimensions,
+                                               float hfov,
+                                               float vfov)
+{
+    geometry_msgs::PoseArray poseArray;
+    poseArray.header.frame_id = origin2fcu.child_frame_id_;
+    poseArray.header.stamp = origin2fcu.stamp_;
+
+    tf::Transform origin2camera = origin2fcu * fcu2camera;
+    for (int i = 0; i  < points.size(); ++i)
+    {
+        poseArray.poses.push_back(computeOrigin2Target(fcu2camera, origin2camera, origin2fcu, points[i], dimensions, hfov, vfov));
     }
     return poseArray;
 }
@@ -36,11 +54,10 @@ geometry_msgs::PoseStamped getFcu2Target(const tf::StampedTransform& origin2fcu,
                                          float hfov,
                                          float vfov)
 {
-    tf::Transform origin2camera = origin2fcu * fcu2camera;
     geometry_msgs::PoseStamped pose;
     pose.header.frame_id = origin2fcu.child_frame_id_;
     pose.header.stamp = origin2fcu.stamp_;
-    pose.pose = computeFcu2Target(fcu2camera, origin2camera, point, dimensions, hfov, vfov);
+    pose.pose = computeFcu2Target(fcu2camera, origin2fcu, point, dimensions, hfov, vfov);
     return pose;
 }
 
@@ -60,7 +77,7 @@ geometry_msgs::PoseStamped getOrigin2Target(const tf::StampedTransform& origin2f
 }
 
 geometry_msgs::Pose computeFcu2Target(const tf::StampedTransform& fcu2camera,
-                                      const tf::Transform& origin2camera,
+                                      const tf::Transform& origin2fcu,
                                       cv::Point2f point,
                                       cv::Size dimensions,
                                       float hfov,
@@ -77,13 +94,13 @@ geometry_msgs::Pose computeFcu2Target(const tf::StampedTransform& fcu2camera,
     camera2turret.setRotation(rotation);
 
     // Compute the origin to turret transform
-    tf::Transform origin2turret = origin2camera * camera2turret;
+    tf::Transform origin2turret = origin2fcu * fcu2camera * camera2turret;
 
     // Find the robot2turret transform
     tf::Transform turret2target = computeTurret2Target(origin2turret);
 
     //Compute the robot poses
-    tf::Transform fcu2target = fcu2camera * camera2turret * turret2target ;
+    tf::Transform fcu2target = origin2fcu * fcu2camera * camera2turret * turret2target ;
 
     geometry_msgs::Pose pose;
     tf::quaternionTFToMsg(fcu2target.getRotation(), pose.orientation);

@@ -1,27 +1,32 @@
 <launch>
 	<!-- Target and obstacle robots -->
-	<!--include file="$(find elikos_sim)/launch/robots_sim.launch"/-->
+	<include file="$(find elikos_sim)/launch/robots_sim.launch"/>
   
   <!-- Target detection -->
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_front" />
       <arg name="cfg" value="gazebo_r200_front"/>
+      <arg name="calib" value="gazebo_front.yaml"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_right" />
       <arg name="cfg" value="gazebo_r200_right"/>
+      <arg name="calib" value="gazebo_front.yaml"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_left" />
       <arg name="cfg" value="gazebo_r200_left"/>
+      <arg name="calib" value="gazebo_front.yaml"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_r200_back" />
       <arg name="cfg" value="gazebo_r200_back"/>
+      <arg name="calib" value="gazebo_front.yaml"/>
   </include>
 	<include file="$(find elikos_detection)/launch/elikos_detection.launch">
       <arg name="camera_name" value="gazebo_ffmv_bottom" />
       <arg name="cfg" value="gazebo_ffmv_bottom"/>
+      <arg name="calib" value="gazebo_bottom.yaml"/>
   </include>
 
   <!-- Target transformation -->
@@ -45,11 +50,12 @@
       <arg name="camera_name" value="gazebo_ffmv_bottom" />
       <arg name="cfg" value="gazebo_ffmv_bottom"/>
   </include>
+  
 	<include file="$(find elikos_ros)/launch/elikos_ai_control.launch"/>
 
 	<!-- Static transforms -->
-	<!--node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
-	<node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
+	<node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0 0 0 0 0 0 1 elikos_arena_origin elikos_local_origin 100" />
+	<!--node pkg="tf" type="static_transform_publisher" name="baselink_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_fcu elikos_base_link 100" />
   <node pkg="tf" type="static_transform_publisher" name="r200_front_broadcaster" args="0.15 0 0 0.6029 -0.6029 0.3695 -0.3695 elikos_base_link r200_front 100" />
   <node pkg="tf" type="static_transform_publisher" name="r200_left_broadcaster" args="0 0.15 0 -0.8526 0.0 0.0 0.5225 elikos_base_link r200_left 100" />
   <node pkg="tf" type="static_transform_publisher" name="r200_right_broadcaster" args="0 -0.15 0 -0.0 -0.8526 0.5225 0.0 elikos_base_link r200_right 100" />

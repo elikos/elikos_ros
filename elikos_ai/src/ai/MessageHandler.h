@@ -10,6 +10,7 @@
 #include <elikos_ros/AICmd.h>
 #include <tf/transform_broadcaster.h>
 #include <CmdDefines.h>
+#include "std_msgs/String.h"
 
 namespace tf
 {
@@ -18,7 +19,7 @@ namespace tf
 
 namespace ai
 {
-const std::string TRGT_TOPIC { "elikos_target_robot_array" };
+const std::string TRGT_TOPIC { "/elikos_track_robot_array" };
 const std::string SETPOINT_TOPIC { "elikos_ai_sim" };
 const std::string CMD_TOPIC { "elikos_ai_cmd" };
 const std::string WORLD_FRAME = { "elikos_arena_origin" };
@@ -35,6 +36,8 @@ public:
     void lookForMessages();
     void lookForMav();
     void sendDestination(const tf::Vector3& destination, CmdCode cmd_code);
+    void publishAiStateBehavior(std::string state);
+    void publishAiStateCommand(std::string state);
 
 private:
     static MessageHandler* instance_;
@@ -45,6 +48,8 @@ private:
 
     ros::Publisher simPub_;
     ros::Publisher cmdPub_;
+    ros::Publisher statePubBehavior_;
+    ros::Publisher statePubCommand_;
     tf::TransformBroadcaster br_;
     bool is_simulation_;
 
