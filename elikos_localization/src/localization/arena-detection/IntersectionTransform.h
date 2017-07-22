@@ -56,6 +56,7 @@ private:
                         const std::vector<std::vector<float>>& distanceMatrix);
 
     void estimateQuadState(const geometry_msgs::PoseArray& intersections);
+    void estimateQuadStateFallback(const geometry_msgs::PoseArray& intersections);
 
     visualization_msgs::Marker marker_;
 
@@ -68,6 +69,9 @@ private:
 
     pcl::KdTreeFLANN<pcl::PointXY> imageIntersectionsTree_;
     pcl::PointCloud<pcl::PointXY>::Ptr imageIntersectionsPointCloud_;
+    //Used for fallback method
+    pcl::KdTreeFLANN<pcl::PointXY> lastDetectionTree_;
+    pcl::PointCloud<pcl::PointXY>::Ptr lastDetectionPointCloud_;
 
     geometry_msgs::PoseArray lastDetection_;
 
