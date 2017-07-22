@@ -225,9 +225,9 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray& in
         icp.setInputSource(cloud_in);
         icp.setInputTarget(cloud_out);
 
-        pcl::PointCloud<pcl::PointXYZ> final;
+        pcl::PointCloud<pcl::PointXYZ> finalCloud;
         // TODO: compute initial guess.
-        icp.align(final);
+        icp.align(finalCloud, transformHint);
         if (icp.hasConverged())
         {
             Eigen::Matrix4f T = icp.getFinalTransformation();
