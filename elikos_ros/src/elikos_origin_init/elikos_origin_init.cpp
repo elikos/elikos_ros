@@ -13,10 +13,12 @@ const std::string ELIKOS_VISION = "elikos_vision";
 const std::string ELIKOS_ATTITUDE = "elikos_attitude";
 
 bool isInit_ = false;
+bool lookupDone = false;
 bool initialize(std_srvs::Empty::Request  &req,
          std_srvs::Empty::Response &res)
 {
   isInit_ = true;
+  lookupDone = false;
   return true;
 }
 
@@ -56,7 +58,6 @@ int main(int argc, char* argv[])
     ROS_ERROR("Origin init failed!!!! Exception : %s",ex.what());
   }
 
-  bool lookupDone = false;
 
   ros::ServiceServer service = n.advertiseService("elikos_origin_init", initialize);
   

@@ -187,7 +187,7 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<cv
 
 void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &intersections) {
 
-    if (!lastDetection_.poses.empty())
+    if (!lastDetection_.poses.empty() && !intersections.poses.empty())
     {
         tf::Vector3 translationEstimate = state_.getOrigin2Fcu().getOrigin() - lastState_.getOrigin();
 
@@ -273,8 +273,9 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             resetPivot();
             ROS_WARN("%s", "RESET PIVOT - NO MATCH");
         }
+    } else {
+        resetPivot();
     }
-
     lastDetection_ = intersections;
     lastState_ = state_.getOrigin2Fcu();
 }
