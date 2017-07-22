@@ -6,6 +6,7 @@
   <node pkg="tf" type="static_transform_publisher" name="r200_right_broadcaster" args="-0.046 -0.3626 0.0506 -0.0 0.8339 -0.5519 0.0 elikos_base_link cam_r200_right_link 100" />
   <node pkg="tf" type="static_transform_publisher" name="r200_back_broadcaster" args="-0.3626 0.046 0.0506 -0.59 -0.59 0.39 0.39 elikos_base_link cam_r200_back_link 100" />
 
+  <node pkg="tf" type="static_transform_publisher" name="corner_broadcaster" args="2.5 -1.5 0 0 0 0 1 elikos_corner elikos_arena_origin 100" />  
   <!-- REALSENSE TF mauvais referentiel -->
   <node pkg="tf" type="static_transform_publisher" name="moveit_r200_front_broadcaster" args="0.3626 -0.046 0.0506 0 0.199 0 0.98 elikos_base_link r200_front_link 100" />
   <node pkg="tf" type="static_transform_publisher" name="moveit_r200_left_broadcaster" args="0.046 0.3626 0.0506 -0.141 0.141 0.693 0.693 elikos_base_link r200_left_link 100" />

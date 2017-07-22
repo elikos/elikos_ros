@@ -74,15 +74,15 @@ int AggressiveBehavior::resolveCurrentStateLevelConcrete()
 
     OrientationEvaluation* evaluation = currentTarget_->getOrientationEvaluation();
     int stateLevel = 1;
-    if (evaluation->isGoodIntersection_) {
+    //if (evaluation->isGoodIntersection_) {
         // TODO: Something better should be done here
         // We need to clear the q if the target is going in the good direction or the ai will keep executing the
         // interaction commands that are still there.
-        q_.clear();
-        q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(&arena_->getQuad(), currentTarget_)));
-    } else {
+       // q_.clear();
+       // q_.push(std::unique_ptr<FollowCommand>(new FollowCommand(&arena_->getQuad(), currentTarget_)));
+    //} else {
         stateLevel = 2;
-    }
+    //}
     return stateLevel;
 }
 

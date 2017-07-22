@@ -12,7 +12,7 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <visualization_msgs/Marker.h>
 
-const int NUM_ROBOTS_PER_COLOR = 5;
+const int NUM_ROBOTS_PER_COLOR = 1;
 
 
 class TrackingHandler {

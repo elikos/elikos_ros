@@ -6,15 +6,15 @@
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
         <arg name="camera_name" value="elikos_realsense_front"/>
     </include>
-    <!--include file="$(find elikos_localization)/launch/localization_detection.launch">
+    <include file="$(find elikos_localization)/launch/localization_detection.launch">
         <arg name="camera_name" value="elikos_realsense_right"/>
     </include>
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
         <arg name="camera_name" value="elikos_realsense_left"/>
     </include>
     <include file="$(find elikos_localization)/launch/localization_detection.launch">
-        <arg name="camera_name" value="elikos_realsense_right"/>
-    </include-->
+        <arg name="camera_name" value="elikos_realsense_back"/>
+    </include>
 
 <!--
     <node pkg="elikos_localization" type="fallback.py" name="feature_tracking" output="screen">

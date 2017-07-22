@@ -6,7 +6,7 @@
 #include <sensor_msgs/Imu.h>
 #include <string>
 
-const std::string ELIKOS_ARENA_ORIGIN = "elikos_arena_origin";
+const std::string ELIKOS_ARENA_ORIGIN = "elikos_corner";
 const std::string ELIKOS_LOCAL_ORIGIN = "elikos_local_origin";
 const std::string ELIKOS_FCU = "elikos_fcu";
 const std::string ELIKOS_VISION = "elikos_vision";
