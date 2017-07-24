@@ -14,11 +14,16 @@ const std::string ELIKOS_ATTITUDE = "elikos_attitude";
 
 bool isInit_ = false;
 bool lookupDone = false;
+bool reInit_ = false;
+tf::Vector3 pos_offset_;
 bool initialize(std_srvs::Empty::Request  &req,
          std_srvs::Empty::Response &res)
 {
+  if (isInit_) 
+  {
+    reInit_ = true;
+  }
   isInit_ = true;
-  lookupDone = false;
   return true;
 }
 
@@ -65,6 +70,14 @@ int main(int argc, char* argv[])
   ros::Rate r(10);
   while(ros::ok())
   {
+    if(reInit_)
+    {
+      tf::StampedTransform temp;
+      tf_listener_.lookupTransform(ELIKOS_ARENA_ORIGIN, ELIKOS_FCU, ros::Time(0), temp);
+      pos_offset_.setX(pos_offset_.getX() - temp.getOrigin().getX());
+      pos_offset_.setY(pos_offset_.getY() - temp.getOrigin().getY());
+      reInit_ = false;
+    }
     if(isInit_)
     {
       if(!lookupDone)
@@ -90,7 +103,9 @@ int main(int argc, char* argv[])
               ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_VISION));
     		}
       }
-      tf_broadcaster_.sendTransform(tf::StampedTransform(arenaOriginTransform.inverse(), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_LOCAL_ORIGIN));
+      tf::Transform final_arena_transform = arenaOriginTransform.inverse();
+      final_arena_transform.setOrigin(arenaOriginTransform.inverse().getOrigin() + pos_offset_);
+      tf_broadcaster_.sendTransform(tf::StampedTransform(final_arena_transform, ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_LOCAL_ORIGIN));
       tf_broadcaster_.sendTransform(tf::StampedTransform(tf::Transform(attitude_offset_.inverse() * attitude_, tf::Vector3(0,0,0)), ros::Time::now(), ELIKOS_ARENA_ORIGIN, ELIKOS_ATTITUDE));
     }
     else
