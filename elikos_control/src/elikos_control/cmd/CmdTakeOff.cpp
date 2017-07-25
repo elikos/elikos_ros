@@ -80,6 +80,8 @@ void CmdTakeOff::execute()
         double distance = lastPosition_.getOrigin().distance(targetPosition_.getOrigin());
         if (distance > threshold_)
         {
+            targetPosition_.getOrigin().setX(lastPosition_.getOrigin().x());
+            targetPosition_.getOrigin().setY(lastPosition_.getOrigin().y());
             targetPosition_.stamp_ = ros::Time::now();
             tf_broadcaster_.sendTransform(targetPosition_);
             rate.sleep();
