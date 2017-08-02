@@ -35,7 +35,7 @@
 
     Installer gazebo 7 pour ros
 
-        sudo apt-get install ros-$(ROS_DISTRO)-gazebo7-ros-pkgs
+        sudo apt-get install ros-$(ROS_DISTRO)-gazebo-ros-pkgs
 
     Builder le firmware pour gazebo
 
