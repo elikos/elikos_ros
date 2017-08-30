@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     cmake_modules
     cv_bridge
     geometry_msgs
-    elikos_ros
+    elikos_main
     elikos_detection
     nav_msgs
     image_transport
@@ -32,7 +32,7 @@ catkin_package(
     CATKIN_DEPENDS
     image_transport
     cv_bridge
-    elikos_ros
+    elikos_main
     elikos_detection
     geometry_msgs
     nav_msgs

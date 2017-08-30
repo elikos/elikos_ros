@@ -38,7 +38,7 @@ MessageHandler::MessageHandler(string calibrationFilename)
     subRC_ = nh_.subscribe(RCinputTopic, 100, &MessageHandler::dispatchCommand, this);
     std::string cam_name = ros::this_node::getName();
     cam_name = cam_name.substr(0, cam_name.size()-std::string("_detection").size());
-    pub_ = nh_.advertise<elikos_ros::RobotRawArray>("/"+cam_name+"/elikos_robot_raw_array", 1);
+    pub_ = nh_.advertise<elikos_main::RobotRawArray>("/"+cam_name+"/elikos_robot_raw_array", 1);
     pubCommandOutput_ = nh_.advertise<std_msgs::String>(RCCommandOutputTopic, 100);
     
     pubImages_ = it_.advertise(RCdebugTopic, 1);  // debug only
@@ -118,8 +118,8 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr& input) {
     }
 
     // publishing data
-    elikos_ros::RobotRawArray output;
-    elikos_ros::RobotRaw data;
+    elikos_main::RobotRawArray output;
+    elikos_main::RobotRaw data;
 
     for (auto robot : robotsArray) {
         data.id = robot.getID();

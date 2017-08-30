@@ -1,9 +1,9 @@
 #ifndef AI_MESSAGE_EMULATOR_H
 #define AI_MESSAGE_EMULATOR_H
 
-#include <elikos_ros/TargetRobot.h>
+#include <elikos_main/TargetRobot.h>
 
-#include <elikos_ros/TargetRobotArray.h>
+#include <elikos_main/TargetRobotArray.h>
 #include <string>
 
 #include <ros/ros.h>
@@ -33,7 +33,7 @@ public:
 private:
     static MessageEmulator* instance_;
 
-    elikos_ros::TargetRobotArray targets_;
+    elikos_main::TargetRobotArray targets_;
 
     ros::NodeHandle nh_;
     tf::TransformListener listener_;

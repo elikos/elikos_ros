@@ -19,9 +19,9 @@ PriorityEvaluationManager::PriorityEvaluationManager(AbstractArena* arena)
     //TODO: use the config here.
 }
 
-void PriorityEvaluationManager::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
+void PriorityEvaluationManager::updateTargets(const elikos_main::TargetRobotArray::ConstPtr& input)
 {
-    const elikos_ros::TargetRobot* targets = input->targets.data();
+    const elikos_main::TargetRobot* targets = input->targets.data();
     size_t n = input->targets.size();
     //std::thread th[n];
 
@@ -33,7 +33,7 @@ void PriorityEvaluationManager::updateTargets(const elikos_ros::TargetRobotArray
     }
 }
 
-void PriorityEvaluationManager::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
+void PriorityEvaluationManager::updateTarget(const elikos_main::TargetRobot& targetUpdate)
 {
     /*TargetRobot* target = arena_->updateTarget(targetUpdate);
     if (target != nullptr) {

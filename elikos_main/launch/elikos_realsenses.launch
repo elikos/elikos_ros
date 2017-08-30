@@ -1,0 +1,5 @@
+<launch> <!-- Ne fonctionne pas -->
+  <include file="$(find elikos_main)/launch/elikos_realsense_right.launch"/>
+  <include file="$(find elikos_main)/launch/elikos_realsense_left.launch"/>
+  <include file="$(find elikos_main)/launch/elikos_realsense_front.launch"/>
+</launch>

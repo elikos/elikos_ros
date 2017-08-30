@@ -27,5 +27,5 @@
       <param name="bayer_pattern" value="rggb" />
       <param name="bayer_mode" value="AHD" />
   </node>
-	<include file="$(find elikos_ros)/launch/mavros_config.launch"/>-->
+	<include file="$(find elikos_main)/launch/mavros_config.launch"/>-->
 </launch>

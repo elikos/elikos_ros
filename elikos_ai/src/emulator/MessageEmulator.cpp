@@ -16,7 +16,7 @@ MessageEmulator* MessageEmulator::instance_ = nullptr;
 
 MessageEmulator::MessageEmulator()
 {
-    trgtPub_ = nh_.advertise<elikos_ros::TargetRobotArray>(ai::TRGT_TOPIC, 1);
+    trgtPub_ = nh_.advertise<elikos_main::TargetRobotArray>(ai::TRGT_TOPIC, 1);
     dstSub_ = nh_.subscribe<geometry_msgs::PoseStamped>(ai::SETPOINT_TOPIC, 1, &MessageEmulator::handleDstMsg, this);
     dstPub_ = nh_.advertise<geometry_msgs::PoseStamped>(SIM_DST_TOPIC, 1);
 }
@@ -97,7 +97,7 @@ void MessageEmulator::addTarget(const tf::StampedTransform& stf, unsigned char i
         geometry_msgs::Pose poseMsg;
         tf::poseTFToMsg(poseTf, poseMsg);
 
-        elikos_ros::TargetRobot target;
+        elikos_main::TargetRobot target;
         target.color = 0;
         target.id = id;
         target.poseOrigin.pose = poseMsg;

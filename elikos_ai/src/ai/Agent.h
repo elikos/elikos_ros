@@ -7,7 +7,7 @@
 #include "PriorityEvaluationManager.h"
 #include "BehaviorManager.h"
 #include "AbstractArena.h"
-#include <elikos_ros/TargetRobotArray.h>
+#include <elikos_main/TargetRobotArray.h>
 
 namespace ai
 {
@@ -28,7 +28,7 @@ public:
 
     void init();
 
-    void updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input);
+    void updateTargets(const elikos_main::TargetRobotArray::ConstPtr& input);
     void updateQuadRobot(const tf::Pose& pose);
 
     void behave();

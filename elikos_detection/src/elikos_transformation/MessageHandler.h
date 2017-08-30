@@ -2,8 +2,8 @@
 #define MESSAGE_HANDLER
 
 #include <ros/ros.h>
-#include <elikos_ros/RobotRaw.h>
-#include <elikos_ros/RobotRawArray.h>
+#include <elikos_main/RobotRaw.h>
+#include <elikos_main/RobotRawArray.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <cv_bridge/cv_bridge.h>
 
@@ -14,13 +14,13 @@ class MessageHandler
 public:
     MessageHandler();
     ~MessageHandler();
-    void dispatchMessageRobotRaw(const elikos_ros::RobotRawArray::ConstPtr &input);
+    void dispatchMessageRobotRaw(const elikos_main::RobotRawArray::ConstPtr &input);
 
 private:
     ros::NodeHandle nh_;
     ros::Subscriber sub_;
     ros::Publisher pubTest_;
-    elikos_ros::RobotRawArray newArray_;
+    elikos_main::RobotRawArray newArray_;
 	TransformationUnit transformationUnit_;
 };
 

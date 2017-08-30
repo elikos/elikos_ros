@@ -10,10 +10,10 @@
 #include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
-#include <elikos_ros/RobotRawArray.h>
-#include <elikos_ros/RobotRaw.h>
-#include <elikos_ros/TargetRobotArray.h>
-#include <elikos_ros/TargetRobot.h>
+#include <elikos_main/RobotRawArray.h>
+#include <elikos_main/RobotRaw.h>
+#include <elikos_main/TargetRobotArray.h>
+#include <elikos_main/TargetRobot.h>
 #include <string>
 #include <sstream>
 #include <geometry_msgs/Pose.h>
@@ -25,7 +25,7 @@ class TransformationUnit
 	public:
 		TransformationUnit();
 		//Turret: frame coordinate referencing the camera to robot vector.
-		geometry_msgs::PoseArray computeTransformForRobots(elikos_ros::RobotRawArray);
+		geometry_msgs::PoseArray computeTransformForRobots(elikos_main::RobotRawArray);
 
 	private:
 		tf::TransformBroadcaster tf_broadcaster_;
