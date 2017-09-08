@@ -1,12 +1,18 @@
 Elikos_ROS
 ===
 
-Package ROS "Elikos_ROS" contenant les différents modules servant à la localisation, à la détection d'obstacles et de cibles et à l'autonomie du quadricoptère.
+Package ROS "Elikos_ROS" contenant les différents modules servant à la localisation, à la détection d'obstacles et de cibles et à l'autonomie du quadricoptère.  
+
+[WikiElikos](https://elikos-org.gitbooks.io/wikielikos/content/)
 
 ## Dependencies
 
   Packages ROS :  
-	`sudo apt-get install ros-kinetic-mavros ros-kinetic-mavros-extras ros-kinetic-pointgrey-camera-driver ros-kinetic-moveit`
+  
+    sudo apt-get install -y ros-$ROS_DISTRO-mavros ros-$ROS_DISTRO-mavros-extras ros-$ROS_DISTRO-pointgrey-camera-driver ros-$ROS_DISTRO-moveit
+    sudo apt install -y python-pip
+    sudo pip install --upgrade pip
+    sudo pip install numba scipy numpy numpy-quaternion`
 
 ## Wut is dis
 

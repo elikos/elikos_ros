@@ -8,12 +8,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   tf
+  elikos_control
 )
 
 catkin_package(
 #	INCLUDE_DIRS include
 #	LIBRARIES elikos_ai
-	CATKIN_DEPENDS elikos_ros geometry_msgs roscpp std_msgs tf
+	CATKIN_DEPENDS elikos_ros geometry_msgs roscpp std_msgs tf elikos_control
 #	DEPENDS system_lib
 )
 

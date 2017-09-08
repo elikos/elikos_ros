@@ -1,0 +1,2 @@
+geometry_msgs/Point imagePosition
+geometry_msgs/Point arenaPosition

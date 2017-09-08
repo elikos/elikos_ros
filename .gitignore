@@ -42,8 +42,14 @@
 .cproject
 
 # vscode files
-.vscode/*
+.vscode/
 elikos_sim/.vscode/*
 elikos_localization/.vscode/*
 elikos_localization/build/*
+elikos_control/.vscode/*
+elikos_control/build/*
+**/cmake-build-debug
+
+#Le bytecode de python
+*.pyc
 

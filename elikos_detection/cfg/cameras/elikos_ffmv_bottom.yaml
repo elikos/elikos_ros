@@ -1,6 +1,8 @@
 #topic: "/cam1/camera/image_raw" #Real Stuff
-topic: "/camera/image_rect_color" #RosBag with ImageProc
-#topic: "/elikos_ffmv_bottom_camera/image_raw" #Simulation Gazebo
+#topic: "/camera/image_rect_color" #RosBag with ImageProc
+
+topic: "/camera_bottom/image_rect_color" #Simulation Gazebo
+preprocessed_topic: "/elikos_ffmv_bottom_camera/preprocessed"
 
 frame: "elikos_ffmv_bottom"
 calibration: false
@@ -10,4 +12,6 @@ cam_height: 480
 cam_width: 640
 cam_fov_v: 63
 cam_fov_h: 89
-min_height: 0.1
+min_height: 0.5
+bw_threshold: 149
+undistort: true

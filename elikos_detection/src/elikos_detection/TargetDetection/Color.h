@@ -34,13 +34,13 @@ public:
     int* DILATIONS;
     int* POST_EROSIONS;
     
+    int PRE_BLUR = 8;
 protected:
     Mat threshold;
     Mat hsv;
     vector<RobotDesc> foundObjects;
 	CVWrapperInterface* cvWrapper;
 
-    int PRE_BLUR = 2;
     int BLUR_AMOUNT;
 
     const int FRAME_WIDTH = 640;
@@ -48,7 +48,7 @@ protected:
 
     const int MAX_NUM_OBJECTS = 50;
 
-    const int MIN_OBJECT_AREA = 40 * 40;
+    const int MIN_OBJECT_AREA = 100;
     const int MAX_OBJECT_AREA = FRAME_HEIGHT * FRAME_WIDTH / 1.5;
 
 private:

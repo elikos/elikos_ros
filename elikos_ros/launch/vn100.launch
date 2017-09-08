@@ -1,0 +1,15 @@
+<launch>
+    <!-- Arguments -->
+    <arg name="port" default="/dev/ttyUSB1" />
+    <arg name="imu" default="imu"/>
+    <arg name="frame_id" default="$(arg imu)"/>
+    <arg name="baudrate" default="921600"/>
+    <arg name="imu_rate" default="100"/>
+
+    <include ns="vn100" file="$(find imu_vn_100)/launch/vn_100_cont.launch">
+        <arg name="port" value="$(arg port)" />
+        <arg name="frame_id" value="$(arg imu)"/>
+        <arg name="baudrate" value="$(arg baudrate)"/>
+        <arg name="imu_rate" value="$(arg imu_rate)"/>
+    </include>
+</launch>

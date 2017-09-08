@@ -29,12 +29,13 @@
 4. Builder le code du Firmware
 
     Suivre les instructions pour installer les dépendances requises : http://dev.px4.io/starting-installing-linux.html
+    Note: Installer les dépendances pour Nuttx based hardware.
 
     Ajouter les packages de osrfoundation.org pour gazebo : http://gazebosim.org/tutorials?tut=install_ubuntu
 
     Installer gazebo 7 pour ros
 
-        sudo apt-get install ros-$(ROS_DISTRO)-gazebo7-ros-pkgs
+        sudo apt-get install ros-$(ROS_DISTRO)-gazebo-ros-pkgs
 
     Builder le firmware pour gazebo
 
@@ -53,8 +54,6 @@
     * Lance une simulation gazebo, le firmware du pixhawk et mavros
     * `world` : Le chemin vers le fichier .world qui décrit l'environnement
     * `sdf` : Le chemin vers le fichier .sdf qui décrit le véhicule simulé
-<<<<<<< HEAD
-=======
     * `config_yaml` : Le chemin vers le fichier .yaml qui contient les configurations pour mavros.
 
 * `integration_sim.launch`
@@ -62,7 +61,6 @@
 
 * `robots_sim.launch`
     * Ajoute des cibles et des obstacles se déplaçant dans la simulation.
->>>>>>> master
 
 ## Positionner le drône
 Après avoir lancé le launch file pour la simulation gazebo, envoyer un setpoint à une position dans les airs

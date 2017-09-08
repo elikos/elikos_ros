@@ -24,6 +24,9 @@
 #include <ctime>
 
 #include <elikos_ros/TrajectoryCmd.h>
+#include <elikos_ros/AICmd.h>
+
+#include <CmdDefines.h>
 
 class Moveit_move_group
 {
@@ -31,7 +34,7 @@ public:
     Moveit_move_group();
     ~Moveit_move_group();
 
-    void move(geometry_msgs::PoseStamped target);
+    trajectory_msgs::MultiDOFJointTrajectory move(geometry_msgs::PoseStamped target);
     void publishTrajectoryPoint(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint);
 
 private:
@@ -47,7 +50,6 @@ private:
     double safetyTime_;
 
     ros::NodeHandle nh_;
-    ros::Publisher pub_;
 };
 
 #endif

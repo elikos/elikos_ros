@@ -1,0 +1,12 @@
+topic: "/r200_right/color/image_raw_throttle"
+frame: "cam_r200_right_link"
+calibration: false
+file_in: "calib_poly"
+file_out: "new_calibration"
+cam_height: 480
+cam_width: 640
+cam_fov_v: 41
+cam_fov_h: 53
+min_height: 0.1
+bw_threshold: 130
+undistort: false

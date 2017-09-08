@@ -19,6 +19,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
 #include <opencv2/opencv.hpp>
+#include "TransformationUtils.h"
 class TransformationUnit
 {
 	public:
@@ -27,16 +28,11 @@ class TransformationUnit
 		geometry_msgs::PoseArray computeTransformForRobots(elikos_ros::RobotRawArray);
 
 	private:
-		tf::Quaternion computeTurretRotation(elikos_ros::RobotRaw);
-		tf::Transform computeRobotTransform(tf::Transform);
-
 		tf::TransformBroadcaster tf_broadcaster_;
 		tf::TransformListener tf_listener_;
 
 		ros::NodeHandle nh_;
 		ros::Publisher pub_;
-
-		elikos_ros::TargetRobotArray oldArray_;
 
 	  	std::string cameraFrameID_;
 

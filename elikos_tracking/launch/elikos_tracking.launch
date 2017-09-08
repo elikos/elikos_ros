@@ -1,0 +1,3 @@
+<launch>
+  <node name="elikos_tracking" pkg="elikos_tracking" type="elikos_tracking" output="screen" />
+</launch>
