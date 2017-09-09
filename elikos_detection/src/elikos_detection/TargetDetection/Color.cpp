@@ -1,4 +1,3 @@
-#include <opencv2/core/gpumat.hpp>
 #include "Color.h"
 #include "GpuCV.h"
 #include "CpuCV.h"

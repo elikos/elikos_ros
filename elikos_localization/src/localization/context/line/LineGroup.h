@@ -6,6 +6,7 @@
 #define LOCALIZATION_LINEGROUP_H
 
 #include <Eigen/Core>
+#include <vector>
 
 namespace localization
 {
