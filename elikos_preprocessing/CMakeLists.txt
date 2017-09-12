@@ -23,14 +23,7 @@ find_package(Qt5Widgets)
 find_package(Qt5Test)
 find_package(Qt5Concurrent)
 find_package(Qt5OpenGL)
-find_package(OpenCV 2 REQUIRED)
-find_package(Qt5Gui)
-find_package(Qt5Core)
-find_package(Qt5Widgets)
-find_package(Qt5Test)
-find_package(Qt5Concurrent)
-find_package(Qt5OpenGL)
-find_package(OpenCV 2 REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 
 catkin_package(
 #   INCLUDE_DIRS include
