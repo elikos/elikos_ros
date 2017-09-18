@@ -23,7 +23,7 @@ cv::Mat distortionMap2_;
 BlobDetection::BlobDetection() {
     // foundCircles initialisation
     // Maximum of 20 circles detected at the same time
-    // It allows to loose a circle for a few frames without loosing its
+    // It allows to miss a circle for a few frames without loosing its
     // information
     for (int j = 0; j < 20; j++) {
         foundCircles.emplace_back(RobotDesc(j, 0, 0));
