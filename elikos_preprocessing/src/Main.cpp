@@ -33,8 +33,6 @@ private:
 };
 }
 
-/** pas de main dans un nodelet*/
-
 //Exportation de la classe principale du nodelet
 PLUGINLIB_EXPORT_CLASS(preprocessing::ElikosPreprocessing, nodelet::Nodelet)
 

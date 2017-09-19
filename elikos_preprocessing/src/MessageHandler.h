@@ -23,7 +23,7 @@ public:
 
 private:
 
-    void cameraCallback(const sensor_msgs::ImageConstPtr& msg, const sensor_msgs::CameraInfoConstPtr& info_msg);
+    void cameraCallback(const sensor_msgs::ImageConstPtr& msg);
 
     CameraInfo cameraInfo_;
     QuadState state_;
@@ -31,8 +31,8 @@ private:
     ros::NodeHandle nh_;
 
     image_transport::ImageTransport it_;
-    image_transport::CameraSubscriber imageSub_;
-    image_transport::Publisher preprocessedPub_;
+    image_transport::Subscriber imageSub_;
+    image_transport::Publisher imagePub_;
     ros::Publisher inverseTransformPub_;
 
     PreProcessing preProcessing_;

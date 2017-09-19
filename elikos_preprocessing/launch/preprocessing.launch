@@ -1,5 +1,5 @@
 <launch>
-    <arg name="camera_name" default="gazebo_r200_front"/>
+    <arg name="camera_name" default="elikos_realsense_front"/>
     <arg name="camera_manager_nodelet" default="camera_manager"/>
 
     <include file="$(find elikos_detection)/launch/camera_param.launch">
