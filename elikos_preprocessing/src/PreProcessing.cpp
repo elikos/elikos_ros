@@ -29,20 +29,16 @@ PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& stat
 
 void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat& perspectiveTransform)
 {
-    /*
-    cv::Mat typeConverted;
-    if (raw.type() != CV_8UC1) {
-        cv::cvtColor(raw, typeConverted, CV_BGR2GRAY);
-    }
-    else 
+    cv::Size size(640, 480);
+    cv::Mat resized = raw;
+    if (size != raw.size())
     {
-        raw.copyTo(typeConverted);
+        cv::resize(raw, resized, size);
     }
-    */
 
-    cv::Mat undistorted = raw;
+    cv::Mat undistorted = resized;
     if (!undistortType_) {
-        cv::remap(raw, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
+        cv::remap(resized, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
     }
 
     cv::Mat perspective;

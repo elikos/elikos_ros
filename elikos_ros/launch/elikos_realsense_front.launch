@@ -17,8 +17,8 @@
       <arg name="enable_color"      default="$(arg camera_front_enable_color)" />
       <arg name="enable_pointcloud" default="$(arg camera_front_enable_pointcloud)" />
       <arg name="enable_tf"         default="$(arg camera_front_enable_tf)" />
-      <arg name="color_width"  value="640" />
-      <arg name="color_height" value="480" />
+      <arg name="color_width"  value="1920" />
+      <arg name="color_height" value="1080" />
   </include>
   <node pkg="topic_tools" type="throttle" name="r200_front_throttle" args="messages /r200_front/color/image_raw 10.0" /> 
   <node pkg="topic_tools" type="throttle" name="r200_dfront_throttle" args="messages /r200_front/depth/points 10.0" />
