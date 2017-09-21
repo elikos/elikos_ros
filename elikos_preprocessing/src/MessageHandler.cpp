@@ -27,7 +27,7 @@ MessageHandler::~MessageHandler()
 
 void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& image_msg)
 {
-    state_.update(image_msg->header.stamp);
+    //state_.update(image_msg->header.stamp);
 
     cv::Mat input = cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image;
     cv::Mat output;
@@ -43,7 +43,7 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& image_msg)
 
     elikos_ros::StampedMatrix3 invTransformMsg;
     invTransformMsg.header = image_msg->header;
-    for(int i = 0; i < 9; ++i){
+    for(int i = 0; i < inverseTransform.total(); ++i){
         invTransformMsg.matrix.data[i] = inverseTransform.at<double>(i / 3, i % 3);
     }
     inverseTransformPub_.publish(invTransformMsg);

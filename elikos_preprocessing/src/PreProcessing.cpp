@@ -21,15 +21,15 @@ PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& stat
 
     cv::Mat cameraDistortion = (cv::Mat_<float>(1,5) << -0.321590, 0.089597, 0.001090, -0.000489, 0.000000);
 
-
     cv::Mat undistortedCamera = cv::getOptimalNewCameraMatrix(distortedCamera, cameraDistortion, cv::Size(640, 480), 0);
 
     cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
-                                cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
+                              cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
 }
 
 void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat& perspectiveTransform)
 {
+
     cv::Size size(640, 480);
     cv::Mat resized = raw;
     if (size != raw.size())
