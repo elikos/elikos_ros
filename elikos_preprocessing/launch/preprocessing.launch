@@ -1,5 +1,5 @@
 <launch>
-    <arg name="camera_name" default="elikos_realsense_front"/>
+    <arg name="camera_name" default="elikos_realsense_right"/>
     <arg name="camera_manager_nodelet" default="camera_manager"/>
 
     <include file="$(find elikos_detection)/launch/camera_param.launch">
@@ -7,6 +7,8 @@
     </include>
 
     <node name="$(arg camera_manager_nodelet)" type="nodelet" pkg="nodelet" args="manager" output="screen"/>
-    <node name="$(arg camera_name)_preprocessing" type="nodelet" pkg="nodelet" args="load elikos_preprocessing/preprocessing $(arg camera_manager_nodelet) $(arg camera_name)" output="screen"/>
+    <node name="$(arg camera_name)_preprocessing" type="nodelet" pkg="nodelet" args="load elikos_preprocessing/preprocessing $(arg camera_manager_nodelet)" output="screen">
+        <param name="camera_name" type="string" value="$(arg camera_name)"/>
+    </node>
 
 </launch>

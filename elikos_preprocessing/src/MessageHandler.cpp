@@ -10,13 +10,15 @@ namespace preprocessing {
 MessageHandler::MessageHandler(const ros::NodeHandle& nodeHandle, const std::string& cameraName)
     : nh_(nodeHandle), it_(nh_), preProcessing_(cameraInfo_, state_)
 {
+    ROS_ERROR("Loading camera parameters.");
     if (!cameraInfo_.load(cameraName)) {
         ROS_ERROR("Failed to load config file.");
     }
     ROS_ERROR("Camera config loaded successfully.");
     state_.setCameraFrame(cameraInfo_.frame);
-    //imageSub_ = it_.subscribe(cameraInfo_.topic, 1, &MessageHandler::cameraCallback, this);
-    //inverseTransformPub_ = nh_.advertise<elikos_ros::StampedMatrix3>("image_preprocessed/inverse_transform", 1);
+    imageSub_ = it_.subscribe(cameraInfo_.topic, 1, &MessageHandler::cameraCallback, this);
+    imagePub_ = it_.advertise(cameraInfo_.topic + "/image_preprocessed", 1);
+    inverseTransformPub_ = nh_.advertise<elikos_ros::StampedMatrix3>("image_preprocessed/inverse_transform", 1);
 }
 
 MessageHandler::~MessageHandler()
@@ -42,7 +44,7 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& image_msg)
     elikos_ros::StampedMatrix3 invTransformMsg;
     invTransformMsg.header = image_msg->header;
     for(int i = 0; i < 9; ++i){
-        invTransformMsg.matrix.data[i] = inverseTransform.at<double>(i/3, i%3);
+        invTransformMsg.matrix.data[i] = inverseTransform.at<double>(i / 3, i % 3);
     }
     inverseTransformPub_.publish(invTransformMsg);
 }

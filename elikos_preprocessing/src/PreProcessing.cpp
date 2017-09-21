@@ -21,6 +21,7 @@ PreProcessing::PreProcessing(const CameraInfo& cameraInfo, const QuadState& stat
 
     cv::Mat cameraDistortion = (cv::Mat_<float>(1,5) << -0.321590, 0.089597, 0.001090, -0.000489, 0.000000);
 
+
     cv::Mat undistortedCamera = cv::getOptimalNewCameraMatrix(distortedCamera, cameraDistortion, cv::Size(640, 480), 0);
 
     cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(), undistortedCamera,
@@ -41,7 +42,7 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat
         cv::remap(resized, undistorted, distortionMap1_, distortionMap2_, CV_INTER_LINEAR);
     }
 
-    cv::Mat perspective;
+    cv::Mat perspective = undistorted;
     removePerspective(undistorted, perspective, perspectiveTransform);
 
     cv::Mat blured;

@@ -18,19 +18,20 @@ class ElikosPreprocessing : public nodelet::Nodelet
 public:
     virtual void onInit()
     {
-        std::vector<std::string> args = getMyArgv();
-        if (args.size() > 0)
+        std::string cameraName;
+        if (getPrivateNodeHandle().getParam("camera_name", cameraName))
         {
-            messageHandler_ = std::unique_ptr<MessageHandler>(new MessageHandler(getNodeHandle(), args[0]));
+            messageHandler_ = new MessageHandler(getPrivateNodeHandle(), cameraName);
         }
         else
         {
-            ROS_ERROR("Expected at least one argument");
+            ROS_ERROR("Expected camera_name parameter not found");
         }
     }
 private:
-    std::unique_ptr<MessageHandler> messageHandler_;
+   MessageHandler* messageHandler_;
 };
+
 }
 
 //Exportation de la classe principale du nodelet

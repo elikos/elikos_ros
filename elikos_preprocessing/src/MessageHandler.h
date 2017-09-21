@@ -18,6 +18,7 @@ namespace preprocessing {
 class MessageHandler
 {
 public:
+    MessageHandler() = default;
     MessageHandler(const ros::NodeHandle& nodeHandle, const std::string& cameraName);
     ~MessageHandler();
 

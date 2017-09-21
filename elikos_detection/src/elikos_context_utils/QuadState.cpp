@@ -25,7 +25,6 @@ bool QuadState::update(ros::Time stamp)
 
         tfListener_.waitForTransform("elikos_fcu", cameraFrame_, stamp, ros::Duration(1.0));
         tfListener_.lookupTransform("elikos_fcu", cameraFrame_, stamp, fcu2camera_);
-        
 
         success = true;
     }
