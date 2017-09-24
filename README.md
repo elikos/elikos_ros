@@ -3,6 +3,8 @@ elikos_ros
 
 Dossier contenant les différents modules servant à la localisation, à la détection d'obstacles et de cibles et à l'autonomie du quadricoptère.
 
+[WikiElikos](https://elikos.github.io/documentation/)
+
 ## Dependencies
 
   Packages ROS :  
