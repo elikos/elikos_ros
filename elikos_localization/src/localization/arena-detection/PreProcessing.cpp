@@ -98,6 +98,7 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Ma
     double f = cameraInfo_.focalLength;
     double HFOV = cameraInfo_.hfov;
     double VFOV = cameraInfo_.vfov;
+    f = width / (2.0 * std::tan(HFOV / 2.0));
 
     Eigen::Vector4f src[4] { Eigen::Vector4f( 1.0,  1.0, 0.0, 1.0), 
                              Eigen::Vector4f(-1.0,  1.0, 0.0, 1.0), 
@@ -136,18 +137,6 @@ void PreProcessing::removePerspective(cv::Mat& input, cv::Mat& rectified, cv::Ma
 
     cv::warpPerspective(input, rectified, cv::getPerspectiveTransform(tSrc, tDst), input.size());
     toPerspective = cv::getPerspectiveTransform(tDst, tSrc);
-
-
-    //Eigen::Vector4f camDirection = R * Eigen::Vector4f(0.0, 0.0, 1.0, 0.0);
-    //float S = 1.0 / std::cos(std::atan(std::sqrt(std::pow(camDirection.x(), 2) + std::pow(camDirection.y(), 2)) / camDirection.z()));
-    /*
-    if (!std::isnan(S)) {
-        cv::resize(transformed, rectified, cv::Size(), S, S);
-        //rectified = transformed;
-    } else {
-        rectified = input.clone();
-    }*/
-
 }
 
 Eigen::Matrix4f PreProcessing::getPerspectiveProjectionTransform(double focalLength, double width, double height) const
