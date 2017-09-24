@@ -3,7 +3,7 @@ project(elikos_sim)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
-  elikos_ros
+  elikos_main
   geometry_msgs
   roscpp
   std_msgs
@@ -13,12 +13,12 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #	INCLUDE_DIRS include
 #	LIBRARIES elikos_ai
-	CATKIN_DEPENDS elikos_ros geometry_msgs roscpp std_msgs tf
+	CATKIN_DEPENDS elikos_main geometry_msgs roscpp std_msgs tf
 #	DEPENDS system_lib
 )
 
 include_directories(
-    ../elikos_ros/src/
+    ../elikos_main/src/
     ${catkin_INCLUDE_DIRS}
 )
 

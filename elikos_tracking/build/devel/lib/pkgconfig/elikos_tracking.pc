@@ -1,8 +1,0 @@
-prefix=/home/lajoiepy/ELIKOS_WS/src/elikos_ros/elikos_tracking/build/devel
-
-Name: elikos_tracking
-Description: Description of elikos_tracking
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/lajoiepy/ELIKOS_WS/src/elikos_ros/elikos_tracking/build/devel/lib 
-Requires: roscpp cv_bridge elikos_ros geometry_msgs std_msgs tf

@@ -57,9 +57,9 @@ void AbstractArena::prepareUpdate()
     }
 }
 
-void AbstractArena::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
+void AbstractArena::updateTargets(const elikos_main::TargetRobotArray::ConstPtr& input)
 {
-    const elikos_ros::TargetRobot* inputTargets = input->targets.data();
+    const elikos_main::TargetRobot* inputTargets = input->targets.data();
     size_t n = input->targets.size();
 
     prepareUpdate();
@@ -69,7 +69,7 @@ void AbstractArena::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& 
     }
 }
 
-TargetRobot* AbstractArena::updateTarget(const elikos_ros::TargetRobot& targetUpdate)
+TargetRobot* AbstractArena::updateTarget(const elikos_main::TargetRobot& targetUpdate)
 {
     tf::Pose pose;
     tf::poseMsgToTF(targetUpdate.poseOrigin.pose, pose);
@@ -89,7 +89,7 @@ void AbstractArena::updateQuadRobot(const tf::Pose& pose)
     quad_.setPose(pose);
 }
 
-TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_ros::TargetRobot& targetUpdate)
+TargetRobot* AbstractArena::findMostLikelyUpdateCondidate(const elikos_main::TargetRobot& targetUpdate)
 {
     std::unordered_map<int, TargetRobot*>::iterator it = targetsId_.find(targetUpdate.id);
     TargetRobot* candidate = nullptr;

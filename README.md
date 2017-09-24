@@ -1,7 +1,7 @@
-Elikos_ROS
+elikos_ros
 ===
 
-Package ROS "Elikos_ROS" contenant les différents modules servant à la localisation, à la détection d'obstacles et de cibles et à l'autonomie du quadricoptère.  
+Dossier contenant les différents modules servant à la localisation, à la détection d'obstacles et de cibles et à l'autonomie du quadricoptère.
 
 [WikiElikos](https://elikos.github.io/documentation/)
 
@@ -13,11 +13,6 @@ Package ROS "Elikos_ROS" contenant les différents modules servant à la localis
     sudo apt install -y python-pip
     sudo pip install --upgrade pip
     sudo pip install numba scipy numpy numpy-quaternion`
-
-## Wut is dis
-
-Le but ultime de ce repo est de pouvoir le cloner directement sur le board de dev et tout le code devrait compiler sans problème. Il est donc important de porter une attention particulière à ce qui se ramasse ici, en portant une attention particulière au différent Makefile.
-
 
 ## Prérequis
 

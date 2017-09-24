@@ -8,7 +8,7 @@
 #include <ros/ros.h>
 
 #include <image_transport/image_transport.h>
-#include <elikos_ros/StampedMatrix3.h>
+#include <elikos_main/StampedMatrix3.h>
 #include "PreProcessing.h"
 
 #include "CameraInfo.h"

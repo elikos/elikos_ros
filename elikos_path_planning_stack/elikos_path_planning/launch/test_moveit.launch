@@ -20,7 +20,7 @@
   <node pkg="tf" type="static_transform_publisher" name="r200_broadcaster" args="0.141 0 0 -0.59 0.59 -00.39 0.39 elikos_base_link r200 100" />
 
   <!-- elikos_arena_origin initialisation -->
-  <include file="$(find elikos_ros)/launch/elikos_origin_init.launch"/>
+  <include file="$(find elikos_main)/launch/elikos_origin_init.launch"/>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_path_planning)/cfg/test_moveit.rviz"/>
 </launch>

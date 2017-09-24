@@ -6,7 +6,7 @@
       <arg name="cfg" value="elikos_hand_quad"/>
     </include>
 
-  	<include file="$(find elikos_ros)/launch/px4.launch" />
+  	<include file="$(find elikos_main)/launch/px4.launch" />
 
     <node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="0.1 0.0 0.0 -0.5 0.5 -0.5 0.5 elikos_fcu elikos_hand_quad 100" />
     <node pkg="tf" type="static_transform_publisher" name="arena_origin_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 elikos_local_origin elikos_arena_origin 100" />

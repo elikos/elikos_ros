@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="elikos_main" type="elikos_origin_init" name="elikos_origin_init" />
+</launch>

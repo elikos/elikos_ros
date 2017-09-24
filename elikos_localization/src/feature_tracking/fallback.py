@@ -21,7 +21,7 @@ from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseArray
 from sensor_msgs.msg import CameraInfo
 from std_msgs.msg import Header
-import elikos_ros.msg as elikos_ros
+import elikos_main.msg as elikos_main
 
 import message_interface as msgs
 import point_manipulation as pt_manip
@@ -110,7 +110,7 @@ class GlobalState:
 
             points_filter_subscriber = message_filters.Subscriber(
                 points_subscriber_name,
-                elikos_ros.IntersectionArray,
+                elikos_main.IntersectionArray,
                 queue_size=1
             )
             camera_info_filter_subscriber = message_filters.Subscriber(

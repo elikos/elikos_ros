@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
     ros::NodeHandle nh;
     ros::Publisher pub;
     ros::Publisher debug_pub;
-    pub = nh.advertise<elikos_ros::TrajectoryCmd>("elikos_trajectory", 1);
+    pub = nh.advertise<elikos_main::TrajectoryCmd>("elikos_trajectory", 1);
     debug_pub = nh.advertise<geometry_msgs::Transform>("elikos_trajectory_debug", 1);
 
     //Asynchronous spinner to compute the motion plan
@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
     {
         if(messageHandler.hasNewMessage())
         {
-            elikos_ros::AICmd ai_cmd = messageHandler.getAICmd();
-            elikos_ros::TrajectoryCmd traj_cmd;
+            elikos_main::AICmd ai_cmd = messageHandler.getAICmd();
+            elikos_main::TrajectoryCmd traj_cmd;
             traj_cmd.cmdCode = ai_cmd.cmdCode;
             traj_cmd.destination = ai_cmd.pose.pose;
 

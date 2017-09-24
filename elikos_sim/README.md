@@ -57,7 +57,7 @@
     * `config_yaml` : Le chemin vers le fichier .yaml qui contient les configurations pour mavros.
 
 * `integration_sim.launch`
-    * Lance les différents nodes d'elikos_ros pour la simulation
+    * Lance les différents nodes d'elikos_main pour la simulation
 
 * `robots_sim.launch`
     * Ajoute des cibles et des obstacles se déplaçant dans la simulation.

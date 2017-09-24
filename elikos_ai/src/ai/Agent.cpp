@@ -42,7 +42,7 @@ void Agent::behave()
     behaviorManager_->behave();
 }
 
-void Agent::updateTargets(const elikos_ros::TargetRobotArray::ConstPtr& input)
+void Agent::updateTargets(const elikos_main::TargetRobotArray::ConstPtr& input)
 {
     arena_->updateTargets(input);
 }

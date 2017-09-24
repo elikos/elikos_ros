@@ -19,7 +19,7 @@ MessageHandler::~MessageHandler()
 
 }
 
-void MessageHandler::dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr& input)
+void MessageHandler::dispatchMessage(const elikos_main::TrajectoryCmd::ConstPtr& input)
 {
 	lastReceivedCmd_.cmdCode_ = input->cmdCode;
 	lastReceivedCmd_.cmdTrajectory_ = input->trajectory;

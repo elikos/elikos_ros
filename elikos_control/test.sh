@@ -1,1 +1,1 @@
-rostopic pub /elikos_trajectory elikos_ros/TrajectoryCmd "cmdCode: 0" --once
+rostopic pub /elikos_trajectory elikos_main/TrajectoryCmd "cmdCode: 0" --once
