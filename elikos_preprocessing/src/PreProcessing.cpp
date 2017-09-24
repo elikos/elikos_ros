@@ -34,6 +34,7 @@ void PreProcessing::preProcessImage(cv::Mat& raw, cv::Mat& preProcessed, cv::Mat
     cv::Mat resized = raw;
     if (size != raw.size())
     {
+        size.height = size.width * raw.size().height / raw.size().width;
         cv::resize(raw, resized, size);
     }
 
