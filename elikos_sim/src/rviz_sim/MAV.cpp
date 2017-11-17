@@ -25,6 +25,10 @@ simSpeed(simulationSpeed), Name("MAV"), cycleTime(cycleTime) {
                                 Pid<double>::ACCUMULATE_OUTPUT,
                                 33.3 / simSpeed,
                                 -5.0, 5.0, 0.0);
+
+    xy_sp.setX(0);
+    xy_sp.setY(0);
+    z_sp = 0;
     refreshTransform();
 };
 
