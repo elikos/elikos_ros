@@ -1,25 +1,28 @@
 import unittest
 
 import elikos_initialisation
+import elikos_node_monitor.node_monitor as nm
+import sqlite3
+import os
+        
 
 
 
 class TestTest(unittest.TestCase):
-    def test_database_wrapper(self):
-        import elikos_node_monitor.node_monitor as nm
-        import sqlite3
-        import os
-        print os.path.abspath('.')
+    
+    def __init__(self, *args, **kwargs):
+        super(TestTest, self).__init__(*args, **kwargs);
+        self.table_name = "test_table"
+        self.db_name = "test_batabase"
 
-        table_name = "some_name"
-        db_name = "test.db"
 
-        con = sqlite3.connect(db_name)
+    def setUp(self):
+        con = sqlite3.connect(self.db_name)
 
         #create the table
         c = con.cursor()
-        c.execute("CREATE TABLE IF NOT EXISTS " + table_name + "(status INTEGER, name STRING PRIMARY KEY, pid INTEGER)")
-        c.executemany("INSERT INTO {0} VALUES (?,?,?)".format(table_name),
+        c.execute("CREATE TABLE IF NOT EXISTS " + self.table_name + "(status INTEGER, name STRING PRIMARY KEY, pid INTEGER)")
+        c.executemany("INSERT INTO {0} VALUES (?,?,?)".format(self.table_name),
             [(nm.ns.RUNNING, "test-ham", 2830),
              (nm.ns.PENDING, "test-hem", 2830),
              (nm.ns.STOPPED, "test-him", 2830),
@@ -29,7 +32,13 @@ class TestTest(unittest.TestCase):
         )
         con.commit()
 
-        db = nm.DBWrapper(db_name, table_name)
+    def tearDown(self):
+        if os.path.isfile(self.db_name):
+            os.remove(self.db_name)
+
+
+    def test_database_wrapper(self):
+        db = nm.DBWrapper(self.db_name, self.table_name)
         
         self.assertEqual(db.get_status("test-ham"), nm.ns.RUNNING)
         self.assertEqual(db.get_status("test-hum"), nm.ns.PENDING)
@@ -40,6 +49,9 @@ class TestTest(unittest.TestCase):
 
         del db
         #os.remove(db_name)
+
+    def test_some_other_func(self):
+        pass
 
 
 if __name__ == "__main__":
