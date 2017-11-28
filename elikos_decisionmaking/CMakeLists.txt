@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(elikos_ai)
+project(elikos_decisionmaking)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
 #	INCLUDE_DIRS include
-#	LIBRARIES elikos_ai
+#	LIBRARIES elikos_decisionmaking
 	CATKIN_DEPENDS elikos_main geometry_msgs roscpp std_msgs tf elikos_control
 #	DEPENDS system_lib
 )

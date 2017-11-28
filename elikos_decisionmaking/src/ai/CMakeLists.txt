@@ -83,7 +83,7 @@ set(UTIL_SRC
     util/Timer.cpp
     util/Timer.h)
 
-add_executable(elikos_ai
+add_executable(elikos_decisionmaking
     Ai.cpp
     Agent.cpp
     Agent.h
@@ -98,6 +98,6 @@ add_executable(elikos_ai
 	${UTIL_SRC}
 	${BEHAVIOR_SRC})
 
-target_link_libraries(elikos_ai
+target_link_libraries(elikos_decisionmaking
     ${catkin_LIBRARIES}
 	yaml-cpp)

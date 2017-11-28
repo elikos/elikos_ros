@@ -1,0 +1,5 @@
+<launch>
+    <node name="elikos_decisionmaking" pkg="elikos_decisionmaking" type="elikos_decisionmaking" output="log">
+       <rosparam command="load" file="$(find elikos_decisionmaking)/cfg/config.yaml"/>
+    </node>
+</launch>
