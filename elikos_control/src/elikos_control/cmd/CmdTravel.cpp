@@ -6,18 +6,18 @@ CmdTravel::CmdTravel(ros::NodeHandle* nh, int id)
     cmdPriority_ = PriorityLevel::ALWAYS_ABORTABLE;
 	cmdCode_ = CmdCode::MOVE_TO_POINT;
 	
-	nh_->getParam("/elikos_ai/dimension_c", dimension_c_);
- 	nh_->getParam("/elikos_ai/max_altitude", max_altitude_);
+	nh_->getParam("/elikos_decisionmaking/dimension_c", dimension_c_);
+ 	nh_->getParam("/elikos_decisionmaking/max_altitude", max_altitude_);
     double takeoff_altitude = 1;
-    nh_->getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);
+    nh_->getParam("/elikos_decisionmaking/takeoff_altitude", takeoff_altitude);
 	lastPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, takeoff_altitude }));
     lastPosition_.child_frame_id_ = SETPOINT;
     lastPosition_.frame_id_ = WORLD_FRAME;
 
 	threshold_ = 0.8;
-	nh_->getParam("/elikos_ai/min_step", threshold_);
+	nh_->getParam("/elikos_decisionmaking/min_step", threshold_);
 	max_step_ = 2;
-	nh_->getParam("/elikos_ai/max_step", max_step_);
+	nh_->getParam("/elikos_decisionmaking/max_step", max_step_);
 }
 
 CmdTravel::~CmdTravel()

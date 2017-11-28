@@ -19,9 +19,9 @@
 * **elikos_action_controller** : Reçoit les actions multi_dof_follow_joint_trajectory produites par moveit et broadcast les tf::Transforms représentant les points à franchir dans la trajectoire. La logique d'envoi des tf est dans src/elikos_actionController.cpp. Ce package n'est pas utilisé présentement.
 
 ## Input topics  
-* `elikos_ai_cmd`  
+* `elikos_decisionmaking_cmd`  
     * type : `geometry_msgs::PoseStamped`  
-    * desc : commande de position envoyée par l'AI. 
+    * desc : commande de position envoyée par le decision-making. 
 
 ## Output topic  
 * `elikos_trajectory`  

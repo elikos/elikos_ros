@@ -7,16 +7,16 @@ CmdTopInteraction::CmdTopInteraction(ros::NodeHandle* nh, int id)
     cmdCode_ = CmdCode::TOP_INTERACTION;
 
     takeoff_altitude_ = 1;
-    nh_->getParam("/elikos_ai/takeoff_altitude", takeoff_altitude_);
+    nh_->getParam("/elikos_decisionmaking/takeoff_altitude", takeoff_altitude_);
     targetPosition_.setData(tf::Transform(tf::Quaternion{ 0.0, 0.0, 0.0, 1.0 }, tf::Vector3{ 0.0, 0.0, takeoff_altitude_ }));
     targetPosition_.child_frame_id_ = SETPOINT;
     targetPosition_.frame_id_ = WORLD_FRAME;
     
     interaction_altitude_ = 0.1;
-    nh_->getParam("/elikos_ai/interaction_altitude", interaction_altitude_);
+    nh_->getParam("/elikos_decisionmaking/interaction_altitude", interaction_altitude_);
 
 	threshold_ = 0.8;
-	nh_->getParam("/elikos_ai/has_reach_destination_threshold", threshold_);
+	nh_->getParam("/elikos_decisionmaking/has_reach_destination_threshold", threshold_);
 }
 
 CmdTopInteraction::~CmdTopInteraction()

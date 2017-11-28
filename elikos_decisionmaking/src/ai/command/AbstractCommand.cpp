@@ -8,7 +8,7 @@ AbstractCommand::AbstractCommand(QuadRobot* quad, TargetRobot* target)
 {
     ros::NodeHandle nh_;
     has_reach_destination_threshold_ = 0.2;
-    nh_.getParam("/elikos_ai/has_reach_destination_threshold", has_reach_destination_threshold_);
+    nh_.getParam("/elikos_decisionmaking/has_reach_destination_threshold", has_reach_destination_threshold_);
 }
 
 AbstractCommand::~AbstractCommand()

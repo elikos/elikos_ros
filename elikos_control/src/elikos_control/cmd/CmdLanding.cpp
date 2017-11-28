@@ -18,7 +18,7 @@ CmdLanding::CmdLanding(ros::NodeHandle* nh, int id)
     targetPosition_.frame_id_ = WORLD_FRAME;
 
 	threshold_ = 0.8;
-	nh_->getParam("/elikos_ai/has_reach_destination_threshold", threshold_);
+	nh_->getParam("/elikos_decisionmaking/has_reach_destination_threshold", threshold_);
 }
 
 CmdLanding::~CmdLanding()

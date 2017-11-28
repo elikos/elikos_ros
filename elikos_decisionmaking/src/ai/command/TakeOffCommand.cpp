@@ -22,7 +22,7 @@ void TakeOffCommand::execute()
 
    ros::NodeHandle nh;
    double takeoff_altitude;
-   nh.getParam("/elikos_ai/takeoff_altitude", takeoff_altitude);
+   nh.getParam("/elikos_decisionmaking/takeoff_altitude", takeoff_altitude);
 
    tf::StampedTransform currentPosition;
    try {

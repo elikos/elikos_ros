@@ -4,6 +4,6 @@
 int main(int argc, char* argv[])
 {
     // ROS Init
-    ros::init(argc, argv, "elikos_ai");
+    ros::init(argc, argv, "elikos_decisionmaking");
     emu::MessageEmulator::getInstance()->lookForTf();
 }

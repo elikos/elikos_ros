@@ -13,11 +13,11 @@ BehaviorManager::BehaviorManager(AbstractArena* arena)
 {
     ros::NodeHandle nh;
     bool aggressive_enabled;
-    nh.getParam("/elikos_ai/aggressive_enabled", aggressive_enabled);
+    nh.getParam("/elikos_decisionmaking/aggressive_enabled", aggressive_enabled);
     bool preventive_enabled;
-    nh.getParam("/elikos_ai/preventive_enabled", preventive_enabled);
+    nh.getParam("/elikos_decisionmaking/preventive_enabled", preventive_enabled);
     bool research_enabled;
-    nh.getParam("/elikos_ai/research_enabled", research_enabled);
+    nh.getParam("/elikos_decisionmaking/research_enabled", research_enabled);
 
     aggressiveBehavior_.setIsEnabled(aggressive_enabled);
     preventiveBehavior_.setIsEnabled(preventive_enabled);

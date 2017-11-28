@@ -15,7 +15,7 @@ FollowCommand::FollowCommand(QuadRobot* quad, TargetRobot* target)
     : AbstractCommand(quad, target)
 {
     ros::NodeHandle nh;
-    nh.getParam("/elikos_ai/research_altitude", flight_height_);
+    nh.getParam("/elikos_decisionmaking/research_altitude", flight_height_);
 }
 
 FollowCommand::~FollowCommand()

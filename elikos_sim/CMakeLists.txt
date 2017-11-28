@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
 #	INCLUDE_DIRS include
-#	LIBRARIES elikos_ai
+#	LIBRARIES elikos_decisionmaking
 	CATKIN_DEPENDS elikos_main geometry_msgs roscpp std_msgs tf
 #	DEPENDS system_lib
 )

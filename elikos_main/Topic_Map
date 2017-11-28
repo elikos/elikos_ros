@@ -8,11 +8,11 @@ elikos_tracking:
   output: elikos_target_robot_array
           elikos_robot_pose_array (debug only)
 
-elikos_ai:
+elikos_decisionmaking:
   input:  elikos_robot_pose_array
           mavros/local_position
-  output: elikos_ai_target
+  output: elikos_decisionmaking_target
 
 elikos_path_planning:
-  input:  elikos_ai_target
+  input:  elikos_decisionmaking_target
   output: /move_group/display_planned_path (debug only)
