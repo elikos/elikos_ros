@@ -2,19 +2,27 @@
     <arg name="arena_dimension" default="20" />
     <rosparam command="load" file="$(find elikos_main)/param/config.yaml" />
 
-    <node name="sim_roomba" pkg="elikos_sim" type="sim_roomba" output="screen" />
+    <group ns="sim">
+        <!-- Arena (squares and lines) -->
+        <node name="arena_node" pkg="elikos_roomba" type="arena_node" output="screen">
+            <param name="arena_dimension" value="$(arg arena_dimension)" />
+        </node>
 
-    <node name="arena_node" pkg="elikos_roomba" type="arena_node" output="screen">
-        <param name="arena_dimension" value="$(arg arena_dimension)" />
-    </node>
+        <!-- Robots -->
+        <node name="sim_roomba" pkg="elikos_sim" type="sim_roomba" output="screen" />
 
-    <node name="serviceredirect_node" pkg="elikos_roomba" type="serviceredirect_node" output="screen">
-        <param name="groundrobot_qty" value="10" />
-        <param name="obstaclerobot_qty" value="4" />
-    </node>
+        <!-- Services for robots -->
+        <node name="serviceredirect_node" pkg="elikos_roomba" type="serviceredirect_node" output="screen">
+            <param name="groundrobot_qty" value="10" />
+            <param name="obstaclerobot_qty" value="4" />
+        </node>
 
-    <node pkg="tf" type="static_transform_publisher" name="elikos_fcu" args="0.0 0.0 0.0 0.0 0.0 0.0 elikos_arena_origin elikos_fcu 100"/>
-    <node name="sim_detection" pkg="elikos_sim" type="sim_detection" output="screen" />
-    
+        <!-- Target robot detection simulation -->
+        <node name="sim_detection" pkg="elikos_sim" type="sim_detection" output="screen" />
+
+        <!-- Fake elikos_fcu (for testing) -->
+        <node pkg="tf" type="static_transform_publisher" name="elikos_fcu" args="0.0 0.0 0.0 0.0 0.0 0.0 elikos_arena_origin elikos_fcu 100"/>
+    </group>
+
     <node name="rviz" pkg="rviz" type="rviz" />
 </launch>

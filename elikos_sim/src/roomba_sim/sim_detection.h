@@ -11,9 +11,10 @@
 #include "elikos_main/TargetRobotArray.h"
 
 // names
-static const std::string TF_NAME_BASE = "/elikos_arena_origin";        // origin
-static const std::string TF_NAME_QUAD = "/elikos_fcu";                 // quad pose tf
-static const std::string TEST_MARKERS_TOPIC_NAME = "detection_poses";
+static const std::string TF_NAME_BASE = "/elikos_arena_origin";                 // origin
+static const std::string TF_NAME_QUAD = "/elikos_fcu";                          // quad pose tf
+static const std::string TEST_MARKERS_TOPIC_NAME = "target_robot_array_test";   // display detected target in rviz
+
 
 class SimDetection
 {
