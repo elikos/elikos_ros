@@ -61,10 +61,18 @@ target_link_libraries(robots_sim
   ${catkin_LIBRARIES} 
 )
 
-add_executable(roomba_sim
-    src/rviz_sim/roomba_sim.cpp
+add_executable(sim_roomba
+    src/roomba_sim/sim_roomba.cpp
 )
-target_link_libraries(roomba_sim
+target_link_libraries(sim_roomba
   ${catkin_LIBRARIES}
   #do NOT put elikos_roomba_lib
+)
+
+add_executable(sim_detection
+    src/roomba_sim/sim_detection.cpp
+    src/roomba_sim/sim_detection.h
+)
+target_link_libraries(sim_detection
+  ${catkin_LIBRARIES}
 )
