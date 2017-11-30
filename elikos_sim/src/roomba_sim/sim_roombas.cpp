@@ -5,7 +5,7 @@
 #include "elikos_roomba/obstaclerobot.h"
 
 static const double LOOP_RATE_SIM = 10.0;
-static const std::string NODE_NAME = "roomba_sim";
+static const std::string NODE_NAME = "sim_roombas";
 static const std::string TF_MIDDLE_ARENA = "/elikos_arena_origin";
 static const std::string ARENA_SQUARE_MODEL = "package://elikos_roomba/models/arena_square.dae";
 

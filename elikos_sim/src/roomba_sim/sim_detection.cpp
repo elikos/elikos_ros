@@ -17,9 +17,15 @@ SimDetection::SimDetection(ros::NodeHandle& n)
 
     robotsPoses_ = new std::vector<tf::StampedTransform>(nbTargetRobots_);
     detectedRobots_ = new std::vector<elikos_main::TargetRobot>();
+
+    // wait for transforms
+    tf_listener_.waitForTransform(TF_NAME_BASE, TF_NAME_QUAD, ros::Time(0), ros::Duration(1.0));
+    tf_listener_.waitForTransform(TF_NAME_BASE, "/groundrobot1", ros::Time(0), ros::Duration(1.0));
 }
 
 SimDetection::~SimDetection() {
+    delete robotsPoses_;
+    delete detectedRobots_;
 }
 
 /*===========================

@@ -9,7 +9,7 @@
         </node>
 
         <!-- Robots -->
-        <node name="sim_roomba" pkg="elikos_sim" type="sim_roomba" output="screen" />
+        <node name="sim_roombas" pkg="elikos_sim" type="sim_roombas" output="screen" />
 
         <!-- Services for robots -->
         <node name="serviceredirect_node" pkg="elikos_roomba" type="serviceredirect_node" output="screen">
@@ -21,8 +21,9 @@
         <node name="sim_detection" pkg="elikos_sim" type="sim_detection" output="screen" />
 
         <!-- Fake elikos_fcu (for testing) -->
+        <node pkg="tf" type="static_transform_publisher" name="elikos_arena_origin" args="0.0 0.0 0.0 0.0 0.0 0.0 world elikos_arena_origin 100"/>
         <node pkg="tf" type="static_transform_publisher" name="elikos_fcu" args="0.0 0.0 0.0 0.0 0.0 0.0 elikos_arena_origin elikos_fcu 100"/>
     </group>
 
-    <node name="rviz" pkg="rviz" type="rviz" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_sim)/launch/roomba_sim.rviz" />
 </launch>
