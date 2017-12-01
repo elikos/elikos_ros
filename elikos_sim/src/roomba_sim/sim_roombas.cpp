@@ -46,8 +46,18 @@ int main(int argc, char** argv){
     ros::Rate rate(LOOP_RATE_SIM);
     while (ros::ok())
     {
-        for (auto& robot : robots) {
-            robot->update();
+        for (auto& robotBase : robots) {
+            robotBase->update();
+
+            // check collisions
+            std::string baseNS = robotBase->getNamespace();
+            for (auto& robot : robots) {
+                std::string robotNS = robot->getNamespace();
+                // if not same robot
+                if (baseNS != robotNS) {
+                    robotBase->checkCollision(robot->getPosition());
+                }
+            }
         }
 
         ros::spinOnce();

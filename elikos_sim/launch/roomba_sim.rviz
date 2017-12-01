@@ -5,6 +5,8 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /TF1/Tree1/world1
+        - /TF1/Tree1/world1/elikos_arena_origin1
       Splitter Ratio: 0.5
     Tree Height: 975
   - Class: rviz/Selection
@@ -44,7 +46,7 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
+      Plane Cell Count: 20
       Reference Frame: elikos_arena_origin
       Value: true
     - Class: rviz/TF
@@ -84,43 +86,46 @@ Visualization Manager:
           Value: false
         obstaclerobot4:
           Value: false
+        world:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        elikos_arena_origin:
-          elikos_fcu:
-            {}
-          groundrobot1:
-            {}
-          groundrobot10:
-            {}
-          groundrobot2:
-            {}
-          groundrobot3:
-            {}
-          groundrobot4:
-            {}
-          groundrobot5:
-            {}
-          groundrobot6:
-            {}
-          groundrobot7:
-            {}
-          groundrobot8:
-            {}
-          groundrobot9:
-            {}
-          obstaclerobot1:
-            {}
-          obstaclerobot2:
-            {}
-          obstaclerobot3:
-            {}
-          obstaclerobot4:
-            {}
+        world:
+          elikos_arena_origin:
+            elikos_fcu:
+              {}
+            groundrobot1:
+              {}
+            groundrobot10:
+              {}
+            groundrobot2:
+              {}
+            groundrobot3:
+              {}
+            groundrobot4:
+              {}
+            groundrobot5:
+              {}
+            groundrobot6:
+              {}
+            groundrobot7:
+              {}
+            groundrobot8:
+              {}
+            groundrobot9:
+              {}
+            obstaclerobot1:
+              {}
+            obstaclerobot2:
+              {}
+            obstaclerobot3:
+              {}
+            obstaclerobot4:
+              {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -283,25 +288,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 26.4792309
+      Distance: 25.7763577
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.2003001
-        Y: 0.33700633
-        Z: -3.01035023
+        X: 1.11513889
+        Y: -0.0478628054
+        Z: -3.47239804
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.934796214
+      Pitch: 1.0497961
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.70855808
+      Yaw: 4.71355915
     Saved: ~
 Window Geometry:
   Displays:
