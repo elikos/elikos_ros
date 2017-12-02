@@ -1,5 +1,5 @@
-#ifndef MOVINGOBJECT_H
-#define MOVINGOBJECT_H
+#ifndef ELIKOS_SIM_DETECTION_H
+#define ELIKOS_SIM_DETECTION_H
 
 #include <string>
 #include <vector>
@@ -108,4 +108,4 @@ class SimDetection
         //tf::Transform createTfFromPosYaw(tf::Vector3 pos, double yaw);
 };
 
-#endif  // ELIKOS_ROOMBA_MOVINGOBJECT_H
+#endif  // ELIKOS_SIM_DETECTION_H
