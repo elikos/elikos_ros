@@ -30,7 +30,7 @@
         <!-- Target robot detection simulation -->
         <node name="sim_detection" pkg="elikos_sim" type="sim_detection" output="screen">
             <param name="target_robots_topic" value="/elikos_target_robot_array" />
-            <param name="target_robots_markers_topic" value="target_robots_markers" />
+            <param name="target_robots_markers_topic" value="markers/target_robots" />
             <param name="tf_pose" value="/elikos_fcu" />
             <param name="tf_origin" value="/elikos_arena_origin" />
         </node>

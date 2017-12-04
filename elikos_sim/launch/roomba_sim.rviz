@@ -133,7 +133,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /sim/arena_markers
+      Marker Topic: /sim/markers/arena
       Name: MarkerArray
       Namespaces:
         "": true
@@ -264,12 +264,12 @@ Visualization Manager:
       Shaft Length: 0.5
       Shaft Radius: 0.0299999993
       Shape: Arrow (3D)
-      Topic: /sim/target_robots_markers
+      Topic: /sim/markers/target_robots
       Unreliable: false
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /sim/elikos_fcu_marker
+      Marker Topic: /sim/markers/elikos_fcu
       Name: Marker
       Namespaces:
         "": true
@@ -277,7 +277,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /sim/elikos_setpoint_marker
+      Marker Topic: /sim/markers/elikos_setpoint
       Name: Marker
       Namespaces:
         "": true

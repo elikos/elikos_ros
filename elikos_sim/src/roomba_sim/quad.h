@@ -10,9 +10,9 @@
 #include "BoundedPID.h"
 
 // names
+static const std::string SETPOINT_MARKER_TOPIC_NAME = "markers/elikos_setpoint";
+static const std::string QUAD_MARKER_TOPIC_NAME = "markers/elikos_fcu";
 static const std::string QUAD_MESH_RESOURCE_PREFIX = "package://elikos_sim/src/gazebo_sim/elikos_gazebo_models/models/quad/"; //"package://elikos_gazebo_models/models/quad/"
-static const std::string SETPOINT_MARKER_TOPIC_NAME = "elikos_setpoint_marker";
-static const std::string QUAD_MARKER_TOPIC_NAME = "elikos_fcu_marker";
 static const std::string QUAD_MARKER_MODEL_NAME = "Yopokos_vSim.dae";
 
 class Quad
