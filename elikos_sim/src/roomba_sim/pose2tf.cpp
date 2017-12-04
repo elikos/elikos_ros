@@ -5,9 +5,6 @@
 #include <tf/transform_broadcaster.h>
 
 static const double LOOP_RATE_SIM = 10.0;
-// names
-static const std::string QUAD_TF_NAME_BASE = "/elikos_arena_origin";                 // origin
-static const std::string QUAD_TF_NAME_SETPOINT = "/elikos_setpoint";                 // quad setpoint tf
 
 double x, y, z;
 tf::Quaternion yaw;
@@ -27,10 +24,11 @@ int main(int argc, char** argv){
 
     tf::TransformBroadcaster tf_br;
 
-    //ros::NodeHandle n_p("~");
-    //int nbTargetRobots, nbObstacleRobots;
-    //n_p.getParam("/target_robot_count", nbTargetRobots);
-    //n_p.getParam("/obstacle_robot_count", nbObstacleRobots);
+    ros::NodeHandle n_p("~");
+    std::string poseTopic, tfName, tfBaseName;
+    n_p.getParam("pose_topic", poseTopic);
+    n_p.getParam("tf_name", tfName);
+    n_p.getParam("base_tf_name", tfBaseName);
 
     // init values
     x = 0.0;
@@ -39,7 +37,7 @@ int main(int argc, char** argv){
     yaw = tf::Quaternion(0.0, 0.0, 0.0, 1.0);
 
     // subscriber
-    ros::Subscriber pose_sub = n.subscribe("elikos_setpoint_pose", 10, &poseCallback);
+    ros::Subscriber pose_sub = n.subscribe(poseTopic, 10, &poseCallback);
 
     while (ros::ok())
     {
@@ -47,7 +45,7 @@ int main(int argc, char** argv){
         tf::Transform tf;
         tf.setOrigin(tf::Vector3(x, y, z));
         tf.setRotation(yaw);
-        tf_br.sendTransform(tf::StampedTransform(tf, ros::Time::now(), QUAD_TF_NAME_BASE, QUAD_TF_NAME_SETPOINT));
+        tf_br.sendTransform(tf::StampedTransform(tf, ros::Time::now(), tfBaseName, tfName));
 
         ros::spinOnce();
         rate.sleep();
