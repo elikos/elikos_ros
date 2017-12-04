@@ -5,8 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /TF1/Tree1/world1
-        - /TF1/Tree1/world1/elikos_arena_origin1
+        - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 975
   - Class: rviz/Selection
@@ -57,7 +56,9 @@ Visualization Manager:
         elikos_arena_origin:
           Value: true
         elikos_fcu:
-          Value: true
+          Value: false
+        elikos_setpoint:
+          Value: false
         groundrobot1:
           Value: false
         groundrobot10:
@@ -97,6 +98,8 @@ Visualization Manager:
         world:
           elikos_arena_origin:
             elikos_fcu:
+              {}
+            elikos_setpoint:
               {}
             groundrobot1:
               {}
@@ -264,6 +267,22 @@ Visualization Manager:
       Topic: /sim/target_robot_array_test
       Unreliable: false
       Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /sim/elikos_fcu_marker
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /sim/elikos_setpoint_marker
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -288,25 +307,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 25.7763577
+      Distance: 24.927454
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.11513889
-        Y: -0.0478628054
-        Z: -3.47239804
+        X: -0.506144047
+        Y: 1.74410915
+        Z: -4.38179493
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.0497961
+      Pitch: 0.73979634
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.71355915
+      Yaw: 4.70855761
     Saved: ~
 Window Geometry:
   Displays:

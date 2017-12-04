@@ -3,6 +3,7 @@
 #include <tf/tf.h>
 #include "elikos_roomba/groundrobot.h"
 #include "elikos_roomba/obstaclerobot.h"
+#include "quad.h"
 
 static const double LOOP_RATE_SIM = 10.0;
 static const std::string NODE_NAME = "sim_roombas";
@@ -13,11 +14,14 @@ static const double TARGET_ROBOT_RADIUS = 1.0;
 static const double OBSTACLE_ROBOT_RADIUS = 5.0;
 
 std::vector<Robot*> robots;
+Quad* quad;
 
 
 int main(int argc, char** argv){
     ros::init(argc, argv, NODE_NAME);
     ros::NodeHandle n;
+
+    ros::Rate rate(LOOP_RATE_SIM);
 
     ros::NodeHandle n_p("~");
     int nbTargetRobots, nbObstacleRobots;
@@ -43,9 +47,16 @@ int main(int argc, char** argv){
         robots.push_back(new ObstacleRobot(n, i+1, tf::Vector3(pos_x, pos_y, 0.0), yaw, height));
     }
 
-    ros::Rate rate(LOOP_RATE_SIM);
+    // create quad
+    quad = new Quad(n, rate.expectedCycleTime());
+
+
     while (ros::ok())
     {
+        // quad
+        quad->update();
+
+        // robots
         for (auto& robotBase : robots) {
             robotBase->update();
 
