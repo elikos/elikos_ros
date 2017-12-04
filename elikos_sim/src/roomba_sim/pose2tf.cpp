@@ -27,8 +27,8 @@ int main(int argc, char** argv){
     ros::NodeHandle n_p("~");
     std::string poseTopic, tfName, tfBaseName;
     n_p.getParam("pose_topic", poseTopic);
-    n_p.getParam("tf_name", tfName);
-    n_p.getParam("base_tf_name", tfBaseName);
+    n_p.getParam("tf_setpoint", tfName);
+    n_p.getParam("tf_origin", tfBaseName);
 
     // init values
     x = 0.0;

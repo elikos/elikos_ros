@@ -3,13 +3,14 @@
 SimDetection::SimDetection(ros::NodeHandle& n)
     : n_(n)
 {
-    // setup publishers
-    testmarkers_pub_ = n.advertise<geometry_msgs::PoseArray>(TEST_MARKERS_TOPIC_NAME, 10);
-
     // get params
     ros::NodeHandle n_p("~");
     n_p.getParam("/target_robot_count", nbTargetRobots_);
     //n_p.getParam("/obstacle_robot_count", nbObstacleRobots_);
+    n_p.getParam("tf_origin", tfOrigin_);
+    n_p.getParam("tf_pose", tfPose_);
+    n_p.getParam("target_robots_topic", targetRobotArrayTopic_);
+    n_p.getParam("target_robots_markers_topic", targetRobotArrayMarkerTopic_);
 
     angleMin_ = - 3.1415 / 4.0;
     angleMax_ = 3.1415 / 4.0;
@@ -18,9 +19,13 @@ SimDetection::SimDetection(ros::NodeHandle& n)
     robotsPoses_ = new std::vector<tf::StampedTransform>(nbTargetRobots_);
     detectedRobots_ = new std::vector<elikos_main::TargetRobot>();
 
+    // setup publishers
+    testmarkers_pub_ = n_.advertise<geometry_msgs::PoseArray>(targetRobotArrayMarkerTopic_, 10);
+    targetRobots_pub_ = n_.advertise<elikos_main::TargetRobotArray>(targetRobotArrayTopic_, 10);
+
     // wait for transforms
-    tf_listener_.waitForTransform(TF_NAME_BASE, TF_NAME_QUAD, ros::Time(0), ros::Duration(1.0));
-    tf_listener_.waitForTransform(TF_NAME_BASE, "/groundrobot1", ros::Time(0), ros::Duration(1.0));
+    tf_listener_.waitForTransform(tfOrigin_, tfPose_, ros::Time(0), ros::Duration(1.0));
+    tf_listener_.waitForTransform(tfOrigin_, "/groundrobot1", ros::Time(0), ros::Duration(1.0));
 }
 
 SimDetection::~SimDetection() {
@@ -38,7 +43,7 @@ geometry_msgs::PoseStamped SimDetection::createPoseStampedFromPosYaw(tf::Vector3
     pose_msg.pose.position.y = pos.y();
     pose_msg.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
     pose_msg.header.stamp = ros::Time::now();
-    pose_msg.header.frame_id = TF_NAME_BASE;
+    pose_msg.header.frame_id = tfOrigin_;
     return pose_msg;
 }
 
@@ -49,7 +54,7 @@ geometry_msgs::PoseStamped SimDetection::createPoseStampedFromPosYaw(tf::Vector3
 void SimDetection::publishTestMarkers() {
     geometry_msgs::PoseArray msg;
     msg.header.stamp = ros::Time::now();
-    msg.header.frame_id = TF_NAME_BASE;
+    msg.header.frame_id = tfOrigin_;
 
     std::vector<geometry_msgs::Pose> poses;
     for (auto& robot : *detectedRobots_) {
@@ -59,6 +64,12 @@ void SimDetection::publishTestMarkers() {
     msg.poses = poses;
 
     testmarkers_pub_.publish(msg);
+}
+
+void SimDetection::publishTargetRobotArray() {
+    elikos_main::TargetRobotArray msg;
+    msg.targets = *detectedRobots_;
+    targetRobots_pub_.publish(msg);
 }
 
 void SimDetection::updateDetectedRobots() {
@@ -98,7 +109,7 @@ void SimDetection::updateDetectedRobots() {
 void SimDetection::updateRobotsPoses() {
     try {
         for (int i = 0; i < nbTargetRobots_; ++i) {
-            tf_listener_.lookupTransform(TF_NAME_BASE, "/groundrobot"+std::to_string(i+1), ros::Time(0), robotsPoses_->at(i));
+            tf_listener_.lookupTransform(tfOrigin_, "/groundrobot"+std::to_string(i+1), ros::Time(0), robotsPoses_->at(i));
         }
     } catch (tf::TransformException e) {
         ROS_ERROR("SIM DETECTION tf robots: %s", e.what());
@@ -107,7 +118,7 @@ void SimDetection::updateRobotsPoses() {
 
 void SimDetection::updateQuadPose() {
     try {
-        tf_listener_.lookupTransform(TF_NAME_BASE, TF_NAME_QUAD, ros::Time(0), currentQuadPose_);
+        tf_listener_.lookupTransform(tfOrigin_, tfPose_, ros::Time(0), currentQuadPose_);
     } catch (tf::TransformException e) {
         ROS_ERROR("SIM DETECTION tf quad: %s", e.what());
     }
@@ -117,6 +128,8 @@ void SimDetection::update() {
     updateQuadPose();
     updateRobotsPoses();
     updateDetectedRobots();
+
+    publishTargetRobotArray();
     publishTestMarkers();
 }
 
@@ -128,7 +141,7 @@ void SimDetection::spinOnce()
 
 void SimDetection::spin()
 {
-  ros::Rate rate(30.0);
+  ros::Rate rate(10.0);
   while (ros::ok())
   {
     spinOnce();

@@ -1,5 +1,11 @@
 <launch>
     <arg name="arena_dimension" default="20" />
+    <!--
+    <arg name="tf_origin" default="/elikos_arena_origin" >
+    <arg name="tf_pose" default="/elikos_fcu" >
+    <arg name="tf_setpoint" default="/elikos_setpoint" >
+    -->
+
     <rosparam command="load" file="$(find elikos_main)/param/config.yaml" />
 
     <group ns="sim">
@@ -9,7 +15,11 @@
         </node>
 
         <!-- Simulation -->
-        <node name="sim_roombas" pkg="elikos_sim" type="sim_roombas" output="screen" />
+        <node name="sim_roombas" pkg="elikos_sim" type="sim_roombas" output="screen">
+            <param name="tf_pose" value="/elikos_fcu" />
+            <param name="tf_setpoint" value="/elikos_setpoint" />
+            <param name="tf_origin" value="/elikos_arena_origin" />
+        </node>
 
         <!-- Services for robots -->
         <node name="serviceredirect_node" pkg="elikos_roomba" type="serviceredirect_node" output="screen">
@@ -18,13 +28,18 @@
         </node>
 
         <!-- Target robot detection simulation -->
-        <node name="sim_detection" pkg="elikos_sim" type="sim_detection" output="screen" />
+        <node name="sim_detection" pkg="elikos_sim" type="sim_detection" output="screen">
+            <param name="target_robots_topic" value="/elikos_target_robot_array" />
+            <param name="target_robots_markers_topic" value="target_robots_markers" />
+            <param name="tf_pose" value="/elikos_fcu" />
+            <param name="tf_origin" value="/elikos_arena_origin" />
+        </node>
 
         <!-- Fake elikos_setpoint (for testing) -->
         <node name="sim_pose2tf" pkg="elikos_sim" type="sim_pose2tf" output="screen">
             <param name="pose_topic" value="elikos_setpoint_pose" />
-            <param name="tf_name" value="elikos_setpoint" />
-            <param name="base_tf_name" value="elikos_arena_origin" />
+            <param name="tf_setpoint" value="/elikos_setpoint" />
+            <param name="tf_origin" value="/elikos_arena_origin" />
         </node>
 
         <node pkg="tf" type="static_transform_publisher" name="elikos_arena_origin" args="0.0 0.0 0.0 0.0 0.0 0.0 world elikos_arena_origin 100"/>

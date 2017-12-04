@@ -10,9 +10,6 @@
 #include "BoundedPID.h"
 
 // names
-static const std::string QUAD_TF_NAME_BASE = "/elikos_arena_origin";                 // origin
-static const std::string QUAD_TF_NAME_SETPOINT = "/elikos_setpoint";                 // quad setpoint tf
-static const std::string QUAD_TF_NAME = "/elikos_fcu";                          // quad pose tf
 static const std::string QUAD_MESH_RESOURCE_PREFIX = "package://elikos_sim/src/gazebo_sim/elikos_gazebo_models/models/quad/"; //"package://elikos_gazebo_models/models/quad/"
 static const std::string SETPOINT_MARKER_TOPIC_NAME = "elikos_setpoint_marker";
 static const std::string QUAD_MARKER_TOPIC_NAME = "elikos_fcu_marker";
@@ -36,6 +33,13 @@ class Quad
         
     private:
         ros::NodeHandle& n_;
+
+        /* arena origin tf */
+        std::string tfOrigin_;
+        /* pose tf */
+        std::string tfPose_;
+        /* setpoint tf */
+        std::string tfSetpoint_;
 
         /* tf listener */
         tf::TransformListener tf_listener_;

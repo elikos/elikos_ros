@@ -19,6 +19,10 @@ Quad::Quad(ros::NodeHandle& n, ros::Duration expectedCycleTime)
     n_p.param<double>("/vel_z_i", vel_z_i, 0.5);
     n_p.param<double>("/vel_z_d", vel_z_d, 1.0);
     n_p.param<double>("/vel_z_max", vel_z_max, 0.5);
+    // tfs
+    n_p.getParam("tf_origin", tfOrigin_);
+    n_p.getParam("tf_pose", tfPose_);
+    n_p.getParam("tf_setpoint", tfSetpoint_);
 
     // setup PIDs
     pid_vel_x_ = new BoundedPID(-vel_xy_max, vel_xy_max, vel_xy_p, vel_xy_i, vel_xy_d, 0.0, -0.0, false);
@@ -27,7 +31,7 @@ Quad::Quad(ros::NodeHandle& n, ros::Duration expectedCycleTime)
     
 
     // wait for transforms
-    tf_listener_.waitForTransform(QUAD_TF_NAME_BASE, QUAD_TF_NAME_SETPOINT, ros::Time(0), ros::Duration(1.0));
+    tf_listener_.waitForTransform(tfOrigin_, tfSetpoint_, ros::Time(0), ros::Duration(1.0));
 }
 
 Quad::~Quad() {
@@ -71,15 +75,15 @@ void Quad::publishQuad() {
     tf.setOrigin(tf::Vector3(pos_x_, pos_y_, pos_z_));
     q.setRPY(0, 0, yaw_);
     tf.setRotation(q);
-    tf_br_.sendTransform(tf::StampedTransform(tf, ros::Time::now(), QUAD_TF_NAME_BASE, QUAD_TF_NAME));
+    tf_br_.sendTransform(tf::StampedTransform(tf, ros::Time::now(), tfOrigin_, tfPose_));
 
     // publish elikos_fcu_marker
-    quad_marker_pub_.publish(createMarkerMsg(QUAD_TF_NAME, QUAD_MARKER_MODEL_NAME, 0.8, 0.0, 0.0, 1.0));
+    quad_marker_pub_.publish(createMarkerMsg(tfPose_, QUAD_MARKER_MODEL_NAME, 0.8, 0.0, 0.0, 1.0));
 }
 
 void Quad::publishSetpointMarker() {
     // publish elikos_setpoint_marker
-    setpoint_marker_pub_.publish(createMarkerMsg(QUAD_TF_NAME_SETPOINT, QUAD_MARKER_MODEL_NAME, 0.0, 0.8, 0.0, 0.25));
+    setpoint_marker_pub_.publish(createMarkerMsg(tfSetpoint_, QUAD_MARKER_MODEL_NAME, 0.0, 0.8, 0.0, 0.25));
 }
 
 void Quad::updatePose() {
@@ -98,7 +102,7 @@ void Quad::updateVel() {
 
 void Quad::updateSetpoint() {
     try {
-        tf_listener_.lookupTransform(QUAD_TF_NAME_BASE, QUAD_TF_NAME_SETPOINT, ros::Time(0), currentSetpoint_);
+        tf_listener_.lookupTransform(tfOrigin_, tfSetpoint_, ros::Time(0), currentSetpoint_);
     } catch (tf::TransformException e) {
         ROS_ERROR("QUAD tf setpoint: %s", e.what());
     }
