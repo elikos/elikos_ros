@@ -1,4 +1,8 @@
-#include <ros/ros.h>
+/**
+ * \file pose2tf.cpp
+ * \brief Simple helper node which subscribes to a geometry_msgs::Pose topic and publishes the latest corresponding tf.
+ * \author christophebedard
+ */
 
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>

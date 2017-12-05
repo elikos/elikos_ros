@@ -1,3 +1,9 @@
+/**
+ * \file BoundedPID.cpp
+ * \brief BoundedPID class implementation
+ * \author christophebedard
+ */
+
 #include "BoundedPID.h"
 
 BoundedPID::BoundedPID(double minCmd, double maxCmd, double p, double i, double d, double i_max, double i_min, bool antiwindup)

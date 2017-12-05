@@ -1,6 +1,12 @@
 #ifndef ELIKOS_SIM_QUAD_H
 #define ELIKOS_SIM_QUAD_H
 
+/**
+ * \file quad.h
+ * \brief Quad class declaration
+ * \author christophebedard
+ */
+
 #include <string>
 #include <vector>
 #include <ros/ros.h>
@@ -17,68 +23,118 @@ static const std::string QUAD_MARKER_MODEL_NAME = "Yopokos_vSim.dae";
 
 static const double INTERACTION_DIAMETER = 0.4;
 
+/** \class Quad
+ * \brief class which simulates the quadcopter.
+ *
+ * It moves to a given setpoint with simple PIDs and publishes a tf of its current pose.
+ */
 class Quad
 {
     public:
+        /**
+         * \brief Quad constructor.
+         *
+         * \param n : node handle.
+         * \param expectedCycleTime : expected time between every update.
+         */
         Quad(ros::NodeHandle& n, ros::Duration expectedCycleTime);
+
+        /**
+         * \brief Quad destructor.
+         */
         ~Quad();
 
+        /**
+         * \brief General update method, called every loop.
+         */
         void update();
-        void spinOnce();
 
+        /**
+         * \brief Accessor for the diameter to consider for physical interactions.
+         *
+         * \return diameter.
+         */
         double getInteractionDiameter() const;
+
+        /**
+         * \brief Accessor for the quad's current position.
+         *
+         * \return current position.
+         */
         tf::Vector3 getPosition() const;
 
-    protected:
-        void updateSetpoint();
-        void updateVel();
-        void updatePose();
-        void publishSetpointMarker();
-        void publishQuad();
-        
     private:
-        ros::NodeHandle& n_;
+        ros::NodeHandle& n_; /**< node handle */
 
-        /* arena origin tf */
-        std::string tfOrigin_;
-        /* pose tf */
-        std::string tfPose_;
-        /* setpoint tf */
-        std::string tfSetpoint_;
+        std::string tfOrigin_; /**< arena origin tf */
+        std::string tfPose_; /**< pose tf */
+        std::string tfSetpoint_; /**< setpoint tf */
 
-        /* tf listener */
-        tf::TransformListener tf_listener_;
-        /* elikos_fcu tf publisher */
-        tf::TransformBroadcaster tf_br_;
-        /* Expected cycle time (1/refresh rate) */
-        ros::Duration expectedCycleTime_;
+        tf::TransformListener tf_listener_; /**< tf listener used for getting setpoint */
+        tf::TransformBroadcaster tf_br_; /**< tf broadcaster used for current quad pose */
+        ros::Duration expectedCycleTime_; /**< expected cycle time (1/refresh rate) */
 
-        // publishers
-        ros::Publisher quad_marker_pub_;
-        ros::Publisher setpoint_marker_pub_;
+        ros::Publisher quad_marker_pub_; /**< quad marker publisher */
+        ros::Publisher setpoint_marker_pub_; /**< setpoint marker publisher */
 
-        // setpoint
-        tf::StampedTransform currentSetpoint_;
-        double setpoint_x_, setpoint_y_, setpoint_z_;
-        //double setpoint_yaw_;
+        tf::StampedTransform currentSetpoint_; /**< current setpoint tf */
+        double setpoint_x_; /**< current X setpoint */
+        double setpoint_y_; /**< current Y setpoint */
+        double setpoint_z_; /**< current Z setpoint */
+        //double setpoint_yaw_; /**< current yaw setpoint */
 
-        // pose
-        double pos_x_, pos_y_, pos_z_;
-        double yaw_;
+        double pos_x_; /**< current X position */
+        double pos_y_; /**< current Y position */
+        double pos_z_; /**< current Z position */
+        double yaw_; /**< current yaw */
 
-        // velocities
-        double vel_x_, vel_y_, vel_z_;
-        //double vel_yaw_;
+        double vel_x_; /**< X velocity */
+        double vel_y_; /**< Y velocity */
+        double vel_z_; /**< Z velocity */
+        //double vel_yaw_; /**< yaw velocity */
 
-        // PIDs
-        BoundedPID* pid_vel_x_;
-        BoundedPID* pid_vel_y_;
-        BoundedPID* pid_vel_z_;
+        BoundedPID* pid_vel_x_; /**< X PID */
+        BoundedPID* pid_vel_y_; /**< Y PID */
+        BoundedPID* pid_vel_z_; /**< Z PID */
 
-        // Gains
+        /**
+         * \brief Update setpoint by looking up latest setpoint tf.
+         */
+        void updateSetpoint();
 
+        /**
+         * \brief Update velocities by calling PIDs.
+         */
+        void updateVel();
+
+        /**
+         * \brief Update quad position given velocities.
+         */
+        void updatePose();
+
+        /**
+         * \brief Publish marker for current setpoint.
+         */
+        void publishSetpointMarker();
+
+        /**
+         * \brief Publish tf and marker for current quad position.
+         */
+        void publishQuad();
+
+        /**
+         * \brief Helper method for creating marker message.
+         *
+         * \param frame : frame_id to use.
+         * \param meshResource : resource file to use.
+         * \param r : red color value.
+         * \param g : green color value.
+         * \param b : blue color value.
+         * \param a : transparency value.
+         * 
+         * \return marker message.
+         */
         visualization_msgs::Marker createMarkerMsg(std::string frame, std::string meshResource, double r, double g, double b, double a);
-
 };
 
 #endif // ELIKOS_SIM_QUAD_H

@@ -1,3 +1,9 @@
+/**
+ * \file sim_roombas.cpp
+ * \brief Simulation manager for roomba_sim. Creates and handles robots and quad.
+ * \author christophebedard
+ */
+
 #include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <tf/tf.h>
@@ -47,7 +53,7 @@ int main(int argc, char** argv) {
     // create quad
     quad = new Quad(n, rate.expectedCycleTime());
 
-
+    // run simulation
     while (ros::ok())
     {
         // quad

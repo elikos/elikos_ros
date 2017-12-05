@@ -1,3 +1,9 @@
+/**
+ * \file sim_detection.cpp
+ * \brief SimDetection class implementation
+ * \author christophebedard
+ */
+
 #include "sim_detection.h"
 
 SimDetection::SimDetection(ros::NodeHandle& n)

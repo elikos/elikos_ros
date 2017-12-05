@@ -1,3 +1,9 @@
+/**
+ * \file quad.cpp
+ * \brief Quad class implementation
+ * \author christophebedard
+ */
+
 #include "quad.h"
 
 Quad::Quad(ros::NodeHandle& n, ros::Duration expectedCycleTime)
@@ -127,36 +133,3 @@ void Quad::update() {
     publishSetpointMarker();
     publishQuad();
 }
- /*
-void Quad::spinOnce() {
-  update();
-  ros::spinOnce();
-}
-
-// ---------------------------
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "sim_quad");
-    ros::NodeHandle n;
-
-    ros::Rate rate(10.0);
-
-    Quad quad_(n, rate.expectedCycleTime());
-    
-    try
-    {
-        while (ros::ok())
-        {
-            quad_.spinOnce();
-            rate.sleep();
-        }
-    }
-    catch (std::runtime_error& e)
-    {
-        ROS_FATAL_STREAM("[SIM QUAD] Runtime error: " << e.what());
-        return 1;
-    }
-    return 0;
-}
-*/
