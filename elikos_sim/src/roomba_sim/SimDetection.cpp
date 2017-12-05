@@ -4,7 +4,7 @@
  * \author christophebedard
  */
 
-#include "sim_detection.h"
+#include "SimDetection.h"
 
 SimDetection::SimDetection(ros::NodeHandle& n)
     : n_(n)

@@ -9,13 +9,13 @@
 #include <tf/tf.h>
 #include "elikos_roomba/groundrobot.h"
 #include "elikos_roomba/obstaclerobot.h"
-#include "quad.h"
+#include "Quad.h"
 
-static const double LOOP_RATE_SIM = 10.0;
-static const std::string NODE_NAME = "sim_roombas";
+static const double LOOP_RATE_SIM = 10.0; /**< loop rate */
+static const std::string NODE_NAME = "sim_roombas"; /**< node name */
 
-static const double TARGET_ROBOT_RADIUS = 1.0;
-static const double OBSTACLE_ROBOT_RADIUS = 5.0;
+static const double TARGET_ROBOT_RADIUS = 1.0; /**< circle radius for target robot initial position */
+static const double OBSTACLE_ROBOT_RADIUS = 5.0; /**<  circle radius for obstacle robot initial position */
 
 std::vector<Robot*> robots;
 Quad* quad;

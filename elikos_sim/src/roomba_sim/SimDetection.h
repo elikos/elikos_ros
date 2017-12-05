@@ -16,9 +16,6 @@
 #include <visualization_msgs/MarkerArray.h>
 #include "elikos_main/TargetRobotArray.h"
 
-// names
-static const std::string TEST_MARKERS_TOPIC_NAME = "target_robot_array_test";   // display detected target in rviz
-
 static const double PI = 3.1415;
 
 /** \class SimDetection

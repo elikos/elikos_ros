@@ -4,7 +4,7 @@
  * \author christophebedard
  */
 
-#include "quad.h"
+#include "Quad.h"
 
 Quad::Quad(ros::NodeHandle& n, ros::Duration expectedCycleTime)
     : n_(n),

@@ -66,8 +66,8 @@ target_link_libraries(robots_sim
 
 add_executable(sim_roombas
     src/roomba_sim/sim_roombas.cpp
-    src/roomba_sim/quad.cpp
-    src/roomba_sim/quad.h
+    src/roomba_sim/Quad.cpp
+    src/roomba_sim/Quad.h
     src/roomba_sim/BoundedPID.cpp
     src/roomba_sim/BoundedPID.h
 )
@@ -76,8 +76,8 @@ target_link_libraries(sim_roombas
 )
 
 add_executable(sim_detection
-    src/roomba_sim/sim_detection.cpp
-    src/roomba_sim/sim_detection.h
+    src/roomba_sim/SimDetection.cpp
+    src/roomba_sim/SimDetection.h
 )
 target_link_libraries(sim_detection
   ${catkin_LIBRARIES}

@@ -13,6 +13,11 @@ static const double LOOP_RATE_SIM = 10.0;
 double x, y, z;
 tf::Quaternion yaw;
 
+/**
+ * \brief Callback for pose topic.
+ *
+ * \param msg : constptr to latest message.
+ */
 void poseCallback(const geometry_msgs::Pose::ConstPtr& msg) {
     // update pose info
     x = msg->position.x;
