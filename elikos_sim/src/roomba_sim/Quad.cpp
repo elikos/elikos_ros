@@ -1,5 +1,5 @@
 /**
- * \file quad.cpp
+ * \file Quad.cpp
  * \brief Quad class implementation
  * \author christophebedard
  */

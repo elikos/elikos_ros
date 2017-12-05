@@ -2,7 +2,7 @@
 #define ELIKOS_SIM_QUAD_H
 
 /**
- * \file quad.h
+ * \file Quad.h
  * \brief Quad class declaration
  * \author christophebedard
  */

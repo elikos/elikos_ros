@@ -1,5 +1,5 @@
 /**
- * \file sim_detection.cpp
+ * \file SimDetection.cpp
  * \brief SimDetection class implementation
  * \author christophebedard
  */

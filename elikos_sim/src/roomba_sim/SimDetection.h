@@ -2,7 +2,7 @@
 #define ELIKOS_SIM_DETECTION_H
 
 /**
- * \file sim_detection.h
+ * \file SimDetection.h
  * \brief SimDetection class declaration
  * \author christophebedard
  */
