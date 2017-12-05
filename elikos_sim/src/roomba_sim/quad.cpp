@@ -65,7 +65,7 @@ visualization_msgs::Marker Quad::createMarkerMsg(std::string frame, std::string 
 }
 
 double Quad::getInteractionDiameter() const {
-    return 0.4;
+    return INTERACTION_DIAMETER;
 }
 
 tf::Vector3 Quad::getPosition() const {

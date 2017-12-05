@@ -15,6 +15,8 @@ static const std::string QUAD_MARKER_TOPIC_NAME = "markers/elikos_fcu";
 static const std::string QUAD_MESH_RESOURCE_PREFIX = "package://elikos_sim/src/gazebo_sim/elikos_gazebo_models/models/quad/"; //"package://elikos_gazebo_models/models/quad/"
 static const std::string QUAD_MARKER_MODEL_NAME = "Yopokos_vSim.dae";
 
+static const double INTERACTION_DIAMETER = 0.4;
+
 class Quad
 {
     public:
