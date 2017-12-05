@@ -36,7 +36,7 @@ class SimDetection
         SimDetection(ros::NodeHandle& n);
 
         /**
-         * \brief Quad destructor.
+         * \brief SimDetection destructor.
          */
         ~SimDetection();
 
