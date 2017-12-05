@@ -1,17 +1,51 @@
 <launch>
     <arg name="arena_dimension" default="20" />
+    <!--
+    <arg name="tf_origin" default="/elikos_arena_origin" >
+    <arg name="tf_pose" default="/elikos_fcu" >
+    <arg name="tf_setpoint" default="/elikos_setpoint" >
+    -->
+
     <rosparam command="load" file="$(find elikos_main)/param/config.yaml" />
 
-    <node name="roomba_sim" pkg="elikos_sim" type="roomba_sim" output="screen" />
+    <group ns="sim">
+        <!-- Arena (squares and lines) -->
+        <node name="arena_node" pkg="elikos_roomba" type="arena_node" output="screen">
+            <param name="arena_dimension" value="$(arg arena_dimension)" />
+        </node>
 
-    <node name="arena_node" pkg="elikos_roomba" type="arena_node" output="screen">
-        <param name="arena_dimension" value="$(arg arena_dimension)" />
-    </node>
+        <!-- Simulation -->
+        <node name="sim_roombas" pkg="elikos_sim" type="sim_roombas" output="screen">
+            <param name="tf_pose" value="/elikos_fcu" />
+            <param name="tf_setpoint" value="/elikos_setpoint" />
+            <param name="tf_origin" value="/elikos_arena_origin" />
+        </node>
 
-    <node name="serviceredirect_node" pkg="elikos_roomba" type="serviceredirect_node" output="screen">
-        <param name="groundrobot_qty" value="10" />
-        <param name="obstaclerobot_qty" value="4" />
-    </node>
-    
-    <node name="rviz" pkg="rviz" type="rviz" />
+        <!-- Services for robots -->
+        <node name="serviceredirect_node" pkg="elikos_roomba" type="serviceredirect_node" output="screen">
+            <param name="groundrobot_qty" value="10" />
+            <param name="obstaclerobot_qty" value="4" />
+        </node>
+
+        <!-- Target robot detection simulation -->
+        <node name="sim_detection" pkg="elikos_sim" type="sim_detection" output="screen">
+            <param name="target_robots_topic" value="/elikos_target_robot_array" />
+            <param name="target_robots_markers_topic" value="markers/target_robots" />
+            <param name="tf_pose" value="/elikos_fcu" />
+            <param name="tf_origin" value="/elikos_arena_origin" />
+            <param name="detection_camera_info" value="[0.0, 1.5708, 20.0,
+                                                        3.1415, 1.5708, 20.0]" />
+        </node>
+
+        <!-- Fake elikos_setpoint (for testing) -->
+        <node name="sim_pose2tf" pkg="elikos_sim" type="sim_pose2tf" output="screen">
+            <param name="pose_topic" value="elikos_setpoint_pose" />
+            <param name="tf_setpoint" value="/elikos_setpoint" />
+            <param name="tf_origin" value="/elikos_arena_origin" />
+        </node>
+
+        <node pkg="tf" type="static_transform_publisher" name="elikos_arena_origin" args="0.0 0.0 0.0 0.0 0.0 0.0 world elikos_arena_origin 100"/>
+    </group>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_sim)/launch/roomba_sim.rviz" />
 </launch>

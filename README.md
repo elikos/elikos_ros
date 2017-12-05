@@ -9,7 +9,7 @@ Dossier contenant les différents modules servant à la localisation, à la dét
 
   Packages ROS :  
   
-    sudo apt-get install -y ros-$ROS_DISTRO-mavros ros-$ROS_DISTRO-mavros-extras ros-$ROS_DISTRO-pointgrey-camera-driver ros-$ROS_DISTRO-moveit
+    sudo apt-get install -y ros-$ROS_DISTRO-mavros ros-$ROS_DISTRO-mavros-extras ros-$ROS_DISTRO-pointgrey-camera-driver ros-$ROS_DISTRO-moveit ros-$ROS_DISTRO-control-toolbox
     sudo apt install -y python-pip
     sudo pip install --upgrade pip
     sudo pip install numba scipy numpy numpy-quaternion`
