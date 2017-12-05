@@ -7,8 +7,8 @@
 #include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <tf/tf.h>
-#include "elikos_roomba/groundrobot.h"
-#include "elikos_roomba/obstaclerobot.h"
+#include "elikos_roomba/GroundRobot.h"
+#include "elikos_roomba/ObstacleRobot.h"
 #include "Quad.h"
 
 static const double LOOP_RATE_SIM = 10.0; /**< loop rate */
