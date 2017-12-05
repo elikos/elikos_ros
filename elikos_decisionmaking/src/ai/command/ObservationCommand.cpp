@@ -20,7 +20,7 @@ ObservationCommand::ObservationCommand(QuadRobot* quad, TargetRobot* target)
     
     ros::NodeHandle nh;
     double research_altitude;
- 	nh.getParam("/elikos_ai/research_altitude", research_altitude);
+ 	nh.getParam("/elikos_decisionmaking/research_altitude", research_altitude);
     observation_position_.setZ(research_altitude);
 }
 

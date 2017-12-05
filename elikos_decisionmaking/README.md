@@ -1,4 +1,4 @@
-# ELIKOS_AI  
+# ELIKOS_DECISIONMAKING  
 ## Buts  
 * Prise de décision haut niveau.  
 * Amener le plus de robots cibles possible à la ligne verte dans la limite de temps donnée.  
@@ -11,7 +11,7 @@
 ## Launch files  
 * `ai.launch`  
 *Description*  
-    *  Lance le node elikos_ai 
+    *  Lance le node elikos_decisionmaking 
     *  TODO: Spécification du fichier de configuration 
 * `simulation.launch`   
 *Description*   
@@ -36,7 +36,7 @@
     Indique si on veut exécuter la simulation de l'AI.
 
 ## Nodes  
-* **elikos_ai** : Effectue la prise de décision haut niveau. Génère des destinations et devrait 
+* **elikos_decisionmaking** : Effectue la prise de décision haut niveau. Génère des destinations et devrait 
                  éventuellement générer les commandes.  
 * **elikos_emulator** : Transforme les coordonnées du repère de l'image vers le repère de l'arène.  
 

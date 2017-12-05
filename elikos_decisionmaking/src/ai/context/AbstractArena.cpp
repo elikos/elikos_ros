@@ -17,9 +17,9 @@ AbstractArena::AbstractArena()
 
     ros::NodeHandle nh;
     double dimension_c;
-    nh.getParam("/elikos_ai/dimension_c", dimension_c);
+    nh.getParam("/elikos_decisionmaking/dimension_c", dimension_c);
     double edge_tolerance;
-    nh.getParam("/elikos_ai/edge_tolerance", edge_tolerance);
+    nh.getParam("/elikos_decisionmaking/edge_tolerance", edge_tolerance);
 
     TOP_RIGHT_CORNER = tf::Point( dimension_c/2,  dimension_c/2, 0.0 );
     TOP_LEFT_CORNER = tf::Point(-dimension_c/2,  dimension_c/2, 0.0 );

@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
 #	INCLUDE_DIRS include
-#	LIBRARIES
+#	LIBRARIES elikos_decisionmaking
 	CATKIN_DEPENDS elikos_main elikos_roomba geometry_msgs roscpp std_msgs control_toolbox tf
 #	DEPENDS system_lib
 )

@@ -2,7 +2,7 @@
 
 MessageHandler_moveit::MessageHandler_moveit()
 {
-   sub_ = nh_.subscribe("elikos_ai_cmd", 1, &MessageHandler_moveit::dispatchMessageTarget, this);
+   sub_ = nh_.subscribe("elikos_decisionmaking_cmd", 1, &MessageHandler_moveit::dispatchMessageTarget, this);
    hasNewMessage_ = false;
 }
 

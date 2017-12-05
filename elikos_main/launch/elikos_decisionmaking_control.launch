@@ -3,7 +3,7 @@
 	<include file="$(find elikos_tracking)/launch/elikos_tracking.launch"/>
 
   <!-- AI -->
-  <include file="$(find elikos_ai)/launch/ai.launch"/>
+  <include file="$(find elikos_decisionmaking)/launch/decisionmaking.launch"/>
 
   <!-- Path planning -->
   <include file="$(find elikos_path_planning)/launch/path_planning.launch"/>

@@ -8,8 +8,8 @@
   <arg name="calib_dir" default="$(find elikos_detection)/cfg/" />
   <include file="$(find elikos_detection)/launch/elikos_detection.launch"/>
 
-  <!-- AI -->
-	<include file="$(find elikos_ai)/launch/ai.launch"/>
+  <!-- Decision-making -->
+	<include file="$(find elikos_decisionmaking)/launch/decisionmaking.launch"/>
 
   <!-- Path planning -->
   <include file="$(find elikos_path_planning)/launch/path_planning.launch"/>

@@ -25,9 +25,9 @@ MessageHandler::MessageHandler()
     trgtSub_ = nh_.subscribe<elikos_main::TargetRobotArray>(TRGT_TOPIC, 1, &MessageHandler::handleTrgtMsg, this);
     simPub_ = nh_.advertise<geometry_msgs::PoseStamped>(SETPOINT_TOPIC, 1);
     cmdPub_ = nh_.advertise<elikos_main::AICmd>(CMD_TOPIC, 1);
-    nh_.param<bool>("/elikos_ai/simulation", is_simulation_, false);
-    statePubBehavior_ = nh_.advertise<std_msgs::String>("/elikos_ai_state_behavior", 1);
-    statePubCommand_ = nh_.advertise<std_msgs::String>("/elikos_ai_state_command", 1);
+    nh_.param<bool>("/elikos_decisionmaking/simulation", is_simulation_, false);
+    statePubBehavior_ = nh_.advertise<std_msgs::String>("/elikos_decisionmaking_state_behavior", 1);
+    statePubCommand_ = nh_.advertise<std_msgs::String>("/elikos_decisionmaking_state_command", 1);
 }
 
 void MessageHandler::freeInstance()

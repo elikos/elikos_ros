@@ -20,8 +20,8 @@ namespace tf
 namespace ai
 {
 const std::string TRGT_TOPIC { "/elikos_track_robot_array" };
-const std::string SETPOINT_TOPIC { "elikos_ai_sim" };
-const std::string CMD_TOPIC { "elikos_ai_cmd" };
+const std::string SETPOINT_TOPIC { "elikos_decisionmaking_sim" };
+const std::string CMD_TOPIC { "elikos_decisionmaking_cmd" };
 const std::string WORLD_FRAME = { "elikos_arena_origin" };
 const std::string MAV_FRAME = { "elikos_fcu" };
 class Agent;
