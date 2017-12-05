@@ -33,6 +33,8 @@
             <param name="target_robots_markers_topic" value="markers/target_robots" />
             <param name="tf_pose" value="/elikos_fcu" />
             <param name="tf_origin" value="/elikos_arena_origin" />
+            <param name="detection_camera_info" value="[0.0, 1.5708, 20.0,
+                                                        3.1415, 1.5708, 20.0]" />
         </node>
 
         <!-- Fake elikos_setpoint (for testing) -->

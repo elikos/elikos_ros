@@ -11,10 +11,15 @@ SimDetection::SimDetection(ros::NodeHandle& n)
     n_p.getParam("tf_pose", tfPose_);
     n_p.getParam("target_robots_topic", targetRobotArrayTopic_);
     n_p.getParam("target_robots_markers_topic", targetRobotArrayMarkerTopic_);
+    n_p.getParam("detection_camera_info", detectionCameraInfo_str_);
 
-    angleMin_ = - 3.1415 / 4.0;
-    angleMax_ = 3.1415 / 4.0;
-    distanceMax_ = 20.0;
+    // convert string to vector
+    detectionCameraInfo_ = getVectorFromString(detectionCameraInfo_str_);
+    // throw error if size is inconsistent (not multiple of 3)
+    if (detectionCameraInfo_.size() % 3 != 0) {
+        ROS_ERROR("[SIM DETECTION] size of detection_camera_info array inconsistent. Using default.");
+        detectionCameraInfo_ = {0.0, 1.5708, 20.0};
+    }
 
     robotsPoses_ = new std::vector<tf::StampedTransform>(nbTargetRobots_);
     detectedRobots_ = new std::vector<elikos_main::TargetRobot>();
@@ -37,6 +42,25 @@ SimDetection::~SimDetection() {
  * Other utilities
  *===========================*/
 
+std::vector<double> SimDetection::getVectorFromString(std::string& str) {
+    const std::string delim = ",";
+
+    // remove square brackets []
+    str = str.substr(1, str.size() - 2);
+
+	std::vector<double> tokens;
+	size_t prev = 0, pos = 0;
+	do
+	{
+		pos = str.find(",", prev);
+		if (pos == std::string::npos) pos = str.length();
+		std::string token = str.substr(prev, pos - prev);
+		if (!token.empty()) tokens.push_back(std::stod(token));
+		prev = pos + 1;
+	} while (pos < str.length() && prev < str.length());
+	return tokens;
+}
+
 geometry_msgs::PoseStamped SimDetection::createPoseStampedFromPosYaw(tf::Vector3 pos, double yaw) {
     geometry_msgs::PoseStamped pose_msg;
     pose_msg.pose.position.x = pos.x();
@@ -45,6 +69,59 @@ geometry_msgs::PoseStamped SimDetection::createPoseStampedFromPosYaw(tf::Vector3
     pose_msg.header.stamp = ros::Time::now();
     pose_msg.header.frame_id = tfOrigin_;
     return pose_msg;
+}
+
+double SimDetection::normalizeZeroTwoPi(double a) {
+    while ((a > 2.0*PI) || (a < 0.0)) {
+        if (a > 2.0*PI) {
+            a -= 2.0*PI;
+        } else if (a < 0.0) {
+            a += 2.0*PI;
+        }
+    }
+    return a;
+}
+
+bool SimDetection::isAngleWithin(double angle, double min, double max) {
+    bool res;
+    min = normalizeZeroTwoPi(min);
+    max = normalizeZeroTwoPi(max);
+    if (min > max) {
+        // max overflowed (e.g. min=2.5, max=0.5)
+        res = (angle >= min) || (angle <= max);
+    } else {
+        res = (angle >= min) && (angle <= max);
+    }
+    return res;
+}
+
+bool SimDetection::isDetected(double robotAngle, double robotDistanceSquared) {
+    bool isDetected = false;
+
+    robotAngle = normalizeZeroTwoPi(robotAngle);
+
+    // for every camera
+    for (int i = 0; i < (detectionCameraInfo_.size()/3); ++i) {
+        // extract info
+        double position = detectionCameraInfo_[(i*3) + 0];
+        double angle = detectionCameraInfo_[(i*3) + 1];
+        double distance = detectionCameraInfo_[(i*3) + 2];
+
+        // calculate corresponding angle interval
+        double angleMin = position - (angle / 2.0);
+        double angleMax = position + (angle / 2.0);
+
+        // check if it's within the current camera's FOV
+        if (isAngleWithin(robotAngle, angleMin, angleMax)) {
+            // check if it's within the current camera's range
+            if (robotDistanceSquared <= pow(distance, 2)) {
+                // detected
+                isDetected = true;
+            }
+        }
+    }
+
+    return isDetected;
 }
 
 /*===========================
@@ -84,18 +161,13 @@ void SimDetection::updateDetectedRobots() {
 
     // loop through all robots and check if valid
     for (int i = 0; i < nbTargetRobots_; ++i) {
-        //robotsPoses_->at(i)
         double robot_x = robotsPoses_->at(i).getOrigin().x();
         double robot_y = robotsPoses_->at(i).getOrigin().y();
 
         double angleWrtQuad = atan2(robot_y - quad_y, robot_x - quad_x);
         double distanceSquaredWrtQuad = pow((robot_y - quad_y), 2) + pow((robot_x - quad_x), 2);
 
-        bool isDistanceOkay = distanceSquaredWrtQuad <= pow(distanceMax_, 2);
-        bool isAngleOkay = (angleWrtQuad >= angleMin_) && (angleWrtQuad <= angleMax_);
-
-        bool isDetected = isDistanceOkay && isAngleOkay;
-        if (isDetected) {
+        if (isDetected(angleWrtQuad, distanceSquaredWrtQuad)) {
             // create and add TargetRobot message
             elikos_main::TargetRobot msg;
             //msg.id = 0;

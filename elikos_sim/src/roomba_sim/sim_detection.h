@@ -13,6 +13,8 @@
 // names
 static const std::string TEST_MARKERS_TOPIC_NAME = "target_robot_array_test";   // display detected target in rviz
 
+static const double PI = 3.1415;
+
 
 class SimDetection
 {
@@ -30,19 +32,6 @@ class SimDetection
 
     protected:
         ros::NodeHandle& n_;
-
-        int nbTargetRobots_;
-        //int nbObstacleRobots_;
-
-        tf::StampedTransform currentQuadPose_;
-        std::vector<tf::StampedTransform>* robotsPoses_;
-        std::vector<elikos_main::TargetRobot>* detectedRobots_;
-
-        // detection conditions/parameters
-        // TODO: parametrize
-        double angleMin_;
-        double angleMax_;
-        double distanceMax_;
 
         /*===========================
          * Update
@@ -84,7 +73,17 @@ class SimDetection
 
     
     private:
-        tf::TransformListener tf_listener_;
+        /* number of target robots */
+        int nbTargetRobots_;
+        /* number of obstacle robots; in case we add obstacle robot detection */
+        //int nbObstacleRobots_;
+
+        /* quad pose */
+        tf::StampedTransform currentQuadPose_;
+        /* targets poses */
+        std::vector<tf::StampedTransform>* robotsPoses_;
+        /* detected robots */
+        std::vector<elikos_main::TargetRobot>* detectedRobots_;
 
         /* arena origin tf */
         std::string tfOrigin_;
@@ -94,6 +93,12 @@ class SimDetection
         std::string targetRobotArrayTopic_;
         /* target detection pose array (tests/viz) */
         std::string targetRobotArrayMarkerTopic_;
+
+        /* camera information (position (rad), angle (rad), range (m)) */
+        std::vector<double> detectionCameraInfo_;
+        std::string detectionCameraInfo_str_;
+
+        tf::TransformListener tf_listener_;
 
         /*===========================
          * Publishers
@@ -110,6 +115,26 @@ class SimDetection
          * Create posestamped message from position and yaw
          */
         geometry_msgs::PoseStamped createPoseStampedFromPosYaw(tf::Vector3 pos, double yaw);
+
+        /*
+         * Convert string "[0.0, 0.0, 0,0]" to vector<double>
+         */
+        std::vector<double> getVectorFromString(std::string& str);
+
+        /*
+         * Check if robot is detected given its angle and distance^2 wrt quad
+         */
+        bool isDetected(double robotAngle, double robotDistanceSquared);
+
+        /*
+         * Convert to [0,2pi]
+         */
+        double normalizeZeroTwoPi(double a);
+
+        /*
+         * Check if angle is within [min,max] while handling cases where min>max
+         */
+        bool isAngleWithin(double angle, double min, double max);
 };
 
 #endif  // ELIKOS_SIM_DETECTION_H
