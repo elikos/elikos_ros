@@ -1,0 +1,17 @@
+<launch>
+    <arg name="arena_dimension" default="20" />
+    <rosparam command="load" file="$(find elikos_main)/param/config.yaml" />
+
+    <node name="roomba_sim" pkg="elikos_sim" type="roomba_sim" output="screen" />
+
+    <node name="arena_node" pkg="elikos_roomba" type="arena_node" output="screen">
+        <param name="arena_dimension" value="$(arg arena_dimension)" />
+    </node>
+
+    <node name="serviceredirect_node" pkg="elikos_roomba" type="serviceredirect_node" output="screen">
+        <param name="groundrobot_qty" value="10" />
+        <param name="obstaclerobot_qty" value="4" />
+    </node>
+    
+    <node name="rviz" pkg="rviz" type="rviz" />
+</launch>

@@ -4,6 +4,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
   elikos_main
+  elikos_roomba
   geometry_msgs
   roscpp
   std_msgs
@@ -13,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #	INCLUDE_DIRS include
 #	LIBRARIES elikos_decisionmaking
-	CATKIN_DEPENDS elikos_main geometry_msgs roscpp std_msgs tf
+	CATKIN_DEPENDS elikos_main elikos_roomba geometry_msgs roscpp std_msgs tf
 #	DEPENDS system_lib
 )
 
@@ -41,7 +42,8 @@ target_link_libraries(elikos_sim
 )
 
 add_executable(gazebo_tf_fix
-    src/gazebo_sim/gazebo_tf_fix/gazebo_tf_fix.cpp)
+    src/gazebo_sim/gazebo_tf_fix/gazebo_tf_fix.cpp
+)
 
 target_link_libraries(gazebo_tf_fix
   ${catkin_LIBRARIES}
@@ -52,8 +54,17 @@ add_executable(robots_sim
     src/gazebo_sim/robots_sim/Obstacle.cpp
     src/gazebo_sim/robots_sim/Robot.h
     src/gazebo_sim/robots_sim/Robot.cpp
-    src/gazebo_sim/robots_sim/robots_sim.cpp)
+    src/gazebo_sim/robots_sim/robots_sim.cpp
+)
 
 target_link_libraries(robots_sim
   ${catkin_LIBRARIES} 
+)
+
+add_executable(roomba_sim
+    src/rviz_sim/roomba_sim.cpp
+)
+target_link_libraries(roomba_sim
+  ${catkin_LIBRARIES}
+  #do NOT put elikos_roomba_lib
 )
