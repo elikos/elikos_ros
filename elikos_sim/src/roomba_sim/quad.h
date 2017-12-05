@@ -24,6 +24,9 @@ class Quad
         void update();
         void spinOnce();
 
+        double getInteractionDiameter() const;
+        tf::Vector3 getPosition() const;
+
     protected:
         void updateSetpoint();
         void updateVel();

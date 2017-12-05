@@ -64,6 +64,14 @@ visualization_msgs::Marker Quad::createMarkerMsg(std::string frame, std::string 
     return msg;
 }
 
+double Quad::getInteractionDiameter() const {
+    return 0.4;
+}
+
+tf::Vector3 Quad::getPosition() const {
+    return tf::Vector3(pos_x_, pos_y_, pos_z_);
+}
+
 /*===========================
  * Update
  *===========================*/

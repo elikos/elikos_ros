@@ -7,8 +7,6 @@
 
 static const double LOOP_RATE_SIM = 10.0;
 static const std::string NODE_NAME = "sim_roombas";
-static const std::string TF_MIDDLE_ARENA = "/elikos_arena_origin";
-static const std::string ARENA_SQUARE_MODEL = "package://elikos_roomba/models/arena_square.dae";
 
 static const double TARGET_ROBOT_RADIUS = 1.0;
 static const double OBSTACLE_ROBOT_RADIUS = 5.0;
@@ -16,8 +14,7 @@ static const double OBSTACLE_ROBOT_RADIUS = 5.0;
 std::vector<Robot*> robots;
 Quad* quad;
 
-
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
     ros::init(argc, argv, NODE_NAME);
     ros::NodeHandle n;
 
@@ -60,14 +57,21 @@ int main(int argc, char** argv){
         for (auto& robotBase : robots) {
             robotBase->update();
 
-            // check collisions
             std::string baseNS = robotBase->getNamespace();
-            for (auto& robot : robots) {
-                std::string robotNS = robot->getNamespace();
-                // if not same robot
-                if (baseNS != robotNS) {
-                    robotBase->checkCollision(robot->getPosition());
+
+            // if target robot
+            if (robotBase->getRobotType() == "ground") {
+                // check robot bumper collisions
+                for (auto& robot : robots) {
+                    std::string robotNS = robot->getNamespace();
+                    // if not same robot
+                    if (baseNS != robotNS) {
+                        robotBase->checkRobotCollision(robot->getPosition());
+                    }
                 }
+
+                // check top interaction
+                robotBase->checkTopInteraction(quad->getPosition(), quad->getInteractionDiameter());
             }
         }
 
