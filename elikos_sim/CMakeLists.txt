@@ -8,13 +8,14 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
   std_msgs
+  control_toolbox
   tf
 )
 
 catkin_package(
 #	INCLUDE_DIRS include
 #	LIBRARIES elikos_decisionmaking
-	CATKIN_DEPENDS elikos_main elikos_roomba geometry_msgs roscpp std_msgs tf
+	CATKIN_DEPENDS elikos_main elikos_roomba geometry_msgs roscpp std_msgs control_toolbox tf
 #	DEPENDS system_lib
 )
 
@@ -61,10 +62,30 @@ target_link_libraries(robots_sim
   ${catkin_LIBRARIES} 
 )
 
-add_executable(roomba_sim
-    src/rviz_sim/roomba_sim.cpp
+# roomba_sim
+
+add_executable(sim_roombas
+    src/roomba_sim/sim_roombas.cpp
+    src/roomba_sim/Quad.cpp
+    src/roomba_sim/Quad.h
+    src/roomba_sim/BoundedPID.cpp
+    src/roomba_sim/BoundedPID.h
 )
-target_link_libraries(roomba_sim
+target_link_libraries(sim_roombas
   ${catkin_LIBRARIES}
-  #do NOT put elikos_roomba_lib
+)
+
+add_executable(sim_detection
+    src/roomba_sim/SimDetection.cpp
+    src/roomba_sim/SimDetection.h
+)
+target_link_libraries(sim_detection
+  ${catkin_LIBRARIES}
+)
+
+add_executable(sim_pose2tf
+    src/roomba_sim/pose2tf.cpp
+)
+target_link_libraries(sim_pose2tf
+  ${catkin_LIBRARIES}
 )
