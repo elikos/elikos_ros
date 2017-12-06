@@ -98,6 +98,8 @@ void IntersectionTransform::transformIntersections(const std::vector<Eigen::Vect
         estimateQuadState(intersections);
 	    publishTransformedIntersections(dst, intersections);
     } else {
+	resetPivot();
+	lastDetection_ = geometry_msgs::PoseArray();
         publishTransformedIntersections(std::vector<cv::Point2f>(), geometry_msgs::PoseArray());
     }
 }
@@ -258,6 +260,10 @@ void IntersectionTransform::estimateQuadState(const geometry_msgs::PoseArray &in
             double offsetLength = offset.length();
             if (offsetLength < 0.3)
             {
+		if (estimate.getZ() < 0)
+		{
+			estimate.setZ(0.17);
+		}
                 // TODO: Add elikos_vision_debug as a parameter.
                 tf::StampedTransform transform(tf::Transform(state_.getOrigin2Attitude().getRotation(), estimate),
                                 state_.getTimeStamp(), "elikos_arena_origin", "elikos_vision");
