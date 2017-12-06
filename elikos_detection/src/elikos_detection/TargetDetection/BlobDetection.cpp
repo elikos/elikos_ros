@@ -23,7 +23,7 @@ cv::Mat distortionMap2_;
 BlobDetection::BlobDetection() {
     // foundCircles initialisation
     // Maximum of 20 circles detected at the same time
-    // It allows to loose a circle for a few frames without loosing its
+    // It allows to miss a circle for a few frames without loosing its
     // information
     for (int j = 0; j < 20; j++) {
         foundCircles.emplace_back(RobotDesc(j, 0, 0));
@@ -39,21 +39,6 @@ BlobDetection::BlobDetection() {
     cv::createTrackbar("Max", windowName_, &MAX_CIRCLE_RADIUS, 200);
     cv::createTrackbar("Min", windowName_, &MIN_CIRCLE_RADIUS, 200);*/
 
-    /* ToDO: REMOVE*/
-    /*_tfListener = &tfListener_;
-    cv::Mat distortedCamera =
-        (cv::Mat_<float>(3, 3) << 422.918640, 0.000000, 350.119451, 0.000000,
-         423.121112, 236.380265, 0.000000, 0.000000, 1.000000);
-
-    cv::Mat cameraDistortion = (cv::Mat_<float>(1, 5) << -0.321590, 0.089597,
-                                0.001090, -0.000489, 0.000000);
-
-    cv::Mat undistortedCamera = cv::getOptimalNewCameraMatrix(
-        distortedCamera, cameraDistortion, cv::Size(640, 480), 0);*/
-
-    // cv::initUndistortRectifyMap(distortedCamera, cameraDistortion, cv::Mat(),
-    // undistortedCamera,
-    //  cv::Size(640, 480), CV_32FC1, distortionMap1_, distortionMap2_);
 }
 
 void BlobDetection::detect(const cv::Mat& input, cv::Mat& output_w,

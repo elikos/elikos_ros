@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   geometry_msgs
   nav_msgs
-  elikos_ros
+  elikos_main
   elikos_detection
   image_transport
   roscpp
@@ -23,19 +23,12 @@ find_package(Qt5Widgets)
 find_package(Qt5Test)
 find_package(Qt5Concurrent)
 find_package(Qt5OpenGL)
-find_package(OpenCV 2 REQUIRED)
-find_package(Qt5Gui)
-find_package(Qt5Core)
-find_package(Qt5Widgets)
-find_package(Qt5Test)
-find_package(Qt5Concurrent)
-find_package(Qt5OpenGL)
-find_package(OpenCV 2 REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 
 catkin_package(
 #   INCLUDE_DIRS include
     LIBRARIES elikos_preprocessing
-    CATKIN_DEPENDS elikos_ros elikos_detection image_transport cv_bridge geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros
+    CATKIN_DEPENDS elikos_main elikos_detection image_transport cv_bridge geometry_msgs nav_msgs message_runtime roscpp sensor_msgs std_msgs tf2 pcl_ros
 #   DEPENDS system_lib
 )
 

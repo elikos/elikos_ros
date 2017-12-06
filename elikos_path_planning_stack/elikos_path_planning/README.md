@@ -13,11 +13,11 @@
 * **elikos_moveit_move_group** : Node central pour utiliser moveit. 
 
 ## Input topics  
-* `elikos_ai_cmd`  
+* `elikos_decisionmaking_cmd`  
     * type : `geometry_msgs::PoseStamped`  
     * desc : commande de position envoyée par l'AI. 
 
 ## Output topic  
 * `elikos_trajectory`  
-    * type : `elikos_ros::TrajectoryCmd`    
+    * type : `elikos_main::TrajectoryCmd`    
     * desc : Commande et trajectoire à destination du contrôle.  

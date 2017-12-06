@@ -1,0 +1,7 @@
+<launch>
+    <node name="elikos_sim" pkg="elikos_sim" type="elikos_sim" output="screen"/>
+    	<rosparam command="load" file="$(find elikos_main)/param/config.yaml" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elikos_sim)/launch/tf_markerarray.rviz" />
+    <node name="emulator" pkg="elikos_decisionmaking" type="emulator"/>
+    <include file="$(find elikos_decisionmaking)/launch/decisionmaking.launch"/>
+</launch>

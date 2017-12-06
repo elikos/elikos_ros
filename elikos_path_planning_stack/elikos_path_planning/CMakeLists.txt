@@ -3,7 +3,7 @@ project(elikos_path_planning)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
-   elikos_ros
+   elikos_main
    message_generation
    roscpp
    tf
@@ -28,7 +28,7 @@ find_package(OpenCV REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES elikos_tracking
- CATKIN_DEPENDS cv_bridge elikos_ros geometry_msgs image_transport roscpp std_msgs tf
+ CATKIN_DEPENDS cv_bridge elikos_main geometry_msgs image_transport roscpp std_msgs tf
 #  DEPENDS system_lib
 CATKIN_DEPENDS
     moveit_core

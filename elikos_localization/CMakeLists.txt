@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     cmake_modules
     cv_bridge
     geometry_msgs
-    elikos_ros
+    elikos_main
     elikos_detection
     nav_msgs
     image_transport
@@ -26,13 +26,13 @@ find_package(Qt5Concurrent)
 find_package(Qt5OpenGL)
 
 find_package(Eigen3 REQUIRED)
-find_package(OpenCV 2 REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 
 catkin_package(
     CATKIN_DEPENDS
     image_transport
     cv_bridge
-    elikos_ros
+    elikos_main
     elikos_detection
     geometry_msgs
     nav_msgs

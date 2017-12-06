@@ -55,7 +55,7 @@
 
 ## Output topics  
 * `elikos_target_robot_array`  
-    * type : `elikos_ros::TargetRobotArray`  
+    * type : `elikos_main::TargetRobotArray`  
     * desc : résultats du package.  
 * `(topic spécifié dans le fichier de configuration)/debug`  
     * type : image couleur avec annotations  

@@ -23,8 +23,8 @@
 #include <std_srvs/Empty.h>
 #include <ctime>
 
-#include <elikos_ros/TrajectoryCmd.h>
-#include <elikos_ros/AICmd.h>
+#include <elikos_main/TrajectoryCmd.h>
+#include <elikos_main/AICmd.h>
 
 #include <CmdDefines.h>
 

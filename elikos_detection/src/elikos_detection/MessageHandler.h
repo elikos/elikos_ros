@@ -3,8 +3,8 @@
 
 #include "TargetDetection/TargetDetection.h"
 #include <cv_bridge/cv_bridge.h>
-#include <elikos_ros/RobotRaw.h>
-#include <elikos_ros/RobotRawArray.h>
+#include <elikos_main/RobotRaw.h>
+#include <elikos_main/RobotRawArray.h>
 #include <image_transport/image_transport.h>
 #include <ros/ros.h>
 #include <sensor_msgs/image_encodings.h>

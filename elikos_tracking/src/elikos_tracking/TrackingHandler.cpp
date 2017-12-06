@@ -21,7 +21,7 @@ TrackingHandler::TrackingHandler()
     ros::NodeHandle n;
     targetsSub_ = n.subscribe("/elikos_target_robot_array", 1000,
       &TrackingHandler::subCallback, this);
-    targetsPub_ = n.advertise<elikos_ros::TargetRobotArray>(
+    targetsPub_ = n.advertise<elikos_main::TargetRobotArray>(
         "/elikos_track_robot_array", 1000);
     debugPub_ =  n.advertise<visualization_msgs::MarkerArray>(
         "/elikos_track_debug", 1);
@@ -48,7 +48,7 @@ TrackingHandler::TrackingHandler()
     marker_.lifetime.sec = 0;
 }
 
-void TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const elikos_ros::TargetRobotArray::ConstPtr &msg)
+void TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const elikos_main::TargetRobotArray::ConstPtr &msg)
 {
 
     int idxMinDist = -1;
@@ -102,7 +102,7 @@ void TrackingHandler::MatchRobots(std::vector<double> &ModelMsgDistances, const 
     }
 }
 void TrackingHandler::AssignRobots(
-    const elikos_ros::TargetRobotArray::ConstPtr &msg)
+    const elikos_main::TargetRobotArray::ConstPtr &msg)
 {
     std::vector<double> ModelMsgDistancesForRedRobots(NUM_ROBOTS_PER_COLOR *
                                                       msg->targets.size());
@@ -151,7 +151,7 @@ void TrackingHandler::AssignRobots(
 }
 
 void TrackingHandler::subCallback(
-    const elikos_ros::TargetRobotArray::ConstPtr &msg)
+    const elikos_main::TargetRobotArray::ConstPtr &msg)
 {
     AssignRobots(msg);
 
@@ -198,7 +198,7 @@ void TrackingHandler::drawResultImage()
 
 void TrackingHandler::publishTargets()
 {
-    elikos_ros::TargetRobotArray msgTargetArray;
+    elikos_main::TargetRobotArray msgTargetArray;
     // Debug
     visualization_msgs::MarkerArray msgDebugArray;
     for (int idx = 0; idx < robotsVec_.size(); idx++)
@@ -207,7 +207,7 @@ void TrackingHandler::publishTargets()
         if (!robotsVec_.at(idx)->isNew && robotsVec_.at(idx)->getIncertitude() < 1.05)
         {
            //ROS_INFO("Publishing robot %i with incertitude %f", idx, robotsVec_.at(idx)->getIncertitude());
-            elikos_ros::TargetRobot msg;
+            elikos_main::TargetRobot msg;
             msg.id = robotsVec_.at(idx)->getId();
             msg.color = robotsVec_.at(idx)->getColor();
             msg.poseOrigin.pose.position = robotsVec_.at(idx)->getPos();

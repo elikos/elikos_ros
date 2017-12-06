@@ -3,22 +3,24 @@ project(elikos_sim)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
-  elikos_ros
+  elikos_main
+  elikos_roomba
   geometry_msgs
   roscpp
   std_msgs
+  control_toolbox
   tf
 )
 
 catkin_package(
 #	INCLUDE_DIRS include
-#	LIBRARIES elikos_ai
-	CATKIN_DEPENDS elikos_ros geometry_msgs roscpp std_msgs tf
+#	LIBRARIES elikos_decisionmaking
+	CATKIN_DEPENDS elikos_main elikos_roomba geometry_msgs roscpp std_msgs control_toolbox tf
 #	DEPENDS system_lib
 )
 
 include_directories(
-    ../elikos_ros/src/
+    ../elikos_main/src/
     ${catkin_INCLUDE_DIRS}
 )
 
@@ -41,7 +43,8 @@ target_link_libraries(elikos_sim
 )
 
 add_executable(gazebo_tf_fix
-    src/gazebo_sim/gazebo_tf_fix/gazebo_tf_fix.cpp)
+    src/gazebo_sim/gazebo_tf_fix/gazebo_tf_fix.cpp
+)
 
 target_link_libraries(gazebo_tf_fix
   ${catkin_LIBRARIES}
@@ -52,8 +55,37 @@ add_executable(robots_sim
     src/gazebo_sim/robots_sim/Obstacle.cpp
     src/gazebo_sim/robots_sim/Robot.h
     src/gazebo_sim/robots_sim/Robot.cpp
-    src/gazebo_sim/robots_sim/robots_sim.cpp)
+    src/gazebo_sim/robots_sim/robots_sim.cpp
+)
 
 target_link_libraries(robots_sim
   ${catkin_LIBRARIES} 
+)
+
+# roomba_sim
+
+add_executable(sim_roombas
+    src/roomba_sim/sim_roombas.cpp
+    src/roomba_sim/Quad.cpp
+    src/roomba_sim/Quad.h
+    src/roomba_sim/BoundedPID.cpp
+    src/roomba_sim/BoundedPID.h
+)
+target_link_libraries(sim_roombas
+  ${catkin_LIBRARIES}
+)
+
+add_executable(sim_detection
+    src/roomba_sim/SimDetection.cpp
+    src/roomba_sim/SimDetection.h
+)
+target_link_libraries(sim_detection
+  ${catkin_LIBRARIES}
+)
+
+add_executable(sim_pose2tf
+    src/roomba_sim/pose2tf.cpp
+)
+target_link_libraries(sim_pose2tf
+  ${catkin_LIBRARIES}
 )

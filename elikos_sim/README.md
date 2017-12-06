@@ -2,6 +2,29 @@
 ## Buts
 * Simuler le drône et son environnement afin de pouvoir tester le logiciel sans le matériel
 
+## Simulation avec rviz (2017-2018)
+
+Utiliser le launch file `roomba_sim.launch`  
+````
+roslaunch elikos_sim roomba_sim.launch
+````
+
+Pour faire bouger les robots  
+````
+rosservice call /sim/toggle_activate
+````
+
+Pour reset les robots  
+````
+rosservice call /sim/reset
+````
+
+Pour envoyer un setpoint au quad  
+````
+rosrun tf static_transform_publisher 0 0 0 0 0 0 1 elikos_arena_origin elikos_setpoint 100
+````
+
+
 ## Étapes préliminaires pour effectuer une simulation avec gazebo
 1. Aller dans le dossier de simulation de gazebo
 
@@ -35,7 +58,7 @@
 
     Installer gazebo 7 pour ros
 
-        sudo apt-get install ros-$(ROS_DISTRO)-gazebo7-ros-pkgs
+        sudo apt-get install ros-$(ROS_DISTRO)-gazebo-ros-pkgs
 
     Builder le firmware pour gazebo
 
@@ -47,6 +70,10 @@
     Fermer la simulation pour les étapes suivantes.
 
 ## Launch files 
+
+* `roomba_sim.launch`
+    * Lance une simulation avec rviz 
+
 * `simulation.launch`
     * Lance une simulation rviz
  
@@ -57,7 +84,7 @@
     * `config_yaml` : Le chemin vers le fichier .yaml qui contient les configurations pour mavros.
 
 * `integration_sim.launch`
-    * Lance les différents nodes d'elikos_ros pour la simulation
+    * Lance les différents nodes d'elikos_main pour la simulation
 
 * `robots_sim.launch`
     * Ajoute des cibles et des obstacles se déplaçant dans la simulation.

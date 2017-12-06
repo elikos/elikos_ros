@@ -1,0 +1,9 @@
+<launch>
+  <!-- HARDWARE -->
+	<include file="$(find elikos_main)/launch/elikos_drivers.launch" />
+  <!-- HARDWARE -->
+
+  <!-- SOFTWARE -->
+	<include file="$(find elikos_main)/launch/elikos_software_stack.launch" />
+  <!-- SOFTWARE -->
+</launch>

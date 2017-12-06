@@ -5,7 +5,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/include/eigen3 ${CMAKE_CXX_FLAGS}")
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   cv_bridge
-  elikos_ros
+  elikos_main
   image_transport
   geometry_msgs
   sensor_msgs
@@ -19,13 +19,13 @@ find_package(Qt5Widgets)
 find_package(Qt5Test)
 find_package(Qt5Concurrent)
 find_package(Qt5OpenGL)
-find_package(OpenCV 2 REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 
 
 catkin_package(
     INCLUDE_DIRS src/elikos_transformation_utils src/elikos_context_utils
     LIBRARIES elikos_transformation_utils elikos_context_utils
-	CATKIN_DEPENDS roscpp cv_bridge elikos_ros image_transport sensor_msgs geometry_msgs std_msgs tf
+	CATKIN_DEPENDS roscpp cv_bridge elikos_main image_transport sensor_msgs geometry_msgs std_msgs tf
 #   DEPENDS system_lib
 )
 

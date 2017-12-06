@@ -25,10 +25,10 @@ CmdFrontInteraction::CmdFrontInteraction(ros::NodeHandle* nh, int id)
     armCmd_.request.value = true;
 
     interaction_altitude_ = 0.1;
-    nh_->getParam("/elikos_ai/interaction_altitude", interaction_altitude_);
+    nh_->getParam("/elikos_decisionmaking/interaction_altitude", interaction_altitude_);
 
 	threshold_ = 0.8;
-	nh_->getParam("/elikos_ai/has_reach_destination_threshold", threshold_);
+	nh_->getParam("/elikos_decisionmaking/has_reach_destination_threshold", threshold_);
 }
 
 void CmdFrontInteraction::stateCallBack(const mavros_msgs::State::ConstPtr& msg)

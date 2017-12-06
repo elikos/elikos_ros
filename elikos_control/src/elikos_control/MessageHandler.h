@@ -6,7 +6,7 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
 #include <cv_bridge/cv_bridge.h>
-#include <elikos_ros/TrajectoryCmd.h>
+#include <elikos_main/TrajectoryCmd.h>
 
 struct CmdConfig
 {
@@ -23,7 +23,7 @@ class MessageHandler
 public:
     MessageHandler(CmdExecutor& CmdExecutor);
     ~MessageHandler();
-    void dispatchMessage(const elikos_ros::TrajectoryCmd::ConstPtr &input);
+    void dispatchMessage(const elikos_main::TrajectoryCmd::ConstPtr &input);
     void publishTrajectoryPosition(geometry_msgs::Transform_<std::allocator<void> > trajectoryPoint);
     inline CmdConfig getLastCmdConfig() const;
 
