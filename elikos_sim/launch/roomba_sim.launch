@@ -37,12 +37,13 @@
                                                         3.1415, 1.5708, 20.0]" />
         </node>
 
-        <!-- Fake elikos_setpoint (for testing) -->
+        <!-- (optional) Fake elikos_setpoint for testing instead of using a static_transform_publisher - ->
         <node name="sim_pose2tf" pkg="elikos_sim" type="sim_pose2tf" output="screen">
             <param name="pose_topic" value="elikos_setpoint_pose" />
             <param name="tf_setpoint" value="/elikos_setpoint" />
             <param name="tf_origin" value="/elikos_arena_origin" />
         </node>
+        <!- - -->
 
         <node pkg="tf" type="static_transform_publisher" name="elikos_arena_origin" args="0.0 0.0 0.0 0.0 0.0 0.0 world elikos_arena_origin 100"/>
     </group>

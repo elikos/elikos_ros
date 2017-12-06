@@ -34,10 +34,20 @@ Quad::Quad(ros::NodeHandle& n, ros::Duration expectedCycleTime)
     pid_vel_x_ = new BoundedPID(-vel_xy_max, vel_xy_max, vel_xy_p, vel_xy_i, vel_xy_d, 0.0, -0.0, false);
     pid_vel_y_ = new BoundedPID(-vel_xy_max, vel_xy_max, vel_xy_p, vel_xy_i, vel_xy_d, 0.0, -0.0, false);
     pid_vel_z_ = new BoundedPID(-vel_z_max, vel_z_max, vel_z_p, vel_z_i, vel_z_d, 0.0, -0.0, false);
-    
 
-    // wait for transforms
-    tf_listener_.waitForTransform(tfOrigin_, tfSetpoint_, ros::Time(0), ros::Duration(1.0));
+    // set initial position and setpoint
+    // TODO: get param for this?
+    pos_x_ = 0.0;
+    pos_y_ = 0.0;
+    pos_z_ = 0.0;
+    yaw_ = 0.0;
+    setpoint_x_ = 0.0;
+    setpoint_y_ = 0.0;
+    setpoint_z_ = 0.0;
+    //setpoint_yaw_ = 0.0;
+
+    // wait for transform
+    tf_listener_.waitForTransform("/world", tfOrigin_, ros::Time(0), ros::Duration(1.0));
 }
 
 Quad::~Quad() {
@@ -117,13 +127,15 @@ void Quad::updateVel() {
 void Quad::updateSetpoint() {
     try {
         tf_listener_.lookupTransform(tfOrigin_, tfSetpoint_, ros::Time(0), currentSetpoint_);
+
+        setpoint_x_ = currentSetpoint_.getOrigin().x();
+        setpoint_y_ = currentSetpoint_.getOrigin().y();
+        setpoint_z_ = currentSetpoint_.getOrigin().z();
+        //setpoint_yaw_ = tf::getYaw(currentSetpoint_.getRotation());
     } catch (tf::TransformException e) {
-        ROS_ERROR("QUAD tf setpoint: %s", e.what());
+        // don't display error since it should just wait until static_transform_publisher
+        ROS_WARN("QUAD tf setpoint: %s", e.what());
     }
-    setpoint_x_ = currentSetpoint_.getOrigin().x();
-    setpoint_y_ = currentSetpoint_.getOrigin().y();
-    setpoint_z_ = currentSetpoint_.getOrigin().z();
-    //setpoint_yaw_ = tf::getYaw(currentSetpoint_.getRotation());
 }
 
 void Quad::update() {
