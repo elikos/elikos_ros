@@ -3,7 +3,7 @@
 
 #include <tf/tf.h>
 
-#include <elikos_main/TargetRobotArray.h>
+#include <elikos_msgs/TargetRobotArray.h>
 
 namespace ai
 {
@@ -25,7 +25,7 @@ public:
 
     void updatePositionRadius(const double& dt);
     tfScalar getDistance(AbstractRobot* robot) const;
-    tfScalar getDistance(const elikos_main::TargetRobot& target) const;
+    tfScalar getDistance(const elikos_msgs::TargetRobot& target) const;
 
 protected:
     bool isUpdated_{ false };

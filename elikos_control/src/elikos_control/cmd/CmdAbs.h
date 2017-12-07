@@ -8,7 +8,7 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
 #include <cv_bridge/cv_bridge.h>
-#include <elikos_main/TrajectoryCmd.h>
+#include <elikos_msgs/TrajectoryCmd.h>
 #include "../../../include/CmdDefines.h"
 #include "std_msgs/String.h"
 

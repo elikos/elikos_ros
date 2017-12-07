@@ -7,19 +7,20 @@ endif()
 
 find_package(Boost REQUIRED thread)
 
-include_directories(SYSTEM "msg_gen/cpp/include")
+#include_directories(SYSTEM "msg_gen/cpp/include")
 
 find_package(catkin REQUIRED COMPONENTS
-  moveit_core
-  pluginlib
-  actionlib
-  roscpp
-  trajectory_msgs
-  actionlib_msgs
-  std_msgs
-  message_generation
-  tf
-  cv_bridge
+        moveit_core
+        pluginlib
+        actionlib
+        roscpp
+        trajectory_msgs
+        actionlib_msgs
+        std_msgs
+        message_generation
+        tf
+        cv_bridge
+        elikos_msgs
 )
 
 find_package(OpenCV REQUIRED)
@@ -27,33 +28,14 @@ find_package(OpenCV REQUIRED)
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})
 
-add_message_files(
-  FILES
-  MultiDofFollowJointTrajectoryFeedback.msg
-  MultiDofFollowJointTrajectoryGoal.msg
-  MultiDofFollowJointTrajectoryResult.msg
-  MultiDofFollowJointTrajectoryActionFeedback.msg
-  MultiDofFollowJointTrajectoryActionGoal.msg
-  MultiDofFollowJointTrajectoryActionResult.msg
-  MultiDofFollowJointTrajectoryAction.msg
-)
-
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  trajectory_msgs
-  actionlib_msgs
-  elikos_action_controller
-)
-
 catkin_package(
-  LIBRARIES
-  INCLUDE_DIRS
-  DEPENDS
-  CATKIN_DEPENDS message_runtime
-  moveit_core
-  tf
-  cv_bridge
+        LIBRARIES
+        INCLUDE_DIRS
+        DEPENDS
+        CATKIN_DEPENDS
+        moveit_core
+        tf
+        cv_bridge
 )
 
 

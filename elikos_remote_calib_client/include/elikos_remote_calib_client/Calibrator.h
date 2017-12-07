@@ -14,8 +14,8 @@
 #include <yaml-cpp/yaml.h>
 #include <ros/ros.h>
 
-#include <elikos_remote_calib_client/FileManipulation.h>
-#include <elikos_remote_calib_client/GetConfigFiles.h>
+#include <elikos_msgs/FileManipulation.h>
+#include <elikos_msgs/GetConfigFiles.h>
 
 #include "elikos_remote_calib_client/Calibratable.h"
 
@@ -48,10 +48,10 @@ private:
     void calibrationCallback(const boost::shared_ptr<Msg const>& msgPtr);
 
     //Callback des services
-    bool saveCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res);
-    bool confCallback(elikos_remote_calib_client::GetConfigFiles::Request& req, elikos_remote_calib_client::GetConfigFiles::Response& res);
-    bool loadCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res);
-    bool deleteFileCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res);
+    bool saveCallback(elikos_msgs::FileManipulation::Request& req, elikos_msgs::FileManipulation::Response& res);
+    bool confCallback(elikos_msgs::GetConfigFiles::Request& req, elikos_msgs::GetConfigFiles::Response& res);
+    bool loadCallback(elikos_msgs::FileManipulation::Request& req, elikos_msgs::FileManipulation::Response& res);
+    bool deleteFileCallback(elikos_msgs::FileManipulation::Request& req, elikos_msgs::FileManipulation::Response& res);
 
     //Ajoute un fichier au métafichier de configuration
     bool addToCalibrationMetafile(const std::string& filename);
@@ -230,7 +230,7 @@ void Calibrator<Msg>::calibrationCallback(const boost::shared_ptr<Msg const>& ms
 * lorsqu'une instance de calibration à besoin de sauvegarder la calibration
 *******************************************************************************/
 template<typename Msg>
-bool Calibrator<Msg>::saveCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res)
+bool Calibrator<Msg>::saveCallback(elikos_msgs::FileManipulation::Request& req, elikos_msgs::FileManipulation::Response& res)
 {
     res.sucess = saveCalibration(req.fileName);
     return true;
@@ -242,7 +242,7 @@ bool Calibrator<Msg>::saveCallback(elikos_remote_calib_client::FileManipulation:
 * de calibration.
 *******************************************************************************/
 template<typename Msg>
-bool Calibrator<Msg>::confCallback(elikos_remote_calib_client::GetConfigFiles::Request& req, elikos_remote_calib_client::GetConfigFiles::Response& res)
+bool Calibrator<Msg>::confCallback(elikos_msgs::GetConfigFiles::Request& req, elikos_msgs::GetConfigFiles::Response& res)
 {
     res.fileNames.clear();
     for(auto it = fileList_.begin(); it != fileList_.end(); ++it) {
@@ -256,7 +256,7 @@ bool Calibrator<Msg>::confCallback(elikos_remote_calib_client::GetConfigFiles::R
 * lorsqu'une instance de calibration à besoin de charger une configuration.
 *******************************************************************************/
 template<typename Msg>
-bool Calibrator<Msg>::loadCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res)
+bool Calibrator<Msg>::loadCallback(elikos_msgs::FileManipulation::Request& req, elikos_msgs::FileManipulation::Response& res)
 {
     res.sucess = loadCalibration(req.fileName);
     return true;
@@ -267,7 +267,7 @@ bool Calibrator<Msg>::loadCallback(elikos_remote_calib_client::FileManipulation:
 * commande pour effacer un fichier a été envoyée.
 *******************************************************************************/
 template<typename Msg>
-bool Calibrator<Msg>::deleteFileCallback(elikos_remote_calib_client::FileManipulation::Request& req, elikos_remote_calib_client::FileManipulation::Response& res)
+bool Calibrator<Msg>::deleteFileCallback(elikos_msgs::FileManipulation::Request& req, elikos_msgs::FileManipulation::Response& res)
 {
     std::string fileName = req.fileName;
     if(isInCalibrationMetafile(fileName)){

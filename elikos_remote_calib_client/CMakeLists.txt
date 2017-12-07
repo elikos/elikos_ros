@@ -8,9 +8,10 @@ add_definitions(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  message_generation
-  roscpp
-  std_msgs
+        message_generation
+        roscpp
+        std_msgs
+        elikos_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -47,21 +48,21 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  CalibPreprocessing.msg
-  ColorHSV.msg
-  ColorHSVRange.msg
-  ColorDetectionInfo.msg
-  CalibDetection.msg
-)
+#add_message_files(
+#  FILES
+#  CalibPreprocessing.msg
+#  ColorHSV.msg
+#  ColorHSVRange.msg
+#  ColorDetectionInfo.msg
+#  CalibDetection.msg
+#)
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  FileManipulation.srv
-  GetConfigFiles.srv
-)
+#add_service_files(
+#  FILES
+#  FileManipulation.srv
+#  GetConfigFiles.srv
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -71,10 +72,10 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
+#generate_messages(
+#        DEPENDENCIES
+#        elikos_msgs
+#)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -106,10 +107,10 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES elikos_remote_calib_client
-  CATKIN_DEPENDS message_runtime roscpp std_msgs
-#  DEPENDS system_lib
+        INCLUDE_DIRS include
+        LIBRARIES elikos_remote_calib_client
+        CATKIN_DEPENDS message_runtime roscpp std_msgs elikos_msgs
+        #  DEPENDS system_lib
 )
 
 ###########
@@ -120,13 +121,13 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-  include/
-  ${catkin_INCLUDE_DIRS}
+        include/
+        ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-  src/${PROJECT_NAME}/Calibrator.cpp
+        src/${PROJECT_NAME}/Calibrator.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -136,7 +137,7 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}
-  yaml-cpp
+        yaml-cpp
 )
 
 ## Declare a C++ executable

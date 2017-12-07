@@ -9,7 +9,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include <elikos_main/TargetRobotArray.h>
+#include <elikos_msgs/TargetRobotArray.h>
 #include "RobotTypes.h"
 #include "Timer.h"
 
@@ -39,7 +39,7 @@ public:
     inline const std::vector<AbstractLine*>& getLines() const;
 
     void prepareUpdate();
-    void updateTargets(const elikos_main::TargetRobotArray::ConstPtr& input);
+    void updateTargets(const elikos_msgs::TargetRobotArray::ConstPtr& input);
     void updateQuadRobot(const tf::Pose& pose);
 
     virtual void evaluateTargetOrientation(TargetRobot& target) = 0;
@@ -60,8 +60,8 @@ protected:
     QuadRobot quad_;
     util::Timer timer_;
 
-    TargetRobot* updateTarget(const elikos_main::TargetRobot& targetUpdate);
-    TargetRobot* findMostLikelyUpdateCondidate(const elikos_main::TargetRobot& targetUpdate);
+    TargetRobot* updateTarget(const elikos_msgs::TargetRobot& targetUpdate);
+    TargetRobot* findMostLikelyUpdateCondidate(const elikos_msgs::TargetRobot& targetUpdate);
     void evaluateOutOfBound(TargetRobot& target);
 };
 

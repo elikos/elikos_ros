@@ -7,20 +7,21 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ## is used, also find other catkin packages
 
 find_package( catkin REQUIRED COMPONENTS
-   message_generation
-   roscpp
-   tf
-   std_msgs
-   genmsg
-   sensor_msgs
-   cv_bridge
-   image_transport
-   mavros_msgs
-   sensor_msgs
-   cv_bridge
-   geometry_msgs
-   std_srvs
-   trajectory_msgs
+  message_generation
+  roscpp
+  tf
+  std_msgs
+  genmsg
+  sensor_msgs
+  cv_bridge
+  image_transport
+  mavros_msgs
+  sensor_msgs
+  cv_bridge
+  geometry_msgs
+  std_srvs
+  trajectory_msgs
+  elikos_msgs
 )
 find_package(OpenCV REQUIRED)
 
@@ -58,21 +59,21 @@ find_package(OpenCV REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  RobotPos.msg
-  RobotsPos.msg
-  RobotRaw.msg
-  RobotRawArray.msg
-  TargetRobot.msg
-  TargetRobotArray.msg
-  TrajectoryCmd.msg
-  AICmd.msg
-  Matrix3.msg
-  StampedMatrix3.msg
-  Intersection.msg
-  IntersectionArray.msg
-)
+# add_message_files(
+#   FILES
+#   RobotPos.msg
+#   RobotsPos.msg
+#   RobotRaw.msg
+#   RobotRawArray.msg
+#   TargetRobot.msg
+#   TargetRobotArray.msg
+#   TrajectoryCmd.msg
+#   AICmd.msg
+#   Matrix3.msg
+#   StampedMatrix3.msg
+#   Intersection.msg
+#   IntersectionArray.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -89,14 +90,14 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-  mavros_msgs
-  sensor_msgs
-  trajectory_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+#   geometry_msgs
+#   mavros_msgs
+#   sensor_msgs
+#   trajectory_msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -112,7 +113,7 @@ catkin_package(
 INCLUDE_DIRS include
 CATKIN_DEPENDS message_runtime
 LIBRARIES elikos_lib
-CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs geometry_msgs roscpp tf
+CATKIN_DEPENDS std_msgs std_srvs mavros_msgs sensor_msgs geometry_msgs roscpp tf elikos_msgs
 #  DEPENDS system_lib
 )
 
@@ -132,10 +133,6 @@ add_library( elikos_lib
   src/elikos_lib/pid.cpp
   src/elikos_lib/RCReceiver.cpp
 include/elikos_lib/PositionHelper.h)
-
-add_dependencies( elikos_lib
-    elikos_main_generate_messages_cpp
-)
 
 
 

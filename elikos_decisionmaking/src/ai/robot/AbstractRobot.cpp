@@ -19,7 +19,7 @@ tfScalar AbstractRobot::getDistance(AbstractRobot* robot) const
     return tf::tfDistance(pose_.getOrigin(), robot->getPose().getOrigin());
 }
 
-tfScalar AbstractRobot::getDistance(const elikos_main::TargetRobot& target) const
+tfScalar AbstractRobot::getDistance(const elikos_msgs::TargetRobot& target) const
 {
     tf::Pose pose;
     tf::poseMsgToTF(target.poseOrigin.pose, pose);

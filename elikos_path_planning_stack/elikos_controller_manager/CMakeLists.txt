@@ -16,16 +16,17 @@ find_package(catkin COMPONENTS
   actionlib
   roscpp
   control_msgs
+  elikos_msgs
   REQUIRED)
 find_package(elikos_action_controller)
 
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})
 
-generate_messages(
-  DEPENDENCIES
-  elikos_action_controller
-)
+#generate_messages(
+#  DEPENDENCIES
+#  elikos_action_controller
+#)
 
 catkin_package(
   LIBRARIES

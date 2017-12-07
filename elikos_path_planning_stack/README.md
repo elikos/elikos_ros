@@ -25,7 +25,7 @@
 
 ## Output topic  
 * `elikos_trajectory`  
-    * type : `elikos_main::TrajectoryCmd`    
+    * type : `elikos_msgs::TrajectoryCmd`    
     * desc : Commande et trajectoire à destination du contrôle.  
 
 ## À savoir!

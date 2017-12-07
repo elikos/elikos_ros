@@ -38,7 +38,7 @@ MessageHandler::MessageHandler(string calibrationFilename)
     subRC_ = nh_.subscribe(RCinputTopic, 100, &MessageHandler::dispatchCommand, this);
     std::string cam_name = ros::this_node::getName();
     cam_name = cam_name.substr(0, cam_name.size()-std::string("_detection").size());
-    pub_ = nh_.advertise<elikos_main::RobotRawArray>("/"+cam_name+"/elikos_robot_raw_array", 1);
+    pub_ = nh_.advertise<elikos_msgs::RobotRawArray>("/"+cam_name+"/elikos_robot_raw_array", 1);
     pubCommandOutput_ = nh_.advertise<std_msgs::String>(RCCommandOutputTopic, 100);
     
     pubImages_ = it_.advertise(RCdebugTopic, 1);  // debug only
@@ -118,8 +118,8 @@ void MessageHandler::dispatchMessage(const sensor_msgs::ImageConstPtr& input) {
     }
 
     // publishing data
-    elikos_main::RobotRawArray output;
-    elikos_main::RobotRaw data;
+    elikos_msgs::RobotRawArray output;
+    elikos_msgs::RobotRaw data;
 
     for (auto robot : robotsArray) {
         data.id = robot.getID();
@@ -140,9 +140,9 @@ void MessageHandler::saveCalibration(string filename) {
 
 
 
-void MessageHandler::calibrate(const elikos_remote_calib_client::CalibDetection* const message)
+void MessageHandler::calibrate(const elikos_msgs::CalibDetection* const message)
 {
-    const elikos_remote_calib_client::ColorDetectionInfo* colors[3] = {&message->red, &message->green, &message->white};
+    const elikos_msgs::ColorDetectionInfo* colors[3] = {&message->red, &message->green, &message->white};
     for(int i = 0; i < 3; ++i){
         detection_.fetchRemoteParams(
             i,
@@ -162,7 +162,7 @@ void MessageHandler::calibrate(const elikos_remote_calib_client::CalibDetection*
 
 void MessageHandler::loadCalibration(const YAML::Node& fileContent)
 {
-    elikos_remote_calib_client::CalibDetection message;
+    elikos_msgs::CalibDetection message;
     //valeurs par défaut
     message.red.col.max.h  = 170;
     message.red.col.min.h  = 10;
@@ -198,7 +198,7 @@ void MessageHandler::loadCalibration(const YAML::Node& fileContent)
     message.white.blur = 6;
 
 
-    elikos_remote_calib_client::ColorDetectionInfo* colors[3] = {&message.red, &message.green, &message.white};
+    elikos_msgs::ColorDetectionInfo* colors[3] = {&message.red, &message.green, &message.white};
     std::string names[3] = {"red","green","white"};
     //chargement des valeurs
     for(int i = 0; i < 3; ++i){

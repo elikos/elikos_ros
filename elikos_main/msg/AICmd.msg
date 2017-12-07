@@ -1,2 +1,0 @@
-uint8 cmdCode
-geometry_msgs/PoseStamped pose

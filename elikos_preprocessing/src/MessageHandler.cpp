@@ -19,7 +19,7 @@ MessageHandler::MessageHandler(const ros::NodeHandle& nodeHandle, const std::str
                 this
         );
         preprocessedPub_ = it_.advertise(cameraInfo_.frame + "/image_preprocessed", 1);
-        inverseTransformPub_ = nh_.advertise<elikos_main::StampedMatrix3>("image_preprocessed/inverse_transform", 1);
+        inverseTransformPub_ = nh_.advertise<elikos_msgs::StampedMatrix3>("image_preprocessed/inverse_transform", 1);
     } else {
         ROS_ERROR("Failed to load config file.");
     }
@@ -46,7 +46,7 @@ void MessageHandler::cameraCallback(const sensor_msgs::ImageConstPtr& image_msg,
                                                           output).toImageMsg();
     preprocessedPub_.publish(msgPreproc);
 
-    elikos_main::StampedMatrix3 invTransformMsg;
+    elikos_msgs::StampedMatrix3 invTransformMsg;
     invTransformMsg.header = image_msg->header;
     for(int i = 0; i < 9; ++i){
         invTransformMsg.matrix.data[i] = inverseTransform.at<double>(i/3, i%3);

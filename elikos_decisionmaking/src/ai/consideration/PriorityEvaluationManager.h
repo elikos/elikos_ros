@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "AbstractConsideration.h"
-#include <elikos_main/TargetRobotArray.h>
+#include <elikos_msgs/TargetRobotArray.h>
 #include "tf/tf.h"
 
 namespace ai
@@ -20,13 +20,13 @@ public:
     ~PriorityEvaluationManager() = default;
 
     void updateQuadRobot(const tf::Pose& pose);
-    void updateTargets(const elikos_main::TargetRobotArray::ConstPtr& input);
+    void updateTargets(const elikos_msgs::TargetRobotArray::ConstPtr& input);
 
 private:
     std::vector<std::unique_ptr<AbstractConsideration>> considerations_;
     AbstractArena* arena_;
 
-    void updateTarget(const elikos_main::TargetRobot& target);
+    void updateTarget(const elikos_msgs::TargetRobot& target);
     void evaluatePriority(TargetRobot& target);
 
     PriorityEvaluationManager() = default;

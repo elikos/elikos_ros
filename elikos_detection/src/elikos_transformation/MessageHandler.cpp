@@ -15,7 +15,7 @@ MessageHandler::~MessageHandler()
 }
 
 
-void MessageHandler::dispatchMessageRobotRaw(const elikos_main::RobotRawArray::ConstPtr& input)
+void MessageHandler::dispatchMessageRobotRaw(const elikos_msgs::RobotRawArray::ConstPtr& input)
 {
 	//Le vecteur results est pour l'affichage dans rviz.
 	geometry_msgs::PoseArray results = transformationUnit_.computeTransformForRobots(*input);
