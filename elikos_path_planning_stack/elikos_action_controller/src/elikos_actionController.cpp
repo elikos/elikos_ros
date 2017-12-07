@@ -7,7 +7,7 @@
 #include <tf/transform_datatypes.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
-#include <elikos_msgs/MultiDofFollowJointTrajectoryAction.h>
+#include <action_controller/MultiDofFollowJointTrajectoryAction.h>
 #include <geometry_msgs/Twist.h>
 #include <opencv2/opencv.hpp>
 #include <std_srvs/Empty.h>
@@ -18,7 +18,7 @@
 
 class Controller{
 private:
-	typedef actionlib::ActionServer<elikos_msgs::MultiDofFollowJointTrajectoryAction> ActionServer;
+	typedef actionlib::ActionServer<action_controller::MultiDofFollowJointTrajectoryAction> ActionServer;
 	typedef ActionServer::GoalHandle GoalHandle;
 public:
 	Controller(ros::NodeHandle &n) :

@@ -39,18 +39,18 @@
 #define MULTI_DOF_FOLLOW_JOINT_CONTROLLER_HANDLE
 
 #include <elikos_controller_manager/action_based_controller_handle.h>
-#include <elikos_msgs/MultiDofFollowJointTrajectoryAction.h>
+#include <action_controller/MultiDofFollowJointTrajectoryAction.h>
 
 namespace elikos_controller_manager
 {
 
-    class MultiDofFollowJointTrajectoryControllerHandle : public ActionBasedControllerHandle<elikos_msgs::MultiDofFollowJointTrajectoryAction>
+    class MultiDofFollowJointTrajectoryControllerHandle : public ActionBasedControllerHandle<action_controller::MultiDofFollowJointTrajectoryAction>
     {
 
     public:
 
         MultiDofFollowJointTrajectoryControllerHandle(const std::string &name, const std::string &action_ns) :
-                ActionBasedControllerHandle<elikos_msgs::MultiDofFollowJointTrajectoryAction>(name, action_ns)
+                ActionBasedControllerHandle<action_controller::MultiDofFollowJointTrajectoryAction>(name, action_ns)
         {
         }
 
@@ -72,7 +72,7 @@ namespace elikos_controller_manager
             else
                 ROS_DEBUG_STREAM("MultiDofFollowJointTrajectoryController: sending continuation for the currently executed trajectory to " << name_);
 
-            elikos_msgs::MultiDofFollowJointTrajectoryGoal goal;
+            action_controller::MultiDofFollowJointTrajectoryGoal goal;
             goal.trajectory = trajectory.multi_dof_joint_trajectory;
             controller_action_client_-> sendGoal(goal,
                                                  boost::bind(&MultiDofFollowJointTrajectoryControllerHandle::controllerDoneCallback, this, _1, _2),
@@ -86,7 +86,7 @@ namespace elikos_controller_manager
     protected:
 
         void controllerDoneCallback(const actionlib::SimpleClientGoalState& state,
-                                    const elikos_msgs::MultiDofFollowJointTrajectoryResultConstPtr& result)
+                                    const action_controller::MultiDofFollowJointTrajectoryResultConstPtr& result)
         {
             finishControllerExecution(state);
         }
@@ -96,7 +96,7 @@ namespace elikos_controller_manager
             ROS_DEBUG_STREAM("MultiDofFollowJointTrajectoryController: " << name_ << " started execution");
         }
 
-        void controllerFeedbackCallback(const elikos_msgs::MultiDofFollowJointTrajectoryFeedbackConstPtr& feedback)
+        void controllerFeedbackCallback(const action_controller::MultiDofFollowJointTrajectoryFeedbackConstPtr& feedback)
         {
         }
     };
