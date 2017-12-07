@@ -9,13 +9,13 @@ class MessageHandler_moveit
 public:
     MessageHandler_moveit();
     ~MessageHandler_moveit();
-    void dispatchMessageTarget(const elikos_main::AICmd::ConstPtr &input);
-    elikos_main::AICmd getAICmd();
+    void dispatchMessageTarget(const elikos_msgs::AICmd::ConstPtr &input);
+    elikos_msgs::AICmd getAICmd();
     bool hasNewMessage();
 private:
     ros::NodeHandle nh_;
     ros::Subscriber sub_;
-    elikos_main::AICmd input_;
+    elikos_msgs::AICmd input_;
     bool hasNewMessage_;
 };
 

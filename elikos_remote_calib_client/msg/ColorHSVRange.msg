@@ -1,2 +1,0 @@
-ColorHSV min
-ColorHSV max

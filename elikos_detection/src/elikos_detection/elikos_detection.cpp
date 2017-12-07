@@ -4,7 +4,9 @@
 #include <iostream>
 #include <elikos_remote_calib_client/Calibrator.h>
 #include <elikos_remote_calib_client/Calibratable.h>
-#include <elikos_remote_calib_client/CalibDetection.h>
+
+#include <elikos_msgs/CalibDetection.h>
+
 #include "MessageHandler.h"
 
 int main(int argc, char* argv[])
@@ -43,7 +45,7 @@ int main(int argc, char* argv[])
     bool calibrationOn;
     nh_.getParam("/"+ros::this_node::getName()+"/calibration", calibrationOn);
 
-    remote_calib::Calibrator<elikos_remote_calib_client::CalibDetection> calibrateur(messageHandler, calibFolderPath);
+    remote_calib::Calibrator<elikos_msgs::CalibDetection> calibrateur(messageHandler, calibFolderPath);
     calibrateur.loadCalibration(calibPath);
 
     ros::Rate r(30);

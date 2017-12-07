@@ -24,7 +24,7 @@ public:
     TargetRobot(uint8_t id, uint8_t color, tf::Vector3 position);
     virtual ~TargetRobot();
 
-    inline void updateFrom(const elikos_main::TargetRobot& targetUpdate);
+    inline void updateFrom(const elikos_msgs::TargetRobot& targetUpdate);
 
     inline void setId(uint8_t id);
     inline uint8_t getId() const;
@@ -55,7 +55,7 @@ inline int TargetRobot::getNMissedUpdates() const
    return nMissedUpdates_;
 }
 
-inline void TargetRobot::updateFrom(const elikos_main::TargetRobot& targetUpdate)
+inline void TargetRobot::updateFrom(const elikos_msgs::TargetRobot& targetUpdate)
 {
     tf::Pose poseUpdate;
     tf::poseMsgToTF(targetUpdate.poseOrigin.pose, poseUpdate);

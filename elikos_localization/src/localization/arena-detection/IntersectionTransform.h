@@ -16,8 +16,8 @@
 
 #include "geometry_msgs/PoseArray.h"
 
-#include <elikos_main/Intersection.h>
-#include <elikos_main/IntersectionArray.h>
+#include <elikos_msgs/Intersection.h>
+#include <elikos_msgs/IntersectionArray.h>
 
 #include <visualization_msgs/MarkerArray.h>
 #include <visualization_msgs/Marker.h>

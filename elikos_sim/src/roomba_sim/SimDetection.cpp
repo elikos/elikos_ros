@@ -28,11 +28,11 @@ SimDetection::SimDetection(ros::NodeHandle& n)
     }
 
     robotsPoses_ = new std::vector<tf::StampedTransform>(nbTargetRobots_);
-    detectedRobots_ = new std::vector<elikos_main::TargetRobot>();
+    detectedRobots_ = new std::vector<elikos_msgs::TargetRobot>();
 
     // setup publishers
     testmarkers_pub_ = n_.advertise<geometry_msgs::PoseArray>(targetRobotArrayMarkerTopic_, 10);
-    targetRobots_pub_ = n_.advertise<elikos_main::TargetRobotArray>(targetRobotArrayTopic_, 10);
+    targetRobots_pub_ = n_.advertise<elikos_msgs::TargetRobotArray>(targetRobotArrayTopic_, 10);
 
     // wait for transforms
     tf_listener_.waitForTransform(tfOrigin_, tfPose_, ros::Time(0), ros::Duration(1.0));
@@ -150,7 +150,7 @@ void SimDetection::publishTestMarkers() {
 }
 
 void SimDetection::publishTargetRobotArray() {
-    elikos_main::TargetRobotArray msg;
+    elikos_msgs::TargetRobotArray msg;
     msg.targets = *detectedRobots_;
     targetRobots_pub_.publish(msg);
 }
@@ -175,7 +175,7 @@ void SimDetection::updateDetectedRobots() {
 
         if (isDetected(angleWrtQuad, distanceSquaredWrtQuad)) {
             // create and add TargetRobot message
-            elikos_main::TargetRobot msg;
+            elikos_msgs::TargetRobot msg;
             //msg.id = 0;
             //msg.color = 1;
             msg.poseOrigin = createPoseStampedFromPosYaw(tf::Vector3(robot_x, robot_y, 0.0), 0.0);

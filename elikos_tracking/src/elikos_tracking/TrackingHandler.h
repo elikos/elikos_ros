@@ -1,7 +1,7 @@
 #include <vector>
 #include "modele/robot.h"
-#include <elikos_main/TargetRobot.h>
-#include <elikos_main/TargetRobotArray.h>
+#include <elikos_msgs/TargetRobot.h>
+#include <elikos_msgs/TargetRobotArray.h>
 #include <geometry_msgs/Point.h>
 #include <stdlib.h>  //for using the function sleep
 #include <unordered_map>
@@ -22,10 +22,10 @@ class TrackingHandler {
 
     void drawResultImage();
 
-    void MatchRobots(std::vector<double>& ModelMsgDistances, const elikos_main::TargetRobotArray::ConstPtr& msg);
-    void AssignRobots(const elikos_main::TargetRobotArray::ConstPtr& msg);
+    void MatchRobots(std::vector<double>& ModelMsgDistances, const elikos_msgs::TargetRobotArray::ConstPtr& msg);
+    void AssignRobots(const elikos_msgs::TargetRobotArray::ConstPtr& msg);
 
-    void subCallback(const elikos_main::TargetRobotArray::ConstPtr& msg);
+    void subCallback(const elikos_msgs::TargetRobotArray::ConstPtr& msg);
     void incertitudeCallback(const ros::TimerEvent& e);
     void publishTargets();
 

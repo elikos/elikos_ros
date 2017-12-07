@@ -4,11 +4,11 @@ u"""
 Interface to serialize en deserealize ros messages.
 """
 import numpy as np
-import elikos_main.msg as elikos_main
+import elikos_msgs.msg as elikos_msgs
 
 
 def deserialize_intersections(localization_points):
-    # type: (elikos_main.IntersectionArray)->(np.ndarray,np.ndarray)
+    # type: (elikos_msgs.IntersectionArray)->(np.ndarray,np.ndarray)
     u"""
     Prens un message de localisation et retourne un message de points.
     :param localization_points: le message

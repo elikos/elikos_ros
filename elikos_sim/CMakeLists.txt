@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   control_toolbox
   tf
+  elikos_msgs
 )
 
 catkin_package(

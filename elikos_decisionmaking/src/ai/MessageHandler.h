@@ -5,9 +5,9 @@
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 
-#include <elikos_main/TargetRobot.h>
-#include <elikos_main/TargetRobotArray.h>
-#include <elikos_main/AICmd.h>
+#include <elikos_msgs/TargetRobot.h>
+#include <elikos_msgs/TargetRobotArray.h>
+#include <elikos_msgs/AICmd.h>
 #include <tf/transform_broadcaster.h>
 #include <CmdDefines.h>
 #include "std_msgs/String.h"
@@ -55,7 +55,7 @@ private:
 
     Agent* agent_{ nullptr };
 
-    void handleTrgtMsg(const elikos_main::TargetRobotArray::ConstPtr& input);
+    void handleTrgtMsg(const elikos_msgs::TargetRobotArray::ConstPtr& input);
 
     MessageHandler();
     ~MessageHandler() = default;

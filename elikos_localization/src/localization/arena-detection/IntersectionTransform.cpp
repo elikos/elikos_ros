@@ -21,7 +21,7 @@ IntersectionTransform::IntersectionTransform(const CameraInfo& cameraInfo, const
 
     pivot_ = tf::Vector3(0.0, 0.0, 0.14);
 
-    intersectionPub_ = nh.advertise<elikos_main::IntersectionArray>(cameraInfo_.name + "/intersections", 1);
+    intersectionPub_ = nh.advertise<elikos_msgs::IntersectionArray>(cameraInfo_.name + "/intersections", 1);
     debugPub_ = nh.advertise<visualization_msgs::MarkerArray>(cameraInfo_.name + "/intersection_debug", 1);
 
     marker_.header.frame_id = "elikos_fcu";
@@ -160,7 +160,7 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<cv
 {
     if (imageIntersections.size() == poseArray.poses.size())
     {
-        elikos_main::IntersectionArray msg;
+        elikos_msgs::IntersectionArray msg;
         msg.header.stamp = state_.getTimeStamp();
         msg.header.frame_id = "elikos_fcu";
 
@@ -168,7 +168,7 @@ void IntersectionTransform::publishTransformedIntersections(const std::vector<cv
 
         for (int i = 0; i < imageIntersections.size(); ++i) 
         {
-            elikos_main::Intersection intersection;
+            elikos_msgs::Intersection intersection;
             intersection.imagePosition.x = imageIntersections[i].x;
             intersection.imagePosition.y = imageIntersections[i].y;
 

@@ -2,7 +2,7 @@
 
 TransformationUnit::TransformationUnit()
 {
-	pub_ = nh_.advertise<elikos_main::TargetRobotArray>("elikos_target_robot_array",1);
+	pub_ = nh_.advertise<elikos_msgs::TargetRobotArray>("elikos_target_robot_array",1);
 	
 	//Parameters
     if (!nh_.getParam("/"+ros::this_node::getName()+"/frame", cameraFrameID_))
@@ -33,8 +33,8 @@ TransformationUnit::TransformationUnit()
   	}
 }
 
-geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_main::RobotRawArray robotArray){
-    elikos_main::TargetRobotArray targetArray;
+geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_msgs::RobotRawArray robotArray){
+	elikos_msgs::TargetRobotArray targetArray;
 
     //results for simulation in rviz
     geometry_msgs::PoseArray results;
@@ -90,7 +90,7 @@ geometry_msgs::PoseArray TransformationUnit::computeTransformForRobots(elikos_ma
 		results.poses.push_back(robotPoseOrigin.pose);
 		//results.poses.push_back(robotPoseFcu.pose);
 
-		elikos_main::TargetRobot target;
+		elikos_msgs::TargetRobot target;
 		target.id = robot.id;
 		target.color = robot.color;
 		target.poseOrigin = robotPoseOrigin;

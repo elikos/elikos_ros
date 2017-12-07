@@ -14,7 +14,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseArray.h>
 #include <visualization_msgs/MarkerArray.h>
-#include "elikos_main/TargetRobotArray.h"
+#include "elikos_msgs/TargetRobotArray.h"
 
 static const double PI = 3.1415;
 
@@ -23,7 +23,7 @@ static const double PI = 3.1415;
  *
  * It acquires the positions of all target robots, then filters which robots
  * would be detected given the info about its cameras, and publishes a 
- * elikos_main::TargetRobotArray message.
+ * elikos_msgs::TargetRobotArray message.
  */
 class SimDetection
 {
@@ -93,7 +93,7 @@ class SimDetection
 
         tf::StampedTransform currentQuadPose_; /**< quad pose */
         std::vector<tf::StampedTransform>* robotsPoses_; /**< targets poses */
-        std::vector<elikos_main::TargetRobot>* detectedRobots_; /**< detected robots */
+        std::vector<elikos_msgs::TargetRobot>* detectedRobots_; /**< detected robots */
 
         std::string tfOrigin_; /**< arena origin tf */
         std::string tfPose_; /**< pose tf */
