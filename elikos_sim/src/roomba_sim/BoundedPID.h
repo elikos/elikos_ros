@@ -36,7 +36,7 @@ class BoundedPID : public control_toolbox::Pid
         ~BoundedPID();
 
         /**
-         * \brief BoundedPID constructor.
+         * \brief Compute next command.
          *
          * \param error : error since last call (error = target - current).
          * \param dt : change in time since last call.
